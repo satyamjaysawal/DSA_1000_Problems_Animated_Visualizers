@@ -1,0 +1,1011 @@
+﻿
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LC 121 — Best Time to Buy and Sell Stock</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+:root{
+  --bg-primary:#FAFAF8; --bg-secondary:#F1EFE8; --bg-tertiary:#E2E0D8; --bg-card:#FFFFFF;
+  --text-primary:#2C2C2A; --text-secondary:#5F5E5A; --text-tertiary:#888780;
+  --border-color:rgba(0,0,0,.11); --border-light:rgba(0,0,0,.06); --border-focus:#534AB7;
+  --accent-indigo:#534AB7; --accent-indigo-bg:#EEEDFE; --accent-indigo-text:#3C3489; --accent-indigo-hover:#4740A0;
+  --accent-teal:#0F6E56; --accent-teal-bg:#E1F5EE; --accent-teal-text:#085041;
+  --accent-red:#E24B4A; --accent-red-bg:#FCEBEB; --accent-red-text:#791F1F;
+  --accent-amber:#B45309; --accent-amber-bg:#FEF3C7; --accent-amber-text:#78350F;
+  --accent-green:#15803D; --accent-green-bg:#DCFCE7; --accent-green-text:#14532D;
+  --syn-keyword:#534AB7; --syn-function:#185FA5; --syn-number:#993C1D; --syn-string:#0F6E56;
+  --active-line-bg:#EEEDFE;
+  --radius-sm:4px; --radius-md:6px; --radius-lg:10px;
+  --font-sans:'DM Sans',system-ui,sans-serif;
+  --font-mono:'JetBrains Mono','Fira Code',monospace;
+  --fs-xs:11px; --fs-sm:12px; --fs-base:14px;
+  --ease:.18s ease;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:var(--bg-primary);color:var(--text-primary);font-family:var(--font-sans);font-size:var(--fs-base)}
+body.no-select{user-select:none}
+::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border-color);border-radius:3px}
+
+.app-shell{display:flex;flex-direction:column;height:100vh;overflow:hidden}
+.problem-card{flex-shrink:0;border-bottom:1px solid var(--border-color);background:var(--bg-card)}
+.pc-header{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:8px 14px;border-bottom:1px solid var(--border-light)}
+.gt-btn{font:700 11px var(--font-sans);padding:5px 10px;background:var(--accent-indigo);color:#fff;border:none;border-radius:99px;cursor:pointer;letter-spacing:.04em}
+.gt-btn:hover{background:var(--accent-indigo-hover)}
+.lc-num{font:700 12px var(--font-mono);color:var(--text-tertiary)}
+.lc-title{font:700 15px var(--font-sans)}
+.lc-diff{font:700 9px var(--font-mono);padding:2px 8px;border-radius:99px;letter-spacing:.06em;background:var(--accent-green-bg);color:var(--accent-green-text);border:1px solid var(--accent-green)}
+.lc-tag{font:600 10px var(--font-mono);padding:2px 8px;border-radius:99px;background:var(--bg-secondary);color:var(--text-secondary);border:1px solid var(--border-color)}
+.pc-header-right{margin-left:auto;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.input-wrap{display:flex;align-items:center;gap:4px}
+.input-wrap label{font:600 10px var(--font-mono);color:var(--text-tertiary)}
+.input-wrap input{font:600 11px var(--font-mono);padding:3px 6px;border:1px solid var(--border-color);border-radius:4px;width:240px}
+.input-wrap input:focus{outline:none;border-color:var(--border-focus)}
+.expected-badge{font:600 10px var(--font-mono);padding:3px 8px;border-radius:4px;background:var(--accent-teal-bg);color:var(--accent-teal-text);border:1px solid var(--accent-teal)}
+.toggle-btn{font-family:system-ui,"Segoe UI Emoji",sans-serif;font:600 10px var(--font-mono);padding:3px 8px;border-radius:4px;background:var(--bg-secondary);border:1px solid var(--border-color);color:var(--text-secondary);cursor:pointer}
+
+.pc-body{display:flex;gap:16px;padding:10px 14px;max-height:34vh;overflow:auto}
+.pc-left{flex:2;min-width:0}.pc-right{flex:1;min-width:0;border-left:1px solid var(--border-light);padding-left:14px}
+.pc-section{margin-bottom:8px}
+.pc-section h4{font:700 11px var(--font-sans);text-transform:uppercase;letter-spacing:.06em;color:var(--text-tertiary);margin-bottom:4px}
+.pc-section p{font-size:12px;line-height:1.55;color:var(--text-secondary)}
+.pc-section code{font:600 11px var(--font-mono);background:var(--bg-secondary);padding:1px 5px;border-radius:3px;color:var(--accent-indigo-text)}
+.pc-section strong{color:var(--text-primary)}
+.concept-block{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
+.concept-card{flex:1;min-width:130px;padding:6px 8px;background:var(--bg-secondary);border-radius:5px;border-left:3px solid var(--accent-indigo);font-size:11px;line-height:1.5}
+.concept-card strong{display:block;color:var(--accent-indigo-text);margin-bottom:2px;font-size:10px;text-transform:uppercase}
+.complexity-row{display:flex;gap:6px;margin-top:4px}
+.cx-chip{font:600 11px var(--font-mono);padding:3px 8px;border-radius:99px;background:var(--accent-indigo-bg);color:var(--accent-indigo-text);border:1px solid var(--accent-indigo)}
+
+.test-chip{display:flex;flex-direction:column;gap:3px;padding:6px 8px;margin-bottom:5px;background:var(--bg-secondary);border-radius:5px;border:1px solid var(--border-color);cursor:pointer;transition:all var(--ease)}
+.test-chip:hover{border-color:var(--accent-indigo);background:var(--accent-indigo-bg)}
+.tc-row{display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+.tc-row code{font:600 10px var(--font-mono);color:var(--text-secondary)}
+.pt-tag{font:600 9px var(--font-mono);padding:1px 5px;border-radius:3px;background:var(--accent-indigo);color:#fff;text-transform:uppercase}
+.tc-exp{font:600 10px var(--font-mono);color:var(--accent-teal-text);margin-left:auto}
+.run-row{display:flex;align-items:center;gap:8px;margin-top:6px}
+.btn-run{font-family:system-ui,"Segoe UI Emoji",sans-serif;font:700 11px var(--font-sans);padding:5px 12px;background:var(--accent-indigo);color:#fff;border:none;border-radius:5px;cursor:pointer}
+.live-output{font:700 12px var(--font-mono);padding:4px 10px;background:var(--accent-green-bg);color:var(--accent-green-text);border-radius:4px;border:1px solid var(--accent-green)}
+
+.main-row{flex:1;display:flex;overflow:hidden;min-height:0}
+.col{display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.col-code{width:33%;min-width:140px;max-width:45vw;background:var(--bg-card);border-right:1px solid var(--border-color)}
+.col-viz{flex:1;min-width:0;background:var(--bg-primary)}
+.section-label{font-family:system-ui,"Segoe UI Emoji",sans-serif;font:700 10px var(--font-sans);text-transform:uppercase;letter-spacing:.08em;color:var(--text-tertiary);padding:8px 12px;border-bottom:1px solid var(--border-light);background:var(--bg-card)}
+
+#codePanel{flex:1;overflow-y:auto;padding:8px 0;font-family:var(--font-mono);font-size:12px;line-height:1.9}
+.code-line{display:flex;padding:0 12px;transition:background var(--ease)}
+.code-line.active{background:var(--active-line-bg);border-left:3px solid var(--accent-indigo);padding-left:9px}
+.code-line .ln{display:inline-block;width:24px;text-align:right;color:var(--text-tertiary);user-select:none;margin-right:10px;font-size:10px}
+.code-content{white-space:pre}
+.code-content .kw{color:var(--syn-keyword);font-weight:600}
+.code-content .fn{color:var(--syn-function)}
+.code-content .num{color:var(--syn-number)}
+.code-content .str{color:var(--syn-string)}
+
+#vizPanel{flex:1;overflow:auto;padding:14px}
+.vars-strip{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.var-chip{font:600 11px var(--font-mono);padding:4px 9px;border-radius:99px;background:var(--bg-card);border:1px solid var(--border-color);color:var(--text-secondary)}
+.var-chip span.k{color:var(--text-tertiary);margin-right:3px}
+.var-chip span.v{color:var(--text-primary);font-weight:700}
+.vc-active{background:var(--accent-indigo-bg);border-color:var(--accent-indigo);color:var(--accent-indigo-text)}
+.vc-active span.v{color:var(--accent-indigo-text)}
+.vc-safe{background:var(--accent-green-bg);border-color:var(--accent-green)}
+.vc-safe span.v{color:var(--accent-green-text)}
+.vc-buy{background:var(--accent-amber-bg);border-color:var(--accent-amber);color:var(--accent-amber-text)}
+.vc-buy span.v{color:var(--accent-amber-text)}
+.vc-bad{background:var(--accent-red-bg);border-color:var(--accent-red);color:var(--accent-red-text)}
+.vc-bad span.v{color:var(--accent-red-text)}
+
+.viz-row{display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap;margin-bottom:14px}
+.viz-card{background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius-md);padding:12px;min-width:240px}
+.viz-card h5{font:700 10px var(--font-sans);text-transform:uppercase;letter-spacing:.06em;color:var(--text-tertiary);margin-bottom:8px;display:flex;align-items:center;gap:5px}
+
+/* ── Stock chart ── */
+.chart-wrap{position:relative;width:100%;background:#0f172a;border-radius:8px;padding:14px 12px 28px 36px;border:2px solid #334155;overflow:visible}
+.chart-svg{display:block;width:100%;height:240px;overflow:visible}
+.chart-bar{stroke-width:0;transition:all .25s}
+.chart-bar.future{fill:#475569;opacity:.55}
+.chart-bar.past{fill:#64748b;opacity:.85}
+.chart-bar.curr{fill:#fbbf24;animation:bar-pulse 1.2s infinite}
+.chart-bar.min{fill:#22c55e}
+.chart-bar.sell-here{fill:#a78bfa;animation:bar-glow 1.5s infinite}
+.chart-bar.win-buy{fill:#22c55e;animation:bar-glow 1.5s infinite}
+.chart-bar.win-sell{fill:#a78bfa;animation:bar-glow 1.5s infinite}
+@keyframes bar-pulse{0%,100%{filter:brightness(1)}50%{filter:brightness(1.35)}}
+@keyframes bar-glow{0%,100%{filter:drop-shadow(0 0 2px currentColor)}50%{filter:drop-shadow(0 0 8px currentColor)}}
+.chart-label{font:700 11px var(--font-mono);fill:#fff}
+.chart-label-min{font:700 10px var(--font-mono);fill:#22c55e}
+.chart-label-sell{font:700 10px var(--font-mono);fill:#a78bfa}
+.chart-label-curr{font:700 10px var(--font-mono);fill:#fbbf24}
+.chart-axis-label{font:600 9px var(--font-mono);fill:#94a3b8}
+.min-line{stroke:#22c55e;stroke-dasharray:4,3;stroke-width:1.5;animation:flow-dash .8s linear infinite}
+@keyframes flow-dash{to{stroke-dashoffset:-14}}
+
+/* ── Decision card ── */
+.decision-card{display:flex;flex-direction:column;gap:8px}
+.dc-row{display:flex;align-items:center;gap:8px;font:600 12px var(--font-mono);flex-wrap:wrap}
+.dc-label{color:var(--text-tertiary);min-width:110px;font-size:11px}
+.dc-val{padding:4px 10px;border-radius:5px;background:var(--bg-secondary);border:1px solid var(--border-color);font-weight:700}
+.dc-val.curr{background:var(--accent-amber-bg);color:var(--accent-amber-text);border-color:var(--accent-amber)}
+.dc-val.minp{background:var(--accent-green-bg);color:var(--accent-green-text);border-color:var(--accent-green)}
+.dc-val.profit-now{background:#EEEDFE;color:var(--accent-indigo-text);border-color:var(--accent-indigo)}
+.dc-val.maxp{background:var(--accent-teal-bg);color:var(--accent-teal-text);border-color:var(--accent-teal)}
+.dc-val.action-buy{background:var(--accent-amber-bg);color:var(--accent-amber-text);border-color:var(--accent-amber);animation:win-pulse 1.5s infinite}
+.dc-val.action-sell{background:var(--accent-indigo-bg);color:var(--accent-indigo-text);border-color:var(--accent-indigo);animation:win-pulse 1.5s infinite}
+.dc-val.action-skip{background:var(--bg-secondary);color:var(--text-tertiary)}
+.dc-val.action-done{background:var(--accent-green-bg);color:var(--accent-green-text);border-color:var(--accent-green)}
+
+/* ── Banner ── */
+.banner{display:flex;align-items:center;gap:8px;padding:8px 14px;border-radius:8px;font:700 13px var(--font-mono);margin-bottom:10px}
+.banner-init{background:var(--bg-secondary);color:var(--text-secondary);border:1px solid var(--border-color)}
+.banner-iter{background:var(--accent-amber-bg);color:var(--accent-amber-text);border:1px solid var(--accent-amber)}
+.banner-buy{background:var(--accent-green-bg);color:var(--accent-green-text);border:1px solid var(--accent-green)}
+.banner-sell{background:var(--accent-indigo-bg);color:var(--accent-indigo-text);border:1px solid var(--accent-indigo);animation:win-pulse 1.5s infinite}
+.banner-done{background:var(--accent-teal-bg);color:var(--accent-teal-text);border:2px solid var(--accent-teal)}
+
+@keyframes pulse-node{0%,100%{box-shadow:0 0 4px var(--accent-indigo)}50%{box-shadow:0 0 14px var(--accent-indigo)}}
+@keyframes win-pulse{0%,100%{box-shadow:0 0 3px rgba(234,179,8,.5)}50%{box-shadow:0 0 10px rgba(234,179,8,.95)}}
+
+.footer-bar{display:flex;flex-shrink:0;border-top:1px solid var(--border-color);background:var(--bg-card)}
+.footer-left{width:33%;min-width:140px;max-width:45vw;display:flex;align-items:center;gap:8px;padding:7px 12px;border-right:1px solid var(--border-light)}
+.footer-right{flex:1;display:flex;align-items:center;gap:6px;padding:7px 14px;flex-wrap:wrap}
+.step-info{font:700 12px var(--font-mono)}
+.action-badge{font-family:system-ui,"Segoe UI Emoji",sans-serif;font:700 10px var(--font-mono);padding:3px 9px;border-radius:99px}
+.action-badge--init,.action-badge--func-def,.action-badge--call,.action-badge--return{background:rgba(130,80,255,.14);color:#3C3489;border:1px solid #8250ff}
+.action-badge--for-check,.action-badge--while-check,.action-badge--if-check{background:rgba(56,139,253,.14);color:#185FA5;border:1px solid #388bfd}
+.action-badge--mark,.action-badge--push,.action-badge--pop,.action-badge--restore,.action-badge--found{background:var(--accent-green-bg);color:var(--accent-green-text);border:1px solid var(--accent-green)}
+.action-badge--remove,.action-badge--prune,.action-badge--fail{background:var(--accent-red-bg);color:var(--accent-red-text);border:1px solid var(--accent-red)}
+.action-badge--exit,.action-badge--skip{background:var(--bg-secondary);color:var(--text-secondary);border:1px solid var(--border-color)}
+
+kbd{font-family:system-ui,"Segoe UI Emoji",sans-serif;font:600 10px var(--font-mono);padding:2px 6px;background:var(--bg-secondary);border:1px solid var(--border-color);border-radius:3px;color:var(--text-secondary)}
+.btn{font-family:system-ui,"Segoe UI Emoji",sans-serif;font:600 12px var(--font-sans);padding:5px 11px;border:1px solid var(--border-color);background:var(--bg-card);border-radius:5px;cursor:pointer;transition:all var(--ease)}
+.btn:hover{background:var(--bg-secondary);border-color:var(--accent-indigo)}
+.btn-primary{background:var(--accent-indigo);color:#fff;border-color:var(--accent-indigo)}
+.btn-primary:hover{background:var(--accent-indigo-hover);color:#fff}
+.btn-fullscreen{font-size:13px;padding:4px 10px}
+.btn-zoom{font-family:system-ui,"Segoe UI Emoji",sans-serif;font:600 11px var(--font-mono);padding:3px 8px;border:1px solid var(--border-color);background:var(--bg-card);color:var(--text-secondary);border-radius:4px;cursor:pointer}
+.btn-zoom:hover{background:var(--bg-secondary)}
+.log-zoom-label{font:600 10px var(--font-mono);color:var(--text-tertiary);min-width:38px;text-align:center}
+.log-toggle-btn{font-family:system-ui,"Segoe UI Emoji",sans-serif;font:600 11px var(--font-mono);padding:4px 9px;border:1px solid var(--accent-indigo);background:var(--accent-indigo-bg);color:var(--accent-indigo-text);border-radius:4px;cursor:pointer}
+.log-toggle-btn--off{background:var(--bg-secondary);border-color:var(--border-color);color:var(--text-tertiary)}
+.footer-sep{width:1px;height:18px;background:var(--border-color);margin:0 4px}
+
+.resize-h{width:5px;background:transparent;cursor:col-resize;position:relative;flex-shrink:0;z-index:5}
+.resize-h::before{content:'';position:absolute;top:0;bottom:0;left:2px;width:1px;background:var(--border-color)}
+.resize-h:hover::before,.resize-h.active::before{background:var(--accent-indigo);width:2px;left:1.5px}
+
+.log-popup{--log-scale:1;position:fixed;bottom:52px;right:14px;width:calc(480px*var(--log-scale));max-width:92vw;max-height:75vh;border-radius:var(--radius-lg);box-shadow:0 10px 32px rgba(0,0,0,.14);border:1px solid var(--border-color);background:var(--bg-card);overflow:hidden;display:flex;flex-direction:column;z-index:100;transition:opacity .15s,transform .15s;transform-origin:bottom right}
+.log-popup--hidden{opacity:0;transform:scale(.92);pointer-events:none}
+.log-popup-body{flex:1;overflow:auto;padding:0}
+.log-popup-body>.log-card{border-radius:0;border:none;border-left:0}
+
+.log-card{border-radius:var(--radius-md);overflow:hidden;border:1px solid var(--border-color);border-left-width:4px;font-size:var(--fs-xs);background:var(--bg-card)}
+.log-card--for-check,.log-card--while-check,.log-card--if-check{border-left-color:#388bfd}
+.log-card--func-def,.log-card--init,.log-card--call,.log-card--return{border-left-color:#8250ff}
+.log-card--mark,.log-card--push,.log-card--pop,.log-card--restore,.log-card--found{border-left-color:#3fb950}
+.log-card--remove,.log-card--prune,.log-card--fail{border-left-color:#f85149}
+.log-card--exit,.log-card--skip{border-left-color:#888780}
+
+.log-card-header{display:flex;align-items:center;gap:6px;padding:8px 10px 6px;background:var(--bg-secondary);border-bottom:1px solid var(--border-light)}
+.log-badge{font-family:system-ui,"Segoe UI Emoji",sans-serif;font:700 10px var(--font-mono);padding:2px 7px;border-radius:99px}
+.log-badge--init,.log-badge--func-def,.log-badge--call,.log-badge--return{background:rgba(130,80,255,.14);color:#3C3489}
+.log-badge--for-check,.log-badge--while-check,.log-badge--if-check{background:rgba(56,139,253,.14);color:#185FA5}
+.log-badge--mark,.log-badge--push,.log-badge--pop,.log-badge--restore,.log-badge--found{background:var(--accent-green-bg);color:var(--accent-green-text)}
+.log-badge--remove,.log-badge--prune,.log-badge--fail{background:var(--accent-red-bg);color:var(--accent-red-text)}
+.log-badge--exit,.log-badge--skip{background:var(--bg-secondary);color:var(--text-secondary)}
+.log-line-ref{font:700 10px var(--font-mono);color:var(--accent-indigo);background:var(--accent-indigo-bg);padding:1px 6px;border-radius:4px;border:1px solid var(--accent-indigo)}
+.log-status-pill{font-family:system-ui,"Segoe UI Emoji",sans-serif;font-size:9px;font-weight:700;padding:2px 7px;border-radius:99px;text-transform:uppercase;margin-left:auto}
+.log-status--success{background:var(--accent-green-bg);color:var(--accent-green-text);border:1px solid var(--accent-green)}
+.log-status--fail{background:var(--accent-red-bg);color:var(--accent-red-text);border:1px solid var(--accent-red)}
+.log-status--skip{background:var(--bg-tertiary);color:var(--text-tertiary);border:1px solid var(--border-color)}
+.log-status--loop{background:rgba(56,139,253,.14);color:#185FA5;border:1px solid #388bfd}
+.log-status--prune{background:var(--accent-red-bg);color:var(--accent-red-text);border:1px solid var(--accent-red)}
+.log-status--info{background:rgba(130,80,255,.14);color:#3C3489;border:1px solid #8250ff}
+
+.log-section{padding:7px 10px;border-bottom:1px dashed var(--border-light)}
+.log-section:last-child{border-bottom:none}
+.log-section-title{font:700 8px var(--font-mono);text-transform:uppercase;letter-spacing:.06em;color:var(--text-tertiary);margin-bottom:3px;display:flex;align-items:center;gap:4px}
+.log-section-title-icon{font-family:system-ui,"Segoe UI Emoji",sans-serif;font-size:11px}
+
+.log-code-snippet{font:600 11px var(--font-mono);background:#0d1117;color:#e6edf3;padding:6px 9px;border-radius:4px;display:block;overflow-x:auto;white-space:pre;border:1px solid #30363d}
+.log-code-snippet .ck{color:#ff7b72}.log-code-snippet .cs{color:#a5d6ff}
+.log-code-snippet .cn{color:#79c0ff}.log-code-snippet .cf{color:#d2a8ff}
+.log-code-snippet .cc{color:#8b949e;font-style:italic}
+
+.log-kv-row{display:flex;flex-wrap:wrap;gap:4px}
+.log-kv{display:inline-flex;align-items:center;gap:3px;font:11px var(--font-mono);padding:2px 7px;border-radius:4px;background:var(--bg-secondary);border:1px solid var(--border-light)}
+.log-kv-key{color:var(--text-tertiary);font-weight:500}
+.log-kv-val{color:var(--text-primary);font-weight:700}
+.log-kv--in{background:rgba(56,139,253,.08);border-color:rgba(56,139,253,.3)}
+.log-kv--out{background:rgba(63,185,80,.08);border-color:rgba(63,185,80,.4)}
+.log-kv--out .log-kv-val{color:#15803D}
+.log-kv--changed{background:rgba(180,83,9,.10);border-color:rgba(180,83,9,.4)}
+.log-kv--changed .log-kv-val{color:var(--accent-amber-text)}
+
+.log-verdict{display:flex;align-items:center;gap:6px;font:600 11px var(--font-mono);padding:5px 8px;border-radius:5px;background:var(--bg-secondary);border:1px solid var(--border-light)}
+.log-verdict--true{background:var(--accent-green-bg);border-color:var(--accent-green);color:var(--accent-green-text)}
+.log-verdict--false{background:var(--accent-red-bg);border-color:var(--accent-red);color:var(--accent-red-text)}
+
+.log-analogy{font:italic 11px var(--font-sans);color:var(--text-secondary);background:#FFF8E7;border:1px solid #FBE8A6;border-left:3px solid var(--accent-amber);padding:6px 9px;border-radius:4px;line-height:1.55}
+.log-analogy strong{color:var(--accent-amber-text);font-style:normal;font-weight:700}
+.log-why{font-size:11px;line-height:1.55;color:var(--text-primary);padding:4px 0}
+.log-why strong{color:var(--accent-indigo-text)}
+.log-why code{font:600 10px var(--font-mono);background:var(--bg-secondary);padding:1px 4px;border-radius:3px;color:var(--accent-indigo-text)}
+
+.legend{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px;padding:0 4px}
+.legend span{display:inline-flex;align-items:center;gap:5px;font-size:10px;color:var(--text-secondary)}
+.legend i{display:inline-block;width:14px;height:14px;border-radius:3px}
+</style>
+</head>
+<body>
+<div class="app-shell">
+
+  <!-- ─── PROBLEM CARD ─── -->
+  <div class="problem-card" id="problemCard">
+    <div class="pc-header">
+      <a href="../00_HomePage/gt_learn_homepage.html" class="gt-btn">GT LEARN</a>
+      <span class="lc-num">#121</span>
+      <span class="lc-title">📈 Best Time to Buy and Sell Stock</span>
+      <span class="lc-diff">EASY</span>
+      <span class="lc-tag">Array</span>
+      <span class="lc-tag">DP</span>
+      <span class="lc-tag">Greedy</span>
+      <div class="pc-header-right">
+        <div class="input-wrap"><label>prices</label><input id="inPrices" type="text" value="[7,1,5,3,6,4]"></div>
+        <span class="expected-badge" id="expBadge">expected: 5</span>
+        <button class="toggle-btn" type="button" onclick="toggleProblem()" id="toggleBtn">▲ Hide</button>
+      </div>
+    </div>
+
+    <div class="pc-body" id="pcBody">
+      <div class="pc-left">
+        <div class="pc-section">
+          <h4>📝 Problem Statement</h4>
+          <p>Diya gaya array <code>prices</code> jahan <code>prices[i]</code> us din ka stock price hai. Sirf <strong>ek transaction</strong> allowed hai — pehle <strong>buy</strong>, baad mein <strong>sell</strong> (sell day &gt; buy day). <strong>Maximum profit</strong> nikalo. Agar koi profit possible nahi, return <code>0</code>.</p>
+        </div>
+        <div class="pc-section">
+          <h4>🧠 Solving Approach</h4>
+          <p><strong>Single-pass greedy</strong> approach: array ko left-to-right scan karte hue do cheezein track karo — ab tak ka <strong>minimum price</strong> (best buy day) aur <strong>max profit</strong>. Har day pe sochna: "agar yahan se becho, kitna profit?" = <code>price - minPrice</code>. Iska maximum hi answer hai.</p>
+        </div>
+        <div class="pc-section">
+          <h4>🎯 Core Concepts</h4>
+          <div class="concept-block">
+            <div class="concept-card"><strong>Min So Far</strong>Har step pe lowest seen price track — yahi best "buy day" candidate.</div>
+            <div class="concept-card"><strong>Profit Calc</strong><code>price[i] - minSoFar</code> = current best sell ka profit.</div>
+            <div class="concept-card"><strong>Max Tracking</strong>Sabhi candidate profits ka max hi <strong>final answer</strong> banta hai.</div>
+          </div>
+        </div>
+        <div class="pc-section">
+          <h4>⏱ Complexity</h4>
+          <div class="complexity-row">
+            <span class="cx-chip">Time: O(n)</span>
+            <span class="cx-chip">Space: O(1)</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="pc-right">
+        <h4 style="font:700 11px var(--font-sans);text-transform:uppercase;letter-spacing:.06em;color:var(--text-tertiary);margin-bottom:6px">🧪 Test Cases</h4>
+        <div class="test-chip" onclick="loadTest('[7,1,5,3,6,4]', '5', 'classic profit')">
+          <div class="tc-row"><span class="pt-tag">T1</span><code>[7,1,5,3,6,4]</code></div>
+          <div class="tc-row"><span style="font:11px var(--font-sans);color:var(--text-secondary)">buy@1, sell@6 → 5</span><span class="tc-exp">→ 5</span></div>
+        </div>
+        <div class="test-chip" onclick="loadTest('[7,6,4,3,1]', '0', 'monotone decreasing')">
+          <div class="tc-row"><span class="pt-tag">T2</span><code>[7,6,4,3,1]</code></div>
+          <div class="tc-row"><span style="font:11px var(--font-sans);color:var(--text-secondary)">all decreasing — no profit</span><span class="tc-exp">→ 0</span></div>
+        </div>
+        <div class="test-chip" onclick="loadTest('[1,2,3,4,5]', '4', 'monotone increasing')">
+          <div class="tc-row"><span class="pt-tag">T3</span><code>[1,2,3,4,5]</code></div>
+          <div class="tc-row"><span style="font:11px var(--font-sans);color:var(--text-secondary)">always rising — buy first, sell last</span><span class="tc-exp">→ 4</span></div>
+        </div>
+        <div class="test-chip" onclick="loadTest('[2,4,1,7]', '6', 'late dip + spike')">
+          <div class="tc-row"><span class="pt-tag">T4</span><code>[2,4,1,7]</code></div>
+          <div class="tc-row"><span style="font:11px var(--font-sans);color:var(--text-secondary)">min updates after early profit</span><span class="tc-exp">→ 6</span></div>
+        </div>
+        <div class="test-chip" onclick="loadTest('[3]', '0', 'single day')">
+          <div class="tc-row"><span class="pt-tag">T5</span><code>[3]</code></div>
+          <div class="tc-row"><span style="font:11px var(--font-sans);color:var(--text-secondary)">single day — can't sell</span><span class="tc-exp">→ 0</span></div>
+        </div>
+        <div class="run-row">
+          <button class="btn-run" type="button" onclick="resetWithInput()">▶ Run</button>
+          <span class="live-output" id="liveOutput">—</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="main-row">
+    <div class="col col-code" id="col1">
+      <div class="section-label">📜 Python Code</div>
+      <div id="codePanel"></div>
+    </div>
+    <div class="resize-h" id="resizeH1"></div>
+    <div class="col col-viz">
+      <div class="section-label">📊 Visualization</div>
+      <div id="vizPanel"></div>
+    </div>
+  </div>
+
+  <div class="footer-bar">
+    <div class="footer-left" id="footerLeft">
+      <span id="stepInfo" class="step-info">0/0</span>
+      <span id="actionBadge" class="action-badge"></span>
+    </div>
+    <div class="footer-right">
+      <kbd>←</kbd><kbd>→</kbd><kbd>R</kbd>
+      <button class="btn" type="button" onclick="resetStep()">↺</button>
+      <button class="btn" type="button" onclick="stepBy(-1)">◀</button>
+      <button class="btn btn-primary" type="button" onclick="stepBy(1)">▶ Next</button>
+      <span class="footer-sep"></span>
+      <button id="logToggleBtn" class="log-toggle-btn" type="button" onclick="toggleLogPreview()">📋 ON</button>
+      <button class="btn-zoom" type="button" onclick="logZoom(-1)">−</button>
+      <span id="logZoomLabel" class="log-zoom-label">100%</span>
+      <button class="btn-zoom" type="button" onclick="logZoom(1)">+</button>
+      <button class="btn-zoom" type="button" onclick="logZoomReset()">↺</button>
+      <span class="footer-sep"></span>
+      <button class="btn btn-fullscreen" type="button" onclick="toggleFullscreen()">⛶</button>
+    </div>
+  </div>
+</div>
+
+<div class="log-popup" id="logPopup">
+  <div class="log-popup-body" id="logPopupBody"></div>
+</div>
+
+<script>
+/* ============ PYTHON CODE ============ */
+var codeLines = [
+  "def maxProfit(prices):",
+  "    min_price = float('inf')",
+  "    max_profit = 0",
+  "    for i in range(len(prices)):",
+  "        if prices[i] < min_price:",
+  "            min_price = prices[i]",
+  "        elif prices[i] - min_price > max_profit:",
+  "            max_profit = prices[i] - min_price",
+  "    return max_profit"
+];
+
+/* ============ STATE ============ */
+var steps=[], currentStep=0, codeWidthUserSet=false, curResult=null;
+var logEnabled=true, logZoomLevel=100;
+
+var LOG_BADGE = {
+  "func-def":"📌 DEF","init":"⚙️ INIT","call":"📞 CALL","return":"🏆 RETURN",
+  "for-check":"🔁 FOR","while-check":"🔁 WHILE","if-check":"🔎 IF",
+  "mark":"✅ MARK","push":"⬆ PUSH","pop":"⬇ POP","restore":"↩ RESTORE","found":"🎉 FOUND",
+  "remove":"✏️ EDIT","prune":"✂️ PRUNE","fail":"❌ FAIL","exit":"🔚 EXIT","skip":"⏭ SKIP"
+};
+var BADGE_LABEL = {
+  "func-def":"DEF","init":"INIT","call":"CALL","return":"RETURN",
+  "for-check":"FOR","while-check":"WHILE","if-check":"IF",
+  "mark":"MARK","push":"PUSH","pop":"POP","restore":"RESTORE","found":"FOUND",
+  "remove":"EDIT","prune":"PRUNE","fail":"FAIL","exit":"EXIT","skip":"SKIP"
+};
+
+/* ============ CODE RENDERER ============ */
+function renderCode(){
+  var p = document.getElementById('codePanel');
+  p.innerHTML = codeLines.map(function(raw,i){
+    var h = raw;
+    h = h.replace(/("[^"]*"|'[^']*')/g, '\x01STR\x02$1\x03');
+    h = h.replace(/\b(def|for|in|if|return|break|continue|and|else|elif|True|False|None|not|or|while|lambda)\b/g, '\x01KW\x02$1\x03');
+    h = h.replace(/\b(len|range|int|str|list|append|pop|sorted|min|max|sum|abs|enumerate|zip|print|set|add|float)\b/g, '\x01FN\x02$1\x03');
+    h = h.replace(/\b(\d+)\b/g, '\x01NUM\x02$1\x03');
+    h = h.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    h = h.replace(/\x01([A-Z]+)\x02/g, function(_,c){
+      return '<span class="'+(c==='KW'?'kw':c==='FN'?'fn':c==='NUM'?'num':'str')+'">';
+    }).replace(/\x03/g,'</span>');
+    return '<div class="code-line" data-line="'+i+'"><span class="ln">'+(i+1)+'</span><span class="code-content">'+h+'</span></div>';
+  }).join('');
+}
+
+/* ============ MINI HIGHLIGHTER ============ */
+function hlCode(raw){
+  var h = raw;
+  h = h.replace(/("[^"]*"|'[^']*')/g, '\x01s\x02$1\x03');
+  h = h.replace(/\b(def|for|in|if|return|break|continue|and|else|elif|True|False|None|not|or|while|lambda)\b/g, '\x01k\x02$1\x03');
+  h = h.replace(/\b(len|range|int|str|list|append|pop|sorted|min|max|sum|abs|enumerate|zip|print|set|add|float)\b/g, '\x01f\x02$1\x03');
+  h = h.replace(/(?<![.\w"\x01\x02\x03])(-?\d+)\b/g, '\x01n\x02$1\x03');
+  h = h.replace(/(#.*$)/gm, '\x01c\x02$1\x03');
+  h = h.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  h = h.replace(/\x01([a-z])\x02/g, function(_,c){return '<span class="c'+c+'">';}).replace(/\x03/g,'</span>');
+  return h;
+}
+
+/* ============ richLog ============ */
+function richLog(opts){
+  var statusMap = {success:"✅ Success",fail:"❌ Failed",skip:"⏭ Skipped",loop:"🔁 Loop iter",prune:"✂️ Pruned",info:"ℹ️ Info"};
+  var status = opts.status || "info";
+  var html = '<div class="log-card log-card--'+opts.action+'">';
+  html += '<div class="log-card-header">';
+  html += '<span class="log-badge log-badge--'+opts.action+'">'+(LOG_BADGE[opts.action]||opts.action)+'</span>';
+  html += '<span class="log-line-ref">L'+(opts.line+1)+'</span>';
+  html += '<span class="log-status-pill log-status--'+status+'">'+statusMap[status]+'</span></div>';
+  if(opts.code){
+    html += '<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">📜</span>Code Executing</div>';
+    html += '<code class="log-code-snippet">'+hlCode(opts.code)+'</code></div>';
+  }
+  if(opts.inputs && opts.inputs.length){
+    html += '<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">📥</span>Input Values (line is using these)</div><div class="log-kv-row">';
+    opts.inputs.forEach(function(kv){
+      html += '<span class="log-kv log-kv--in"><span class="log-kv-key">'+kv.k+'</span>=<span class="log-kv-val">'+kv.v+'</span></span>';
+    });
+    html += '</div></div>';
+  }
+  if(opts.outputs && opts.outputs.length){
+    html += '<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">📤</span>Output / State After Line</div><div class="log-kv-row">';
+    opts.outputs.forEach(function(kv){
+      var cls = kv.changed ? 'log-kv--changed':'log-kv--out';
+      html += '<span class="log-kv '+cls+'"><span class="log-kv-key">'+kv.k+'</span>=<span class="log-kv-val">'+kv.v+'</span></span>';
+    });
+    html += '</div></div>';
+  }
+  if(opts.verdict){
+    var vCls = opts.verdictTrue===true?'log-verdict--true':(opts.verdictTrue===false?'log-verdict--false':'');
+    var vIcon = opts.verdictTrue===true?'✓':(opts.verdictTrue===false?'✗':'•');
+    html += '<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">⚖️</span>Verdict / Decision</div>';
+    html += '<div class="log-verdict '+vCls+'">'+vIcon+' '+opts.verdict+'</div></div>';
+  }
+  if(opts.why){
+    html += '<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">💡</span>Why This Happens</div><div class="log-why">'+opts.why+'</div></div>';
+  }
+  if(opts.analogy){
+    html += '<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">🎭</span>Real-Life Analogy</div><div class="log-analogy">'+opts.analogy+'</div></div>';
+  }
+  html += '</div>';
+  return html;
+}
+
+/* ============ INPUT PARSING ============ */
+function parseArr(s){
+  s = s.trim();
+  if(!s) return [];
+  s = s.replace(/^\[|\]$/g,'');
+  if(!s.trim()) return [];
+  return s.split(',').map(function(x){return parseInt(x.trim(),10);}).filter(function(x){return !isNaN(x);});
+}
+
+/* ============ buildSteps ============ */
+function buildSteps(p){
+  var st=[], MAX=2000;
+  var prices = p.prices.slice();
+  var n = prices.length;
+  var INF = "∞";
+  var minPrice = null;       // numeric or null (Infinity sentinel)
+  var maxProfit = 0;
+  var i = -1;
+  var phase = "init";        // init | iter | check | min-update | profit-update | skip-elif | done
+  var minPriceIdx = -1;      // index where current min was set
+  var winBuyIdx = -1;        // best-profit buy day (set when sell triggers)
+  var winSellIdx = -1;       // best-profit sell day
+  var lastWinProfit = 0;     // last recorded best profit value
+
+  function fmtMin(){ return minPrice===null ? INF : minPrice; }
+  function snap(extra){
+    return Object.assign({
+      prices: prices.slice(), n: n,
+      minPrice: minPrice, maxProfit: maxProfit,
+      i: i, phase: phase,
+      minPriceIdx: minPriceIdx, winBuyIdx: winBuyIdx, winSellIdx: winSellIdx,
+      lastWinProfit: lastWinProfit
+    }, extra||{});
+  }
+  function push(o){ if(st.length>=MAX) return; st.push(Object.assign({line:0,action:"init",logHTML:""}, snap(o))); }
+
+  // ── L0: function def ──
+  push({
+    line:0, action:"func-def",
+    logHTML: richLog({
+      line:0, action:"func-def",
+      code:"def maxProfit(prices):",
+      status:"info",
+      inputs:[{k:"prices",v:JSON.stringify(prices)},{k:"len(prices)",v:n}],
+      why:"Function start — <code>prices</code> array <strong>"+JSON.stringify(prices)+"</strong> mila. Hume <strong>1 buy + 1 sell</strong> ka maximum profit nikalna hai.",
+      analogy:"Tum stock market trader ho — <strong>"+n+" din ka chart</strong> diya hai. Sirf ek baar khareed-bech karke <strong>maximum kamai</strong> nikalni hai."
+    })
+  });
+
+  // ── L1: min_price = float('inf') ──
+  push({
+    line:1, action:"init",
+    logHTML: richLog({
+      line:1, action:"init",
+      code:"min_price = float('inf')",
+      status:"success",
+      outputs:[{k:"min_price",v:"∞ (infinity)",changed:true}],
+      why:"<code>min_price</code> ko <strong>infinity</strong> set kiya. Yeh sentinel value hai — koi bhi real price isse chhoti hi hogi, toh first iteration mein automatically update ho jayegi.",
+      analogy:"Cricket scoreboard pe <strong>'lowest score'</strong> ka column blank — pehla batsman aate hi update ho jaayega. Bilkul wahi logic."
+    })
+  });
+
+  // ── L2: max_profit = 0 ──
+  push({
+    line:2, action:"init",
+    logHTML: richLog({
+      line:2, action:"init",
+      code:"max_profit = 0",
+      status:"success",
+      outputs:[{k:"max_profit",v:0,changed:true}],
+      why:"<code>max_profit</code> ko <strong>0</strong> se start kiya. Agar koi profit hi possible nahi (jaise descending prices), toh 0 hi return hoga. Bilkul safe default.",
+      analogy:"<strong>Bank account starting balance: ₹0</strong>. Profit aaya toh add karenge, nahi aaya toh khaata zero hi rahega."
+    })
+  });
+
+  // ── L3: for i in range(len(prices)) ──
+  if(n === 0){
+    phase = "done";
+    push({
+      line:3, action:"skip",
+      logHTML: richLog({
+        line:3, action:"skip",
+        code:"for i in range(len(prices)):  # range(0) — empty",
+        status:"skip",
+        inputs:[{k:"len(prices)",v:0}],
+        verdict:"range(0) is empty → loop body skipped",
+        verdictTrue:false,
+        why:"Array <strong>khaali</strong> hai — koi din hi nahi. Loop body bilkul execute nahi hogi. Direct <code>L9</code> jayenge.",
+        analogy:"Stock chart pe <strong>koi data point hi nahi</strong> — kya bechoge? Seedha return 0."
+      })
+    });
+  } else {
+    for(var idx=0; idx<n; idx++){
+      i = idx;
+      var curPrice = prices[i];
+      phase = "iter";
+
+      // ── L3 iteration ──
+      push({
+        line:3, action:"for-check",
+        logHTML: richLog({
+          line:3, action:"for-check",
+          code:"for i in range(len(prices)): i="+i+"  # prices["+i+"]="+curPrice,
+          status:"loop",
+          inputs:[{k:"i",v:i},{k:"len(prices)",v:n},{k:"prices["+i+"]",v:curPrice}],
+          outputs:[{k:"i",v:i,changed:true}],
+          verdict:"i ("+i+") < "+n+" → True",
+          verdictTrue:true,
+          why:"Loop ka <strong>"+(i+1)+"-th iteration</strong> — <strong>day "+i+"</strong> ka price <code>"+curPrice+"</code>. Ab decide karna hai: yeh new minimum hai (buy candidate) ya beach do?",
+          analogy:"Trader bhai — <strong>din "+i+"</strong> aa gaya, screen pe price <strong>₹"+curPrice+"</strong>. Buy karein, sell karein, ya wait karein?"
+        })
+      });
+
+      // ── L4: if prices[i] < min_price ──
+      var isNewMin = (minPrice === null) || (curPrice < minPrice);
+      var minStr = fmtMin();
+      phase = isNewMin ? "min-update" : "check";
+
+      push({
+        line:4, action:"if-check",
+        logHTML: richLog({
+          line:4, action:"if-check",
+          code:"if prices["+i+"] < min_price:  # "+curPrice+" < "+minStr,
+          status: isNewMin ? "success" : "skip",
+          inputs:[{k:"prices["+i+"]",v:curPrice},{k:"min_price",v:minStr}],
+          verdict: curPrice+" < "+minStr+" → "+(isNewMin?"True":"False"),
+          verdictTrue: isNewMin,
+          why: isNewMin
+            ? "<strong>Naya minimum mil gaya!</strong> <code>"+curPrice+"</code> abhi tak ki sabse low price hai. Yahi ab humara <strong>best buy candidate</strong> hai."
+            : "<code>"+curPrice+"</code> previous min <code>"+minStr+"</code> se chhota nahi hai. Toh min update nahi hoga — <code>elif</code> branch check karenge.",
+          analogy: isNewMin
+            ? "Stock <strong>aur sasta</strong> ho gaya — pehle se bhi neeche! <strong>Buy ka best moka</strong> ab hai. Memory mein note kar lo."
+            : "Price <strong>kuch zyada</strong> hai aaj — buy candidate update nahi karna. Dekho profit ka angle se kya banta hai."
+        })
+      });
+
+      if(isNewMin){
+        // ── L5: min_price = prices[i] ──
+        var oldMin = minStr;
+        minPrice = curPrice;
+        minPriceIdx = i;
+        push({
+          line:5, action:"mark",
+          logHTML: richLog({
+            line:5, action:"mark",
+            code:"min_price = prices["+i+"]  # min_price: "+oldMin+" → "+curPrice,
+            status:"success",
+            inputs:[{k:"prices["+i+"]",v:curPrice},{k:"min_price (old)",v:oldMin}],
+            outputs:[{k:"min_price (new)",v:curPrice,changed:true},{k:"buy day",v:"index "+i}],
+            why:"<code>min_price</code> ko <strong>"+oldMin+" → "+curPrice+"</strong> update kiya. Ab agar future mein koi din zyada price aaya, profit calc isi naye min se hoga.",
+            analogy:"Notebook mein lowest price <strong>'₹"+curPrice+"' (day "+i+")</strong> likh diya. Agar baad mein koi din mehenga aaya, isi se ghata-jod karenge."
+          })
+        });
+      } else {
+        // ── L6: elif prices[i] - min_price > max_profit ──
+        var curProfit = curPrice - minPrice;
+        var isBetter = curProfit > maxProfit;
+        phase = isBetter ? "profit-update" : "skip-elif";
+
+        push({
+          line:6, action:"if-check",
+          logHTML: richLog({
+            line:6, action:"if-check",
+            code:"elif prices["+i+"] - min_price > max_profit:  # "+curPrice+" - "+minPrice+" = "+curProfit+" > "+maxProfit,
+            status: isBetter ? "success" : "skip",
+            inputs:[
+              {k:"prices["+i+"]",v:curPrice},
+              {k:"min_price",v:minPrice},
+              {k:"current_profit",v:curProfit},
+              {k:"max_profit",v:maxProfit}
+            ],
+            verdict: curProfit+" > "+maxProfit+" → "+(isBetter?"True":"False"),
+            verdictTrue: isBetter,
+            why: isBetter
+              ? "<strong>Better profit possible!</strong> Aaj sell karein toh <code>"+curPrice+" - "+minPrice+" = ₹"+curProfit+"</code> profit — yeh previous best <code>"+maxProfit+"</code> se zyada hai."
+              : "Aaj ka profit <code>"+curProfit+"</code> previous max <code>"+maxProfit+"</code> se <strong>zyada nahi</strong>. Best record nahi tootega — skip.",
+            analogy: isBetter
+              ? "<strong>Naya record!</strong> Pehle "+maxProfit+" ki kamai thi, ab "+curProfit+". Ye day "+i+" pe sell karne se hi best — note karo!"
+              : "Aaj sell karne se sirf "+curProfit+" milega — previous "+maxProfit+" se kam. <strong>Bekaar deal</strong> — skip kar do."
+          })
+        });
+
+        if(isBetter){
+          // ── L7: max_profit = prices[i] - min_price ──
+          var oldProfit = maxProfit;
+          maxProfit = curProfit;
+          winBuyIdx = minPriceIdx;
+          winSellIdx = i;
+          lastWinProfit = curProfit;
+          push({
+            line:7, action:"found",
+            logHTML: richLog({
+              line:7, action:"found",
+              code:"max_profit = prices["+i+"] - min_price  # max_profit: "+oldProfit+" → "+curProfit,
+              status:"success",
+              inputs:[{k:"prices["+i+"]",v:curPrice},{k:"min_price",v:minPrice}],
+              outputs:[
+                {k:"max_profit (old)",v:oldProfit},
+                {k:"max_profit (new)",v:curProfit,changed:true},
+                {k:"best buy day",v:"index "+winBuyIdx+" @ "+prices[winBuyIdx]},
+                {k:"best sell day",v:"index "+winSellIdx+" @ "+prices[winSellIdx]}
+              ],
+              why:"<strong>🎉 Best profit updated!</strong> <code>"+oldProfit+" → "+curProfit+"</code>. Buy day "+winBuyIdx+" (₹"+prices[winBuyIdx]+"), sell day "+winSellIdx+" (₹"+prices[winSellIdx]+"). Aage chal kar agar isse better mila toh phir update.",
+              analogy:"Trader ne diary mein likha: <strong>'Buy day "+winBuyIdx+" @ ₹"+prices[winBuyIdx]+", sell day "+winSellIdx+" @ ₹"+prices[winSellIdx]+", profit ₹"+curProfit+"!'</strong> Personal record toot gaya!"
+            })
+          });
+        }
+      }
+    }
+
+    // ── L3 loop EXIT ──
+    push({
+      line:3, action:"exit",
+      logHTML: richLog({
+        line:3, action:"exit",
+        code:"# for-loop exit (i reached "+n+")",
+        status:"info",
+        inputs:[{k:"final i",v:n},{k:"len(prices)",v:n}],
+        verdict:"i ("+n+") < "+n+" → False",
+        verdictTrue:false,
+        outputs:[{k:"min_price (final)",v:minPrice},{k:"max_profit (final)",v:maxProfit}],
+        why:"Saare <strong>"+n+" days</strong> scan ho gaye. Loop natural exit. Final answer <code>max_profit = "+maxProfit+"</code> ready hai.",
+        analogy:"<strong>Trading session khatam!</strong> Saare days ka chart dekh liya — ab final report banao."
+      })
+    });
+  }
+
+  // ── L8: return max_profit ──
+  phase = "done";
+  curResult = maxProfit;
+  push({
+    line:8, action:"return",
+    logHTML: richLog({
+      line:8, action:"return",
+      code:"return max_profit  # "+maxProfit,
+      status:"success",
+      inputs:[{k:"max_profit",v:maxProfit}],
+      outputs:[{k:"return",v:maxProfit,changed:true}],
+      why:"<strong>🏆 Final answer:</strong> <code>"+maxProfit+"</code>. " + (maxProfit > 0
+        ? "Buy day <code>"+winBuyIdx+"</code> @ ₹"+prices[winBuyIdx]+", sell day <code>"+winSellIdx+"</code> @ ₹"+prices[winSellIdx]+"."
+        : "Koi profitable trade nahi mila — ya toh array khaali thi ya prices monotone decreasing."),
+      analogy: maxProfit > 0
+        ? "<strong>Final cheque ₹"+maxProfit+"!</strong> Trader ne best buy-sell pair use karke account credit kar diya. Game over."
+        : "<strong>Zero profit</strong> — koi opportunity nahi mili. Trader ne paise safe rakhe, koi loss nahi hua."
+    })
+  });
+
+  return st;
+}
+
+/* ============ VARS STRIP ============ */
+function buildVars(s){
+  var chips=[];
+  function chip(k,v,cls){ chips.push('<span class="var-chip '+(cls||'')+'"><span class="k">'+k+':</span><span class="v">'+v+'</span></span>'); }
+
+  var phaseLabel = {
+    "init":"Setup",
+    "iter":"Inspecting day",
+    "check":"Checking elif",
+    "min-update":"💰 New min!",
+    "profit-update":"🎉 Better profit!",
+    "skip-elif":"Skip — no improvement",
+    "done":"🏁 Done"
+  };
+  var phaseCls = "vc-active";
+  if(s.phase==="min-update") phaseCls="vc-buy";
+  else if(s.phase==="profit-update" || s.phase==="done") phaseCls="vc-safe";
+  else if(s.phase==="skip-elif") phaseCls="";
+
+  chip("phase", phaseLabel[s.phase] || s.phase, phaseCls);
+  chip("n", s.n);
+  if(s.i >= 0) chip("i", s.i, "vc-active");
+  if(s.i >= 0) chip("prices[i]", s.prices[s.i], "vc-active");
+  chip("min_price", s.minPrice===null ? "∞" : s.minPrice, s.minPrice!==null ? "vc-buy" : "");
+  chip("max_profit", s.maxProfit, s.maxProfit > 0 ? "vc-safe" : "");
+  return '<div class="vars-strip">'+chips.join('')+'</div>';
+}
+
+/* ============ STOCK CHART (SVG) ============ */
+function chartCard(s){
+  if(s.n === 0){
+    return '<div style="color:#94a3b8;font:italic 12px var(--font-sans);text-align:center;padding:30px;background:#0f172a;border-radius:8px">📭 prices array is empty — nothing to chart</div>';
+  }
+  var maxVal = Math.max.apply(null, s.prices);
+  var W = Math.max(360, s.n * 56);
+  var H = 240;
+  var padL = 36, padR = 12, padT = 14, padB = 28;
+  var chartW = W - padL - padR;
+  var chartH = H - padT - padB;
+  var barW = chartW / s.n * 0.75;
+  var gap = chartW / s.n * 0.25;
+  var slot = chartW / s.n;
+
+  function xOf(idx){ return padL + idx*slot + slot/2 - barW/2; }
+  function hOf(val){ return Math.max(4, (val/maxVal) * chartH); }
+  function yOf(val){ return padT + chartH - hOf(val); }
+
+  var svg = '<svg class="chart-svg" viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="xMidYMid meet">';
+
+  // Y-axis baseline
+  svg += '<line x1="'+padL+'" y1="'+(padT+chartH)+'" x2="'+(W-padR)+'" y2="'+(padT+chartH)+'" stroke="#334155" stroke-width="1"/>';
+
+  // Min-price horizontal dashed line
+  if(s.minPrice !== null && s.minPrice !== undefined){
+    var minY = yOf(s.minPrice);
+    svg += '<line class="min-line" x1="'+padL+'" y1="'+minY+'" x2="'+(W-padR)+'" y2="'+minY+'"/>';
+    svg += '<text class="chart-label-min" x="'+(padL-4)+'" y="'+(minY+3)+'" text-anchor="end">min</text>';
+  }
+
+  // Bars
+  for(var k=0; k<s.n; k++){
+    var x = xOf(k);
+    var h = hOf(s.prices[k]);
+    var y = yOf(s.prices[k]);
+    var cls = "chart-bar";
+    var isWinPath = (s.phase==="done" && s.lastWinProfit > 0);
+    if(isWinPath && k === s.winBuyIdx) cls += " win-buy";
+    else if(isWinPath && k === s.winSellIdx) cls += " win-sell";
+    else if(s.phase!=="init" && k === s.i){
+      if(s.phase==="profit-update") cls += " sell-here";
+      else if(s.phase==="min-update") cls += " min";
+      else cls += " curr";
+    }
+    else if(s.phase!=="init" && k === s.minPriceIdx && s.i > s.minPriceIdx) cls += " min";
+    else if(s.i >= 0 && k < s.i) cls += " past";
+    else if(s.i >= 0 && k > s.i) cls += " future";
+    else cls += " past";
+
+    svg += '<rect class="'+cls+'" x="'+x+'" y="'+y+'" width="'+barW+'" height="'+h+'" rx="3"/>';
+    // Value on top
+    svg += '<text class="chart-label" x="'+(x+barW/2)+'" y="'+(y-4)+'" text-anchor="middle">'+s.prices[k]+'</text>';
+    // Day index at bottom
+    svg += '<text class="chart-axis-label" x="'+(x+barW/2)+'" y="'+(padT+chartH+14)+'" text-anchor="middle">d'+k+'</text>';
+  }
+
+  // "BUY" / "SELL" labels on win path
+  if(s.phase==="done" && s.lastWinProfit > 0){
+    var bx = xOf(s.winBuyIdx) + barW/2;
+    var sx = xOf(s.winSellIdx) + barW/2;
+    var labelY = padT + chartH + 24;
+    svg += '<text class="chart-label-min" x="'+bx+'" y="'+labelY+'" text-anchor="middle">⬆ BUY</text>';
+    svg += '<text class="chart-label-sell" x="'+sx+'" y="'+labelY+'" text-anchor="middle">⬇ SELL</text>';
+  } else if(s.phase==="profit-update" || s.phase==="min-update"){
+    var ux = xOf(s.i) + barW/2;
+    var ulabel = s.phase==="min-update" ? "📍 BUY?" : "💰 SELL!";
+    svg += '<text class="chart-label-curr" x="'+ux+'" y="'+(padT+chartH+24)+'" text-anchor="middle">'+ulabel+'</text>';
+  }
+
+  svg += '</svg>';
+
+  var legend = '<div class="legend">';
+  legend += '<span><i style="background:#fbbf24"></i>Current day</span>';
+  legend += '<span><i style="background:#22c55e"></i>min_price</span>';
+  legend += '<span><i style="background:#a78bfa"></i>Sell candidate</span>';
+  legend += '<span><i style="background:#64748b"></i>Past</span>';
+  legend += '<span><i style="background:#475569;opacity:.55"></i>Future</span>';
+  legend += '</div>';
+
+  return '<div class="chart-wrap">'+svg+'</div>'+legend;
+}
+
+/* ============ DECISION CARD ============ */
+function decisionCard(s){
+  var html = '<div class="decision-card">';
+  if(s.i < 0){
+    html += '<div style="font:italic 11px var(--font-sans);color:var(--text-tertiary);padding:6px 0">Iteration shuru hone ka intezaar…</div>';
+    html += '<div class="dc-row"><span class="dc-label">min_price</span><span class="dc-val">'+(s.minPrice===null?"∞":s.minPrice)+'</span></div>';
+    html += '<div class="dc-row"><span class="dc-label">max_profit</span><span class="dc-val maxp">'+s.maxProfit+'</span></div>';
+  } else {
+    var p = s.prices[s.i];
+    var profitNow = s.minPrice===null ? "—" : (p - s.minPrice);
+    html += '<div class="dc-row"><span class="dc-label">today (i='+s.i+')</span><span class="dc-val curr">prices['+s.i+'] = '+p+'</span></div>';
+    html += '<div class="dc-row"><span class="dc-label">min_price</span><span class="dc-val minp">'+(s.minPrice===null?"∞":s.minPrice)+'</span></div>';
+    html += '<div class="dc-row"><span class="dc-label">profit if sell</span><span class="dc-val profit-now">'+profitNow+'</span></div>';
+    html += '<div class="dc-row"><span class="dc-label">max_profit</span><span class="dc-val maxp">'+s.maxProfit+'</span></div>';
+    var actLabel="", actCls="action-skip";
+    if(s.phase==="min-update"){ actLabel="📍 update min_price"; actCls="action-buy"; }
+    else if(s.phase==="profit-update"){ actLabel="🎉 update max_profit"; actCls="action-sell"; }
+    else if(s.phase==="skip-elif"){ actLabel="⏭ skip (no improvement)"; }
+    else if(s.phase==="iter"){ actLabel="evaluating…"; }
+    else if(s.phase==="check"){ actLabel="checking elif…"; }
+    else if(s.phase==="done"){ actLabel="✓ done — return "+s.maxProfit; actCls="action-done"; }
+    if(actLabel){
+      html += '<div class="dc-row"><span class="dc-label">action</span><span class="dc-val '+actCls+'">'+actLabel+'</span></div>';
+    }
+  }
+  html += '</div>';
+  return html;
+}
+
+/* ============ RENDER VIZ ============ */
+function renderViz(s){
+  var v = document.getElementById('vizPanel');
+  var html = '';
+  html += buildVars(s);
+
+  // Banner
+  var bannerCls, bannerText;
+  if(s.phase==="init"){ bannerCls="banner-init"; bannerText="⚙️ Setup — min_price=∞, max_profit=0"; }
+  else if(s.phase==="iter"){ bannerCls="banner-iter"; bannerText="🔁 Day "+s.i+" — inspecting prices["+s.i+"]="+s.prices[s.i]; }
+  else if(s.phase==="check"){ bannerCls="banner-iter"; bannerText="🔎 Day "+s.i+" — not new min, checking profit instead"; }
+  else if(s.phase==="min-update"){ bannerCls="banner-buy"; bannerText="📍 New min_price = "+s.prices[s.i]+" at day "+s.i+" (best buy candidate)"; }
+  else if(s.phase==="profit-update"){ bannerCls="banner-sell"; bannerText="🎉 Better profit! sell at day "+s.i+" — profit "+(s.prices[s.i]-s.minPrice); }
+  else if(s.phase==="skip-elif"){ bannerCls="banner-iter"; bannerText="⏭ Day "+s.i+" — profit "+(s.prices[s.i]-s.minPrice)+" ≤ max "+s.maxProfit+" → skip"; }
+  else if(s.phase==="done"){
+    if(s.lastWinProfit > 0){
+      bannerCls="banner-done";
+      bannerText="🏆 Done — buy day "+s.winBuyIdx+" @ ₹"+s.prices[s.winBuyIdx]+", sell day "+s.winSellIdx+" @ ₹"+s.prices[s.winSellIdx]+", profit ₹"+s.maxProfit;
+    } else {
+      bannerCls="banner-done";
+      bannerText="🏁 Done — no profitable trade, return 0";
+    }
+  }
+  html += '<div class="banner '+bannerCls+'">'+bannerText+'</div>';
+
+  // Row: Chart + Decision
+  html += '<div class="viz-row">';
+  html += '<div class="viz-card" style="flex:2;min-width:380px"><h5>📈 Stock Price Chart</h5>'+chartCard(s)+'</div>';
+  html += '<div class="viz-card" style="flex:1;min-width:240px"><h5>🎯 Today\'s Decision</h5>'+decisionCard(s)+'</div>';
+  html += '</div>';
+
+  v.innerHTML = html;
+}
+
+/* ============ STEP CONTROLS ============ */
+function renderStep(idx){
+  if(!steps.length) return;
+  var s = steps[idx];
+  currentStep = idx;
+  document.getElementById('stepInfo').textContent = (idx+1)+'/'+steps.length;
+  var bd = document.getElementById('actionBadge');
+  bd.textContent = BADGE_LABEL[s.action] || s.action;
+  bd.className = 'action-badge action-badge--'+s.action;
+  document.querySelectorAll('.code-line').forEach(function(el){el.classList.remove('active');});
+  var al = document.querySelector('.code-line[data-line="'+s.line+'"]');
+  if(al){ al.classList.add('active'); al.scrollIntoView({block:'nearest'}); }
+  renderViz(s);
+  showLogPreview(s);
+}
+function showLogPreview(s){
+  if(!logEnabled) return;
+  document.getElementById('logPopupBody').innerHTML = s.logHTML || '';
+  document.getElementById('logPopup').classList.remove('log-popup--hidden');
+}
+function hideLogPopup(){ document.getElementById('logPopup').classList.add('log-popup--hidden'); }
+function stepBy(d){
+  var n = currentStep + d;
+  if(n<0||n>=steps.length) return;
+  renderStep(n);
+}
+function resetStep(){ if(steps.length) renderStep(0); }
+
+/* ============ POPUP CONTROLS ============ */
+function toggleLogPreview(){
+  logEnabled = !logEnabled;
+  var btn = document.getElementById('logToggleBtn');
+  btn.textContent = logEnabled ? '📋 ON' : '📋 OFF';
+  btn.classList.toggle('log-toggle-btn--off', !logEnabled);
+  if(!logEnabled) hideLogPopup();
+  else if(steps.length) showLogPreview(steps[currentStep]);
+}
+function logZoom(dir){ logZoomLevel = Math.max(60, Math.min(180, logZoomLevel + dir*20)); updateLogZoom(); }
+function logZoomReset(){ logZoomLevel=100; updateLogZoom(); }
+function updateLogZoom(){
+  document.getElementById('logZoomLabel').textContent = logZoomLevel+'%';
+  document.getElementById('logPopup').style.setProperty('--log-scale', logZoomLevel/100);
+}
+function toggleFullscreen(){
+  var viz = document.querySelector('.col-viz');
+  if(!document.fullscreenElement) viz.requestFullscreen().catch(function(){});
+  else document.exitFullscreen();
+}
+function toggleProblem(){
+  var b = document.getElementById('pcBody');
+  var btn = document.getElementById('toggleBtn');
+  if(b.style.display==='none'){ b.style.display=''; btn.textContent='▲ Hide'; }
+  else { b.style.display='none'; btn.textContent='▼ Show'; }
+}
+
+/* ============ TEST LOADER ============ */
+function loadTest(pricesStr, exp, note){
+  document.getElementById('inPrices').value = pricesStr;
+  document.getElementById('expBadge').textContent = 'expected: '+exp+' ('+note+')';
+  resetWithInput();
+}
+
+/* ============ RESET WITH INPUT ============ */
+function resetWithInput(){
+  curResult = null;
+  var prices = parseArr(document.getElementById('inPrices').value);
+  renderCode();
+  fitCodeWidth();
+  steps = buildSteps({prices: prices});
+  currentStep = 0;
+  renderStep(0);
+  document.getElementById('liveOutput').textContent = curResult!==null ? String(curResult) : '—';
+}
+
+/* ============ CODE WIDTH ============ */
+function fitCodeWidth(){ syncFooterWidth(); }
+function syncFooterWidth(){
+  document.getElementById('footerLeft').style.width = document.getElementById('col1').offsetWidth + 'px';
+}
+
+/* ============ RESIZE HANDLE ============ */
+(function(){
+  var col1 = document.getElementById('col1');
+  document.getElementById('resizeH1').addEventListener('mousedown', function(e){
+    e.preventDefault();
+    codeWidthUserSet = true;
+    var startX = e.clientX, startW = col1.offsetWidth, h = this;
+    document.body.classList.add('no-select');
+    h.classList.add('active');
+    function mv(e){
+      col1.style.width = Math.max(140, startW + (e.clientX - startX)) + 'px';
+      syncFooterWidth();
+    }
+    function up(){
+      document.removeEventListener('mousemove', mv);
+      document.removeEventListener('mouseup', up);
+      document.body.classList.remove('no-select');
+      h.classList.remove('active');
+    }
+    document.addEventListener('mousemove', mv);
+    document.addEventListener('mouseup', up);
+  });
+})();
+window.addEventListener('resize', function(){
+  if(!codeWidthUserSet) fitCodeWidth();
+  else syncFooterWidth();
+});
+
+/* ============ KEYBOARD ============ */
+document.addEventListener('keydown', function(e){
+  if(e.target.tagName==='INPUT' || e.target.tagName==='SELECT') return;
+  if(e.key==='ArrowRight'){ e.preventDefault(); stepBy(1); }
+  else if(e.key==='ArrowLeft'){ e.preventDefault(); stepBy(-1); }
+  else if(e.key==='r' || e.key==='R'){ e.preventDefault(); resetStep(); }
+});
+
+/* ============ INIT ============ */
+renderCode();
+syncFooterWidth();
+resetWithInput();
+</script>
+</body>
+</html>

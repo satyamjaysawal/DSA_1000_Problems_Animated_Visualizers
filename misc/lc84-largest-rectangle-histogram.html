@@ -1,0 +1,889 @@
+﻿
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>84. Largest Rectangle in Histogram — Dry Run Visualizer</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=DM+Sans:wght@400;500;600&display=swap');
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{--bg-primary:#FAFAF8;--bg-secondary:#F1EFE8;--bg-tertiary:#E2E0D8;--bg-card:#FFFFFF;--text-primary:#2C2C2A;--text-secondary:#5F5E5A;--text-tertiary:#888780;--border-color:rgba(0,0,0,.11);--border-light:rgba(0,0,0,.06);--border-focus:#534AB7;--accent-indigo:#534AB7;--accent-indigo-bg:#EEEDFE;--accent-indigo-text:#3C3489;--accent-indigo-hover:#4740A0;--accent-teal:#0F6E56;--accent-teal-bg:#E1F5EE;--accent-teal-text:#085041;--accent-red:#E24B4A;--accent-red-bg:#FCEBEB;--accent-red-text:#791F1F;--accent-amber:#B45309;--accent-amber-bg:#FEF3C7;--accent-amber-text:#78350F;--accent-green:#15803D;--accent-green-bg:#DCFCE7;--accent-green-text:#14532D;--syn-keyword:#534AB7;--syn-function:#185FA5;--syn-number:#993C1D;--syn-string:#0F6E56;--active-line-bg:#EEEDFE;--radius-sm:4px;--radius-md:6px;--radius-lg:10px;--sp-2:8px;--sp-3:12px;--sp-5:20px;--font-sans:'DM Sans',system-ui,sans-serif;--font-mono:'JetBrains Mono','Fira Code',monospace;--fs-xs:11px;--fs-sm:12px;--fs-base:14px;--fs-md:15px;--fw-medium:500;--fw-semibold:600;--fw-bold:700;--lh-normal:1.6;--lh-code:1.9;--ease:.18s ease}
+html,body{height:100%;background:var(--bg-primary);color:var(--text-primary);font:var(--fs-base) var(--font-sans)}
+.kw{color:var(--syn-keyword);font-weight:var(--fw-medium)}.fn{color:var(--syn-function)}.num{color:var(--syn-number)}.str{color:var(--syn-string)}
+.btn,.section-label,.action-badge,.log-badge,kbd{font-family:system-ui,"Segoe UI Emoji",var(--font-sans)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:4px;padding:5px var(--sp-3);font-size:var(--fs-sm);font-weight:var(--fw-medium);border:1px solid var(--border-color);border-radius:var(--radius-md);background:var(--bg-card);color:var(--text-primary);cursor:pointer;transition:all var(--ease);white-space:nowrap}.btn:hover{background:var(--bg-secondary)}.btn:active{transform:scale(.96)}.btn-primary{background:var(--accent-indigo);color:#fff;border-color:var(--accent-indigo)}.btn-primary:hover{background:var(--accent-indigo-hover)}
+.btn-zoom{display:inline-flex;align-items:center;justify-content:center;padding:2px 7px;font:700 12px var(--font-mono);border:1px solid var(--border-color);border-radius:var(--radius-sm);background:var(--bg-card);color:var(--text-secondary);cursor:pointer}.btn-zoom:hover{background:var(--accent-indigo-bg);border-color:var(--accent-indigo);color:var(--accent-indigo)}
+.input{padding:4px var(--sp-2);font:var(--fs-sm) var(--font-mono);border:1px solid var(--border-color);border-radius:var(--radius-md);background:var(--bg-card);color:var(--text-primary);outline:none}.input:focus{border-color:var(--border-focus)}
+kbd{display:inline-block;padding:1px 5px;border-radius:var(--radius-sm);font-size:10px;background:var(--bg-secondary);border:1px solid var(--border-color);color:var(--text-secondary);line-height:1.5}
+::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border-color);border-radius:3px}
+@keyframes pulse-node{0%,100%{box-shadow:0 0 4px var(--accent-indigo)}50%{box-shadow:0 0 12px var(--accent-indigo)}}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-3px)}75%{transform:translateX(3px)}}
+@keyframes win-pulse{0%,100%{box-shadow:0 0 5px rgba(234,179,8,.5)}50%{box-shadow:0 0 14px rgba(234,179,8,.95)}}
+@keyframes glow-rect{0%,100%{box-shadow:0 0 0 2px rgba(234,179,8,.5)}50%{box-shadow:0 0 0 3px rgba(234,179,8,.95)}}
+.app-shell{display:flex;flex-direction:column;height:100vh;overflow:hidden;background:var(--bg-primary)}
+.prob-header{display:flex;align-items:center;gap:var(--sp-2);padding:8px var(--sp-5);border-bottom:1px solid var(--border-color);background:var(--bg-card);flex-wrap:wrap;flex-shrink:0}
+.prob-header-left{display:flex;align-items:center;gap:6px;flex-wrap:wrap;flex:1}
+.prob-header-right{display:flex;align-items:center;gap:var(--sp-2);flex-wrap:wrap}
+.gt-home-btn{padding:3px 10px;font-family:var(--font-sans);font-size:11px;font-weight:700;letter-spacing:.04em;border:1.5px solid var(--accent-indigo);border-radius:var(--radius-md);background:var(--accent-indigo);color:#fff;cursor:pointer;text-transform:uppercase}
+.gt-home-btn:hover{background:var(--accent-indigo-hover)}
+.prob-num{font-size:var(--fs-sm);font-weight:var(--fw-bold);color:var(--accent-indigo);font-family:var(--font-mono)}
+.prob-name{font-size:var(--fs-md);font-weight:var(--fw-semibold)}
+.prob-diff--hard{font-size:10px;padding:2px 8px;border-radius:99px;font-weight:var(--fw-semibold);background:var(--accent-red-bg);color:var(--accent-red-text)}
+.prob-tag{font-size:10px;padding:2px 8px;border-radius:99px;background:var(--bg-tertiary);color:var(--text-tertiary);border:1px solid var(--border-color);font-weight:var(--fw-medium)}
+.top-label{font:var(--fs-xs) var(--font-mono);color:var(--text-tertiary)}
+.top-expected{font:700 10px var(--font-mono);padding:2px 8px;border-radius:99px;background:var(--accent-teal-bg);color:var(--accent-teal-text);border:1px solid var(--accent-teal)}
+.prob-toggle-btn{font-family:system-ui,sans-serif;font-size:11px;padding:3px 10px;border-radius:var(--radius-md);background:var(--bg-secondary);border:1px solid var(--border-color);color:var(--text-secondary);cursor:pointer}
+.prob-body{display:flex;gap:var(--sp-5);padding:var(--sp-3) var(--sp-5);border-bottom:1px solid var(--border-color);background:var(--bg-card);flex-shrink:0}
+.problem-body--hidden{display:none!important}
+.prob-body-left{flex:1;min-width:0}.prob-body-right{width:340px;flex-shrink:0}
+.prob-body-left h3,.prob-body-right h3{font-size:var(--fs-sm);font-weight:var(--fw-semibold);color:var(--accent-indigo);margin:8px 0 3px}
+.prob-body-left h3:first-child{margin-top:0}
+.prob-desc{font-size:var(--fs-sm);color:var(--text-secondary);margin-bottom:4px}
+.prob-desc code{font-family:var(--font-mono);background:var(--bg-secondary);padding:1px 4px;border-radius:3px;font-size:var(--fs-xs)}
+.concept-block{background:var(--bg-secondary);border-radius:var(--radius-md);padding:8px 12px;margin:4px 0;font-size:var(--fs-sm);border-left:3px solid var(--accent-teal);color:var(--text-secondary)}
+.concept-block strong{color:var(--accent-teal-text);font-family:var(--font-mono);font-size:var(--fs-xs)}
+.prob-complexity{display:flex;gap:var(--sp-2);margin-top:6px}
+.prob-complexity-chip{font:10px var(--font-mono);padding:2px 8px;border-radius:var(--radius-md);background:var(--bg-secondary);border:1px solid var(--border-color)}
+.cc-label{color:var(--text-tertiary)}.cc-val{color:var(--accent-indigo-text);font-weight:var(--fw-bold)}
+.prob-tests{display:flex;flex-direction:column;gap:4px;margin-bottom:6px}
+.prob-test{display:flex;align-items:center;gap:5px;background:var(--bg-secondary);border:1px solid var(--border-color);border-radius:var(--radius-md);padding:5px 8px;font-size:var(--fs-xs);cursor:pointer;transition:all var(--ease)}
+.prob-test:hover{border-color:var(--accent-indigo)}
+.prob-test--active{border-color:var(--accent-indigo)!important;background:var(--accent-indigo-bg)!important}
+.pt-label{font-size:10px;font-weight:var(--fw-bold);color:var(--text-tertiary)}
+.pt-input{font-family:var(--font-mono);color:var(--text-primary);font-size:9px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pt-tag{font-size:7px;padding:1px 4px;border-radius:99px;background:var(--bg-tertiary);color:var(--text-tertiary);border:1px solid var(--border-color);font-weight:600;font-family:var(--font-mono)}
+.pt-arrow{color:var(--text-tertiary)}
+.pt-expected{font-family:var(--font-mono);font-weight:var(--fw-bold);color:var(--accent-teal);font-size:10px}
+.prob-live{display:flex;align-items:center;gap:6px;padding:6px var(--sp-3);border-radius:var(--radius-md);background:var(--bg-primary);border:1px solid var(--border-color);font-size:var(--fs-sm);margin-bottom:6px}
+.pl-label{font-size:var(--fs-xs);color:var(--text-tertiary)}
+.pl-output{font-family:var(--font-mono);font-weight:var(--fw-bold);color:var(--accent-indigo);font-size:var(--fs-sm)}
+.main-row{flex:1;display:flex;overflow:hidden;min-height:0}
+.col{display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.col-code{width:33%;min-width:140px;max-width:45vw}
+.col-viz{flex:1;min-width:0}
+.section-label{padding:5px var(--sp-3);font-size:var(--fs-xs);font-weight:var(--fw-semibold);color:var(--text-tertiary);text-transform:uppercase;letter-spacing:.07em;border-bottom:1px solid var(--border-color);flex-shrink:0;background:var(--bg-secondary)}
+.code-panel{flex:1;overflow-y:auto;padding:var(--sp-3) var(--sp-2);font-family:var(--font-mono);font-size:var(--fs-sm);line-height:var(--lh-code)}
+.code-line{display:flex;align-items:center;gap:var(--sp-2);padding:1px var(--sp-2);border-radius:var(--radius-sm)}
+.code-line.active{background:var(--active-line-bg)}
+.ln{min-width:18px;text-align:right;color:var(--text-tertiary);font-size:10px;user-select:none;flex-shrink:0;opacity:.6}
+.code-content{white-space:pre;flex:1}
+.resize-h{width:5px;cursor:col-resize;flex-shrink:0;background:transparent;position:relative;z-index:10;border-left:1px solid var(--border-color)}
+.resize-h:hover,.resize-h.active{background:rgba(99,102,241,.15)}
+.resize-h::after{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:3px;height:24px;border-radius:2px;background:rgba(0,0,0,.08)}
+.no-select{user-select:none!important;cursor:col-resize}
+.viz-panel{flex:1;overflow:auto;padding:var(--sp-3)}
+.vars-strip{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;padding:6px 10px;background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius-md)}
+.var-chip{display:inline-flex;align-items:center;gap:2px;padding:2px 7px;border-radius:var(--radius-md);background:var(--bg-secondary);border:1px solid var(--border-light);font-family:var(--font-mono);font-size:10px}
+.var-chip.vc-active{border-color:var(--accent-indigo);background:var(--accent-indigo-bg)}
+.var-chip.vc-safe{border-color:var(--accent-green);background:var(--accent-green-bg)}
+.var-chip.vc-flip{border-color:var(--accent-red);background:var(--accent-red-bg)}
+.vn{color:var(--text-tertiary);font-weight:500}.vv{font-weight:var(--fw-bold)}
+.viz-row{display:flex;gap:12px;align-items:flex-start;flex-wrap:wrap}
+.viz-card{background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius-md);padding:10px}
+.viz-title{font:600 9px var(--font-mono);text-transform:uppercase;letter-spacing:.04em;color:var(--text-tertiary);margin-bottom:6px}
+
+/* === HISTOGRAM (Big SVG-like) === */
+.hist-wrap{padding:14px;background:#0f172a;border-radius:var(--radius-md);border:1px solid var(--border-color);position:relative;overflow:visible}
+.hist-bars{display:flex;align-items:flex-end;gap:4px;height:280px;padding-bottom:24px;padding-top:8px;position:relative}
+.hist-bar{width:46px;display:flex;align-items:flex-end;justify-content:center;color:#fff;font:700 12px var(--font-mono);border-radius:4px 4px 0 0;position:relative;transition:all .25s;transform-origin:bottom;border:1.5px solid transparent}
+.hist-bar--zero{height:3px!important;background:#475569;color:#cbd5e1;border:none}
+.hist-bar--idle{background:linear-gradient(180deg,#3b82f6,#1e40af);border-color:#1e3a8a}
+.hist-bar--in-stack{background:linear-gradient(180deg,#a78bfa,#6d28d9)!important;border-color:#5b21b6;box-shadow:0 0 6px rgba(167,139,250,.5)}
+.hist-bar--top-stack{background:linear-gradient(180deg,#fbbf24,#B45309)!important;border-color:#FBE8A6;animation:pulse-node 1.2s infinite}
+.hist-bar--popping{background:linear-gradient(180deg,#fca5a5,#E24B4A)!important;border-color:#fff;animation:shake .35s}
+.hist-bar--in-rect{background:linear-gradient(180deg,#86efac,#15803D)!important;border-color:#22c55e}
+.hist-bar--rect-best{background:linear-gradient(180deg,#fde68a,#B45309)!important;border:2px solid #fff!important;animation:win-pulse 1.4s infinite}
+.hist-bar-label{position:absolute;bottom:-20px;left:50%;transform:translateX(-50%);font:700 10px var(--font-mono);color:#94a3b8}
+.hist-bar-h{padding-bottom:5px;text-shadow:0 1px 2px rgba(0,0,0,.6)}
+.hist-bar--sentinel{width:46px;height:3px!important;border:2px dashed #fbbf24;background:transparent}
+.hist-bar--sentinel .hist-bar-label{color:#fbbf24}
+
+/* I-Pointer marker */
+.hist-i-marker{position:absolute;display:flex;flex-direction:column;align-items:center;color:#fbbf24;font:700 11px var(--font-mono);pointer-events:none;transition:left .25s}
+.hist-i-marker-arrow{font-size:18px;line-height:1;animation:pulse-node 1.4s infinite}
+.hist-i-line{position:absolute;width:2px;background:repeating-linear-gradient(180deg,#fbbf24 0,#fbbf24 5px,transparent 5px,transparent 10px);top:8px;bottom:24px;pointer-events:none;transition:left .25s}
+
+/* Rect overlay (highlights computed rectangle) */
+.rect-overlay{position:absolute;background:rgba(251,191,36,.18);border:2.5px solid #fbbf24;border-radius:3px;pointer-events:none;transition:all .25s;z-index:5;display:flex;align-items:center;justify-content:center;color:#fbbf24;font:700 14px var(--font-mono);text-shadow:0 1px 3px rgba(0,0,0,.85)}
+.rect-overlay--best{background:rgba(34,197,94,.22);border-color:#86efac;color:#86efac;animation:glow-rect 1.4s infinite}
+
+/* === STACK === */
+.stack-col{display:flex;flex-direction:column-reverse;gap:4px;min-height:140px;padding:8px;background:var(--bg-secondary);border-radius:var(--radius-md);border:1px dashed var(--border-color);min-width:160px}
+.stack-item{font:11px var(--font-mono);padding:6px 10px;border-radius:6px;background:#fff;border:1.5px solid var(--accent-indigo);color:var(--accent-indigo-text);display:flex;justify-content:space-between;gap:8px;font-weight:600}
+.stack-item--top{background:var(--accent-amber-bg)!important;border-color:var(--accent-amber)!important;color:var(--accent-amber-text);animation:pulse-node 1.2s infinite}
+.stack-item--popping{background:var(--accent-red-bg)!important;border-color:var(--accent-red)!important;color:var(--accent-red-text);animation:shake .35s}
+.stack-item--just-pushed{background:var(--accent-green-bg)!important;border-color:var(--accent-green)!important;color:var(--accent-green-text)}
+
+.empty-state{font-size:11px;color:var(--text-tertiary);font-style:italic;text-align:center;padding:14px}
+.legend{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+.legend span{display:inline-flex;align-items:center;gap:5px;font-size:10px;color:var(--text-secondary)}
+.legend i{display:inline-block;width:14px;height:14px;border-radius:3px;border:1px solid var(--border-color)}
+
+.best-display{font:700 36px var(--font-mono);color:var(--accent-amber-text);text-align:center;padding:8px;background:linear-gradient(180deg,#FEF3C7,#FBE8A6);border:2px solid #B45309;border-radius:var(--radius-md);margin-top:6px}
+
+/* Heights cells */
+.heights-cells{display:flex;gap:3px}
+.height-cell{display:flex;flex-direction:column;align-items:center;gap:2px}
+.hc-idx{font:700 10px var(--font-mono);color:var(--text-tertiary)}
+.hc-box{width:32px;height:32px;border-radius:5px;border:1.5px solid var(--border-color);display:flex;align-items:center;justify-content:center;font:700 13px var(--font-mono);background:#fff;transition:all .2s}
+.hc-box--curr-i{box-shadow:0 0 0 2px var(--accent-amber);animation:pulse-node 1.2s infinite}
+.hc-box--in-stack{background:#ede9fe;border-color:#a78bfa;color:#5b21b6}
+.hc-box--top{background:var(--accent-amber-bg);border-color:var(--accent-amber);color:var(--accent-amber-text)}
+
+/* Step calc display */
+.step-calc{margin-top:10px;padding:8px 12px;background:#FFF8E7;border:1px solid #FBE8A6;border-left:3px solid var(--accent-amber);border-radius:var(--radius-md);font:12px var(--font-mono);color:var(--accent-amber-text);text-align:center}
+.step-calc strong{font-size:14px;font-weight:700}
+
+.result-banner{margin-top:12px;padding:10px 14px;border-radius:var(--radius-md);font-family:var(--font-mono);font-size:var(--fs-md);font-weight:bold;background:var(--accent-green-bg);border:2px solid var(--accent-green);color:var(--accent-green-text);animation:win-pulse 1.6s infinite;text-align:center}
+
+.action-badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:var(--radius-sm);font-size:10px;font-weight:var(--fw-bold)}
+.action-badge--func-def,.action-badge--init,.action-badge--call,.action-badge--return,.action-badge--resume{background:rgba(130,80,255,.14);color:#8250ff}
+.action-badge--for-check,.action-badge--if-check,.action-badge--while-check{background:rgba(56,139,253,.14);color:#388bfd}
+.action-badge--mark,.action-badge--push,.action-badge--pop,.action-badge--restore,.action-badge--found,.action-badge--update{background:rgba(63,185,80,.14);color:#3fb950}
+.action-badge--remove,.action-badge--prune,.action-badge--fail{background:rgba(248,81,73,.14);color:#f85149}
+.action-badge--exit,.action-badge--skip{background:rgba(85,84,80,.14);color:#555450}
+.log-card{border-radius:var(--radius-md);overflow:hidden;border:1px solid var(--border-color);border-left-width:4px;font-size:var(--fs-xs);background:var(--bg-card)}
+.log-card--func-def,.log-card--init,.log-card--call,.log-card--return,.log-card--resume{border-left-color:#8250ff}
+.log-card--for-check,.log-card--if-check,.log-card--while-check{border-left-color:#388bfd}
+.log-card--mark,.log-card--push,.log-card--pop,.log-card--restore,.log-card--found,.log-card--update{border-left-color:#3fb950}
+.log-card--remove,.log-card--prune,.log-card--fail{border-left-color:#f85149}
+.log-card--exit,.log-card--skip{border-left-color:#555450}
+.log-badge{display:inline-flex;flex-shrink:0;border-radius:var(--radius-sm);font-size:9px;font-weight:var(--fw-bold);padding:2px 6px;white-space:nowrap}
+.log-badge--func-def,.log-badge--init,.log-badge--call,.log-badge--return,.log-badge--resume{background:rgba(130,80,255,.22);color:#8250ff}
+.log-badge--for-check,.log-badge--if-check,.log-badge--while-check{background:rgba(56,139,253,.22);color:#388bfd}
+.log-badge--mark,.log-badge--push,.log-badge--pop,.log-badge--restore,.log-badge--found,.log-badge--update{background:rgba(63,185,80,.22);color:#3fb950}
+.log-badge--remove,.log-badge--prune,.log-badge--fail{background:rgba(248,81,73,.22);color:#f85149}
+.log-badge--exit,.log-badge--skip{background:rgba(85,84,80,.22);color:#555450}
+.log-card-header{display:flex;align-items:center;gap:6px;padding:8px 10px 6px;background:var(--bg-secondary);border-bottom:1px solid var(--border-light)}
+.log-line-ref{font:700 10px var(--font-mono);color:var(--accent-indigo);background:var(--accent-indigo-bg);padding:1px 6px;border-radius:4px;border:1px solid var(--accent-indigo)}
+.log-status-pill{font-family:system-ui,"Segoe UI Emoji",sans-serif;font-size:9px;font-weight:700;padding:2px 7px;border-radius:99px;text-transform:uppercase;letter-spacing:.04em;margin-left:auto}
+.log-status--success{background:var(--accent-green-bg);color:var(--accent-green-text);border:1px solid var(--accent-green)}
+.log-status--fail{background:var(--accent-red-bg);color:var(--accent-red-text);border:1px solid var(--accent-red)}
+.log-status--skip{background:var(--bg-tertiary);color:var(--text-tertiary);border:1px solid var(--border-color)}
+.log-status--loop{background:rgba(56,139,253,.14);color:#185FA5;border:1px solid #388bfd}
+.log-status--prune{background:var(--accent-red-bg);color:var(--accent-red-text);border:1px solid var(--accent-red)}
+.log-status--info{background:rgba(130,80,255,.14);color:#3C3489;border:1px solid #8250ff}
+.log-section{padding:7px 10px;border-bottom:1px dashed var(--border-light)}
+.log-section:last-child{border-bottom:none}
+.log-section-title{font:700 8px var(--font-mono);text-transform:uppercase;letter-spacing:.06em;color:var(--text-tertiary);margin-bottom:3px;display:flex;align-items:center;gap:4px}
+.log-section-title-icon{font-family:system-ui,"Segoe UI Emoji",sans-serif;font-size:10px}
+.log-code-snippet{font:600 11px var(--font-mono);background:#0d1117;color:#e6edf3;padding:6px 9px;border-radius:4px;display:block;overflow-x:auto;white-space:pre;border:1px solid #30363d}
+.log-code-snippet .ck{color:#ff7b72}.log-code-snippet .cs{color:#a5d6ff}.log-code-snippet .cn{color:#79c0ff}.log-code-snippet .cf{color:#d2a8ff}.log-code-snippet .cc{color:#8b949e;font-style:italic}
+.log-kv-row{display:flex;flex-wrap:wrap;gap:4px;margin-top:2px}
+.log-kv{display:inline-flex;align-items:center;gap:3px;font:11px var(--font-mono);padding:2px 7px;border-radius:4px;background:var(--bg-secondary);border:1px solid var(--border-light)}
+.log-kv-key{color:var(--text-tertiary);font-weight:500}
+.log-kv-val{color:var(--text-primary);font-weight:700}
+.log-kv--in{background:rgba(56,139,253,.08);border-color:rgba(56,139,253,.3)}
+.log-kv--out{background:rgba(63,185,80,.08);border-color:rgba(63,185,80,.4)}
+.log-kv--out .log-kv-val{color:#15803D}
+.log-kv--changed{background:rgba(180,83,9,.10);border-color:rgba(180,83,9,.4)}
+.log-verdict{display:flex;align-items:center;gap:6px;font:600 11px var(--font-mono);padding:5px 8px;border-radius:5px;background:var(--bg-secondary);border:1px solid var(--border-light)}
+.log-verdict--true{background:var(--accent-green-bg);border-color:var(--accent-green);color:var(--accent-green-text)}
+.log-verdict--false{background:var(--accent-red-bg);border-color:var(--accent-red);color:var(--accent-red-text)}
+.log-analogy{font:italic 11px var(--font-sans);color:var(--text-secondary);background:#FFF8E7;border:1px solid #FBE8A6;border-left:3px solid var(--accent-amber);padding:6px 9px;border-radius:4px;line-height:1.55}
+.log-analogy strong{color:var(--accent-amber-text);font-style:normal;font-weight:700}
+.log-why{font-size:11px;line-height:1.55;color:var(--text-primary);padding:4px 0}
+.log-why strong{color:var(--accent-indigo-text)}
+.log-popup{--log-scale:1;position:fixed;bottom:52px;right:14px;width:calc(480px * var(--log-scale));max-width:92vw;max-height:75vh;border-radius:var(--radius-lg);box-shadow:0 10px 32px rgba(0,0,0,.14);border:1px solid var(--border-color);background:var(--bg-card);overflow:hidden;display:flex;flex-direction:column;z-index:100;transition:opacity .15s,transform .15s;transform-origin:bottom right}
+.log-popup--hidden{opacity:0;transform:scale(.92);pointer-events:none}
+.log-popup-body{flex:1;overflow:auto;padding:0}
+.log-popup-body > .log-card{border-radius:0;border:none;border-left:0}
+.footer-bar{display:flex;flex-shrink:0;border-top:1px solid var(--border-color);background:var(--bg-card)}
+.footer-left{width:33%;min-width:140px;max-width:45vw;display:flex;align-items:center;gap:8px;padding:7px 12px;border-right:1px solid var(--border-light)}
+.footer-right{flex:1;display:flex;align-items:center;gap:6px;padding:7px 14px;flex-wrap:wrap}
+.footer-sep{width:1px;height:16px;background:var(--border-color);flex-shrink:0}
+.step-info{font:10px var(--font-mono);color:var(--text-tertiary)}
+.log-toggle-btn{padding:2px 8px;font:700 9px var(--font-mono);border:1px solid var(--accent-green);border-radius:99px;background:var(--accent-green-bg);color:var(--accent-green-text);cursor:pointer}
+.log-toggle-btn--off{background:var(--bg-tertiary);color:var(--text-tertiary);border-color:var(--border-color)}
+.log-zoom-label{font:10px var(--font-mono);color:var(--text-tertiary);min-width:28px;text-align:center}
+.btn-fullscreen{font-size:14px;padding:3px 8px;background:var(--accent-indigo-bg);border-color:var(--accent-indigo);color:var(--accent-indigo)}
+.btn-fullscreen:hover{background:var(--accent-indigo);color:#fff}
+</style>
+</head>
+<body>
+<div class="app-shell">
+  <header class="prob-header">
+    <div class="prob-header-left">
+      <a href="../00_HomePage/gt_learn_homepage.html" class="gt-home-btn">GT LEARN</a>
+      <span class="prob-num">#84</span>
+      <span class="prob-name">📊 Largest Rectangle in Histogram</span>
+      <span class="prob-diff--hard">HARD</span>
+      <span class="prob-tag">Monotonic Stack</span>
+      <span class="prob-tag">Array</span>
+    </div>
+    <div class="prob-header-right">
+      <span class="top-label">heights=</span>
+      <input id="inputArr" class="input" style="width:200px" value="2,1,5,6,2,3">
+      <span id="expectedBadge" class="top-expected">exp: 10</span>
+      <button id="probToggleBtn" class="prob-toggle-btn" type="button" onclick="toggleProblem()">▲ Hide</button>
+    </div>
+  </header>
+  <div id="probBody" class="prob-body">
+    <div class="prob-body-left">
+      <h3>📝 Problem Statement</h3>
+      <p class="prob-desc">Given an array of integers <code>heights</code> representing the bar heights of a histogram (each bar width = 1), return the area of the <strong>largest rectangle</strong> that can be formed using contiguous bars.</p>
+      <h3>🧠 Solving Approach</h3>
+      <p class="prob-desc">Use a <strong>monotonic increasing stack</strong> of indices. Jab koi choti bar mile, taller bars ko stack se pop karke unka maximum rectangle calculate karo. Ek <strong>sentinel iteration</strong> (i = n) at the end with virtual h=0 ensures sab pending bars flush ho jayein.</p>
+      <h3>🎯 Core Concepts & Base Case</h3>
+      <div class="concept-block"><strong>Monotonic Stack:</strong> Indices in <strong>increasing order of height</strong>. Naya bar joins only if it's ≥ top.</div>
+      <div class="concept-block"><strong>Pop & Measure:</strong> Jab popped bar nikle, uski rectangle = <code>height[top] × width</code> jahan width = <code>i</code> if stack empty, else <code>i - stack[-1] - 1</code>.</div>
+      <div class="concept-block"><strong>Sentinel Trick:</strong> <code>range(n+1)</code> mein last iter par h=0 (virtual) — taaki <strong>remaining stack bars bhi process</strong> ho jayein.</div>
+      <div class="prob-complexity">
+        <span class="prob-complexity-chip"><span class="cc-label">Time </span><span class="cc-val">O(n)</span></span>
+        <span class="prob-complexity-chip"><span class="cc-label">Space </span><span class="cc-val">O(n)</span></span>
+      </div>
+    </div>
+    <div class="prob-body-right">
+      <h3>🧪 Test Cases</h3>
+      <div id="testList" class="prob-tests"></div>
+      <div class="prob-live"><span class="pl-label">Result:</span><span id="liveOutput" class="pl-output">—</span></div>
+      <button class="btn btn-primary" type="button" onclick="resetWithInput()">▶ Run</button>
+      <p style="font-size:9px;color:var(--text-tertiary);margin-top:6px;font-family:var(--font-mono)">Format: comma-separated <code>2,1,5,6,2,3</code></p>
+    </div>
+  </div>
+  <div class="main-row">
+    <div id="col1" class="col col-code">
+      <div class="section-label">📜 Python Code</div>
+      <div id="codePanel" class="code-panel"></div>
+    </div>
+    <div id="resizeH1" class="resize-h"></div>
+    <div class="col col-viz">
+      <div class="section-label">📊 Visualization</div>
+      <div id="vizPanel" class="viz-panel"></div>
+    </div>
+  </div>
+  <div class="footer-bar">
+    <div id="footerLeft" class="footer-left">
+      <span id="stepInfo" class="step-info">0/0</span>
+      <span id="actionBadge" class="action-badge"></span>
+    </div>
+    <div class="footer-right">
+      <kbd>←</kbd><kbd>→</kbd>
+      <button class="btn" type="button" onclick="resetStep()">↺</button>
+      <button class="btn" type="button" onclick="stepBy(-1)">◀</button>
+      <button class="btn btn-primary" type="button" onclick="stepBy(1)">▶ Next</button>
+      <span class="footer-sep"></span>
+      <button id="logToggleBtn" class="log-toggle-btn" type="button" onclick="toggleLogPreview()">📋 ON</button>
+      <button class="btn-zoom" type="button" onclick="logZoom(-1)">−</button>
+      <span id="logZoomLabel" class="log-zoom-label">100%</span>
+      <button class="btn-zoom" type="button" onclick="logZoom(1)">+</button>
+      <button class="btn-zoom" type="button" onclick="logZoomReset()">↺</button>
+      <span class="footer-sep"></span>
+      <button class="btn btn-fullscreen" type="button" onclick="toggleFullscreen()">⛶</button>
+    </div>
+  </div>
+</div>
+<div id="logPopup" class="log-popup log-popup--hidden">
+  <div id="logPopupBody" class="log-popup-body"></div>
+</div>
+<script>
+var TESTS=[
+  {arr:"2,1,5,6,2,3",e:"10",tag:"classic LC84"},
+  {arr:"2,4",e:"4",tag:"increasing"},
+  {arr:"4,2",e:"4",tag:"decreasing"},
+  {arr:"6,7,5,2,4,5,9,3",e:"16",tag:"complex"},
+  {arr:"1,1,1,1",e:"4",tag:"all equal"},
+  {arr:"5",e:"5",tag:"single bar"},
+  {arr:"0,9",e:"9",tag:"with zero"}
+];
+
+var codeLines=[
+  "def largestRectangleArea(heights):",
+  "    stack = []",
+  "    best = 0",
+  "    n = len(heights)",
+  "    for i in range(n + 1):",
+  "        h = heights[i] if i < n else 0",
+  "        while stack and heights[stack[-1]] > h:",
+  "            top = stack.pop()",
+  "            width = i if not stack else i - stack[-1] - 1",
+  "            area = heights[top] * width",
+  "            best = max(best, area)",
+  "        stack.append(i)",
+  "    return best"
+];
+
+var LOG_BADGE={"func-def":"📌 DEF","init":"⚙️ INIT","call":"📞 CALL","resume":"🔄 RESUME","for-check":"🔁 FOR","if-check":"🔎 IF","while-check":"🔁 WHILE","mark":"✅ MARK","push":"⬆ PUSH","pop":"⬇ POP","update":"✏️ UPDATE","exit":"🔚 EXIT","return":"🏆 RETURN","found":"🎉 FOUND","prune":"✂️ PRUNE","skip":"⏭ SKIP","fail":"❌ FAIL","restore":"↩ RESTORE"};
+var BADGE_LABEL={"func-def":"DEF","init":"INIT","call":"CALL","resume":"RESUME","for-check":"FOR","if-check":"IF","while-check":"WHILE","mark":"MARK","push":"PUSH","pop":"POP","update":"UPDATE","exit":"EXIT","return":"RETURN","found":"FOUND","prune":"PRUNE","skip":"SKIP","fail":"FAIL","restore":"RESTORE"};
+
+var steps=[],currentStep=0,codeWidthUserSet=false,curResult=null,logEnabled=true,logZoomLevel=100;
+var BAR_W=46,BAR_GAP=4;
+
+function renderTests(){
+  document.getElementById("testList").innerHTML=TESTS.map(function(t,i){
+    return '<div class="prob-test'+(i===0?' prob-test--active':'')+'" onclick="loadTest('+i+',this)">'+
+      '<span class="pt-label">T'+(i+1)+'</span>'+
+      '<span class="pt-input" title="'+t.arr+'">['+t.arr+']</span>'+
+      '<span class="pt-tag">'+t.tag+'</span>'+
+      '<span class="pt-arrow">→</span>'+
+      '<span class="pt-expected">'+t.e+'</span></div>';
+  }).join("");
+}
+
+function renderCode(){
+  var p=document.getElementById('codePanel');
+  p.innerHTML=codeLines.map(function(raw,i){
+    var h=raw;
+    h=h.replace(/("[^"]*"|'[^']*')/g,'\x01STR\x02$1\x03');
+    h=h.replace(/\b(def|for|in|if|return|break|continue|and|else|elif|True|False|None|not|or|while|lambda)\b/g,'\x01KW\x02$1\x03');
+    h=h.replace(/\b(len|range|int|str|list|append|pop|sorted|min|max|sum|abs|enumerate|zip|print|set|add)\b/g,'\x01FN\x02$1\x03');
+    h=h.replace(/(?<![.\w"\x01\x02\x03])(-?\d+)\b/g,'\x01NUM\x02$1\x03');
+    h=h.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    h=h.replace(/\x01([A-Z]+)\x02/g,function(_,c){return '<span class="'+c.toLowerCase()+'">';}).replace(/\x03/g,'</span>');
+    return '<div class="code-line" data-line="'+i+'"><span class="ln">'+(i+1)+'</span><span class="code-content">'+h+'</span></div>';
+  }).join('');
+}
+
+function toggleProblem(){
+  var body=document.getElementById('probBody'),btn=document.getElementById('probToggleBtn');
+  body.classList.toggle('problem-body--hidden');
+  btn.textContent=body.classList.contains('problem-body--hidden')?'▼ Show':'▲ Hide';
+}
+
+function syncFooterWidth(){document.getElementById('footerLeft').style.width=document.getElementById('col1').offsetWidth+'px';}
+
+function fitCodeWidth(){
+  if(codeWidthUserSet)return;
+  var c=document.getElementById('col1');
+  c.style.flex='none';c.style.width='max-content';
+  c.style.width=Math.min(c.offsetWidth,window.innerWidth*.45)+'px';
+  syncFooterWidth();
+}
+
+function hlCode(raw){
+  if(!raw)return '';
+  var h=raw;
+  h=h.replace(/("[^"]*"|'[^']*')/g,'\x01CS\x02$1\x03');
+  h=h.replace(/\b(def|for|in|if|return|break|continue|and|else|elif|True|False|None|not|or|while|lambda)\b/g,'\x01CK\x02$1\x03');
+  h=h.replace(/\b(len|range|int|str|list|append|pop|sorted|min|max|sum|abs|largestRectangleArea)\b/g,'\x01CF\x02$1\x03');
+  h=h.replace(/(?<![.\w"\x01\x02\x03])(-?\d+)\b/g,'\x01CN\x02$1\x03');
+  h=h.replace(/(#.*$)/g,'\x01CC\x02$1\x03');
+  h=h.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  h=h.replace(/\x01([A-Z]+)\x02/g,function(_,c){return '<span class="'+c.toLowerCase()+'">';}).replace(/\x03/g,'</span>');
+  return h;
+}
+
+function richLog(opts){
+  var statusMap={success:"✅ Success",fail:"❌ Failed",skip:"⏭ Skipped",loop:"🔁 Loop iter",prune:"✂️ Pruned",info:"ℹ️ Info"};
+  var status=opts.status||"info";
+  var html='<div class="log-card log-card--'+opts.action+'">';
+  html+='<div class="log-card-header">';
+  html+='<span class="log-badge log-badge--'+opts.action+'">'+(LOG_BADGE[opts.action]||opts.action)+'</span>';
+  html+='<span class="log-line-ref">L'+(opts.line+1)+'</span>';
+  html+='<span class="log-status-pill log-status--'+status+'">'+(statusMap[status]||status)+'</span>';
+  html+='</div>';
+  if(opts.code){
+    html+='<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">📜</span>Code Executing</div>';
+    html+='<code class="log-code-snippet">'+hlCode(opts.code)+'</code></div>';
+  }
+  if(opts.inputs&&opts.inputs.length){
+    html+='<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">📥</span>Input Values</div><div class="log-kv-row">';
+    opts.inputs.forEach(function(kv){html+='<span class="log-kv log-kv--in"><span class="log-kv-key">'+kv.k+'</span>=<span class="log-kv-val">'+kv.v+'</span></span>';});
+    html+='</div></div>';
+  }
+  if(opts.outputs&&opts.outputs.length){
+    html+='<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">📤</span>Output / State After Line</div><div class="log-kv-row">';
+    opts.outputs.forEach(function(kv){
+      var cls=kv.changed?'log-kv--changed':'log-kv--out';
+      html+='<span class="log-kv '+cls+'"><span class="log-kv-key">'+kv.k+'</span>=<span class="log-kv-val">'+kv.v+'</span></span>';
+    });
+    html+='</div></div>';
+  }
+  if(opts.verdict){
+    var vCls=opts.verdictTrue===true?'log-verdict--true':(opts.verdictTrue===false?'log-verdict--false':'');
+    var vIcon=opts.verdictTrue===true?'✓':(opts.verdictTrue===false?'✗':'•');
+    html+='<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">⚖️</span>Verdict / Decision</div>';
+    html+='<div class="log-verdict '+vCls+'">'+vIcon+' '+opts.verdict+'</div></div>';
+  }
+  if(opts.why){
+    html+='<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">💡</span>Why This Happens</div>';
+    html+='<div class="log-why">'+opts.why+'</div></div>';
+  }
+  if(opts.analogy){
+    html+='<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">🎭</span>Real-Life Analogy</div>';
+    html+='<div class="log-analogy">'+opts.analogy+'</div></div>';
+  }
+  html+='</div>';
+  return html;
+}
+
+function buildSteps(heights){
+  var st=[],MAX_STEPS=4000;
+  var n=heights.length;
+  var stack=[],best=0;
+  var i_var=null,h_var=null,top_var=null,width_var=null,area_var=null;
+  var poppingIdx=null,justPushedIdx=null;
+  // computed rect for current pop step
+  var rectInfo=null;  // {topIdx, left, right, h, area, isBest}
+  var bestRect=null;  // {topIdx, left, right, h, area} of overall winner
+
+  function snap(x){
+    return Object.assign({
+      heights:heights.slice(),n:n,
+      stack:stack.slice(),best:best,
+      i_var:i_var,h_var:h_var,top_var:top_var,width_var:width_var,area_var:area_var,
+      poppingIdx:poppingIdx,justPushedIdx:justPushedIdx,
+      rectInfo:rectInfo?Object.assign({},rectInfo):null,
+      bestRect:bestRect?Object.assign({},bestRect):null
+    },x||{});
+  }
+  function pushStep(o){if(st.length>=MAX_STEPS)return;st.push(Object.assign({line:0,action:"func-def",logHTML:""},snap(o)));}
+
+  // L1 — function entry
+  pushStep({line:0,action:"func-def",logHTML:richLog({
+    line:0,action:"func-def",
+    code:"def largestRectangleArea(heights="+JSON.stringify(heights)+"):",
+    status:"info",
+    inputs:[{k:"heights",v:JSON.stringify(heights)},{k:"n",v:heights.length}],
+    outputs:[{k:"function",v:"entered"}],
+    why:"<strong>Function entry</strong> — histogram bars ka array mil gaya. Goal: max area of contiguous-bar rectangle.",
+    analogy:"<strong>Real-estate scout</strong> 🏗️ — bar chart ke andar sabse bada plot dhundhna hai."
+  })});
+
+  // L2 — stack = []
+  pushStep({line:1,action:"init",logHTML:richLog({
+    line:1,action:"init",
+    code:"stack = []",
+    status:"success",
+    outputs:[{k:"stack",v:"[]",changed:true}],
+    why:"<strong>Empty monotonic stack</strong> — yeh indices store karega in <strong>increasing order of heights</strong>.",
+    analogy:"Khaali <strong>clipboard</strong> 📋 — abhi koi bar register nahi hua."
+  })});
+
+  // L3 — best = 0
+  pushStep({line:2,action:"init",logHTML:richLog({
+    line:2,action:"init",
+    code:"best = 0",
+    status:"success",
+    outputs:[{k:"best",v:0,changed:true}],
+    why:"<strong>Best area tracker</strong> initialize zero.",
+    analogy:"<strong>Scoreboard zero</strong> — abhi koi rectangle measure nahi hua."
+  })});
+
+  // L4 — n = len(heights)
+  pushStep({line:3,action:"init",logHTML:richLog({
+    line:3,action:"init",
+    code:"n = len(heights) = "+n,
+    status:"success",
+    inputs:[{k:"heights",v:JSON.stringify(heights)}],
+    outputs:[{k:"n",v:n,changed:true}],
+    why:"Array ki length cache.",
+    analogy:"<strong>Total bars count</strong> = "+n+" — ek baar memo kar liya."
+  })});
+
+  // L5 — for i in range(n+1)
+  pushStep({line:4,action:"for-check",logHTML:richLog({
+    line:4,action:"for-check",
+    code:"for i in range("+n+" + 1):  # range(0, "+(n+1)+")",
+    status:"info",
+    inputs:[{k:"n",v:n}],
+    outputs:[{k:"loop range",v:"[0,"+(n+1)+") (incl. sentinel)"}],
+    why:"Loop range <strong>"+n+"+1</strong> — last iteration <strong>sentinel</strong> hai (i = "+n+", virtual h = 0). Yeh stack flush karne ke liye zaroori hai.",
+    analogy:"<strong>"+n+" real bars + 1 imaginary 'end wall'</strong> 🧱 — taaki sab pending check ho jaye."
+  })});
+
+  for(var i=0;i<=n;i++){
+    i_var=i;
+    pushStep({line:4,action:"for-check",logHTML:richLog({
+      line:4,action:"for-check",
+      code:"# i = "+i+(i===n?"  ← SENTINEL!":""),
+      status:"loop",
+      inputs:[{k:"i",v:i},{k:"n",v:n}],
+      outputs:[{k:"i",v:i,changed:true}],
+      why:i===n?"<strong>Sentinel iteration!</strong> Ab virtual bar h=0 use karenge — taaki saare pending taller bars stack se nikal jayein.":"Iteration <strong>i = "+i+"</strong> — bar #"+i+" pe focus.",
+      analogy:i===n?"<strong>Histogram ki end wall</strong> 🧱 — sab kuch close out karne ke liye.":"<strong>Bar #"+i+"</strong> ki turn — measurement shuru."
+    })});
+
+    // L6 — h = heights[i] if i < n else 0
+    var h=i<n?heights[i]:0;
+    h_var=h;
+    pushStep({line:5,action:"init",logHTML:richLog({
+      line:5,action:"init",
+      code:"h = heights["+i+"] if "+i+" < "+n+" else 0  # h = "+h+(i===n?" (sentinel)":""),
+      status:"success",
+      inputs:[{k:"i",v:i},{k:"n",v:n},{k:"heights[i]",v:i<n?heights[i]:"out-of-bounds"}],
+      outputs:[{k:"h",v:h,changed:true}],
+      verdict:i+" < "+n,
+      verdictTrue:i<n,
+      why:i<n?"Current bar ki <strong>height = "+h+"</strong>.":"<strong>Out of bounds!</strong> Sentinel virtual height = 0 use kar rahe.",
+      analogy:i<n?"Bar #"+i+" ki <strong>height naap li</strong> = "+h:"<strong>Wall touch ho gayi</strong> — h = 0 imagine karo, taaki sab pop ho jayein."
+    })});
+
+    // L7 — while loop
+    var whileGuard=0;
+    while(true){
+      var stackNonEmpty=stack.length>0;
+      var topIdxLocal=stackNonEmpty?stack[stack.length-1]:null;
+      var topH=stackNonEmpty?heights[topIdxLocal]:null;
+      var shouldPop=stackNonEmpty&&topH>h;
+      pushStep({line:6,action:"while-check",logHTML:richLog({
+        line:6,action:"while-check",
+        code:"while stack and heights[stack[-1]] > h:  # "+(stackNonEmpty?("stack=["+stack.join(",")+"], heights["+topIdxLocal+"]="+topH+" > h="+h):"stack empty")+" → "+shouldPop,
+        status:shouldPop?"loop":"info",
+        inputs:[{k:"stack",v:JSON.stringify(stack)},{k:"top h",v:stackNonEmpty?topH:"—"},{k:"h",v:h}],
+        verdict:stackNonEmpty?("heights[top]("+topH+") "+(shouldPop?">":"<=")+" h("+h+")"):"stack is empty",
+        verdictTrue:shouldPop,
+        why:shouldPop?"<strong>Top bar choti current bar se taller hai!</strong> Iska maximum rectangle <strong>abhi calculate karna hoga</strong> — yeh ab right side mein extend nahi ho sakti (kyunki current chota bar block kar dega).":(stackNonEmpty?"Top bar "+topH+" ≤ h ("+h+") — current bar tak peacefully extend ho sakti, while exit. Push hoga.":"Stack <strong>khaali</strong> hai — pop karne ko kuch nahi, while exit."),
+        analogy:shouldPop?"<strong>Tall guest ko nikalna hi padega</strong> 🚪 — chota guest entry pe khada hai, taller wala fit nahi.":"Stack <strong>safe state</strong> mein 😌 — koi pop nahi, aage badho."
+      })});
+      if(!shouldPop)break;
+
+      // L8 — top = stack.pop()
+      poppingIdx=topIdxLocal;
+      var popped=stack.pop();
+      top_var=popped;
+      pushStep({line:7,action:"pop",logHTML:richLog({
+        line:7,action:"pop",
+        code:"top = stack.pop()  # popped index "+popped+" (h="+heights[popped]+")",
+        status:"success",
+        inputs:[{k:"stack (before)",v:JSON.stringify(stack.concat([popped]))}],
+        outputs:[{k:"top",v:popped,changed:true},{k:"stack",v:JSON.stringify(stack),changed:true}],
+        why:"Index <strong>"+popped+"</strong> (height "+heights[popped]+") ko stack se nikala — ab iska <strong>maximum possible rectangle</strong> measure karenge.",
+        analogy:"<strong>Bar "+popped+" ka exit slip</strong> ✂️ — checkout time, ab iska total bill calculate hoga."
+      })});
+
+      // L9 — width
+      var width=stack.length===0?i:i-stack[stack.length-1]-1;
+      width_var=width;
+      var widthExpr=stack.length===0?("i = "+i+" (stack empty)"):(i+" - stack[-1]("+stack[stack.length-1]+") - 1 = "+width);
+      pushStep({line:8,action:"init",logHTML:richLog({
+        line:8,action:"init",
+        code:"width = "+widthExpr,
+        status:"success",
+        inputs:[{k:"i",v:i},{k:"stack",v:JSON.stringify(stack)}],
+        outputs:[{k:"width",v:width,changed:true}],
+        verdict:stack.length===0?"stack is empty → width = i":"stack has prev boundary at idx "+stack[stack.length-1],
+        verdictTrue:null,
+        why:stack.length===0?"<strong>Stack empty</strong> — popped bar ki height "+heights[popped]+" leftmost se "+i+" tak extend hoti thi. Width = i = "+width+".":"Stack mein <strong>previous shorter bar at index "+stack[stack.length-1]+"</strong> hai. Popped bar uske RIGHT (excl) se i (excl) tak extend hoti thi. Width = "+i+" - "+stack[stack.length-1]+" - 1 = "+width+".",
+        analogy:"<strong>Plot ki chaudai naap li</strong> 📏 — kahan se kahan tak yeh height continuous thi."
+      })});
+
+      // L10 — area
+      var area=heights[popped]*width;
+      area_var=area;
+      var rectLeft=stack.length===0?0:stack[stack.length-1]+1;
+      var rectRight=i-1;
+      rectInfo={topIdx:popped,left:rectLeft,right:rectRight,h:heights[popped],area:area,isBest:false};
+      pushStep({line:9,action:"init",logHTML:richLog({
+        line:9,action:"init",
+        code:"area = heights["+popped+"] * width = "+heights[popped]+" * "+width+" = "+area,
+        status:"success",
+        inputs:[{k:"heights[top]",v:heights[popped]},{k:"width",v:width}],
+        outputs:[{k:"area",v:area,changed:true}],
+        why:"<strong>Rectangle area = "+heights[popped]+" × "+width+" = "+area+"</strong>. Yeh popped bar ka maximum possible rectangle hai (since left aur right boundaries dono fixed ho gayi).",
+        analogy:"<strong>"+heights[popped]+" feet height × "+width+" feet width = "+area+" sq.ft</strong> 🏠 — popped plot ka final size."
+      })});
+
+      // L11 — best = max(best, area)
+      var newBest=Math.max(best,area);
+      var becameBest=newBest>best;
+      if(becameBest){
+        rectInfo.isBest=true;
+        bestRect={topIdx:popped,left:rectLeft,right:rectRight,h:heights[popped],area:area};
+      }
+      pushStep({line:10,action:becameBest?"found":"update",logHTML:richLog({
+        line:10,action:becameBest?"found":"update",
+        code:"best = max("+best+", "+area+") = "+newBest,
+        status:"success",
+        inputs:[{k:"best (before)",v:best},{k:"area",v:area}],
+        outputs:[{k:"best",v:newBest,changed:becameBest}],
+        verdict:area+" "+(becameBest?">":"<=")+" "+best,
+        verdictTrue:becameBest,
+        why:becameBest?"🎉 <strong>NEW RECORD!</strong> Bar "+popped+" se "+heights[popped]+"×"+width+"="+area+" ka rectangle mila — overall best update.":"Area "+area+" pichle best "+best+" se chota — koi update nahi.",
+        analogy:becameBest?"<strong>Naya record book pe</strong> 🏆 — '"+area+" sq.ft' biggest abhi tak.":"<strong>Existing champ "+best+" abhi safe</strong> — yeh wala chota nikla."
+      })});
+      if(becameBest)best=newBest;
+
+      // Reset transient highlight
+      rectInfo=null;
+      poppingIdx=null;
+      whileGuard++;
+      if(whileGuard>200)break;
+    }
+    top_var=null;width_var=null;area_var=null;
+
+    // L12 — stack.append(i)
+    stack.push(i);
+    justPushedIdx=i;
+    pushStep({line:11,action:"push",logHTML:richLog({
+      line:11,action:"push",
+      code:"stack.append("+i+")",
+      status:"success",
+      inputs:[{k:"i",v:i}],
+      outputs:[{k:"stack",v:JSON.stringify(stack),changed:true},{k:"stack.size",v:stack.length}],
+      why:"Index <strong>"+i+"</strong> ko stack mein push — yeh future shorter bars ke liye <strong>left boundary</strong> ban sakta hai.",
+      analogy:"Bar "+i+" ka <strong>'check-in slip'</strong> 📋 clipboard pe lag gaya — future calculations ke liye reference."
+    })});
+    justPushedIdx=null;
+  }
+
+  i_var=null;h_var=null;
+  // L5 exit
+  pushStep({line:4,action:"exit",logHTML:richLog({
+    line:4,action:"exit",
+    code:"# for-loop exit (saare bars + sentinel done)",
+    status:"info",
+    outputs:[{k:"best",v:best},{k:"stack (final)",v:JSON.stringify(stack)}],
+    why:"<strong>Saare bars + sentinel process</strong> ho gaye. Sentinel ki wajah se stack mein sirf last sentinel index "+n+" bacha (sab actual bars pop ho gaye).",
+    analogy:"<strong>Sab guests check-out kar gaye</strong> 👋 — bills calculate ho gaye."
+  })});
+
+  curResult=best;
+  // L13 — return best
+  pushStep({line:12,action:"return",logHTML:richLog({
+    line:12,action:"return",
+    code:"return best  # = "+best,
+    status:best>0?"success":"fail",
+    inputs:[{k:"best",v:best}],
+    outputs:[{k:"return",v:best}],
+    why:best>0?"🏆 <strong>Largest rectangle area = "+best+"</strong> sq.units!"+(bestRect?" Best rect: bar "+bestRect.topIdx+" with h="+bestRect.h+" × width "+(bestRect.right-bestRect.left+1):"")+"":"All zeros mile — koi rectangle nahi.",
+    analogy:best>0?"<strong>Final answer "+best+" sq.units!</strong> 🎉 Property scout ka kaam done.":"<strong>Khaali plot</strong> — kuch nahi mila."
+  })});
+  return st;
+}
+
+// ── VIZ ──
+function renderViz(s){
+  function chip(n,v,cls){return '<span class="var-chip '+(cls||'')+'"><span class="vn">'+n+'</span><span class="vv">'+v+'</span></span>';}
+
+  // Vars strip
+  var h='<div class="vars-strip">'+
+    chip("n ",s.n,"")+
+    chip("i ",s.i_var===null?"—":s.i_var,(s.line===4||s.line===5)?"vc-active":"")+
+    chip("h ",s.h_var===null?"—":s.h_var,s.line===5?"vc-active":"")+
+    chip("top ",s.top_var===null?"—":s.top_var,s.line===7?"vc-active":"")+
+    chip("width ",s.width_var===null?"—":s.width_var,s.line===8?"vc-active":"")+
+    chip("area ",s.area_var===null?"—":s.area_var,s.line===9?"vc-active":"")+
+    chip("📚 stack ",JSON.stringify(s.stack),(s.line>=6&&s.line<=11)?"vc-active":"")+
+    chip("🏆 best ",s.best,s.best>0?"vc-safe":"")+
+  '</div>';
+
+  // ── Histogram ──
+  h+='<div class="viz-card"><div class="viz-title">📊 Histogram (heights = '+JSON.stringify(s.heights)+')</div>';
+  h+='<div class="hist-wrap" id="histWrap">';
+
+  // Determine max height for scaling
+  var maxH=Math.max.apply(null,s.heights.length?s.heights:[1]);if(maxH<1)maxH=1;
+  var HIST_HEIGHT=240; // px usable
+  var topOfStack=s.stack.length>0?s.stack[s.stack.length-1]:-1;
+
+  h+='<div class="hist-bars">';
+  // I-pointer dashed line
+  if(s.i_var!==null){
+    var iLeftPx=8+s.i_var*(BAR_W+BAR_GAP);
+    h+='<div class="hist-i-line" style="left:'+(iLeftPx+BAR_W/2-1)+'px"></div>';
+    h+='<div class="hist-i-marker" style="left:'+(iLeftPx)+'px;top:-22px;width:'+BAR_W+'px"><span class="hist-i-marker-arrow">▼</span><span>i='+s.i_var+(s.i_var===s.n?'⚑':'')+'</span></div>';
+  }
+
+  // Rectangle overlay (current pop's measured rect)
+  if(s.rectInfo){
+    var ri=s.rectInfo;
+    var leftPx=8+ri.left*(BAR_W+BAR_GAP);
+    var rightPx=8+(ri.right+1)*(BAR_W+BAR_GAP)-BAR_GAP;
+    var widthPx=rightPx-leftPx;
+    var heightPx=Math.max(8,(ri.h/maxH)*HIST_HEIGHT);
+    var bottomOffset=24; // matches padding-bottom
+    h+='<div class="rect-overlay'+(ri.isBest?' rect-overlay--best':'')+'" style="left:'+leftPx+'px;bottom:'+bottomOffset+'px;width:'+widthPx+'px;height:'+heightPx+'px">'+ri.h+'×'+(ri.right-ri.left+1)+'='+ri.area+'</div>';
+  }
+  // Best rect (final view) overlay
+  else if(s.bestRect&&s.line===12){
+    var br=s.bestRect;
+    var leftPx2=8+br.left*(BAR_W+BAR_GAP);
+    var rightPx2=8+(br.right+1)*(BAR_W+BAR_GAP)-BAR_GAP;
+    var widthPx2=rightPx2-leftPx2;
+    var heightPx2=Math.max(8,(br.h/maxH)*HIST_HEIGHT);
+    h+='<div class="rect-overlay rect-overlay--best" style="left:'+leftPx2+'px;bottom:24px;width:'+widthPx2+'px;height:'+heightPx2+'px">🏆 '+br.h+'×'+(br.right-br.left+1)+'='+br.area+'</div>';
+  }
+
+  for(var bi=0;bi<s.heights.length;bi++){
+    var bh=s.heights[bi];
+    var pct=bh===0?0:(bh/maxH)*HIST_HEIGHT;
+    var bcls='hist-bar';
+    var inStack=s.stack.indexOf(bi)>=0;
+    if(bh===0)bcls+=' hist-bar--zero';
+    else if(bi===s.poppingIdx)bcls+=' hist-bar--popping';
+    else if(bi===s.justPushedIdx&&s.line===11)bcls+=' hist-bar--in-stack';
+    else if(bi===topOfStack&&s.stack.length>0)bcls+=' hist-bar--top-stack';
+    else if(inStack)bcls+=' hist-bar--in-stack';
+    else if(s.bestRect&&s.line===12&&bi>=s.bestRect.left&&bi<=s.bestRect.right&&s.heights[bi]>=s.bestRect.h)bcls+=' hist-bar--rect-best';
+    else if(s.rectInfo&&bi>=s.rectInfo.left&&bi<=s.rectInfo.right&&s.heights[bi]>=s.rectInfo.h&&bi!==s.poppingIdx)bcls+=' hist-bar--in-rect';
+    else bcls+=' hist-bar--idle';
+
+    var heightPx=bh===0?3:Math.max(10,pct);
+    h+='<div class="'+bcls+'" style="height:'+heightPx+'px">';
+    if(bh>0)h+='<span class="hist-bar-h">'+bh+'</span>';
+    h+='<span class="hist-bar-label">'+bi+'</span>';
+    h+='</div>';
+  }
+
+  // Sentinel bar (visual only when i === n)
+  if(s.i_var===s.n&&s.n>0){
+    h+='<div class="hist-bar hist-bar--sentinel"><span class="hist-bar-label">'+s.n+'⚑</span></div>';
+  }
+
+  h+='</div>'; // hist-bars
+
+  h+='<div class="legend">'+
+    '<span><i style="background:#1e40af"></i>Idle</span>'+
+    '<span><i style="background:#6d28d9"></i>In Stack</span>'+
+    '<span><i style="background:#B45309"></i>Stack Top</span>'+
+    '<span><i style="background:#E24B4A"></i>Popping</span>'+
+    '<span><i style="background:#15803D"></i>In Rect</span>'+
+    '<span><i style="background:#fde68a;border-color:#fff"></i>Best Rect</span>'+
+  '</div>';
+  h+='</div></div>';
+
+  // Step calculation banner
+  if(s.rectInfo){
+    h+='<div class="step-calc">📐 Measuring popped bar '+s.rectInfo.topIdx+': h='+s.rectInfo.h+', cols ['+s.rectInfo.left+'..'+s.rectInfo.right+'] → <strong>'+s.rectInfo.h+' × '+(s.rectInfo.right-s.rectInfo.left+1)+' = '+s.rectInfo.area+'</strong>'+(s.rectInfo.isBest?' 🏆 NEW BEST!':'')+'</div>';
+  }
+
+  // ── ROW 2: Stack + heights table + best display ──
+  h+='<div class="viz-row" style="margin-top:12px">';
+
+  // Stack
+  h+='<div class="viz-card" style="min-width:170px"><div class="viz-title">🗂️ Monotonic Stack (size '+s.stack.length+')</div>';
+  h+='<div class="stack-col">';
+  if(!s.stack.length){
+    h+='<div class="empty-state">Stack empty 📭</div>';
+  }else{
+    for(var si=0;si<s.stack.length;si++){
+      var sCls='stack-item';
+      var stkIdx=s.stack[si];
+      var stkH=stkIdx<s.heights.length?s.heights[stkIdx]:0;
+      if(si===s.stack.length-1){
+        if(stkIdx===s.justPushedIdx&&s.line===11)sCls+=' stack-item--just-pushed';
+        else sCls+=' stack-item--top';
+      }
+      h+='<div class="'+sCls+'">'+(si===s.stack.length-1?'⭐ ':'')+'<span>idx '+stkIdx+'</span><span style="opacity:.7">h='+stkH+'</span></div>';
+    }
+  }
+  h+='</div></div>';
+
+  // Heights table
+  h+='<div class="viz-card"><div class="viz-title">📋 heights[] (with stack indicator)</div>';
+  h+='<div class="heights-cells">';
+  for(var hi=0;hi<s.heights.length;hi++){
+    var hCls='hc-box';
+    var inStk=s.stack.indexOf(hi)>=0;
+    if(inStk){
+      if(hi===topOfStack)hCls+=' hc-box--top';
+      else hCls+=' hc-box--in-stack';
+    }
+    if(hi===s.i_var)hCls+=' hc-box--curr-i';
+    h+='<div class="height-cell"><div class="hc-idx">'+hi+'</div><div class="'+hCls+'">'+s.heights[hi]+'</div></div>';
+  }
+  h+='</div></div>';
+
+  // Best display
+  h+='<div class="viz-card" style="text-align:center;flex:1"><div class="viz-title">🏆 Best Area So Far</div>';
+  h+='<div class="best-display">'+s.best+'</div>';
+  if(s.bestRect){
+    h+='<div style="font:10px var(--font-mono);color:var(--text-tertiary);margin-top:5px">bar '+s.bestRect.topIdx+': h='+s.bestRect.h+' × w='+(s.bestRect.right-s.bestRect.left+1)+' [cols '+s.bestRect.left+'..'+s.bestRect.right+']</div>';
+  }
+  h+='</div>';
+
+  h+='</div>';
+
+  // Result banner
+  if(s.line===12){
+    h+='<div class="result-banner">🏆 Largest Rectangle Area = '+s.best+(s.bestRect?'  (h='+s.bestRect.h+' × w='+(s.bestRect.right-s.bestRect.left+1)+')':'')+'</div>';
+  }
+
+  document.getElementById("vizPanel").innerHTML=h;
+}
+
+function renderStep(idx){
+  if(!steps.length)return;
+  var s=steps[idx];currentStep=idx;
+  document.getElementById('stepInfo').textContent=(idx+1)+'/'+steps.length;
+  var bd=document.getElementById('actionBadge');
+  bd.textContent=BADGE_LABEL[s.action]||s.action;
+  bd.className='action-badge action-badge--'+s.action;
+  document.querySelectorAll('.code-line').forEach(function(el){el.classList.remove('active');});
+  var al=document.querySelector('.code-line[data-line="'+s.line+'"]');
+  if(al){al.classList.add('active');al.scrollIntoView({block:'nearest'});}
+  renderViz(s);
+  showLogPreview(s);
+}
+
+function showLogPreview(s){
+  if(!logEnabled)return;
+  document.getElementById('logPopupBody').innerHTML=s.logHTML||'';
+  document.getElementById('logPopup').classList.remove('log-popup--hidden');
+}
+function hideLogPopup(){document.getElementById('logPopup').classList.add('log-popup--hidden');}
+function toggleLogPreview(){
+  logEnabled=!logEnabled;
+  var btn=document.getElementById('logToggleBtn');
+  btn.textContent=logEnabled?'📋 ON':'📋 OFF';
+  btn.classList.toggle('log-toggle-btn--off',!logEnabled);
+  if(!logEnabled)hideLogPopup();
+  else if(steps.length)showLogPreview(steps[currentStep]);
+}
+function logZoom(dir){logZoomLevel=Math.max(60,Math.min(180,logZoomLevel+dir*20));updateLogZoom();}
+function logZoomReset(){logZoomLevel=100;updateLogZoom();}
+function updateLogZoom(){
+  document.getElementById('logZoomLabel').textContent=logZoomLevel+'%';
+  document.getElementById('logPopup').style.setProperty('--log-scale',logZoomLevel/100);
+}
+function toggleFullscreen(){
+  var viz=document.querySelector('.col-viz');
+  if(!document.fullscreenElement)viz.requestFullscreen().catch(function(){});
+  else document.exitFullscreen();
+}
+
+function parseInput(raw){
+  raw=raw.trim();
+  if(!raw)return [2,1,5,6,2,3];
+  var parts=raw.split(',').map(function(s){return parseInt(s.trim(),10);}).filter(function(n){return !isNaN(n)&&n>=0;});
+  return parts.length?parts:[0];
+}
+
+function resetWithInput(){
+  curResult=null;
+  var raw=document.getElementById('inputArr').value;
+  var arr=parseInput(raw);
+  renderCode();fitCodeWidth();
+  steps=buildSteps(arr);
+  currentStep=0;renderStep(0);
+  document.getElementById('liveOutput').textContent=curResult!==null?curResult:'—';
+}
+
+function stepBy(d){var nx=currentStep+d;if(nx>=0&&nx<steps.length)renderStep(nx);}
+function resetStep(){renderStep(0);}
+
+function loadTest(i,el){
+  document.querySelectorAll('.prob-test').forEach(function(t){t.classList.remove('prob-test--active');});
+  if(el)el.classList.add('prob-test--active');
+  document.getElementById('inputArr').value=TESTS[i].arr;
+  document.getElementById('expectedBadge').textContent='exp: '+TESTS[i].e;
+  resetWithInput();
+}
+
+document.addEventListener('keydown',function(e){
+  if(e.target.tagName==='INPUT'||e.target.tagName==='SELECT')return;
+  if(e.key==='ArrowRight'){e.preventDefault();stepBy(1);}
+  else if(e.key==='ArrowLeft'){e.preventDefault();stepBy(-1);}
+  else if(e.key==='r'||e.key==='R'){e.preventDefault();resetStep();}
+});
+
+(function(){
+  var col1=document.getElementById('col1');
+  document.getElementById('resizeH1').addEventListener('mousedown',function(e){
+    e.preventDefault();codeWidthUserSet=true;
+    var startX=e.clientX,startW=col1.offsetWidth,h=this;
+    document.body.classList.add('no-select');h.classList.add('active');
+    function mv(e){col1.style.width=Math.max(140,startW+(e.clientX-startX))+'px';syncFooterWidth();}
+    function up(){document.removeEventListener('mousemove',mv);document.removeEventListener('mouseup',up);document.body.classList.remove('no-select');h.classList.remove('active');}
+    document.addEventListener('mousemove',mv);document.addEventListener('mouseup',up);
+  });
+})();
+
+window.addEventListener('resize',function(){if(!codeWidthUserSet)fitCodeWidth();else syncFooterWidth();});
+
+renderTests();renderCode();fitCodeWidth();resetWithInput();
+</script>
+</body>
+</html>

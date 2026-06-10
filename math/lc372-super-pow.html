@@ -1,0 +1,960 @@
+﻿
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LC #372 — Super Pow | Dry Run Visualizer</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+:root {
+  --bg-primary:#FAFAF8; --bg-secondary:#F1EFE8; --bg-tertiary:#E2E0D8; --bg-card:#FFFFFF;
+  --text-primary:#2C2C2A; --text-secondary:#5F5E5A; --text-tertiary:#888780;
+  --border-color:rgba(0,0,0,0.11); --border-light:rgba(0,0,0,0.06); --border-focus:#534AB7;
+  --accent-indigo:#534AB7; --accent-indigo-bg:#EEEDFE; --accent-indigo-text:#3C3489; --accent-indigo-hover:#4740A0;
+  --accent-teal:#0F6E56; --accent-teal-bg:#E1F5EE; --accent-teal-text:#085041;
+  --accent-red:#E24B4A; --accent-red-bg:#FCEBEB; --accent-red-text:#791F1F;
+  --accent-amber:#B45309; --accent-amber-bg:#FEF3C7; --accent-amber-text:#78350F;
+  --accent-green:#15803D; --accent-green-bg:#DCFCE7; --accent-green-text:#14532D;
+  --syn-keyword:#534AB7; --syn-function:#185FA5; --syn-number:#993C1D; --syn-string:#0F6E56;
+  --active-line-bg:#EEEDFE;
+  --radius-sm:4px; --radius-md:6px; --radius-lg:10px; --radius-xl:14px;
+  --font-sans:'DM Sans', system-ui, sans-serif;
+  --font-mono:'JetBrains Mono', 'Fira Code', monospace;
+  --fs-xs:11px; --fs-sm:12px; --fs-base:14px; --fs-md:15px; --fs-lg:18px;
+  --ease:.18s ease;
+}
+* { box-sizing:border-box; margin:0; padding:0 }
+html, body { height:100%; overflow:hidden }
+body { font-family:var(--font-sans); color:var(--text-primary); background:var(--bg-primary); font-size:var(--fs-base); line-height:1.5 }
+.no-select { user-select:none }
+::-webkit-scrollbar { width:5px; height:5px }
+::-webkit-scrollbar-track { background:transparent }
+::-webkit-scrollbar-thumb { background:var(--border-color); border-radius:3px }
+
+/* App shell */
+.app-shell { display:flex; flex-direction:column; height:100vh; overflow:hidden; background:var(--bg-primary) }
+.problem-card { flex-shrink:0; border-bottom:1px solid var(--border-color); background:var(--bg-card) }
+.main-row { flex:1; display:flex; overflow:hidden; min-height:0 }
+.col { display:flex; flex-direction:column; overflow:hidden; min-width:0 }
+.col-code { width:33%; min-width:140px; max-width:45vw; background:var(--bg-card); border-right:1px solid var(--border-color) }
+.col-viz { flex:1; min-width:0; background:var(--bg-primary) }
+.resize-h { width:5px; cursor:col-resize; background:transparent; flex-shrink:0; transition:background var(--ease) }
+.resize-h:hover, .resize-h.active { background:var(--accent-indigo) }
+.footer-bar { display:flex; flex-shrink:0; border-top:1px solid var(--border-color); background:var(--bg-card) }
+.footer-left { width:33%; min-width:140px; max-width:45vw; display:flex; align-items:center; gap:8px; padding:7px 12px; border-right:1px solid var(--border-light) }
+.footer-right { flex:1; display:flex; align-items:center; gap:8px; padding:7px 20px; flex-wrap:wrap }
+.footer-sep { width:1px; height:20px; background:var(--border-color); margin:0 4px }
+
+/* Problem Card */
+.pc-header { display:flex; align-items:center; gap:10px; padding:10px 16px; border-bottom:1px solid var(--border-light); flex-wrap:wrap }
+.gt-learn { background:var(--accent-indigo); color:#fff; font-weight:700; font-size:11px; padding:5px 12px; border-radius:99px; border:none; cursor:pointer; letter-spacing:.05em }
+.gt-learn:hover { background:var(--accent-indigo-hover) }
+.lc-num { font:700 12px var(--font-mono); color:var(--text-tertiary) }
+.lc-title { font-size:var(--fs-md); font-weight:700; flex:1 }
+.lc-diff { font:700 10px var(--font-mono); padding:3px 9px; border-radius:99px; background:var(--accent-red-bg); color:var(--accent-red-text); border:1px solid var(--accent-red) }
+.lc-tag { font:600 10px var(--font-mono); padding:3px 9px; border-radius:99px; background:var(--accent-indigo-bg); color:var(--accent-indigo-text); border:1px solid var(--accent-indigo) }
+.pc-input-row { display:flex; align-items:center; gap:8px; flex-wrap:wrap }
+.pc-input-row label { font:600 11px var(--font-mono); color:var(--text-secondary) }
+.pc-input-row input { font:600 12px var(--font-mono); padding:4px 8px; border:1px solid var(--border-color); border-radius:var(--radius-sm); background:var(--bg-card); width:140px }
+.pc-input-row input:focus { outline:none; border-color:var(--border-focus) }
+.exp-badge { font:600 11px var(--font-mono); padding:4px 8px; background:var(--accent-green-bg); color:var(--accent-green-text); border-radius:var(--radius-sm); border:1px solid var(--accent-green) }
+.toggle-btn { background:var(--bg-secondary); border:1px solid var(--border-color); border-radius:var(--radius-sm); padding:4px 10px; font-size:11px; cursor:pointer; font-family:system-ui,"Segoe UI Emoji",sans-serif }
+.toggle-btn:hover { background:var(--bg-tertiary) }
+.pc-body { display:flex; gap:16px; padding:14px 16px; max-height:34vh; overflow:auto }
+.pc-body.hidden { display:none }
+.pc-left { flex:1.5 }
+.pc-right { flex:1; display:flex; flex-direction:column; gap:8px }
+.pc-section-title { font:700 11px var(--font-mono); text-transform:uppercase; letter-spacing:.06em; color:var(--text-tertiary); margin-bottom:6px; display:flex; align-items:center; gap:5px }
+.pc-text { font-size:13px; line-height:1.6; color:var(--text-secondary); margin-bottom:10px }
+.pc-text code { font:600 12px var(--font-mono); background:var(--bg-secondary); padding:1px 5px; border-radius:3px; color:var(--accent-indigo-text) }
+.pc-text strong { color:var(--text-primary) }
+.concept-block { background:var(--bg-secondary); border-left:3px solid var(--accent-indigo); padding:7px 11px; border-radius:var(--radius-sm); margin-bottom:6px; font-size:12px }
+.concept-block strong { color:var(--accent-indigo-text); font-size:11px; text-transform:uppercase; letter-spacing:.05em }
+.complexity-row { display:flex; gap:8px; margin-top:8px }
+.cx-chip { font:600 11px var(--font-mono); padding:4px 9px; border-radius:99px; background:var(--bg-secondary); border:1px solid var(--border-color) }
+.cx-chip.cx-time { background:var(--accent-amber-bg); border-color:var(--accent-amber); color:var(--accent-amber-text) }
+.cx-chip.cx-space { background:var(--accent-teal-bg); border-color:var(--accent-teal); color:var(--accent-teal-text) }
+.tc-chip { background:var(--bg-secondary); border:1px solid var(--border-color); border-radius:var(--radius-md); padding:8px 10px; cursor:pointer; transition:all var(--ease); display:flex; flex-direction:column; gap:5px }
+.tc-chip:hover { border-color:var(--accent-indigo); background:var(--accent-indigo-bg) }
+.tc-row1 { display:flex; align-items:center; gap:6px; flex-wrap:wrap }
+.pt-tag { font:600 9px var(--font-mono); text-transform:uppercase; letter-spacing:.04em; padding:2px 6px; border-radius:3px; background:var(--accent-indigo-bg); color:var(--accent-indigo-text); border:1px solid var(--accent-indigo) }
+.tc-label { font-size:11px; color:var(--text-secondary); flex:1 }
+.tc-expected { font:700 11px var(--font-mono); color:var(--accent-green-text); background:var(--accent-green-bg); padding:2px 6px; border-radius:3px; border:1px solid var(--accent-green) }
+.tc-vals { display:flex; gap:4px; flex-wrap:wrap; align-items:center }
+.tc-vals code { font:600 10px var(--font-mono); background:var(--bg-card); border:1px solid var(--border-color); padding:1px 5px; border-radius:3px; color:var(--text-primary) }
+.tc-vals .vk { font-size:10px; color:var(--text-tertiary); font-weight:600 }
+.run-row { display:flex; align-items:center; gap:8px; margin-top:6px }
+.btn-run { background:var(--accent-indigo); color:#fff; border:none; padding:7px 16px; border-radius:var(--radius-md); font-weight:700; cursor:pointer; font-family:system-ui,"Segoe UI Emoji",sans-serif; font-size:12px }
+.btn-run:hover { background:var(--accent-indigo-hover) }
+.live-out { font:700 12px var(--font-mono); padding:5px 10px; background:var(--bg-secondary); border-radius:var(--radius-sm); border:1px solid var(--border-color); flex:1 }
+
+/* Code panel */
+.code-header, .viz-header { padding:6px 14px; font:700 11px var(--font-mono); text-transform:uppercase; letter-spacing:.06em; color:var(--text-tertiary); border-bottom:1px solid var(--border-light); background:var(--bg-secondary); flex-shrink:0; font-family:system-ui,"Segoe UI Emoji",sans-serif }
+.code-panel { flex:1; overflow-y:auto; padding:10px 0; font:500 13px var(--font-mono); line-height:1.9 }
+.code-line { display:flex; padding:1px 14px; transition:background var(--ease); white-space:pre }
+.code-line.active { background:var(--active-line-bg); border-left:3px solid var(--accent-indigo); padding-left:11px }
+.ln { color:var(--text-tertiary); margin-right:14px; user-select:none; min-width:24px; text-align:right }
+.kw { color:var(--syn-keyword); font-weight:600 }
+.fn { color:var(--syn-function); font-weight:600 }
+.num { color:var(--syn-number) }
+.str { color:var(--syn-string) }
+
+/* Visualization */
+.viz-panel { flex:1; overflow-y:auto; padding:14px 18px }
+.vars-strip { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:12px }
+.var-chip { font:600 11px var(--font-mono); padding:5px 10px; border-radius:var(--radius-md); background:var(--bg-card); border:1px solid var(--border-color); display:inline-flex; align-items:center; gap:4px }
+.var-chip .vk { color:var(--text-tertiary); font-weight:500 }
+.var-chip .vv { color:var(--text-primary); font-weight:700 }
+.vc-active { background:var(--accent-indigo-bg); border-color:var(--accent-indigo); color:var(--accent-indigo-text) }
+.vc-safe { background:var(--accent-green-bg); border-color:var(--accent-green); color:var(--accent-green-text) }
+.vc-flip { background:var(--accent-red-bg); border-color:var(--accent-red); color:var(--accent-red-text) }
+.vc-amber { background:var(--accent-amber-bg); border-color:var(--accent-amber); color:var(--accent-amber-text) }
+.viz-row { display:flex; gap:12px; align-items:flex-start; flex-wrap:wrap; margin-bottom:14px }
+.viz-card { background:var(--bg-card); border:1px solid var(--border-color); border-radius:var(--radius-md); padding:10px 12px; min-width:200px }
+.viz-card-title { font:700 10px var(--font-mono); text-transform:uppercase; letter-spacing:.06em; color:var(--text-tertiary); margin-bottom:8px; display:flex; align-items:center; gap:5px; font-family:system-ui,"Segoe UI Emoji",sans-serif }
+.tile-row { display:flex; gap:5px; flex-wrap:wrap }
+.tile { width:42px; height:42px; display:flex; align-items:center; justify-content:center; font:700 16px var(--font-mono); background:#fff; border:2px solid var(--border-color); border-radius:var(--radius-sm); transition:all var(--ease); position:relative }
+.tile-idx { position:absolute; top:-8px; left:2px; font-size:9px; color:var(--text-tertiary); font-weight:500; background:var(--bg-card); padding:0 2px }
+.tile--curr { background:var(--accent-amber-bg); border-color:var(--accent-amber); animation:pulse-node 1.1s infinite }
+.tile--popped { background:var(--accent-red-bg); border-color:var(--accent-red); opacity:.5; text-decoration:line-through }
+.tile--processed { background:var(--accent-green-bg); border-color:var(--accent-green) }
+.empty-state { font-size:11px; color:var(--text-tertiary); font-style:italic; padding:8px }
+
+/* Recursion stack */
+.stack-col { display:flex; flex-direction:column-reverse; gap:6px; min-height:80px; padding:8px; background:var(--bg-secondary); border-radius:var(--radius-md); border:1px dashed var(--border-color); min-width:280px }
+.frame { background:#fff; border:2px solid var(--border-color); border-radius:var(--radius-md); padding:7px 9px; font:600 11px var(--font-mono); position:relative }
+.frame--top { border-color:var(--accent-indigo); background:var(--accent-indigo-bg); animation:pulse-node 1.4s infinite }
+.frame--returning { border-color:var(--accent-green); background:var(--accent-green-bg) }
+.frame-title { font:700 10px var(--font-mono); color:var(--accent-indigo-text); text-transform:uppercase; letter-spacing:.04em; margin-bottom:3px; display:flex; align-items:center; gap:4px }
+.frame--returning .frame-title { color:var(--accent-green-text) }
+.frame-vars { display:flex; gap:4px; flex-wrap:wrap }
+.fv { font:600 10px var(--font-mono); padding:2px 6px; border-radius:3px; background:var(--bg-secondary); border:1px solid var(--border-light) }
+.fv-changed { background:var(--accent-amber-bg); border-color:var(--accent-amber); color:var(--accent-amber-text) }
+.fv-ret { background:var(--accent-green-bg); border-color:var(--accent-green); color:var(--accent-green-text) }
+
+/* Math display card */
+.math-display { background:#0d1117; color:#e6edf3; padding:12px 16px; border-radius:var(--radius-md); font:600 14px var(--font-mono); margin-top:6px; line-height:1.7; border:1px solid #30363d }
+.math-display .mv { color:#79c0ff }
+.math-display .mr { color:#3fb950; font-weight:700 }
+.math-display .mo { color:#ff7b72 }
+.math-display .mc { color:#8b949e; font-style:italic; font-size:11px; display:block; margin-top:4px }
+
+/* Result banner */
+.result-banner { background:linear-gradient(135deg, var(--accent-green-bg), var(--accent-teal-bg)); border:2px solid var(--accent-green); padding:14px 18px; border-radius:var(--radius-md); margin-top:10px; animation:win-pulse 1.6s ease-in-out infinite }
+.result-banner-title { font:700 13px var(--font-mono); color:var(--accent-green-text); text-transform:uppercase; letter-spacing:.06em; margin-bottom:4px }
+.result-banner-val { font:800 22px var(--font-mono); color:var(--accent-green-text) }
+
+/* Animations */
+@keyframes pulse-node { 0%,100% {box-shadow:0 0 4px var(--accent-indigo)} 50% {box-shadow:0 0 12px var(--accent-indigo)} }
+@keyframes shake { 0%,100% {transform:translateX(0)} 25% {transform:translateX(-3px)} 75% {transform:translateX(3px)} }
+@keyframes win-pulse { 0%,100% {box-shadow:0 0 3px rgba(21,128,61,.4)} 50% {box-shadow:0 0 12px rgba(21,128,61,.7)} }
+
+/* Footer controls */
+.step-info { font:700 12px var(--font-mono); color:var(--text-secondary); padding:3px 8px; background:var(--bg-secondary); border-radius:var(--radius-sm) }
+.action-badge { font:700 10px var(--font-mono); padding:3px 9px; border-radius:99px; text-transform:uppercase; font-family:system-ui,"Segoe UI Emoji",sans-serif }
+.action-badge--func-def, .action-badge--init, .action-badge--call, .action-badge--return { background:rgba(130,80,255,.14); color:#3C3489; border:1px solid #8250ff }
+.action-badge--for-check, .action-badge--while-check, .action-badge--if-check { background:rgba(56,139,253,.14); color:#185FA5; border:1px solid #388bfd }
+.action-badge--mark, .action-badge--push, .action-badge--pop, .action-badge--restore, .action-badge--found { background:var(--accent-green-bg); color:var(--accent-green-text); border:1px solid var(--accent-green) }
+.action-badge--remove, .action-badge--prune, .action-badge--fail { background:var(--accent-red-bg); color:var(--accent-red-text); border:1px solid var(--accent-red) }
+.action-badge--exit, .action-badge--skip { background:var(--bg-tertiary); color:var(--text-secondary); border:1px solid var(--border-color) }
+kbd { font:600 10px var(--font-mono); padding:2px 6px; background:var(--bg-secondary); border:1px solid var(--border-color); border-radius:3px; color:var(--text-secondary); font-family:system-ui,"Segoe UI Emoji",sans-serif }
+.btn { background:var(--bg-card); border:1px solid var(--border-color); padding:5px 11px; border-radius:var(--radius-sm); cursor:pointer; font:600 12px var(--font-mono); color:var(--text-primary); font-family:system-ui,"Segoe UI Emoji",sans-serif }
+.btn:hover { background:var(--bg-secondary); border-color:var(--accent-indigo) }
+.btn-primary { background:var(--accent-indigo); color:#fff; border-color:var(--accent-indigo) }
+.btn-primary:hover { background:var(--accent-indigo-hover) }
+.btn-zoom { width:24px; height:24px; padding:0; display:inline-flex; align-items:center; justify-content:center; background:var(--bg-card); border:1px solid var(--border-color); border-radius:var(--radius-sm); cursor:pointer; font:600 12px var(--font-mono); font-family:system-ui,"Segoe UI Emoji",sans-serif }
+.btn-zoom:hover { background:var(--bg-secondary) }
+.log-zoom-label { font:600 11px var(--font-mono); color:var(--text-secondary); min-width:36px; text-align:center }
+.log-toggle-btn { background:var(--accent-green-bg); color:var(--accent-green-text); border:1px solid var(--accent-green); padding:4px 10px; border-radius:var(--radius-sm); cursor:pointer; font:700 11px var(--font-mono); font-family:system-ui,"Segoe UI Emoji",sans-serif }
+.log-toggle-btn--off { background:var(--bg-tertiary); color:var(--text-secondary); border-color:var(--border-color) }
+.btn-fullscreen { font-family:system-ui,"Segoe UI Emoji",sans-serif }
+
+/* Log popup */
+.log-popup {
+  --log-scale: 1;
+  position: fixed; bottom: 52px; right: 14px;
+  width: calc(480px * var(--log-scale));
+  max-width: 92vw; max-height: 75vh;
+  border-radius: var(--radius-lg);
+  box-shadow: 0 10px 32px rgba(0,0,0,.14);
+  border: 1px solid var(--border-color);
+  background: var(--bg-card);
+  overflow: hidden;
+  display: flex; flex-direction: column;
+  z-index: 100;
+  transition: opacity .15s, transform .15s;
+  transform-origin: bottom right;
+}
+.log-popup--hidden { opacity: 0; transform: scale(.92); pointer-events: none; }
+.log-popup-body { flex: 1; overflow: auto; padding: 0 }
+.log-popup-body > .log-card { border-radius: 0; border: none; border-left: 0 }
+
+/* Log card */
+.log-card { border-radius:var(--radius-md); overflow:hidden; border:1px solid var(--border-color); border-left-width:4px; font-size:var(--fs-xs); background:var(--bg-card) }
+.log-card--func-def, .log-card--init, .log-card--call, .log-card--return { border-left-color:#8250ff }
+.log-card--for-check, .log-card--while-check, .log-card--if-check { border-left-color:#388bfd }
+.log-card--mark, .log-card--push, .log-card--pop, .log-card--restore, .log-card--found { border-left-color:var(--accent-green) }
+.log-card--remove, .log-card--prune, .log-card--fail { border-left-color:var(--accent-red) }
+.log-card--exit, .log-card--skip { border-left-color:var(--text-tertiary) }
+.log-card-header { display:flex; align-items:center; gap:6px; padding:8px 10px 6px; background:var(--bg-secondary); border-bottom:1px solid var(--border-light); flex-wrap:wrap }
+.log-badge { font:700 10px var(--font-mono); padding:2px 7px; border-radius:4px; font-family:system-ui,"Segoe UI Emoji",sans-serif }
+.log-badge--func-def, .log-badge--init, .log-badge--call, .log-badge--return { background:rgba(130,80,255,.14); color:#3C3489; border:1px solid #8250ff }
+.log-badge--for-check, .log-badge--while-check, .log-badge--if-check { background:rgba(56,139,253,.14); color:#185FA5; border:1px solid #388bfd }
+.log-badge--mark, .log-badge--push, .log-badge--pop, .log-badge--restore, .log-badge--found { background:var(--accent-green-bg); color:var(--accent-green-text); border:1px solid var(--accent-green) }
+.log-badge--remove, .log-badge--prune, .log-badge--fail { background:var(--accent-red-bg); color:var(--accent-red-text); border:1px solid var(--accent-red) }
+.log-badge--exit, .log-badge--skip { background:var(--bg-tertiary); color:var(--text-secondary); border:1px solid var(--border-color) }
+.log-line-ref { font:700 10px var(--font-mono); color:var(--accent-indigo); background:var(--accent-indigo-bg); padding:1px 6px; border-radius:4px; border:1px solid var(--accent-indigo) }
+.log-status-pill { font-family:system-ui,"Segoe UI Emoji",sans-serif; font-size:9px; font-weight:700; padding:2px 7px; border-radius:99px; text-transform:uppercase; margin-left:auto }
+.log-status--success { background:var(--accent-green-bg); color:var(--accent-green-text); border:1px solid var(--accent-green) }
+.log-status--fail { background:var(--accent-red-bg); color:var(--accent-red-text); border:1px solid var(--accent-red) }
+.log-status--skip { background:var(--bg-tertiary); color:var(--text-tertiary); border:1px solid var(--border-color) }
+.log-status--loop { background:rgba(56,139,253,.14); color:#185FA5; border:1px solid #388bfd }
+.log-status--prune { background:var(--accent-red-bg); color:var(--accent-red-text); border:1px solid var(--accent-red) }
+.log-status--info { background:rgba(130,80,255,.14); color:#3C3489; border:1px solid #8250ff }
+.log-section { padding:7px 10px; border-bottom:1px dashed var(--border-light) }
+.log-section:last-child { border-bottom:none }
+.log-section-title { font:700 8px var(--font-mono); text-transform:uppercase; letter-spacing:.06em; color:var(--text-tertiary); margin-bottom:4px; display:flex; align-items:center; gap:4px }
+.log-section-title-icon { font-family:system-ui,"Segoe UI Emoji",sans-serif }
+.log-code-snippet { font:600 11px var(--font-mono); background:#0d1117; color:#e6edf3; padding:6px 9px; border-radius:4px; display:block; overflow-x:auto; white-space:pre; border:1px solid #30363d }
+.log-code-snippet .ck { color:#ff7b72 }
+.log-code-snippet .cs { color:#a5d6ff }
+.log-code-snippet .cn { color:#79c0ff }
+.log-code-snippet .cf { color:#d2a8ff }
+.log-code-snippet .cc { color:#8b949e; font-style:italic }
+.log-kv-row { display:flex; gap:4px; flex-wrap:wrap }
+.log-kv { display:inline-flex; align-items:center; gap:3px; font:11px var(--font-mono); padding:2px 7px; border-radius:4px; background:var(--bg-secondary); border:1px solid var(--border-light) }
+.log-kv-key { color:var(--text-tertiary); font-weight:500 }
+.log-kv-val { color:var(--text-primary); font-weight:700 }
+.log-kv--in { background:rgba(56,139,253,.08); border-color:rgba(56,139,253,.3) }
+.log-kv--out { background:rgba(63,185,80,.08); border-color:rgba(63,185,80,.4) }
+.log-kv--out .log-kv-val { color:#15803D }
+.log-kv--changed { background:rgba(180,83,9,.10); border-color:rgba(180,83,9,.4) }
+.log-verdict { display:flex; align-items:center; gap:6px; font:600 11px var(--font-mono); padding:5px 8px; border-radius:5px; background:var(--bg-secondary); border:1px solid var(--border-light) }
+.log-verdict--true { background:var(--accent-green-bg); border-color:var(--accent-green); color:var(--accent-green-text) }
+.log-verdict--false { background:var(--accent-red-bg); border-color:var(--accent-red); color:var(--accent-red-text) }
+.log-analogy { font:italic 11px var(--font-sans); color:var(--text-secondary); background:#FFF8E7; border:1px solid #FBE8A6; border-left:3px solid var(--accent-amber); padding:6px 9px; border-radius:4px; line-height:1.55 }
+.log-analogy strong { color:var(--accent-amber-text); font-style:normal; font-weight:700 }
+.log-why { font-size:11px; line-height:1.55; color:var(--text-primary); padding:4px 0 }
+.log-why strong { color:var(--accent-indigo-text) }
+.log-why code { font:600 10.5px var(--font-mono); background:var(--bg-secondary); padding:1px 4px; border-radius:3px; color:var(--accent-indigo-text) }
+</style>
+</head>
+<body>
+<div class="app-shell">
+
+<!-- ============ PROBLEM CARD ============ -->
+<div class="problem-card" id="problemCard">
+  <div class="pc-header">
+    <a href="../00_HomePage/gt_learn_homepage.html" class="gt-learn">GT LEARN</a>
+    <span class="lc-num">#372</span>
+    <span class="lc-title">🪜 Super Pow</span>
+    <span class="lc-diff">MEDIUM</span>
+    <span class="lc-tag">Math · Recursion</span>
+    <span class="pc-input-row">
+      <label>a=</label><input id="inA" value="2">
+      <label>b=</label><input id="inB" value="[1,0]">
+      <span class="exp-badge" id="expBadge">exp: 1024</span>
+      <button class="toggle-btn" onclick="toggleProblem()" id="toggleBtn">▲ Hide</button>
+    </span>
+  </div>
+  <div class="pc-body" id="pcBody">
+    <div class="pc-left">
+      <div class="pc-section-title">📝 Problem Statement</div>
+      <div class="pc-text">
+        Calculate <code>a<sup>b</sup> mod 1337</code> where <code>a</code> is a positive integer and <code>b</code> is an extremely large positive integer given as an array of digits (most-significant first).
+        Example: if <code>b = [1,0,0]</code>, that means <code>b = 100</code>, so we compute <code>a<sup>100</sup> mod 1337</code>.
+        Direct exponentiation is impossible — <code>b</code> can have thousands of digits!
+      </div>
+      <div class="pc-section-title">🧠 Solving Approach</div>
+      <div class="pc-text">
+        Use the identity: <code>a<sup>[d1,d2,...,dn]</sup> = a<sup>dn</sup> × (a<sup>[d1,d2,...,dn-1]</sup>)<sup>10</sup></code>.
+        Recursively peel off the last digit. Apply <strong>modular exponentiation</strong> at every step (Python's built-in <code>pow(base, exp, mod)</code>) to keep numbers small.
+      </div>
+      <div class="pc-section-title">🎯 Core Concepts & Base Case</div>
+      <div class="concept-block"><strong>Base Case:</strong> Empty array <code>b = []</code> → return <code>1</code> (since <code>a<sup>0</sup> = 1</code>).</div>
+      <div class="concept-block"><strong>Recurrence:</strong> <code>superPow(a, b) = (a<sup>last</sup> × superPow(a, b[:-1])<sup>10</sup>) mod 1337</code></div>
+      <div class="concept-block"><strong>Why mod at every step:</strong> <code>(x × y) mod m = ((x mod m) × (y mod m)) mod m</code> — keeps intermediate values bounded.</div>
+      <div class="complexity-row">
+        <span class="cx-chip cx-time">⏱ Time: O(n)</span>
+        <span class="cx-chip cx-space">💾 Space: O(n)</span>
+      </div>
+    </div>
+    <div class="pc-right">
+      <div class="pc-section-title">🧪 Test Cases (click to load)</div>
+      <div class="tc-chip" onclick="loadTest(2,'[3]',8,'single digit')">
+        <div class="tc-row1"><span class="pt-tag">SINGLE</span><span class="tc-label">single digit exponent</span><span class="tc-expected">→ 8</span></div>
+        <div class="tc-vals"><span class="vk">a=</span><code>2</code><span class="vk">b=</span><code>[3]</code></div>
+      </div>
+      <div class="tc-chip" onclick="loadTest(2,'[1,0]',1024,'two digits — recursion x2')">
+        <div class="tc-row1"><span class="pt-tag">DEFAULT</span><span class="tc-label">2 digits, b=10</span><span class="tc-expected">→ 1024</span></div>
+        <div class="tc-vals"><span class="vk">a=</span><code>2</code><span class="vk">b=</span><code>[1,0]</code></div>
+      </div>
+      <div class="tc-chip" onclick="loadTest(2,'[3,1]',1024,'b=31 nontrivial mod')">
+        <div class="tc-row1"><span class="pt-tag">MID</span><span class="tc-label">b=31, mod kicks in</span><span class="tc-expected">→ 1024</span></div>
+        <div class="tc-vals"><span class="vk">a=</span><code>2</code><span class="vk">b=</span><code>[3,1]</code></div>
+      </div>
+      <div class="tc-chip" onclick="loadTest(1,'[4,3,3,8,5,2]',1,'a=1 always returns 1')">
+        <div class="tc-row1"><span class="pt-tag">BASE-1</span><span class="tc-label">a=1, large b</span><span class="tc-expected">→ 1</span></div>
+        <div class="tc-vals"><span class="vk">a=</span><code>1</code><span class="vk">b=</span><code>
+[4,3,3,8,5,2]</code></div>
+      </div>
+      <div class="tc-chip" onclick="loadTest(2147483647,'[2,0,0]',1198,'huge a — mod heavy')">
+        <div class="tc-row1"><span class="pt-tag">BIG-A</span><span class="tc-label">huge a, b=200</span><span class="tc-expected">→ 1198</span></div>
+        <div class="tc-vals"><span class="vk">a=</span><code>2147483647</code><span class="vk">b=</span><code>[2,0,0]</code></div>
+      </div>
+      <div class="run-row">
+        <button class="btn-run" onclick="resetWithInput()">▶ Run</button>
+        <span class="live-out" id="liveOutput">—</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ MAIN ROW ============ -->
+<div class="main-row">
+  <div class="col col-code" id="col1">
+    <div class="code-header">📜 Python Code</div>
+    <div class="code-panel" id="codePanel"></div>
+  </div>
+  <div class="resize-h" id="resizeH1"></div>
+  <div class="col col-viz">
+    <div class="viz-header">📊 Visualization</div>
+    <div class="viz-panel" id="vizPanel"></div>
+  </div>
+</div>
+
+<!-- ============ FOOTER ============ -->
+<div class="footer-bar">
+  <div class="footer-left" id="footerLeft">
+    <span id="stepInfo" class="step-info">0/0</span>
+    <span id="actionBadge" class="action-badge"></span>
+  </div>
+  <div class="footer-right">
+    <kbd>←</kbd><kbd>→</kbd><kbd>R</kbd>
+    <button class="btn" type="button" onclick="resetStep()">↺</button>
+    <button class="btn" type="button" onclick="stepBy(-1)">◀</button>
+    <button class="btn btn-primary" type="button" onclick="stepBy(1)">▶ Next</button>
+    <span class="footer-sep"></span>
+    <button id="logToggleBtn" class="log-toggle-btn" type="button" onclick="toggleLogPreview()">📋 ON</button>
+    <button class="btn-zoom" type="button" onclick="logZoom(-1)">−</button>
+    <span id="logZoomLabel" class="log-zoom-label">100%</span>
+    <button class="btn-zoom" type="button" onclick="logZoom(1)">+</button>
+    <button class="btn-zoom" type="button" onclick="logZoomReset()">↺</button>
+    <span class="footer-sep"></span>
+    <button class="btn btn-fullscreen" type="button" onclick="toggleFullscreen()">⛶</button>
+  </div>
+</div>
+
+</div>
+
+<!-- ============ LOG POPUP ============ -->
+<div class="log-popup" id="logPopup">
+  <div class="log-popup-body" id="logPopupBody"></div>
+</div>
+
+<script>
+/* =================== CODE LINES =================== */
+var codeLines = [
+  "def superPow(a, b):",
+  "    MOD = 1337",
+  "    if not b:",
+  "        return 1",
+  "    last = b.pop()",
+  "    part1 = pow(a, last, MOD)",
+  "    sub = superPow(a, b)",
+  "    part2 = pow(sub, 10, MOD)",
+  "    result = (part1 * part2) % MOD",
+  "    return result"
+];
+
+/* =================== STATE =================== */
+var steps = [];
+var currentStep = 0;
+var codeWidthUserSet = false;
+var curResult = null;
+var logEnabled = true;
+var logZoomLevel = 100;
+
+var LOG_BADGE = {
+  "func-def":"📌 DEF","init":"⚙️ INIT","call":"📞 CALL","return":"🏆 RETURN",
+  "for-check":"🔁 FOR","while-check":"🔁 WHILE","if-check":"🔎 IF",
+  "mark":"✅ MARK","push":"⬆ PUSH","pop":"⬇ POP","restore":"↩ RESTORE","found":"🎉 FOUND",
+  "remove":"✏️ EDIT","prune":"✂️ PRUNE","fail":"❌ FAIL",
+  "exit":"🔚 EXIT","skip":"⏭ SKIP"
+};
+var BADGE_LABEL = {
+  "func-def":"DEF","init":"INIT","call":"CALL","return":"RETURN",
+  "for-check":"FOR","while-check":"WHILE","if-check":"IF",
+  "mark":"MARK","push":"PUSH","pop":"POP","restore":"RESTORE","found":"FOUND",
+  "remove":"EDIT","prune":"PRUNE","fail":"FAIL",
+  "exit":"EXIT","skip":"SKIP"
+};
+
+/* =================== CODE RENDERING =================== */
+function renderCode() {
+  var p = document.getElementById('codePanel');
+  p.innerHTML = codeLines.map(function(raw, i) {
+    var h = raw;
+    h = h.replace(/("[^"]*"|'[^']*')/g, '\x01STR\x02$1\x03');
+    h = h.replace(/\b(def|for|in|if|return|break|continue|and|else|elif|True|False|None|not|or|while|lambda)\b/g, '\x01KW\x02$1\x03');
+    h = h.replace(/\b(len|range|int|str|list|append|pop|sorted|min|max|sum|abs|enumerate|zip|print|set|add|pow)\b/g, '\x01FN\x02$1\x03');
+    h = h.replace(/\b(\d+)\b/g, '\x01NUM\x02$1\x03');
+    h = h.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    h = h.replace(/\x01([A-Z]+)\x02/g, function(_, c){
+      var cls = c==='STR'?'str':c==='KW'?'kw':c==='FN'?'fn':'num';
+      return '<span class="'+cls+'">';
+    }).replace(/\x03/g, '</span>');
+    return '<div class="code-line" data-line="'+i+'"><span class="ln">'+(i+1)+'</span><span>'+h+'</span></div>';
+  }).join('');
+}
+
+function fitCodeWidth() {
+  if (codeWidthUserSet) return;
+  var col1 = document.getElementById('col1');
+  var maxW = Math.min(col1.offsetWidth, window.innerWidth * 0.45);
+  col1.style.width = maxW + 'px';
+  syncFooterWidth();
+}
+function syncFooterWidth() {
+  document.getElementById('footerLeft').style.width = document.getElementById('col1').offsetWidth + 'px';
+}
+
+/* =================== HLCODE for log snippets =================== */
+function hlCode(raw) {
+  var h = raw;
+  h = h.replace(/("[^"]*"|'[^']*')/g, '\x01s\x02$1\x03');
+  h = h.replace(/\b(def|for|in|if|return|break|continue|and|else|elif|True|False|None|not|or|while|lambda)\b/g, '\x01k\x02$1\x03');
+  h = h.replace(/\b(len|range|int|str|list|append|pop|sorted|min|max|sum|abs|enumerate|zip|print|set|add|pow)\b/g, '\x01f\x02$1\x03');
+  h = h.replace(/(?<![.\w"\x01\x02\x03])(-?\d+)\b/g, '\x01n\x02$1\x03');
+  h = h.replace(/(#.*$)/gm, '\x01c\x02$1\x03');
+  h = h.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  h = h.replace(/\x01([a-z])\x02/g, function(_, c){ return '<span class="c'+c+'">'; }).replace(/\x03/g, '</span>');
+  return h;
+}
+
+/* =================== RICHLOG =================== */
+function richLog(opts) {
+  var statusMap = {
+    success:"✅ Success", fail:"❌ Failed", skip:"⏭ Skipped",
+    loop:"🔁 Loop iter", prune:"✂️ Pruned", info:"ℹ️ Info"
+  };
+  var status = opts.status || "info";
+  var html = '<div class="log-card log-card--'+opts.action+'">';
+  html += '<div class="log-card-header">';
+  html += '<span class="log-badge log-badge--'+opts.action+'">'+(LOG_BADGE[opts.action]||opts.action)+'</span>';
+  html += '<span class="log-line-ref">L'+(opts.line+1)+'</span>';
+  html += '<span class="log-status-pill log-status--'+status+'">'+statusMap[status]+'</span>';
+  html += '</div>';
+  if (opts.code) {
+    html += '<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">📜</span>Code Executing</div>';
+    html += '<code class="log-code-snippet">'+hlCode(opts.code)+'</code></div>';
+  }
+  if (opts.inputs && opts.inputs.length) {
+    html += '<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">📥</span>Input Values (line is using these)</div>';
+    html += '<div class="log-kv-row">';
+    opts.inputs.forEach(function(kv){
+      html += '<span class="log-kv log-kv--in"><span class="log-kv-key">'+kv.k+'</span>=<span class="log-kv-val">'+kv.v+'</span></span>';
+    });
+    html += '</div></div>';
+  }
+  if (opts.outputs && opts.outputs.length) {
+    html += '<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">📤</span>Output / State After Line</div>';
+    html += '<div class="log-kv-row">';
+    opts.outputs.forEach(function(kv){
+      var cls = kv.changed ? 'log-kv--changed' : 'log-kv--out';
+      html += '<span class="log-kv '+cls+'"><span class="log-kv-key">'+kv.k+'</span>=<span class="log-kv-val">'+kv.v+'</span></span>';
+    });
+    html += '</div></div>';
+  }
+  if (opts.verdict) {
+    var vCls = opts.verdictTrue===true?'log-verdict--true':(opts.verdictTrue===false?'log-verdict--false':'');
+    var vIcon = opts.verdictTrue===true?'✓':(opts.verdictTrue===false?'✗':'•');
+    html += '<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">⚖️</span>Verdict / Decision</div>';
+    html += '<div class="log-verdict '+vCls+'">'+vIcon+' '+opts.verdict+'</div></div>';
+  }
+  if (opts.why) {
+    html += '<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">💡</span>Why This Happens</div>';
+    html += '<div class="log-why">'+opts.why+'</div></div>';
+  }
+  if (opts.analogy) {
+    html += '<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">🎭</span>Real-Life Analogy</div>';
+    html += '<div class="log-analogy">'+opts.analogy+'</div></div>';
+  }
+  html += '</div>';
+  return html;
+}
+
+/* =================== BUILD STEPS =================== */
+function buildSteps(a, bArr) {
+  var st = [];
+  var MAX_STEPS = 3000;
+  var MOD = 1337;
+  var frames = [];   // recursion stack visualization
+  var frameId = 0;
+
+  function snap(extra) {
+    return Object.assign({
+      a: a,
+      bOriginal: bArr.slice(),
+      frames: frames.map(function(f){ return Object.assign({}, f, { b: f.b.slice() }); }),
+      result: curResult
+    }, extra || {});
+  }
+
+  function pushStep(o) {
+    if (st.length >= MAX_STEPS) return;
+    st.push(Object.assign({ line:0, action:"init", logHTML:"" }, snap(o)));
+  }
+
+  function superPow(aa, bb, depth) {
+    var fid = frameId++;
+    var f = {
+      id: fid, depth: depth, a: aa, b: bb.slice(), bOrig: bb.slice(),
+      MOD: null, last: null, part1: null, sub: null, part2: null, result: null,
+      stage: 'entered', returning: false
+    };
+    frames.push(f);
+
+    // L0 — function entry
+    pushStep({
+      line: 0, action: "func-def",
+      logHTML: richLog({
+        line:0, action:"func-def", status:"info",
+        code: "def superPow(a, b):  # call: superPow("+aa+", "+JSON.stringify(bb)+")",
+        inputs: [{k:"a",v:aa},{k:"b",v:JSON.stringify(bb)},{k:"depth",v:depth}],
+        why: "Recursion frame <strong>#"+fid+"</strong> (depth="+depth+") create ho gaya. Function ko <code>a="+aa+"</code> aur <code>b="+JSON.stringify(bb)+"</code> ke saath call kiya gaya hai. Ab is frame mein execution start hogi.",
+        analogy: "Jaise ek <strong>Russian doll</strong> kholi — andar ek aur chhoti doll mili. Har doll = ek recursion frame. Sabse andar wali doll = base case."
+      })
+    });
+
+    // L1 — MOD = 1337
+    f.MOD = MOD; f.stage = 'mod-set';
+    pushStep({
+      line: 1, action: "init",
+      logHTML: richLog({
+        line:1, action:"init", status:"success",
+        code: "MOD = 1337",
+        inputs: [],
+        outputs: [{k:"MOD",v:"1337",changed:true}],
+        why: "Constant <code>MOD=1337</code> set kiya. Yeh wahi modulo hai jiske respect mein hum final answer chahte hain. <strong>Kyun 1337?</strong> Problem statement bolti hai — bas ek arbitrary fixed mod.",
+        analogy: "Jaise ek game ka <strong>scoreboard maximum 1337 tak hi dikhata hai</strong>. Score 1337 ko cross kare toh wrap around — fir 0 se start. MOD = wrap-around limit."
+      })
+    });
+
+    // L2 — if not b
+    var isEmpty = (bb.length === 0);
+    pushStep({
+      line: 2, action: "if-check",
+      logHTML: richLog({
+        line:2, action:"if-check", status: isEmpty ? "success" : "skip",
+        code: "if not b:  # b = "+JSON.stringify(bb),
+        inputs: [{k:"b",v:JSON.stringify(bb)},{k:"len(b)",v:bb.length}],
+        verdict: "not b → "+(isEmpty?"True (b is empty)":"False (b has "+bb.length+" digit(s))"),
+        verdictTrue: isEmpty,
+        why: isEmpty
+          ? "<strong>Base case HIT!</strong> Array <code>b</code> empty hai matlab saari digits process ho gayi. Ab <code>a^0 = 1</code> return karenge."
+          : "Array mein abhi <strong>"+bb.length+" digit(s) bachi hain</strong>: <code>"+JSON.stringify(bb)+"</code>. Toh base case nahi hua, neeche jaake recursive case execute karenge.",
+        analogy: isEmpty
+          ? "Jaise <strong>onion ke saare layers chhil gaye</strong> — andar kuch nahi bacha. Ab wapas jao!"
+          : "Onion mein abhi <strong>"+bb.length+" layers baaki hain</strong>. Ek aur layer chhilo, fir andar dekho."
+      })
+    });
+
+    if (isEmpty) {
+      // L3 — return 1
+      f.result = 1; f.returning = true; f.stage = 'returning-1';
+      pushStep({
+        line: 3, action: "return",
+        logHTML: richLog({
+          line:3, action:"return", status:"success",
+          code: "return 1  # base case: a^0 = 1",
+          inputs: [],
+          outputs: [{k:"return",v:"1",changed:true}],
+          why: "<strong>Mathematical fact:</strong> <code>a^0 = 1</code> for any <code>a</code>. Empty exponent = no multiplication = identity = 1. Yeh value parent frame ko return hogi.",
+          analogy: "Jaise <strong>khali shopping list</strong> — kuch khareedna nahi hai, total bill = ₹0... ya yahan multiplicative identity = 1. Khali list ka power = 1."
+        })
+      });
+      frames.pop();
+      return 1;
+    }
+
+    // L4 — last = b.pop()
+    var last = bb[bb.length-1];
+    bb.pop();
+    f.last = last;
+    f.b = bb.slice();
+    f.stage = 'after-pop';
+    pushStep({
+      line: 4, action: "pop",
+      logHTML: richLog({
+        line:4, action:"pop", status:"success",
+        code: "last = b.pop()  # b: "+JSON.stringify(f.bOrig)+" → "+JSON.stringify(bb)+", last="+last,
+        inputs: [{k:"b (before)",v:JSON.stringify(f.bOrig)}],
+        outputs: [{k:"last",v:last,changed:true},{k:"b (after)",v:JSON.stringify(bb),changed:true}],
+        why: "Array ka <strong>last digit nikaal liya</strong> — <code>last="+last+"</code>. Ab <code>b</code> mein "+bb.length+" digits bach gayi: <code>"+JSON.stringify(bb)+"</code>. Yeh use karke hum decompose karenge: <code>a^[..., "+last+"] = a^"+last+" × (a^[...])^10</code>.",
+        analogy: "Jaise <strong>number "+f.bOrig.join('')+" ko decompose</strong> kiya: ones place ka <code>"+last+"</code> alag, baaki <code>"+(bb.join('')||'(empty)')+"</code> tens place mein. Phone number ka last digit dial karke baaki ko queue mein rakhte hain."
+      })
+    });
+
+    // L5 — part1 = pow(a, last, MOD)
+    var part1 = 1, base = aa % MOD, expL = last;
+    while (expL > 0) {
+      if (expL & 1) part1 = (part1 * base) % MOD;
+      base = (base * base) % MOD;
+      expL = expL >> 1;
+    }
+    f.part1 = part1; f.stage = 'after-part1';
+    pushStep({
+      line: 5, action: "init",
+      logHTML: richLog({
+        line:5, action:"init", status:"success",
+        code: "part1 = pow("+aa+", "+last+", "+MOD+")  # = "+part1,
+        inputs: [{k:"a",v:aa},{k:"last",v:last},{k:"MOD",v:MOD}],
+        outputs: [{k:"part1",v:part1,changed:true}],
+        why: "<strong>Modular exponentiation</strong> use kiya: <code>"+aa+"^"+last+" mod "+MOD+" = "+part1+"</code>. Python ka built-in <code>pow(base, exp, mod)</code> fast binary exponentiation karta hai — direct calculation se infinitely faster.",
+        analogy: "Jaise calculator pe <strong>shortcut button</strong> dabaya — bina manually multiply kiye direct answer mil gaya. Python smart hai — internally <code>"+aa+"^"+last+"</code> ko binary expand karke har step pe mod laga deta hai."
+      })
+    });
+
+    // L6 — sub = superPow(a, b)  -- RECURSIVE CALL
+    f.stage = 'before-recurse';
+    pushStep({
+      line: 6, action: "call",
+      logHTML: richLog({
+        line:6, action:"call", status:"info",
+        code: "sub = superPow("+aa+", "+JSON.stringify(bb)+")",
+        inputs: [{k:"a",v:aa},{k:"b",v:JSON.stringify(bb)}],
+        why: "<strong>Recursive call!</strong> Ab same function ko <code>b="+JSON.stringify(bb)+"</code> (ek digit chhoti) ke saath call karenge. Iska answer (<code>sub</code>) hume baad mein <code>^10</code> raise karke combine karna hai.",
+        analogy: "Jaise <strong>matryoshka doll</strong> kholi — andar wali doll ko bhi kholne ke liye SAME function call karna padega. Recursion = self-similar structure. Ek hi kaam baar baar chhote scale pe."
+      })
+    });
+
+    var sub = superPow(aa, bb, depth+1);
+
+    // We need to refresh f reference because `frames` may have grown/shrunk
+    // Find our frame again — it should still be at the same index after recursion popped its child
+    // f is still our local closure ref
+    f.sub = sub; f.stage = 'after-recurse';
+    // Re-push frame reference for visualization (the recursion popped its child, our frame is back on top)
+    pushStep({
+      line: 6, action: "return",
+      logHTML: richLog({
+        line:6, action:"return", status:"success",
+        code: "sub = superPow(...)  # returned: "+sub,
+        inputs: [],
+        outputs: [{k:"sub",v:sub,changed:true}],
+        why: "Recursive call <strong>wapas aa gayi</strong>! Sub-problem ka answer = <code>"+sub+"</code>. Yeh hai <code>"+aa+"^"+f.bOrig.slice(0,-1).join('')+" mod "+MOD+"</code>. Ab ise <code>^10</code> raise karke <code>part1</code> ke saath combine karenge.",
+        analogy: "Jaise <strong>chhoti doll khol ke wapas aaye</strong> — uske andar ka answer mil gaya ("+sub+"). Ab uske hisaab se outer doll ka calculation complete karna hai."
+      })
+    });
+
+    // L7 — part2 = pow(sub, 10, MOD)
+    var part2 = 1, b2 = sub % MOD, e2 = 10;
+    while (e2 > 0) {
+      if (e2 & 1) part2 = (part2 * b2) % MOD;
+      b2 = (b2 * b2) % MOD;
+      e2 = e2 >> 1;
+    }
+    f.part2 = part2; f.stage = 'after-part2';
+    pushStep({
+      line: 7, action: "init",
+      logHTML: richLog({
+        line:7, action:"init", status:"success",
+        code: "part2 = pow("+sub+", 10, "+MOD+")  # = "+part2,
+        inputs: [{k:"sub",v:sub},{k:"MOD",v:MOD}],
+        outputs: [{k:"part2",v:part2,changed:true}],
+        why: "<strong>Sub ko 10th power pe raise kiya</strong>: <code>"+sub+"^10 mod "+MOD+" = "+part2+"</code>. <strong>Why ^10?</strong> Kyunki har baar last digit pop karte hain, baaki digits ek <strong>decimal place left shift</strong> ho jaati hain. Mathematically: <code>a^[d1,d2,...,dn] = a^dn × (a^[d1,...,dn-1])^10</code>.",
+        analogy: "Jaise <strong>123 = 12×10 + 3</strong>. Toh <code>a^123 = a^3 × a^(12×10) = a^3 × (a^12)^10</code>. Ones digit alag, baaki ko 10th power pe — same logic har recursion mein."
+      })
+    });
+
+    // L8 — result = (part1 * part2) % MOD
+    var result = (part1 * part2) % MOD;
+    f.result = result; f.stage = 'after-result';
+    pushStep({
+      line: 8, action: "init",
+      logHTML: richLog({
+        line:8, action:"init", status:"success",
+        code: "result = ("+part1+" * "+part2+") % "+MOD+"  # = "+result,
+        inputs: [{k:"part1",v:part1},{k:"part2",v:part2},{k:"MOD",v:MOD}],
+        outputs: [{k:"result",v:result,changed:true}],
+        why: "<strong>Combine step:</strong> <code>part1 × part2 mod MOD = "+part1+" × "+part2+" mod "+MOD+" = "+result+"</code>. Yeh hai is frame ka final answer — <code>"+aa+"^"+f.bOrig.join('')+" mod "+MOD+"</code>.",
+        analogy: "Jaise <strong>do ingredients mix kiye</strong> — <code>part1</code> (last digit ka contribution) aur <code>part2</code> (baaki digits ka contribution × 10). Mod laga ke ensure kiya answer 1337 ke andar rahe."
+      })
+    });
+
+    // L9 — return result
+    f.returning = true; f.stage = 'returning-result';
+    pushStep({
+      line: 9, action: "return",
+      logHTML: richLog({
+        line:9, action:"return", status:"success",
+        code: "return "+result,
+        inputs: [{k:"result",v:result}],
+        outputs: [{k:"return",v:result,changed:true}],
+        why: "Frame <strong>#"+fid+"</strong> ka kaam khatam — <code>"+result+"</code> return kar raha hai parent frame ko. Yeh value parent ke <code>sub</code> variable mein ja kar baith jayegi.",
+        analogy: "Jaise <strong>employee ne report submit ki manager ko</strong> — apna kaam complete, ab manager apne calculation mein use karega. Frame stack se pop ho gaya."
+      })
+    });
+
+    frames.pop();
+    return result;
+  }
+
+  curResult = superPow(a, bArr.slice(), 0);
+
+  // Final step — show the answer
+  pushStep({
+    line: 9, action: "found",
+    logHTML: richLog({
+      line:9, action:"found", status:"success",
+      code: "# FINAL ANSWER: superPow("+a+", "+JSON.stringify(bArr)+") = "+curResult,
+      outputs: [{k:"answer",v:curResult,changed:true}],
+      why: "<strong>🎉 Mil gaya bhai!</strong> Saari recursion frames complete ho gayi. Final answer = <code>"+curResult+"</code>. Yeh hai <code>"+a+"^"+bArr.join('')+" mod 1337</code>.",
+      analogy: "Jaise <strong>ek lambi assembly line</strong> mein har worker ne apna kaam kiya — last worker ne final product ready kar diya. Board pe likho!"
+    })
+  });
+
+  return st;
+}
+
+/* =================== RENDER VIZ =================== */
+function renderViz(s) {
+  var v = document.getElementById('vizPanel');
+  var topFrame = s.frames.length ? s.frames[s.frames.length-1] : null;
+
+  // Vars strip
+  var h = '<div class="vars-strip">';
+  h += '<span class="var-chip vc-active"><span class="vk">a</span><span class="vv">'+s.a+'</span></span>';
+  h += '<span class="var-chip"><span class="vk">b (input)</span><span class="vv">['+s.bOriginal.join(',')+']</span></span>';
+  h += '<span class="var-chip vc-amber"><span class="vk">depth</span><span class="vv">'+s.frames.length+'</span></span>';
+  h += '<span class="var-chip"><span class="vk">MOD</span><span class="vv">1337</span></span>';
+  if (s.result !== null) {
+    h += '<span class="var-chip vc-safe"><span class="vk">final</span><span class="vv">'+s.result+'</span></span>';
+  }
+  h += '</div>';
+
+  // viz-row 1: b array tiles + recursion stack
+  h += '<div class="viz-row">';
+
+  // b array as tiles
+  h += '<div class="viz-card"><div class="viz-card-title">🔢 Current b (top frame)</div>';
+  var curB = topFrame ? topFrame.b : s.bOriginal;
+  var curBOrig = topFrame ? topFrame.bOrig : s.bOriginal;
+  if (curBOrig.length === 0) {
+    h += '<div class="empty-state">[ ] empty array — base case</div>';
+  } else {
+    h += '<div class="tile-row">';
+    curBOrig.forEach(function(d, idx){
+      var isPopped = idx >= curB.length;
+      var isLast = (idx === curB.length-1) && !isPopped && topFrame && topFrame.stage==='entered';
+      var cls = 'tile';
+      if (isPopped) cls += ' tile--popped';
+      else if (idx === curB.length-1 && topFrame && (topFrame.stage==='after-pop' || topFrame.stage==='after-part1' || topFrame.stage==='before-recurse' || topFrame.stage==='after-recurse')) cls += ' tile--curr';
+      h += '<div class="'+cls+'"><span class="tile-idx">'+idx+'</span>'+d+'</div>';
+    });
+    h += '</div>';
+    if (topFrame && topFrame.last !== null) {
+      h += '<div style="margin-top:8px; font-size:11px; color:var(--text-secondary)">⬇ popped: <code style="font:600 12px var(--font-mono); background:var(--accent-amber-bg); padding:2px 6px; border-radius:3px; color:var(--accent-amber-text)">'+topFrame.last+'</code></div>';
+    }
+  }
+  h += '</div>';
+
+  // Recursion stack
+  h += '<div class="viz-card" style="flex:1"><div class="viz-card-title">🗂️ Recursion Stack ('+s.frames.length+' frames)</div>';
+  if (s.frames.length === 0) {
+    h += '<div class="empty-state">No active frames — recursion finished</div>';
+  } else {
+    h += '<div class="stack-col">';
+    s.frames.forEach(function(f, i){
+      var isTop = i === s.frames.length-1;
+      var cls = 'frame';
+      if (isTop && f.returning) cls += ' frame--returning';
+      else if (isTop) cls += ' frame--top';
+      h += '<div class="'+cls+'">';
+      h += '<div class="frame-title">📞 Frame #'+f.id+' · depth='+f.depth+(isTop?' · TOP':'')+(f.returning?' · RETURNING':'')+'</div>';
+      h += '<div class="frame-vars">';
+      h += '<span class="fv">a='+f.a+'</span>';
+      h += '<span class="fv'+(f.stage==='after-pop'?' fv-changed':'')+'">b=['+f.b.join(',')+']</span>';
+      if (f.last !== null) h += '<span class="fv'+(f.stage==='after-pop'?' fv-changed':'')+'">last='+f.last+'</span>';
+      if (f.part1 !== null) h += '<span class="fv'+(f.stage==='after-part1'?' fv-changed':'')+'">part1='+f.part1+'</span>';
+      if (f.sub !== null) h += '<span class="fv'+(f.stage==='after-recurse'?' fv-changed':'')+'">sub='+f.sub+'</span>';
+      if (f.part2 !== null) h += '<span class="fv'+(f.stage==='after-part2'?' fv-changed':'')+'">part2='+f.part2+'</span>';
+      if (f.result !== null) h += '<span class="fv fv-ret">result='+f.result+'</span>';
+      h += '</div></div>';
+    });
+    h += '</div>';
+  }
+  h += '</div>';
+  h += '</div>';
+
+  // Math display — current calculation
+  if (topFrame) {
+    h += '<div class="viz-card" style="display:block"><div class="viz-card-title">🧮 Math Trace (current frame)</div>';
+    h += '<div class="math-display">';
+    h += '<span class="mc"># Frame #'+topFrame.id+' computing: '+topFrame.a+'^['+topFrame.bOrig.join(',')+'] mod 1337</span>';
+    if (topFrame.last !== null) {
+      h += '<span class="mv">last</span> <span class="mo">=</span> <span class="mr">'+topFrame.last+'</span><br>';
+    }
+    if (topFrame.part1 !== null) {
+      h += '<span class="mv">part1</span> <span class="mo">=</span> pow('+topFrame.a+', '+topFrame.last+', 1337) <span class="mo">=</span> <span class="mr">'+topFrame.part1+'</span><br>';
+    }
+    if (topFrame.sub !== null) {
+      h += '<span class="mv">sub</span> <span class="mo">=</span> superPow('+topFrame.a+', ['+topFrame.b.join(',')+']) <span class="mo">=</span> <span class="mr">'+topFrame.sub+'</span><br>';
+    }
+    if (topFrame.part2 !== null) {
+      h += '<span class="mv">part2</span> <span class="mo">=</span> pow('+topFrame.sub+', 10, 1337) <span class="mo">=</span> <span class="mr">'+topFrame.part2+'</span><br>';
+    }
+    if (topFrame.result !== null) {
+      h += '<span class="mv">result</span> <span class="mo">=</span> ('+topFrame.part1+' × '+topFrame.part2+') % 1337 <span class="mo">=</span> <span class="mr">'+topFrame.result+'</span>';
+    }
+    h += '</div></div>';
+  }
+
+  // Result banner
+  if (s.result !== null && s.frames.length === 0) {
+    h += '<div class="result-banner">';
+    h += '<div class="result-banner-title">🎉 Final Answer</div>';
+    h += '<div class="result-banner-val">'+s.a+'^['+s.bOriginal.join(',')+'] mod 1337 = '+s.result+'</div>';
+    h += '</div>';
+  }
+
+  v.innerHTML = h;
+}
+
+/* =================== RENDER STEP =================== */
+function renderStep(idx) {
+  if (!steps.length) return;
+  var s = steps[idx];
+  currentStep = idx;
+  document.getElementById('stepInfo').textContent = (idx+1)+'/'+steps.length;
+  var bd = document.getElementById('actionBadge');
+  bd.textContent = BADGE_LABEL[s.action] || s.action;
+  bd.className = 'action-badge action-badge--'+s.action;
+  document.querySelectorAll('.code-line').forEach(function(el){ el.classList.remove('active'); });
+  var al = document.querySelector('.code-line[data-line="'+s.line+'"]');
+  if (al) { al.classList.add('active'); al.scrollIntoView({block:'nearest'}); }
+  renderViz(s);
+  showLogPreview(s);
+}
+
+function showLogPreview(s) {
+  if (!logEnabled) return;
+  document.getElementById('logPopupBody').innerHTML = s.logHTML || '';
+  document.getElementById('logPopup').classList.remove('log-popup--hidden');
+}
+
+function stepBy(d) {
+  var n = currentStep + d;
+  if (n < 0 || n >= steps.length) return;
+  renderStep(n);
+}
+function resetStep() { renderStep(0); }
+
+/* =================== INPUT PARSING & RUN =================== */
+function parseInputs() {
+  var a = parseInt(document.getElementById('inA').value, 10);
+  var bRaw = document.getElementById('inB').value.trim();
+  bRaw = bRaw.replace(/[\[\]\s]/g,'');
+  var b = bRaw === '' ? [] : bRaw.split(',').map(function(x){ return parseInt(x,10); });
+  return { a: a, b: b };
+}
+
+function resetWithInput() {
+  curResult = null;
+  var p = parseInputs();
+  renderCode();
+  fitCodeWidth();
+  steps = buildSteps(p.a, p.b);
+  currentStep = 0;
+  renderStep(0);
+  document.getElementById('liveOutput').textContent = curResult !== null ? ('Answer: '+curResult) : '—';
+}
+
+function loadTest(a, b, expected, label) {
+  document.getElementById('inA').value = a;
+  document.getElementById('inB').value = b;
+  document.getElementById('expBadge').textContent = 'exp: '+expected;
+  resetWithInput();
+}
+
+/* =================== TOGGLES =================== */
+function toggleProblem() {
+  var body = document.getElementById('pcBody');
+  var btn = document.getElementById('toggleBtn');
+  body.classList.toggle('hidden');
+  btn.textContent = body.classList.contains('hidden') ? '▼ Show' : '▲ Hide';
+}
+
+function toggleLogPreview() {
+  logEnabled = !logEnabled;
+  var btn = document.getElementById('logToggleBtn');
+  btn.textContent = logEnabled ? '📋 ON' : '📋 OFF';
+  btn.classList.toggle('log-toggle-btn--off', !logEnabled);
+  if (!logEnabled) document.getElementById('logPopup').classList.add('log-popup--hidden');
+  else if (steps.length) showLogPreview(steps[currentStep]);
+}
+
+function logZoom(dir) {
+  logZoomLevel = Math.max(60, Math.min(180, logZoomLevel + dir*20));
+  updateLogZoom();
+}
+function logZoomReset() { logZoomLevel = 100; updateLogZoom(); }
+function updateLogZoom() {
+  document.getElementById('logZoomLabel').textContent = logZoomLevel+'%';
+  document.getElementById('logPopup').style.setProperty('--log-scale', logZoomLevel/100);
+}
+
+function toggleFullscreen() {
+  var viz = document.querySelector('.col-viz');
+  if (!document.fullscreenElement) viz.requestFullscreen().catch(function(){});
+  else document.exitFullscreen();
+}
+
+/* =================== RESIZE HANDLE =================== */
+(function(){
+  var col1 = document.getElementById('col1');
+  document.getElementById('resizeH1').addEventListener('mousedown', function(e){
+    e.preventDefault();
+    codeWidthUserSet = true;
+    var startX = e.clientX, startW = col1.offsetWidth, h = this;
+    document.body.classList.add('no-select');
+    h.classList.add('active');
+    function mv(e){
+      col1.style.width = Math.max(140, startW + (e.clientX - startX)) + 'px';
+      syncFooterWidth();
+    }
+    function up(){
+      document.removeEventListener('mousemove', mv);
+      document.removeEventListener('mouseup', up);
+      document.body.classList.remove('no-select');
+      h.classList.remove('active');
+    }
+    document.addEventListener('mousemove', mv);
+    document.addEventListener('mouseup', up);
+  });
+})();
+
+window.addEventListener('resize', function(){
+  if (!codeWidthUserSet) fitCodeWidth();
+  else syncFooterWidth();
+});
+
+/* =================== KEYBOARD =================== */
+document.addEventListener('keydown', function(e){
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
+  if (e.key === 'ArrowRight') { e.preventDefault(); stepBy(1); }
+  else if (e.key === 'ArrowLeft') { e.preventDefault(); stepBy(-1); }
+  else if (e.key === 'r' || e.key === 'R') { e.preventDefault(); resetStep(); }
+});
+
+/* =================== INIT =================== */
+renderCode();
+fitCodeWidth();
+syncFooterWidth();
+resetWithInput();
+</script>
+</body>
+</html>

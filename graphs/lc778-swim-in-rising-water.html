@@ -1,0 +1,999 @@
+﻿
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LC 778 — Swim in Rising Water</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+:root{
+  --bg-primary:#FAFAF8;--bg-secondary:#F1EFE8;--bg-tertiary:#E2E0D8;--bg-card:#FFFFFF;
+  --text-primary:#2C2C2A;--text-secondary:#5F5E5A;--text-tertiary:#888780;
+  --border-color:rgba(0,0,0,0.11);--border-light:rgba(0,0,0,0.06);
+  --accent-indigo:#534AB7;--accent-indigo-bg:#EEEDFE;--accent-indigo-text:#3C3489;--accent-indigo-hover:#4740A0;
+  --accent-teal:#0F6E56;--accent-teal-bg:#E1F5EE;--accent-teal-text:#085041;
+  --accent-red:#E24B4A;--accent-red-bg:#FCEBEB;--accent-red-text:#791F1F;
+  --accent-amber:#B45309;--accent-amber-bg:#FEF3C7;--accent-amber-text:#78350F;
+  --accent-green:#15803D;--accent-green-bg:#DCFCE7;--accent-green-text:#14532D;
+  --syn-keyword:#534AB7;--syn-function:#185FA5;--syn-number:#993C1D;--syn-string:#0F6E56;
+  --active-line-bg:#EEEDFE;
+  --radius-sm:4px;--radius-md:6px;--radius-lg:10px;
+  --font-sans:'DM Sans',system-ui,sans-serif;--font-mono:'JetBrains Mono','Fira Code',monospace;
+  --fs-xs:11px;--fs-sm:12px;--fs-base:14px;--fs-md:15px;
+  --ease:.18s ease;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans);background:var(--bg-primary);color:var(--text-primary);font-size:var(--fs-base);overflow:hidden}
+.no-select{user-select:none}
+::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border-color);border-radius:3px}
+.app-shell{display:flex;flex-direction:column;height:100vh;overflow:hidden}
+
+.problem-card{flex-shrink:0;border-bottom:1px solid var(--border-color);background:var(--bg-card)}
+.pc-header{display:flex;align-items:center;gap:10px;padding:8px 14px;flex-wrap:wrap}
+.gt-learn{font:700 11px var(--font-sans);background:var(--accent-indigo);color:#fff;padding:5px 11px;border-radius:99px;cursor:pointer;border:none;letter-spacing:.5px;font-family:system-ui,"Segoe UI Emoji",sans-serif}
+.pc-num{font:600 12px var(--font-mono);color:var(--text-tertiary)}
+.pc-title{font-size:var(--fs-md);font-weight:700}
+.pc-diff{font:700 9px var(--font-sans);padding:2px 7px;border-radius:99px;background:var(--accent-red-bg);color:var(--accent-red-text);border:1px solid var(--accent-red)}
+.pc-tag{font:500 10px var(--font-sans);padding:2px 8px;border-radius:99px;background:var(--bg-secondary);color:var(--text-secondary);border:1px solid var(--border-color)}
+.pc-inputs{display:flex;align-items:center;gap:6px;margin-left:auto;flex-wrap:wrap}
+.pc-inputs label{font:600 10px var(--font-mono);color:var(--text-secondary);display:flex;align-items:center;gap:3px}
+.pc-inputs input{font:500 11px var(--font-mono);background:var(--bg-secondary);border:1px solid var(--border-color);border-radius:var(--radius-sm);padding:3px 6px;width:280px;color:var(--text-primary)}
+.expected-badge{font:600 10px var(--font-mono);background:var(--accent-green-bg);color:var(--accent-green-text);padding:3px 7px;border-radius:var(--radius-sm);border:1px solid var(--accent-green)}
+.toggle-btn{font-family:system-ui,"Segoe UI Emoji",sans-serif;font:600 11px var(--font-sans);background:var(--bg-secondary);border:1px solid var(--border-color);padding:4px 9px;border-radius:var(--radius-sm);cursor:pointer;color:var(--text-secondary)}
+.pc-body{display:grid;grid-template-columns:1.4fr 1fr;gap:14px;padding:4px 14px 12px;border-top:1px dashed var(--border-light)}
+.pc-body.hidden{display:none}
+.pc-section-title{font:700 11px var(--font-sans);margin-bottom:5px}
+.pc-text{font-size:var(--fs-xs);color:var(--text-secondary);line-height:1.55;margin-bottom:7px}
+.pc-text code{font-family:var(--font-mono);background:var(--bg-secondary);padding:1px 4px;border-radius:3px;font-size:10.5px;color:var(--accent-indigo-text)}
+.pc-text strong{color:var(--text-primary)}
+.concept-block{background:var(--bg-secondary);border-left:3px solid var(--accent-indigo);padding:6px 9px;border-radius:var(--radius-sm);margin-bottom:5px}
+.concept-block-title{font:700 10px var(--font-mono);color:var(--accent-indigo-text);text-transform:uppercase}
+.concept-block-body{font-size:11px;line-height:1.5;margin-top:2px}
+.complexity-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.complexity-chip{font:600 10px var(--font-mono);background:var(--accent-indigo-bg);color:var(--accent-indigo-text);padding:3px 8px;border-radius:99px;border:1px solid var(--accent-indigo)}
+.tc-list{display:flex;flex-direction:column;gap:5px}
+.tc-chip{background:var(--bg-secondary);border:1px solid var(--border-color);border-radius:var(--radius-sm);padding:6px 9px;cursor:pointer;transition:all var(--ease)}
+.tc-chip:hover{border-color:var(--accent-indigo);background:var(--accent-indigo-bg)}
+.tc-chip-input{font:600 10.5px var(--font-mono);word-break:break-all}
+.pt-tag{display:inline-block;font:500 9px var(--font-sans);background:var(--bg-tertiary);color:var(--text-secondary);padding:1px 6px;border-radius:99px;margin-left:4px}
+.tc-chip-expected{font:600 10px var(--font-mono);color:var(--accent-green-text);margin-top:2px}
+.run-row{display:flex;align-items:center;gap:8px;margin-top:8px}
+.btn-run{font-family:system-ui,"Segoe UI Emoji",sans-serif;font:700 11px var(--font-sans);background:var(--accent-indigo);color:#fff;border:none;padding:6px 14px;border-radius:var(--radius-sm);cursor:pointer}
+.live-output{font:600 11px var(--font-mono);color:var(--accent-green-text);background:var(--accent-green-bg);padding:4px 10px;border-radius:var(--radius-sm);border:1px solid var(--accent-green)}
+
+.main-row{flex:1;display:flex;overflow:hidden;min-height:0}
+.col{display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.col-code{width:33%;min-width:140px;max-width:45vw;background:var(--bg-card);border-right:1px solid var(--border-color)}
+.col-viz{flex:1;min-width:0;background:var(--bg-primary)}
+.section-label{font-family:system-ui,"Segoe UI Emoji",sans-serif;font:700 10px var(--font-sans);color:var(--text-secondary);padding:7px 12px;background:var(--bg-secondary);border-bottom:1px solid var(--border-light);display:flex;align-items:center;gap:5px;flex-shrink:0;text-transform:uppercase;letter-spacing:.06em}
+.code-panel{font-family:var(--font-mono);font-size:12px;line-height:1.9;padding:8px 0 12px 0;overflow-y:auto;flex:1}
+.code-line{display:flex;padding:0 12px;transition:background var(--ease)}
+.code-line.active{background:var(--active-line-bg);border-left:3px solid var(--accent-indigo);padding-left:9px}
+.code-line .ln{display:inline-block;width:24px;color:var(--text-tertiary);user-select:none;flex-shrink:0;font-size:10.5px}
+.code-line .src{white-space:pre;color:var(--text-primary)}
+.kw{color:var(--syn-keyword);font-weight:600}.fn{color:var(--syn-function)}.num{color:var(--syn-number)}.str{color:var(--syn-string)}
+.resize-handle{width:4px;cursor:col-resize;background:transparent;flex-shrink:0;transition:background var(--ease)}
+.resize-handle:hover,.resize-handle.active{background:var(--accent-indigo)}
+
+.viz-panel{padding:10px 14px 14px;overflow:auto;flex:1}
+.vars-strip{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.var-chip{font:600 11px var(--font-mono);padding:4px 9px;border-radius:99px;background:var(--bg-card);border:1px solid var(--border-color);display:inline-flex;align-items:center;gap:4px}
+.var-chip .vk{color:var(--text-tertiary);font-weight:500}
+.var-chip .vv{color:var(--text-primary);font-weight:700}
+.vc-active{background:var(--accent-indigo-bg);border-color:var(--accent-indigo)}.vc-active .vv{color:var(--accent-indigo-text)}
+.vc-safe{background:var(--accent-green-bg);border-color:var(--accent-green)}.vc-safe .vv{color:var(--accent-green-text)}
+.vc-warn{background:var(--accent-amber-bg);border-color:var(--accent-amber)}.vc-warn .vv{color:var(--accent-amber-text)}
+.vc-flip{background:var(--accent-red-bg);border-color:var(--accent-red)}.vc-flip .vv{color:var(--accent-red-text)}
+.viz-row{display:flex;gap:12px;align-items:flex-start;flex-wrap:wrap}
+.viz-card{background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius-md);padding:10px}
+.viz-card-title{font:700 11px var(--font-sans);margin-bottom:8px;display:flex;align-items:center;gap:5px}
+
+/* MATRIX (V9) */
+.matrix-wrap{display:inline-block;padding:14px;background:#1e293b;border-radius:8px;border:2px solid #334155;position:relative}
+.matrix-grid{display:grid;gap:3px;border-radius:3px;position:relative}
+.mat-cell{width:54px;height:54px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:var(--font-mono);font-size:18px;font-weight:700;border-radius:6px;background:#fff;color:#1e293b;border:2px solid transparent;position:relative;transition:all .25s}
+.mat-cell-coord{font-size:7px;color:var(--text-tertiary);font-weight:400;position:absolute;top:2px;left:3px;opacity:.7}
+.mat-cell--start{background:var(--accent-indigo-bg)!important;border-color:var(--accent-indigo)!important}
+.mat-cell--end{background:#FFE9A6!important;border-color:#B45309!important;animation:win-pulse 1.4s infinite}
+.mat-cell--curr{background:#FEF3C7!important;border-color:#B45309!important;animation:pulse-node 1.1s infinite;transform:scale(1.06);z-index:2}
+.mat-cell--visited{background:#DCFCE7;color:#14532D;opacity:.9;border-color:var(--accent-green)}
+.mat-cell--neighbor{background:var(--accent-teal-bg)!important;border-color:var(--accent-teal)!important;animation:pulse-node 1.1s infinite}
+.mat-cell--blocked{background:#FCEBEB;border-color:var(--accent-red);opacity:.7}
+
+/* V9 SVG flow arrows */
+.flow-svg{position:absolute;top:14px;left:14px;pointer-events:none;z-index:6;overflow:visible}
+.flow-line{stroke:#dc2626;stroke-width:2.5;stroke-dasharray:5,4;fill:none;animation:flow-dash 1s linear infinite,flow-pulse 1.4s ease-in-out infinite;filter:drop-shadow(0 0 2px rgba(220,38,38,.5))}
+.flow-line--current{stroke:#f59e0b;stroke-width:3;stroke-dasharray:4,3;animation:flow-dash .6s linear infinite;filter:drop-shadow(0 0 3px rgba(245,158,11,.7))}
+.flow-line--diag-jump{stroke:#8b5cf6;stroke-width:2.2;stroke-dasharray:2,3;opacity:.85}
+
+.legend{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px}
+.legend span{display:inline-flex;align-items:center;gap:5px;font-size:10px;color:var(--text-secondary)}
+.legend i{display:inline-block;width:14px;height:14px;border-radius:3px;border:1px solid var(--border-color)}
+.legend i.legend-flow{width:22px;height:0;border:0;border-top:2.5px dashed #dc2626}
+.legend i.legend-flow-curr{width:22px;height:0;border:0;border-top:3px dashed #f59e0b}
+.legend i.legend-flow-jump{width:22px;height:0;border:0;border-top:2.5px dashed #8b5cf6}
+
+/* HEAP */
+.heap-col{display:flex;flex-direction:column-reverse;gap:4px;min-height:140px;padding:8px;background:var(--bg-secondary);border-radius:var(--radius-md);border:1px dashed var(--border-color);min-width:130px}
+.heap-item{font:600 11px var(--font-mono);padding:4px 8px;border-radius:var(--radius-sm);background:#fff;border:1px solid var(--border-color);display:flex;justify-content:space-between;gap:6px}
+.heap-item.top{background:var(--accent-indigo-bg);border-color:var(--accent-indigo);font-weight:700}
+.heap-item .t{color:var(--accent-red-text);font-weight:800}
+.heap-item .rc{color:var(--text-tertiary)}
+.empty-state{font-size:11px;color:var(--text-tertiary);font-style:italic;text-align:center;padding:8px}
+
+.banner{background:var(--accent-green-bg);border:1px solid var(--accent-green);border-radius:var(--radius-md);padding:8px 12px;font:700 12px var(--font-sans);color:var(--accent-green-text);margin-bottom:10px;display:flex;align-items:center;gap:6px}
+
+@keyframes pulse-node{0%,100%{box-shadow:0 0 4px var(--accent-indigo)}50%{box-shadow:0 0 12px var(--accent-indigo)}}
+@keyframes win-pulse{0%,100%{box-shadow:0 0 3px rgba(234,179,8,.5)}50%{box-shadow:0 0 12px rgba(234,179,8,.9)}}
+@keyframes flow-dash{to{stroke-dashoffset:-18}}
+@keyframes flow-pulse{0%,100%{opacity:.85}50%{opacity:1}}
+
+.footer-bar{display:flex;flex-shrink:0;border-top:1px solid var(--border-color);background:#fff}
+.footer-left{width:33%;min-width:140px;max-width:45vw;display:flex;align-items:center;gap:8px;padding:7px 12px;border-right:1px solid var(--border-light)}
+.footer-right{flex:1;display:flex;align-items:center;gap:8px;padding:7px 20px;flex-wrap:wrap}
+.step-info{font:700 11px var(--font-mono);color:var(--text-secondary);background:var(--bg-secondary);padding:4px 10px;border-radius:var(--radius-sm);border:1px solid var(--border-color)}
+.action-badge{font-family:system-ui,"Segoe UI Emoji",sans-serif;font:700 9px var(--font-sans);padding:3px 8px;border-radius:99px;text-transform:uppercase;background:var(--bg-tertiary);color:var(--text-secondary);border:1px solid var(--border-color)}
+.action-badge--func-def,.action-badge--init,.action-badge--call,.action-badge--return{background:rgba(130,80,255,.14);color:#3C3489;border-color:#8250ff}
+.action-badge--for-check,.action-badge--while-check,.action-badge--if-check{background:rgba(56,139,253,.14);color:#185FA5;border-color:#388bfd}
+.action-badge--mark,.action-badge--push,.action-badge--pop,.action-badge--restore,.action-badge--found{background:var(--accent-green-bg);color:var(--accent-green-text);border-color:var(--accent-green)}
+.action-badge--remove,.action-badge--prune,.action-badge--fail{background:var(--accent-red-bg);color:var(--accent-red-text);border-color:var(--accent-red)}
+.action-badge--exit,.action-badge--skip{background:var(--bg-tertiary);color:var(--text-secondary);border-color:var(--border-color)}
+kbd{font-family:system-ui,"Segoe UI Emoji",sans-serif;font:600 10px var(--font-mono);background:var(--bg-secondary);border:1px solid var(--border-color);border-bottom-width:2px;padding:1px 5px;border-radius:3px;color:var(--text-secondary)}
+.btn{font-family:system-ui,"Segoe UI Emoji",sans-serif;font:600 11px var(--font-sans);background:var(--bg-card);border:1px solid var(--border-color);padding:4px 11px;border-radius:var(--radius-sm);cursor:pointer;color:var(--text-primary);transition:all var(--ease)}
+.btn:hover{background:var(--bg-secondary);border-color:var(--accent-indigo)}
+.btn-primary{background:var(--accent-indigo);color:#fff;border-color:var(--accent-indigo)}
+.btn-primary:hover{background:var(--accent-indigo-hover);color:#fff}
+.btn-fullscreen{font-family:system-ui,"Segoe UI Emoji",sans-serif}
+.footer-sep{width:1px;height:18px;background:var(--border-color)}
+.log-toggle-btn{font-family:system-ui,"Segoe UI Emoji",sans-serif;font:700 10px var(--font-sans);background:var(--accent-green-bg);border:1px solid var(--accent-green);padding:4px 10px;border-radius:var(--radius-sm);cursor:pointer;color:var(--accent-green-text)}
+.log-toggle-btn--off{background:var(--bg-secondary);border-color:var(--border-color);color:var(--text-secondary)}
+.btn-zoom{font-family:system-ui,"Segoe UI Emoji",sans-serif;font:700 12px var(--font-mono);background:var(--bg-card);border:1px solid var(--border-color);width:24px;height:24px;border-radius:var(--radius-sm);cursor:pointer;display:inline-flex;align-items:center;justify-content:center}
+.log-zoom-label{font:600 10px var(--font-mono);color:var(--text-secondary);min-width:36px;text-align:center}
+
+.log-popup{--log-scale:1;position:fixed;bottom:52px;right:14px;width:calc(480px*var(--log-scale));max-width:92vw;max-height:75vh;border-radius:var(--radius-lg);box-shadow:0 10px 32px rgba(0,0,0,.14);border:1px solid var(--border-color);background:var(--bg-card);overflow:hidden;display:flex;flex-direction:column;z-index:100;transition:opacity .15s,transform .15s;transform-origin:bottom right}
+.log-popup--hidden{opacity:0;transform:scale(.92);pointer-events:none}
+.log-popup-body{flex:1;overflow:auto;padding:0}
+.log-popup-body>.log-card{border-radius:0;border:none;border-left:0}
+.log-card{border-radius:var(--radius-md);overflow:hidden;border:1px solid var(--border-color);border-left-width:4px;font-size:var(--fs-xs);background:var(--bg-card)}
+.log-card--func-def,.log-card--init,.log-card--call,.log-card--return{border-left-color:#8250ff}
+.log-card--for-check,.log-card--while-check,.log-card--if-check{border-left-color:#388bfd}
+.log-card--mark,.log-card--push,.log-card--pop,.log-card--restore,.log-card--found{border-left-color:var(--accent-green)}
+.log-card--remove,.log-card--prune,.log-card--fail{border-left-color:var(--accent-red)}
+.log-card--exit,.log-card--skip{border-left-color:var(--text-tertiary)}
+.log-card-header{display:flex;align-items:center;gap:6px;padding:8px 10px 6px;background:var(--bg-secondary);border-bottom:1px solid var(--border-light)}
+.log-badge{font-family:system-ui,"Segoe UI Emoji",sans-serif;font:700 10px var(--font-sans);padding:3px 8px;border-radius:99px;text-transform:uppercase}
+.log-badge--func-def,.log-badge--init,.log-badge--call,.log-badge--return{background:rgba(130,80,255,.14);color:#3C3489}
+.log-badge--for-check,.log-badge--while-check,.log-badge--if-check{background:rgba(56,139,253,.14);color:#185FA5}
+.log-badge--mark,.log-badge--push,.log-badge--pop,.log-badge--restore,.log-badge--found{background:var(--accent-green-bg);color:var(--accent-green-text)}
+.log-badge--remove,.log-badge--prune,.log-badge--fail{background:var(--accent-red-bg);color:var(--accent-red-text)}
+.log-badge--exit,.log-badge--skip{background:var(--bg-tertiary);color:var(--text-secondary)}
+.log-line-ref{font:700 10px var(--font-mono);color:var(--accent-indigo);background:var(--accent-indigo-bg);padding:1px 6px;border-radius:4px;border:1px solid var(--accent-indigo)}
+.log-status-pill{font-family:system-ui,"Segoe UI Emoji",sans-serif;font-size:9px;font-weight:700;padding:2px 7px;border-radius:99px;text-transform:uppercase;margin-left:auto}
+.log-status--success{background:var(--accent-green-bg);color:var(--accent-green-text);border:1px solid var(--accent-green)}
+.log-status--fail{background:var(--accent-red-bg);color:var(--accent-red-text);border:1px solid var(--accent-red)}
+.log-status--skip{background:var(--bg-tertiary);color:var(--text-tertiary);border:1px solid var(--border-color)}
+.log-status--loop{background:rgba(56,139,253,.14);color:#185FA5;border:1px solid #388bfd}
+.log-status--prune{background:var(--accent-red-bg);color:var(--accent-red-text);border:1px solid var(--accent-red)}
+.log-status--info{background:rgba(130,80,255,.14);color:#3C3489;border:1px solid #8250ff}
+.log-section{padding:7px 10px;border-bottom:1px dashed var(--border-light)}
+.log-section:last-child{border-bottom:none}
+.log-section-title{font:700 8px var(--font-mono);text-transform:uppercase;letter-spacing:.06em;color:var(--text-tertiary);margin-bottom:4px;display:flex;align-items:center;gap:4px}
+.log-section-title-icon{font-family:system-ui,"Segoe UI Emoji",sans-serif}
+.log-code-snippet{font:600 11px var(--font-mono);background:#0d1117;color:#e6edf3;padding:6px 9px;border-radius:4px;display:block;overflow-x:auto;white-space:pre;border:1px solid #30363d}
+.log-code-snippet .ck{color:#ff7b72}.log-code-snippet .cs{color:#a5d6ff}.log-code-snippet .cn{color:#79c0ff}.log-code-snippet .cf{color:#d2a8ff}.log-code-snippet .cc{color:#8b949e;font-style:italic}
+.log-kv-row{display:flex;gap:5px;flex-wrap:wrap}
+.log-kv{display:inline-flex;align-items:center;gap:3px;font:11px var(--font-mono);padding:2px 7px;border-radius:4px;background:var(--bg-secondary);border:1px solid var(--border-light)}
+.log-kv-key{color:var(--text-tertiary);font-weight:500}
+.log-kv-val{color:var(--text-primary);font-weight:700}
+.log-kv--in{background:rgba(56,139,253,.08);border-color:rgba(56,139,253,.3)}
+.log-kv--out{background:rgba(63,185,80,.08);border-color:rgba(63,185,80,.4)}
+.log-kv--out .log-kv-val{color:#15803D}
+.log-kv--changed{background:rgba(180,83,9,.10);border-color:rgba(180,83,9,.4)}
+.log-verdict{display:flex;align-items:center;gap:6px;font:600 11px var(--font-mono);padding:5px 8px;border-radius:5px;background:var(--bg-secondary);border:1px solid var(--border-light)}
+.log-verdict--true{background:var(--accent-green-bg);border-color:var(--accent-green);color:var(--accent-green-text)}
+.log-verdict--false{background:var(--accent-red-bg);border-color:var(--accent-red);color:var(--accent-red-text)}
+.log-analogy{font:italic 11px var(--font-sans);color:var(--text-secondary);background:#FFF8E7;border:1px solid #FBE8A6;border-left:3px solid var(--accent-amber);padding:6px 9px;border-radius:4px;line-height:1.55}
+.log-analogy strong{color:var(--accent-amber-text);font-style:normal;font-weight:700}
+.log-why{font-size:11px;line-height:1.55;color:var(--text-primary);padding:4px 0}
+.log-why strong{color:var(--accent-indigo-text)}
+.log-why code{font:11px var(--font-mono);background:var(--bg-secondary);padding:0 3px;border-radius:3px}
+</style>
+</head>
+<body>
+<div class="app-shell">
+
+  <div class="problem-card" id="problemCard">
+    <div class="pc-header">
+      <a href="../00_HomePage/gt_learn_homepage.html" class="gt-learn">GT LEARN</a>
+      <span class="pc-num">#778</span>
+      <span class="pc-title">🌊 Swim in Rising Water</span>
+      <span class="pc-diff">HARD</span>
+      <span class="pc-tag">Dijkstra</span>
+      <span class="pc-tag">Min-Heap</span>
+      <span class="pc-tag">Grid</span>
+      <div class="pc-inputs">
+        <label>grid=<input id="inGrid" value="[[0,2],[1,3]]"></label>
+        <span class="expected-badge" id="expectedBadge">exp: 3</span>
+        <button class="toggle-btn" onclick="toggleProblem()" id="toggleProblemBtn">▲ Hide</button>
+      </div>
+    </div>
+    <div class="pc-body" id="pcBody">
+      <div>
+        <div class="pc-section-title">📝 Problem Statement</div>
+        <div class="pc-text">
+          <code>n×n</code> grid mein har cell ki ek <strong>height</strong> hai. Time <code>t</code> pe water level <code>t</code> hai — tum sirf <strong>un cells mein swim kar sakte ho jinki height ≤ t</strong> hai. Start <code>(0,0)</code> se <code>(n-1,n-1)</code> tak pahunchne ka <strong>minimum time</strong> nikalo.
+        </div>
+        <div class="pc-section-title">🧠 Solving Approach</div>
+        <div class="pc-text">
+          <strong>Modified Dijkstra</strong> — heap pe priority = path ka <strong>maximum height</strong> seen so far (not sum!). Har neighbor ka cost = <code>max(currentMaxHeight, neighborHeight)</code>. Min-heap se sabse "shallow" path nikalti hai.
+        </div>
+        <div class="concept-block">
+          <div class="concept-block-title">🎯 Key Insight</div>
+          <div class="concept-block-body">Path ka cost = path mein aane wali <strong>sabse uchi cell</strong>. Sum nahi — bottleneck minimization!</div>
+        </div>
+        <div class="concept-block">
+          <div class="concept-block-title">🌊 Water Rising</div>
+          <div class="concept-block-body">Time t pe height ≤ t wali sab cells <strong>flooded</strong> hain — easy swim. Min path max-height = answer.</div>
+        </div>
+        <div class="concept-block">
+          <div class="concept-block-title">🏆 Early Exit</div>
+          <div class="concept-block-body">Jab end cell pop hota hai, woh apni <strong>best (min-max) probability ke saath</strong> nikalta hai. Turant return!</div>
+        </div>
+        <div class="complexity-row">
+          <span class="complexity-chip">⏱ Time: O(n² log n)</span>
+          <span class="complexity-chip">💾 Space: O(n²)</span>
+        </div>
+      </div>
+      <div>
+        <div class="pc-section-title">🧪 Test Cases</div>
+        <div class="tc-list">
+          <div class="tc-chip" onclick="loadTest('[[0,2],[1,3]]',3)">
+            <div class="tc-chip-input">[[0,2],[1,3]] <span class="pt-tag">2x2 basic</span></div>
+            <div class="tc-chip-expected">→ 3</div>
+          </div>
+          <div class="tc-chip" onclick="loadTest('[[3,2],[0,1]]',3)">
+            <div class="tc-chip-input">[[3,2],[0,1]] <span class="pt-tag">corner block</span></div>
+            <div class="tc-chip-expected">→ 3</div>
+          </div>
+          <div class="tc-chip" onclick="loadTest('[[0,1,3],[2,4,5],[7,6,8]]',8)">
+            <div class="tc-chip-input">[[0,1,3],[2,4,5],[7,6,8]] <span class="pt-tag">3x3</span></div>
+            <div class="tc-chip-expected">→ 8</div>
+          </div>
+          <div class="tc-chip" onclick="loadTest('[[0,1,2],[5,4,3],[6,7,8]]',8)">
+            <div class="tc-chip-input">[[0,1,2],[5,4,3],[6,7,8]] <span class="pt-tag">snake path</span></div>
+            <div class="tc-chip-expected">→ 8</div>
+          </div>
+        </div>
+        <div class="run-row">
+          <button class="btn-run" onclick="resetWithInput()">▶ Run</button>
+          <span class="live-output" id="liveOutput">—</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="main-row">
+    <div class="col col-code" id="col1">
+      <div class="section-label">📜 Python Code</div>
+      <div class="code-panel" id="codePanel"></div>
+    </div>
+    <div class="resize-handle" id="resizeH1"></div>
+    <div class="col col-viz">
+      <div class="section-label">📊 Visualization</div>
+      <div class="viz-panel" id="vizPanel"></div>
+    </div>
+  </div>
+
+  <div class="log-popup" id="logPopup">
+    <div class="log-popup-body" id="logPopupBody"></div>
+  </div>
+
+  <div class="footer-bar">
+    <div class="footer-left" id="footerLeft">
+      <span id="stepInfo" class="step-info">0/0</span>
+      <span id="actionBadge" class="action-badge"></span>
+    </div>
+    <div class="footer-right">
+      <kbd>←</kbd><kbd>→</kbd><kbd>R</kbd>
+      <button class="btn" type="button" onclick="resetStep()">↺</button>
+      <button class="btn" type="button" onclick="stepBy(-1)">◀</button>
+      <button class="btn btn-primary" type="button" onclick="stepBy(1)">▶ Next</button>
+      <span class="footer-sep"></span>
+      <button id="logToggleBtn" class="log-toggle-btn" type="button" onclick="toggleLogPreview()">📋 ON</button>
+      <button class="btn-zoom" type="button" onclick="logZoom(-1)">−</button>
+      <span id="logZoomLabel" class="log-zoom-label">100%</span>
+            <button class="btn-zoom" type="button" onclick="logZoom(1)">+</button>
+      <button class="btn-zoom" type="button" onclick="logZoomReset()">↺</button>
+      <span class="footer-sep"></span>
+      <button class="btn btn-fullscreen" type="button" onclick="toggleFullscreen()">⛶</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============== CODE LINES ==============
+var codeLines = [
+  "def swimInWater(grid):",
+  "    n = len(grid)",
+  "    visited = [[False]*n for _ in range(n)]",
+  "    heap = [(grid[0][0], 0, 0)]",
+  "    visited[0][0] = True",
+  "    dirs = [(-1,0),(1,0),(0,-1),(0,1)]",
+  "    while heap:",
+  "        t, r, c = heapq.heappop(heap)",
+  "        if r == n-1 and c == n-1:",
+  "            return t",
+  "        for dr, dc in dirs:",
+  "            nr, nc = r+dr, c+dc",
+  "            if 0<=nr<n and 0<=nc<n and not visited[nr][nc]:",
+  "                visited[nr][nc] = True",
+  "                heapq.heappush(heap, (max(t, grid[nr][nc]), nr, nc))",
+  "    return -1"
+];
+
+// ============== STATE ==============
+var steps = [];
+var currentStep = 0;
+var codeWidthUserSet = false;
+var curResult = null;
+var logEnabled = true;
+var logZoomLevel = 100;
+
+var LOG_BADGE = {
+  "func-def":"📌 DEF","init":"⚙️ INIT","call":"📞 CALL","return":"🏆 RETURN",
+  "for-check":"🔁 FOR","while-check":"🔁 WHILE","if-check":"🔎 IF",
+  "mark":"✅ MARK","push":"⬆ PUSH","pop":"⬇ POP","restore":"↩ RESTORE","found":"🎉 FOUND",
+  "remove":"✏️ EDIT","prune":"✂️ PRUNE","fail":"❌ FAIL",
+  "exit":"🔚 EXIT","skip":"⏭ SKIP"
+};
+var BADGE_LABEL = {
+  "func-def":"DEF","init":"INIT","call":"CALL","return":"RETURN",
+  "for-check":"FOR","while-check":"WHILE","if-check":"IF",
+  "mark":"MARK","push":"PUSH","pop":"POP","restore":"RESTORE","found":"FOUND",
+  "remove":"EDIT","prune":"PRUNE","fail":"FAIL",
+  "exit":"EXIT","skip":"SKIP"
+};
+
+var DIR_NAMES = ['UP','DOWN','LEFT','RIGHT'];
+
+// ============== UTILITIES ==============
+function hlCode(raw){
+  var h = raw;
+  h = h.replace(/("[^"]*"|'[^']*')/g, '\x01s\x02$1\x03');
+  h = h.replace(/\b(def|for|in|if|return|break|continue|and|else|elif|True|False|None|not|or|while|lambda)\b/g, '\x01k\x02$1\x03');
+  h = h.replace(/\b(len|range|int|str|list|append|pop|sorted|min|max|sum|abs|enumerate|zip|print|set|add|heappush|heappop|heapq)\b/g, '\x01f\x02$1\x03');
+  h = h.replace(/(?<![.\w"\x01\x02\x03])(-?\d+)\b/g, '\x01n\x02$1\x03');
+  h = h.replace(/(#.*$)/gm, '\x01c\x02$1\x03');
+  h = h.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  h = h.replace(/\x01([a-z])\x02/g, function(_,c){ return '<span class="c'+c+'">'; }).replace(/\x03/g,'</span>');
+  return h;
+}
+
+function richLog(opts){
+  var statusMap = { success:"✅ Success", fail:"❌ Failed", skip:"⏭ Skipped", loop:"🔁 Loop iter", prune:"✂️ Pruned", info:"ℹ️ Info" };
+  var status = opts.status || "info";
+  var html = '<div class="log-card log-card--'+opts.action+'">';
+  html += '<div class="log-card-header">';
+  html += '<span class="log-badge log-badge--'+opts.action+'">'+(LOG_BADGE[opts.action]||opts.action)+'</span>';
+  html += '<span class="log-line-ref">L'+(opts.line+1)+'</span>';
+  html += '<span class="log-status-pill log-status--'+status+'">'+statusMap[status]+'</span>';
+  html += '</div>';
+  if (opts.code) {
+    html += '<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">📜</span>Code Executing</div>';
+    html += '<code class="log-code-snippet">'+hlCode(opts.code)+'</code></div>';
+  }
+  if (opts.inputs && opts.inputs.length) {
+    html += '<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">📥</span>Input Values (line is using these)</div><div class="log-kv-row">';
+    opts.inputs.forEach(function(kv){ html += '<span class="log-kv log-kv--in"><span class="log-kv-key">'+kv.k+'</span>=<span class="log-kv-val">'+kv.v+'</span></span>'; });
+    html += '</div></div>';
+  }
+  if (opts.outputs && opts.outputs.length) {
+    html += '<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">📤</span>Output / State After Line</div><div class="log-kv-row">';
+    opts.outputs.forEach(function(kv){ var cls = kv.changed?'log-kv--changed':'log-kv--out'; html += '<span class="log-kv '+cls+'"><span class="log-kv-key">'+kv.k+'</span>=<span class="log-kv-val">'+kv.v+'</span></span>'; });
+    html += '</div></div>';
+  }
+  if (opts.verdict) {
+    var vCls = opts.verdictTrue===true?'log-verdict--true':(opts.verdictTrue===false?'log-verdict--false':'');
+    var vIcon = opts.verdictTrue===true?'✓':(opts.verdictTrue===false?'✗':'•');
+    html += '<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">⚖️</span>Verdict / Decision</div>';
+    html += '<div class="log-verdict '+vCls+'">'+vIcon+' '+opts.verdict+'</div></div>';
+  }
+  if (opts.why) {
+    html += '<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">💡</span>Why This Happens</div><div class="log-why">'+opts.why+'</div></div>';
+  }
+  if (opts.analogy) {
+    html += '<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">🎭</span>Real-Life Analogy</div><div class="log-analogy">'+opts.analogy+'</div></div>';
+  }
+  html += '</div>';
+  return html;
+}
+
+// ============== RENDER CODE ==============
+function renderCode(){
+  var p = document.getElementById('codePanel');
+  p.innerHTML = codeLines.map(function(raw,i){
+    var h = raw;
+    h = h.replace(/("[^"]*"|'[^']*')/g, '\x01STR\x02$1\x03');
+    h = h.replace(/\b(def|for|in|if|return|break|continue|and|else|elif|True|False|None|not|or|while|lambda)\b/g, '\x01KW\x02$1\x03');
+    h = h.replace(/\b(len|range|int|str|list|append|pop|sorted|min|max|sum|abs|enumerate|zip|print|set|add|heappush|heappop|heapq)\b/g, '\x01FN\x02$1\x03');
+    h = h.replace(/(?<![.\w"\x01\x02\x03])(-?\d+)\b/g, '\x01NUM\x02$1\x03');
+    h = h.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    var map = { STR:'str',KW:'kw',FN:'fn',NUM:'num' };
+    h = h.replace(/\x01([A-Z]+)\x02/g, function(_,c){ return '<span class="'+map[c]+'">'; }).replace(/\x03/g,'</span>');
+    return '<div class="code-line" data-line="'+i+'"><span class="ln">'+(i+1)+'</span><span class="src">'+h+'</span></div>';
+  }).join('');
+}
+
+function fitCodeWidth(){
+  if (codeWidthUserSet) return;
+  var col = document.getElementById('col1');
+  var maxW = Math.min(col.offsetWidth, window.innerWidth*0.45);
+  col.style.width = Math.max(280, maxW*0.85)+'px';
+  syncFooterWidth();
+}
+function syncFooterWidth(){ document.getElementById('footerLeft').style.width = document.getElementById('col1').offsetWidth+'px'; }
+
+// ============== MIN-HEAP (tuple compare: t, r, c) ==============
+function cmpItem(a,b){ if (a[0]!==b[0]) return a[0]-b[0]; if (a[1]!==b[1]) return a[1]-b[1]; return a[2]-b[2]; }
+function heapPush(h,it){ h.push(it); var i=h.length-1; while(i>0){ var p=(i-1)>>1; if (cmpItem(h[i],h[p])<0){ var t=h[i];h[i]=h[p];h[p]=t;i=p;} else break;} }
+function heapPop(h){ var top=h[0]; var last=h.pop(); if (h.length){ h[0]=last; var i=0,n=h.length; while(true){ var l=2*i+1,r=2*i+2,b=i; if(l<n && cmpItem(h[l],h[b])<0)b=l; if(r<n && cmpItem(h[r],h[b])<0)b=r; if(b===i)break; var t=h[i];h[i]=h[b];h[b]=t;i=b;} } return top; }
+
+// ============== BUILD STEPS ==============
+function buildSteps(grid){
+  var st = [];
+  var MAX_STEPS = 5000;
+  var n = grid.length;
+  var visited = null, heap = null, dirs = null;
+  var t, r, c, dr, dc, nr, nc, di;
+  var visitedSet = []; // [[r,c], ...] in pop order
+  var hl = {};
+
+  function snap(extra){
+    return Object.assign({
+      grid: grid.map(function(row){return row.slice();}),
+      n: n,
+      visited: visited ? visited.map(function(row){return row.slice();}) : null,
+      heap: heap ? heap.map(function(it){return it.slice();}) : null,
+      t:t, r:r, c:c, dr:dr, dc:dc, nr:nr, nc:nc, di:di,
+      visitedSet: visitedSet.map(function(p){return p.slice();}),
+      hl: Object.assign({}, hl)
+    }, extra||{});
+  }
+  function pushStep(o){ if (st.length >= MAX_STEPS) return; st.push(Object.assign({line:0,action:"init",logHTML:""}, snap(o))); }
+
+  // L0 — function def
+  pushStep({
+    line:0, action:"func-def",
+    logHTML: richLog({
+      line:0, action:"func-def", status:"info",
+      code:"def swimInWater(grid="+JSON.stringify(grid)+")",
+      inputs:[{k:"grid.size",v:n+"x"+n}],
+      why:"Function entry. <strong>Modified Dijkstra</strong> chalayenge — heap priority = path ka <strong>max height</strong>. Start (0,0) se end ("+(n-1)+","+(n-1)+") tak ka min-max path nikalna hai.",
+      analogy:"<strong>Baarish ke paani mein swim</strong> kar rahe ho — water level dheere dheere badh raha hai. Sabse <strong>shallowest route</strong> dhundhna hai jo dest tak le jaaye!"
+    })
+  });
+
+  // L1 — n = len(grid)
+  pushStep({
+    line:1, action:"init",
+    logHTML: richLog({
+      line:1, action:"init", status:"success",
+      code:"n = len(grid) = "+n,
+      inputs:[{k:"grid.length",v:n}],
+      outputs:[{k:"n",v:n,changed:true}],
+      why:"Grid ki size <strong>"+n+"x"+n+"</strong>. Boundary checks ke liye chahiye.",
+      analogy:"Pool ki <strong>length aur width</strong> note kar li — har edge tak ka faasla pata hai."
+    })
+  });
+
+  // L2 — visited init
+  visited = [];
+  for (var i = 0; i < n; i++) { var row = []; for (var j = 0; j < n; j++) row.push(false); visited.push(row); }
+  pushStep({
+    line:2, action:"init",
+    logHTML: richLog({
+      line:2, action:"init", status:"success",
+      code:"visited = [[False]*"+n+" for _ in range("+n+")]",
+      inputs:[{k:"n",v:n}],
+      outputs:[{k:"visited",v:n+"x"+n+" all False",changed:true}],
+      why:"<strong>Visited matrix</strong> banayi — track karenge ki kaunsi cells already process ho gayi hain.",
+      analogy:"Sheher ka khali <strong>register</strong> — har location pe entry stamp lagayenge ek baar visit karne pe."
+    })
+  });
+
+  // L3 — heap init
+  heap = [[grid[0][0], 0, 0]];
+  pushStep({
+    line:3, action:"init",
+    logHTML: richLog({
+      line:3, action:"init", status:"success",
+      code:"heap = [(grid[0][0]="+grid[0][0]+", 0, 0)]",
+      inputs:[{k:"grid[0][0]",v:grid[0][0]}],
+      outputs:[{k:"heap",v:"[("+grid[0][0]+",0,0)]",changed:true}],
+      why:"Min-heap shuru ki — pehla element <strong>start cell</strong> with its height "+grid[0][0]+". Heap top hamesha <strong>min t (max height seen so far)</strong> dega.",
+      analogy:"Tour bus mein <strong>pehla passenger</strong> — start point. Heap = priority queue jaisi expensive ticket counter, jisme sabse kam height wala pehle nikalta hai."
+    })
+  });
+
+  // L4 — visited[0][0] = True
+  visited[0][0] = true;
+  pushStep({
+    line:4, action:"mark",
+    logHTML: richLog({
+      line:4, action:"mark", status:"success",
+      code:"visited[0][0] = True",
+      inputs:[{k:"start cell",v:"(0,0)"}],
+      outputs:[{k:"visited[0][0]",v:"True",changed:true}],
+      why:"Start cell ko <strong>already visited</strong> mark kar diya — taaki dobara process na ho.",
+      analogy:"Apni starting point pe <strong>'main yahan se aaya'</strong> ka stamp laga diya — wapas isi pe kabhi nahi aayenge."
+    })
+  });
+
+  // L5 — dirs
+  dirs = [[-1,0],[1,0],[0,-1],[0,1]];
+  pushStep({
+    line:5, action:"init",
+    logHTML: richLog({
+      line:5, action:"init", status:"success",
+      code:"dirs = [(-1,0),(1,0),(0,-1),(0,1)]",
+      inputs:[],
+      outputs:[{k:"dirs",v:"4 directions: UP,DOWN,LEFT,RIGHT",changed:true}],
+      why:"4 cardinal directions — <strong>UP, DOWN, LEFT, RIGHT</strong>. Diagonal allowed nahi.",
+      analogy:"Compass <strong>4 directions</strong> set kar li — North, South, East, West. Bas in 4 directions mein hi swim karenge."
+    })
+  });
+
+  // ===== MAIN WHILE LOOP =====
+  while (heap.length > 0) {
+    pushStep({
+      line:6, action:"while-check",
+      logHTML: richLog({
+        line:6, action:"while-check", status:"loop",
+        code:"while heap: # heap has "+heap.length+" item(s)",
+        inputs:[{k:"heap.size",v:heap.length}],
+        verdict:"heap is non-empty", verdictTrue:true,
+        why:"Heap mein abhi <strong>"+heap.length+" candidate(s)</strong> hain — process karte rahenge jab tak end na mil jaaye ya heap khali na ho.",
+        analogy:"Counter pe abhi log <strong>line mein khade</strong> hain — service jaari rakhni hai!"
+      })
+    });
+
+    var popped = heapPop(heap);
+    t = popped[0]; r = popped[1]; c = popped[2];
+    visitedSet.push([r,c]);
+    hl = { currCell:[r,c] };
+    pushStep({
+      line:7, action:"pop",
+      logHTML: richLog({
+        line:7, action:"pop", status:"success",
+        code:"t, r, c = heapq.heappop(heap) → ("+t+", "+r+", "+c+")",
+        inputs:[{k:"heap top",v:"("+t+","+r+","+c+")"}],
+        outputs:[{k:"t",v:t,changed:true},{k:"r",v:r,changed:true},{k:"c",v:c,changed:true},{k:"heap.size",v:heap.length}],
+        why:"Heap se <strong>min-time candidate</strong> nikala — cell <strong>("+r+","+c+")</strong> with max-height-on-path = <strong>"+t+"</strong>. Yeh abhi best route hai is cell tak.",
+        analogy:"Counter ka <strong>VIP customer</strong> aaya — sabse <strong>shallowest route</strong> wala. Iska time noted: "+t+"!"
+      })
+    });
+
+    // L8 — if r == n-1 and c == n-1
+    var isEnd = (r === n-1 && c === n-1);
+    pushStep({
+      line:8, action:"if-check",
+      logHTML: richLog({
+        line:8, action:"if-check", status: isEnd?"success":"skip",
+        code:"if r == n-1 and c == n-1: "+r+" == "+(n-1)+" and "+c+" == "+(n-1),
+        inputs:[{k:"r",v:r},{k:"c",v:c},{k:"n-1",v:n-1}],
+        verdict:"("+r+","+c+") "+(isEnd?"==":"!=")+" ("+(n-1)+","+(n-1)+")", verdictTrue:isEnd,
+        why: isEnd
+          ? "<strong>END CELL POP HUA!</strong> Dijkstra invariant: jab end pop hota hai, woh apni <strong>minimum max-height path</strong> ke saath nikalta hai. Yeh hi answer!"
+          : "Yeh end cell nahi — abhi neighbors explore karenge.",
+        analogy: isEnd
+          ? "<strong>Manzil aa gayi!</strong> Aur paani sirf "+t+" level tak chadhna pada — yahi <strong>minimum time</strong>!"
+          : "Bus abhi raste mein hai — agla stop dekho!"
+      })
+    });
+    if (isEnd) {
+      curResult = t;
+      pushStep({
+        line:9, action:"return",
+        logHTML: richLog({
+          line:9, action:"return", status:"success",
+          code:"return t = "+t,
+          inputs:[{k:"t",v:t}],
+          outputs:[{k:"return value",v:t,changed:true}],
+          why:"<strong>🎉 Final answer = "+t+"</strong>. Yeh minimum time hai jab tak swim karke end cell tak pahuncha jaa sake.",
+          analogy:"<strong>Trophy mil gayi!</strong> Time "+t+" pe paani itna chadh gaya ki manzil tak pure rasta swim ho gaya."
+        })
+      });
+      return st;
+    }
+
+    // L10 — for dr, dc in dirs (4 iterations)
+    for (di = 0; di < dirs.length; di++) {
+      dr = dirs[di][0]; dc = dirs[di][1];
+      pushStep({
+        line:10, action:"for-check",
+        logHTML: richLog({
+          line:10, action:"for-check", status:"loop",
+          code:"for dr,dc in dirs: (dr,dc)=("+dr+","+dc+") → "+DIR_NAMES[di],
+          inputs:[{k:"dr",v:dr},{k:"dc",v:dc},{k:"direction",v:DIR_NAMES[di]}],
+          verdict:"direction "+(di+1)+"/4", verdictTrue:true,
+          why:"<strong>"+DIR_NAMES[di]+"</strong> direction explore kar rahe — kya is taraf jaane ka rasta hai?",
+          analogy:"Compass ki <strong>"+DIR_NAMES[di]+"</strong> taraf dekha — kya yahan paani hai swim karne ke liye?"
+        })
+      });
+
+      nr = r + dr; nc = c + dc;
+      pushStep({
+        line:11, action:"init",
+        logHTML: richLog({
+          line:11, action:"init", status:"success",
+          code:"nr, nc = r+dr, c+dc = "+r+"+"+dr+", "+c+"+"+dc+" = ("+nr+","+nc+")",
+          inputs:[{k:"r",v:r},{k:"c",v:c},{k:"dr",v:dr},{k:"dc",v:dc}],
+          outputs:[{k:"nr",v:nr,changed:true},{k:"nc",v:nc,changed:true}],
+          why:"Neighbor coordinates calculate kar liye — <strong>("+nr+","+nc+")</strong>. Ab check karna hai ki yeh valid cell hai ya nahi.",
+          analogy:"Naye location ke <strong>coordinates note</strong> kar liye — abhi check karenge ki yeh sheher ke andar hai ya bahar."
+        })
+      });
+
+      var inBounds = (nr >= 0 && nr < n && nc >= 0 && nc < n);
+      var notVisited = inBounds ? !visited[nr][nc] : false;
+      var validNeighbor = inBounds && notVisited;
+      var verdictText;
+      if (!inBounds) verdictText = "out of bounds: ("+nr+","+nc+") not in [0,"+n+")";
+      else if (!notVisited) verdictText = "already visited: visited["+nr+"]["+nc+"] = True";
+      else verdictText = "in bounds AND not visited";
+
+      hl = { currCell:[r,c], probeCell:[nr,nc] };
+      pushStep({
+        line:12, action:"if-check",
+        logHTML: richLog({
+          line:12, action:"if-check", status: validNeighbor?"success":"skip",
+          code:"if 0<=nr<n and 0<=nc<n and not visited[nr][nc]:",
+          inputs:[{k:"nr",v:nr},{k:"nc",v:nc},{k:"n",v:n},{k:"in_bounds",v:inBounds?"True":"False"},{k:"not_visited",v:inBounds?(notVisited?"True":"False"):"N/A"}],
+          verdict:verdictText, verdictTrue:validNeighbor,
+          why: validNeighbor
+            ? "Cell <strong>("+nr+","+nc+")</strong> grid ke andar hai aur abhi tak visit nahi hua — <strong>process karenge!</strong>"
+            : (!inBounds
+                ? "Cell <strong>("+nr+","+nc+")</strong> <strong>grid ke bahar</strong> hai — skip!"
+                : "Cell <strong>("+nr+","+nc+")</strong> <strong>already visited</strong> — Dijkstra mein dobara process nahi karte (first pop = best). Skip!"),
+          analogy: validNeighbor
+            ? "<strong>Naya safe spot</strong> mila — yahan jaa sakte hain!"
+            : (!inBounds
+                ? "<strong>Pool ke bahar</strong> — wahan swim nahi kar sakte. Skip!"
+                : "<strong>Yahan pehle aa chuke ho</strong> — purana stamp lag chuka hai. Wapas jaane ka kya fayda?")
+        })
+      });
+
+      if (validNeighbor) {
+        visited[nr][nc] = true;
+        pushStep({
+          line:13, action:"mark",
+          logHTML: richLog({
+            line:13, action:"mark", status:"success",
+            code:"visited["+nr+"]["+nc+"] = True",
+            inputs:[{k:"nr",v:nr},{k:"nc",v:nc}],
+            outputs:[{k:"visited["+nr+"]["+nc+"]",v:"True",changed:true}],
+            why:"Cell <strong>("+nr+","+nc+")</strong> ko visited mark kar diya — abhi heap mein push karenge, lekin doosre koi rasta yahan na aaye yeh ensure ho gaya.",
+            analogy:"Naye location pe <strong>'reservation'</strong> stamp laga diya — koi aur is location ko process na kare."
+          })
+        });
+
+        var newT = Math.max(t, grid[nr][nc]);
+        heapPush(heap, [newT, nr, nc]);
+        pushStep({
+          line:14, action:"push",
+          logHTML: richLog({
+            line:14, action:"push", status:"success",
+            code:"heapq.heappush(heap, (max("+t+", grid["+nr+"]["+nc+"]="+grid[nr][nc]+")="+newT+", "+nr+", "+nc+"))",
+            inputs:[{k:"current t",v:t},{k:"grid["+nr+"]["+nc+"]",v:grid[nr][nc]},{k:"max",v:newT}],
+            outputs:[{k:"heap.size",v:heap.length,changed:true},{k:"new entry",v:"("+newT+","+nr+","+nc+")"}],
+            why:"Naya heap entry — priority = <strong>max("+t+", "+grid[nr][nc]+") = "+newT+"</strong>. Yeh path ka <strong>max-height bottleneck</strong> hai. "+(grid[nr][nc] > t ? "Naya cell uchaa hai — bottleneck update.": "Naya cell neecha — bottleneck same."),
+            analogy: grid[nr][nc] > t
+              ? "Yahan paani <strong>"+grid[nr][nc]+" tak chadhega</strong> — purana "+t+" se zyada. Path ka deepest depth = "+newT+"."
+              : "Yahan paani sirf "+grid[nr][nc]+", lekin pehle hi "+t+" tak chadh chuka tha — bottleneck wahi <strong>"+t+"</strong>."
+          })
+        });
+      }
+    }
+    pushStep({
+      line:10, action:"exit",
+      logHTML: richLog({
+        line:10, action:"exit", status:"info",
+        code:"for dirs loop EXIT — all 4 directions explored from ("+r+","+c+")",
+        inputs:[{k:"directions checked",v:4}],
+        verdict:"all 4 directions done", verdictTrue:false,
+        why:"Cell ("+r+","+c+") ke <strong>chaaron taraf</strong> ki cells check ho gayi. Wapas while loop ke top pe — agla pop karenge.",
+        analogy:"Is location ke <strong>chaaron neighbors</strong> dekh liye — agle hub pe chalo!"
+      })
+    });
+    di = dr = dc = nr = nc = undefined;
+    hl = {};
+  }
+
+  // While loop natural exit
+  pushStep({
+    line:6, action:"exit",
+    logHTML: richLog({
+      line:6, action:"exit", status:"info",
+      code:"while heap loop EXIT — heap is empty",
+      inputs:[{k:"heap.size",v:0}],
+      verdict:"heap is empty", verdictTrue:false,
+      why:"Heap khali ho gaya aur <strong>end cell kabhi pop nahi hua</strong>. Iska matlab grid disconnected hai.",
+      analogy:"Saare raste try kar liye — manzil tak <strong>koi rasta nahi mila</strong>. Pool disconnected hai!"
+    })
+  });
+
+  // L15 — return -1 (theoretically unreachable for valid grid)
+  curResult = -1;
+  pushStep({
+    line:15, action:"return",
+    logHTML: richLog({
+      line:15, action:"return", status:"fail",
+      code:"return -1",
+      inputs:[],
+      outputs:[{k:"return value",v:"-1",changed:true}],
+      why:"<strong>Unreachable</strong> — valid grid ke liye yeh hit nahi hota, but safety fallback hai.",
+      analogy:"<strong>Refund slip</strong> — paani kabhi nahi pahunchaya manzil tak."
+    })
+  });
+
+  return st;
+}
+
+// ============== RENDER VIZ ==============
+function renderViz(s){
+  var p = document.getElementById('vizPanel');
+  var html = '';
+
+  if (s.line === 9) {
+    html += '<div class="banner">🏆 Found! Min time to swim from (0,0) to ('+(s.n-1)+','+(s.n-1)+') = '+s.t+'</div>';
+  }
+
+  // Vars strip
+  html += '<div class="vars-strip">';
+  html += '<span class="var-chip"><span class="vk">n</span>=<span class="vv">'+s.n+'</span></span>';
+  if (s.t !== undefined) html += '<span class="var-chip vc-active"><span class="vk">t</span>=<span class="vv">'+s.t+'</span></span>';
+  if (s.r !== undefined) html += '<span class="var-chip vc-warn"><span class="vk">r,c</span>=<span class="vv">('+s.r+','+s.c+')</span></span>';
+  if (s.dr !== undefined) html += '<span class="var-chip"><span class="vk">dr,dc</span>=<span class="vv">('+s.dr+','+s.dc+')</span></span>';
+  if (s.nr !== undefined) html += '<span class="var-chip vc-safe"><span class="vk">nr,nc</span>=<span class="vv">('+s.nr+','+s.nc+')</span></span>';
+  if (s.heap) html += '<span class="var-chip"><span class="vk">heap.size</span>=<span class="vv">'+s.heap.length+'</span></span>';
+  if (s.visitedSet) html += '<span class="var-chip vc-safe"><span class="vk">popped</span>=<span class="vv">'+s.visitedSet.length+'</span></span>';
+  html += '</div>';
+
+  html += '<div class="viz-row">';
+  html += renderMatrix(s);
+  html += renderHeap(s);
+  html += '</div>';
+
+  p.innerHTML = html;
+}
+
+function renderMatrix(s){
+  var n = s.n;
+  var CELL = 54, GAP = 3, PAD = 14;
+  var totalW = n*CELL + (n-1)*GAP;
+  var totalH = n*CELL + (n-1)*GAP;
+
+  function cx(col){ return col*(CELL+GAP) + CELL/2; }
+  function cy(row){ return row*(CELL+GAP) + CELL/2; }
+
+  var h = '<div class="viz-card"><div class="viz-card-title">🌊 Grid (heights = water depth required)</div>';
+  h += '<div class="matrix-wrap"><div class="matrix-grid" style="grid-template-columns:repeat('+n+',54px);grid-template-rows:repeat('+n+',54px)">';
+
+  for (var i = 0; i < n; i++) {
+    for (var j = 0; j < n; j++) {
+      var cls = 'mat-cell';
+      var isStart = (i===0 && j===0);
+      var isEnd = (i===n-1 && j===n-1);
+      var isCurr = (s.hl.currCell && s.hl.currCell[0]===i && s.hl.currCell[1]===j);
+      var isProbe = (s.hl.probeCell && s.hl.probeCell[0]===i && s.hl.probeCell[1]===j);
+      var isVisited = s.visited && s.visited[i] && s.visited[i][j];
+
+      if (isStart) cls += ' mat-cell--start';
+      if (isEnd) cls += ' mat-cell--end';
+      if (isVisited && !isCurr && !isStart && !isEnd) cls += ' mat-cell--visited';
+      if (isProbe && !isStart && !isEnd) cls += ' mat-cell--neighbor';
+      if (isCurr) cls += ' mat-cell--curr';
+
+      h += '<div class="'+cls+'">';
+      h += '<span class="mat-cell-coord">'+i+','+j+'</span>';
+      h += s.grid[i][j];
+      h += '</div>';
+    }
+  }
+  h += '</div>';
+
+  // SVG flow arrows (V9)
+  if (s.visitedSet && s.visitedSet.length >= 2) {
+    h += '<svg class="flow-svg" width="'+totalW+'" height="'+totalH+'" viewBox="0 0 '+totalW+' '+totalH+'">';
+    h += '<defs>';
+    h += '<marker id="ah-red" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#dc2626"/></marker>';
+    h += '<marker id="ah-amber" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#f59e0b"/></marker>';
+    h += '<marker id="ah-purple" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#8b5cf6"/></marker>';
+    h += '</defs>';
+
+    var visits = s.visitedSet;
+    for (var pi = 0; pi < visits.length - 1; pi++) {
+      var a = visits[pi], b = visits[pi+1];
+      var x1 = cx(a[1]), y1 = cy(a[0]);
+      var x2 = cx(b[1]), y2 = cy(b[0]);
+      // Phase jump = non-adjacent move (Manhattan distance > 1) — heap teleport
+      var manhattan = Math.abs(a[0]-b[0]) + Math.abs(a[1]-b[1]);
+      var isJump = manhattan > 1;
+      var cls = isJump ? 'flow-line flow-line--diag-jump' : 'flow-line';
+      var marker = isJump ? 'ah-purple' : 'ah-red';
+      var dx = x2-x1, dy = y2-y1, len = Math.sqrt(dx*dx + dy*dy);
+      if (len > 0) {
+        var shrink = 20, ux = dx/len, uy = dy/len;
+        var sx1 = x1 + ux*shrink, sy1 = y1 + uy*shrink;
+        var sx2 = x2 - ux*shrink, sy2 = y2 - uy*shrink;
+        h += '<line class="'+cls+'" x1="'+sx1+'" y1="'+sy1+'" x2="'+sx2+'" y2="'+sy2+'" marker-end="url(#'+marker+')"/>';
+      }
+    }
+
+    // Amber "next probe" arrow
+    if (s.hl.probeCell && s.hl.currCell) {
+      var lastP = s.hl.currCell;
+      var curP = s.hl.probeCell;
+      if (lastP[0]!==curP[0] || lastP[1]!==curP[1]) {
+        var x1c = cx(lastP[1]), y1c = cy(lastP[0]);
+        var x2c = cx(curP[1]), y2c = cy(curP[0]);
+        var dxc = x2c-x1c, dyc = y2c-y1c, lenc = Math.sqrt(dxc*dxc + dyc*dyc);
+        if (lenc > 0) {
+          var uxc = dxc/lenc, uyc = dyc/lenc, shrinkC = 20;
+          var sx1c = x1c + uxc*shrinkC, sy1c = y1c + uyc*shrinkC;
+          var sx2c = x2c - uxc*shrinkC, sy2c = y2c - uyc*shrinkC;
+          h += '<line class="flow-line flow-line--current" x1="'+sx1c+'" y1="'+sy1c+'" x2="'+sx2c+'" y2="'+sy2c+'" marker-end="url(#ah-amber)"/>';
+        }
+      }
+    }
+    h += '</svg>';
+  }
+
+  h += '</div>'; // matrix-wrap
+
+  // Legend
+  h += '<div class="legend">';
+  h += '<span><i style="background:var(--accent-indigo-bg);border-color:var(--accent-indigo)"></i>Start (0,0)</span>';
+  h += '<span><i style="background:#FFE9A6;border-color:#B45309"></i>End ('+(n-1)+','+(n-1)+')</span>';
+  h += '<span><i style="background:#FEF3C7;border-color:#B45309"></i>Current pop</span>';
+  h += '<span><i style="background:var(--accent-teal-bg);border-color:var(--accent-teal)"></i>Probe neighbor</span>';
+  h += '<span><i style="background:#DCFCE7;border-color:var(--accent-green)"></i>Visited</span>';
+  h += '<span><i class="legend-flow"></i>Pop sequence</span>';
+  h += '<span><i class="legend-flow-jump"></i>Heap teleport</span>';
+  h += '<span><i class="legend-flow-curr"></i>Probing</span>';
+  h += '</div>';
+  h += '</div>'; // viz-card
+  return h;
+}
+
+function renderHeap(s){
+  if (!s.heap) return '';
+  var h = '<div class="viz-card"><div class="viz-card-title">🗃️ Min-Heap (priority = max-height)</div>';
+  h += '<div class="heap-col">';
+  if (s.heap.length === 0) {
+    h += '<div class="empty-state">— heap empty —</div>';
+  } else {
+    var sorted = s.heap.slice().sort(function(a,b){ return cmpItem(a,b); });
+    for (var i = 0; i < sorted.length; i++) {
+      var it = sorted[i];
+      var cls = (i===0) ? 'heap-item top' : 'heap-item';
+      h += '<div class="'+cls+'">';
+      h += '<span><span class="t">t='+it[0]+'</span> <span class="rc">@('+it[1]+','+it[2]+')</span></span>';
+      h += '</div>';
+    }
+  }
+  h += '</div>';
+  h += '<div style="font:10px var(--font-mono);color:var(--text-tertiary);margin-top:6px">🔝 Top = <strong>min t</strong> = best path so far</div>';
+  h += '</div>';
+  return h;
+}
+
+// ============== STEP CONTROLS ==============
+function renderStep(idx){
+  if (!steps.length) return;
+  var s = steps[idx];
+  currentStep = idx;
+  document.getElementById('stepInfo').textContent = (idx+1)+'/'+steps.length;
+  var bd = document.getElementById('actionBadge');
+    bd.textContent = BADGE_LABEL[s.action] || s.action;
+  bd.className = 'action-badge action-badge--'+s.action;
+  document.querySelectorAll('.code-line').forEach(function(el){ el.classList.remove('active'); });
+  var al = document.querySelector('.code-line[data-line="'+s.line+'"]');
+  if (al) { al.classList.add('active'); al.scrollIntoView({block:'nearest'}); }
+  renderViz(s);
+  showLogPreview(s);
+}
+
+function showLogPreview(s){
+  if (!logEnabled) return;
+  document.getElementById('logPopupBody').innerHTML = s.logHTML || '';
+  document.getElementById('logPopup').classList.remove('log-popup--hidden');
+}
+function hideLogPopup(){ document.getElementById('logPopup').classList.add('log-popup--hidden'); }
+function stepBy(d){ var ns = currentStep + d; if (ns < 0 || ns >= steps.length) return; renderStep(ns); }
+function resetStep(){ renderStep(0); }
+function toggleLogPreview(){
+  logEnabled = !logEnabled;
+  var btn = document.getElementById('logToggleBtn');
+  btn.textContent = logEnabled ? '📋 ON' : '📋 OFF';
+  btn.classList.toggle('log-toggle-btn--off', !logEnabled);
+  if (!logEnabled) hideLogPopup();
+  else if (steps.length) showLogPreview(steps[currentStep]);
+}
+function logZoom(dir){ logZoomLevel = Math.max(60, Math.min(180, logZoomLevel + dir*20)); updateLogZoom(); }
+function logZoomReset(){ logZoomLevel = 100; updateLogZoom(); }
+function updateLogZoom(){
+  document.getElementById('logZoomLabel').textContent = logZoomLevel+'%';
+  document.getElementById('logPopup').style.setProperty('--log-scale', logZoomLevel/100);
+}
+function toggleFullscreen(){
+  var viz = document.querySelector('.col-viz');
+  if (!document.fullscreenElement) viz.requestFullscreen().catch(function(){});
+  else document.exitFullscreen();
+}
+function toggleProblem(){
+  var body = document.getElementById('pcBody');
+  var btn = document.getElementById('toggleProblemBtn');
+  body.classList.toggle('hidden');
+  btn.textContent = body.classList.contains('hidden') ? '▼ Show' : '▲ Hide';
+}
+
+// ============== INPUT PARSING ==============
+function parseInputs(){
+  var grid = JSON.parse(document.getElementById('inGrid').value);
+  return { grid: grid };
+}
+function loadTest(gridStr, expected){
+  document.getElementById('inGrid').value = gridStr;
+  document.getElementById('expectedBadge').textContent = 'exp: '+expected;
+  resetWithInput();
+}
+function resetWithInput(){
+  curResult = null;
+  try {
+    var p = parseInputs();
+    renderCode();
+    fitCodeWidth();
+    steps = buildSteps(p.grid);
+    currentStep = 0;
+    renderStep(0);
+    document.getElementById('liveOutput').textContent = curResult !== null ? curResult : '—';
+  } catch (err) {
+    document.getElementById('liveOutput').textContent = 'Error: '+err.message;
+  }
+}
+
+// ============== RESIZE ==============
+(function(){
+  var col1 = document.getElementById('col1');
+  var h = document.getElementById('resizeH1');
+  h.addEventListener('mousedown', function(e){
+    e.preventDefault();
+    codeWidthUserSet = true;
+    var startX = e.clientX, startW = col1.offsetWidth;
+    document.body.classList.add('no-select');
+    h.classList.add('active');
+    function mv(e){ col1.style.width = Math.max(140, Math.min(window.innerWidth*0.45, startW + (e.clientX - startX))) + 'px'; syncFooterWidth(); }
+    function up(){ document.removeEventListener('mousemove',mv); document.removeEventListener('mouseup',up); document.body.classList.remove('no-select'); h.classList.remove('active'); }
+    document.addEventListener('mousemove',mv); document.addEventListener('mouseup',up);
+  });
+})();
+window.addEventListener('resize', function(){ if (!codeWidthUserSet) fitCodeWidth(); else syncFooterWidth(); });
+
+// ============== KEYBOARD ==============
+document.addEventListener('keydown', function(e){
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
+  if (e.key === 'ArrowRight') { e.preventDefault(); stepBy(1); }
+  else if (e.key === 'ArrowLeft') { e.preventDefault(); stepBy(-1); }
+  else if (e.key === 'r' || e.key === 'R') { e.preventDefault(); resetStep(); }
+});
+
+// ============== INIT ==============
+renderCode();
+fitCodeWidth();
+syncFooterWidth();
+resetWithInput();
+</script>
+</body>
+</html>

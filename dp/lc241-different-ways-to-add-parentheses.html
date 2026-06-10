@@ -1,0 +1,1245 @@
+﻿<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LC 241 — Different Ways to Add Parentheses</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+:root{
+  --bg-primary:#FAFAF8;--bg-secondary:#F1EFE8;--bg-tertiary:#E2E0D8;--bg-card:#FFFFFF;
+  --text-primary:#2C2C2A;--text-secondary:#5F5E5A;--text-tertiary:#888780;
+  --border-color:rgba(0,0,0,0.11);--border-light:rgba(0,0,0,0.06);--border-focus:#534AB7;
+  --accent-indigo:#534AB7;--accent-indigo-bg:#EEEDFE;--accent-indigo-text:#3C3489;--accent-indigo-hover:#4740A0;
+  --accent-teal:#0F6E56;--accent-teal-bg:#E1F5EE;--accent-teal-text:#085041;
+  --accent-red:#E24B4A;--accent-red-bg:#FCEBEB;--accent-red-text:#791F1F;
+  --accent-amber:#B45309;--accent-amber-bg:#FEF3C7;--accent-amber-text:#78350F;
+  --accent-green:#15803D;--accent-green-bg:#DCFCE7;--accent-green-text:#14532D;
+  --syn-keyword:#534AB7;--syn-function:#185FA5;--syn-number:#993C1D;--syn-string:#0F6E56;
+  --active-line-bg:#EEEDFE;
+  --radius-sm:4px;--radius-md:6px;--radius-lg:10px;--radius-xl:14px;
+  --font-sans:'DM Sans',system-ui,sans-serif;
+  --font-mono:'JetBrains Mono','Fira Code',monospace;
+  --fs-xs:11px;--fs-sm:12px;--fs-base:14px;
+  --ease:.18s ease;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden}
+body{font-family:var(--font-sans);font-size:var(--fs-base);color:var(--text-primary);background:var(--bg-primary);line-height:1.6}
+::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border-color);border-radius:99px}
+.no-select{user-select:none}
+
+.app-shell{display:flex;flex-direction:column;height:100vh;overflow:hidden}
+
+.problem-card{flex-shrink:0;border-bottom:1px solid var(--border-color);background:var(--bg-card)}
+.prob-header{display:flex;align-items:center;justify-content:space-between;padding:8px 16px;gap:12px;flex-wrap:wrap;border-bottom:1px solid var(--border-light)}
+.prob-header-left{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.gt-home-btn{font-family:system-ui,"Segoe UI Emoji",sans-serif;font-size:11px;font-weight:700;padding:5px 11px;border-radius:99px;background:var(--accent-indigo);color:#fff;border:none;cursor:pointer;letter-spacing:.05em}
+.gt-home-btn:hover{background:var(--accent-indigo-hover)}
+.prob-num{font:700 13px var(--font-mono);color:var(--text-tertiary)}
+.prob-name{font-size:16px;font-weight:700}
+.prob-diff--medium{font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;background:var(--accent-amber-bg);color:var(--accent-amber-text);border:1px solid var(--accent-amber);text-transform:uppercase;letter-spacing:.05em}
+.prob-tag{font-size:10px;font-weight:600;padding:2px 8px;border-radius:99px;background:var(--accent-indigo-bg);color:var(--accent-indigo-text);border:1px solid var(--accent-indigo)}
+.prob-header-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.top-label{font-size:11px;color:var(--text-secondary)}
+.top-input{font:600 12px var(--font-mono);padding:4px 8px;border:1px solid var(--border-color);border-radius:var(--radius-sm);background:var(--bg-card);color:var(--text-primary);width:160px}
+.top-input:focus{outline:none;border-color:var(--border-focus)}
+.top-expected{font:600 11px var(--font-mono);padding:4px 8px;background:var(--accent-amber-bg);color:var(--accent-amber-text);border:1px solid var(--accent-amber);border-radius:var(--radius-sm)}
+.prob-toggle-btn{font-family:system-ui,"Segoe UI Emoji",sans-serif;font-size:11px;font-weight:600;padding:4px 10px;border-radius:var(--radius-sm);background:var(--bg-secondary);color:var(--text-secondary);border:1px solid var(--border-color);cursor:pointer}
+.prob-toggle-btn:hover{background:var(--bg-tertiary)}
+
+.problem-body{display:flex;gap:20px;padding:14px 16px;max-height:35vh;overflow:auto}
+.problem-body--hidden{display:none}
+.pb-left{flex:1.6;min-width:0}
+.pb-right{flex:1;min-width:0;border-left:1px solid var(--border-light);padding-left:20px}
+.pb-section{margin-bottom:12px}
+.pb-section h4{font-size:12px;font-weight:700;color:var(--accent-indigo-text);margin-bottom:5px;text-transform:uppercase;letter-spacing:.04em}
+.pb-section p{font-size:12.5px;line-height:1.6}
+.pb-section code{font:600 11px var(--font-mono);background:var(--bg-secondary);padding:1px 5px;border-radius:3px;color:var(--accent-indigo-text)}
+.concept-block{background:var(--bg-secondary);border-left:3px solid var(--accent-indigo);padding:7px 10px;border-radius:4px;margin-top:5px;font-size:12px}
+.concept-block strong{color:var(--accent-indigo-text)}
+.complexity-row{display:flex;gap:6px;margin-top:6px}
+.cx-chip{font:600 11px var(--font-mono);padding:3px 8px;background:var(--accent-teal-bg);color:var(--accent-teal-text);border:1px solid var(--accent-teal);border-radius:99px}
+
+.tc-chip{display:flex;flex-direction:column;gap:5px;padding:7px 10px;background:var(--bg-secondary);border:1px solid var(--border-color);border-radius:var(--radius-sm);margin-bottom:6px;cursor:pointer;transition:all var(--ease)}
+.tc-chip:hover{background:var(--accent-indigo-bg);border-color:var(--accent-indigo)}
+.tc-top{display:flex;align-items:center;gap:6px;font-size:11px}
+.tc-label{font-weight:600;color:var(--text-secondary)}
+.tc-arrow{color:var(--text-tertiary)}
+.tc-exp{font:700 11px var(--font-mono);color:var(--accent-green-text)}
+.pt-tag{font-size:9px;font-weight:600;padding:1px 6px;border-radius:99px;background:var(--accent-amber-bg);color:var(--accent-amber-text);border:1px solid var(--accent-amber);text-transform:uppercase;letter-spacing:.04em}
+.tc-vals{display:flex;flex-wrap:wrap;gap:3px;align-items:center}
+.tc-vals code{font:600 11px var(--font-mono);padding:2px 6px;background:var(--bg-card);border:1px solid var(--border-color);border-radius:3px;color:var(--text-primary)}
+.run-btn{font-family:system-ui,"Segoe UI Emoji",sans-serif;font-size:12px;font-weight:700;padding:6px 14px;border-radius:var(--radius-md);background:var(--accent-green);color:#fff;border:none;cursor:pointer;margin-top:8px}
+.run-btn:hover{background:#11703B}
+.live-output{font:600 11.5px var(--font-mono);padding:6px 9px;background:var(--bg-secondary);border:1px dashed var(--border-color);border-radius:var(--radius-sm);margin-top:6px;word-break:break-all}
+
+.main-row{flex:1;display:flex;overflow:hidden;min-height:0}
+.col{display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.col-code{width:33%;min-width:140px;max-width:45vw;background:var(--bg-card);border-right:1px solid var(--border-color)}
+.col-viz{flex:1;min-width:0;background:var(--bg-primary);position:relative}
+.section-label{font-family:system-ui,"Segoe UI Emoji",sans-serif;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-tertiary);padding:8px 12px;border-bottom:1px solid var(--border-light);background:var(--bg-secondary);display:flex;align-items:center;gap:6px}
+
+.code-panel{flex:1;overflow-y:auto;padding:8px 0;font-family:var(--font-mono);font-size:11.5px;line-height:1.9}
+.code-line{display:flex;padding:1px 12px;white-space:pre;transition:background var(--ease)}
+.code-line.active{background:var(--active-line-bg);border-left:3px solid var(--accent-indigo);padding-left:9px}
+.ln{color:var(--text-tertiary);min-width:24px;text-align:right;margin-right:12px;user-select:none;font-weight:500}
+.code-content{flex:1}
+.kw{color:var(--syn-keyword);font-weight:600}
+.fn{color:var(--syn-function);font-weight:600}
+.num{color:var(--syn-number)}
+.str{color:var(--syn-string)}
+
+.resize-handle{width:5px;background:transparent;cursor:col-resize;flex-shrink:0;transition:background var(--ease)}
+.resize-handle:hover,.resize-handle.active{background:var(--accent-indigo)}
+
+.viz-panel{flex:1;overflow:auto;padding:14px 18px}
+.vars-strip{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.var-chip{font:600 11px var(--font-mono);padding:4px 10px;border-radius:99px;background:var(--bg-card);border:1px solid var(--border-color)}
+.var-chip .vk{color:var(--text-tertiary);margin-right:4px;font-weight:500}
+.vc-active{background:var(--accent-indigo-bg);border-color:var(--accent-indigo);color:var(--accent-indigo-text)}
+.vc-safe{background:var(--accent-green-bg);border-color:var(--accent-green);color:var(--accent-green-text)}
+.vc-warn{background:var(--accent-amber-bg);border-color:var(--accent-amber);color:var(--accent-amber-text)}
+.vc-flip{background:var(--accent-red-bg);border-color:var(--accent-red);color:var(--accent-red-text)}
+
+.viz-row{display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap;margin-bottom:14px}
+.viz-card{background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius-md);padding:12px}
+.viz-card-title{font-family:system-ui,"Segoe UI Emoji",sans-serif;font-size:11px;font-weight:700;color:var(--text-secondary);margin-bottom:8px;text-transform:uppercase;letter-spacing:.05em;display:flex;align-items:center;gap:5px}
+
+/* EXPRESSION PANEL — main current frame */
+.expr-display{padding:12px;background:#1e293b;border-radius:8px;border:2px solid #334155;display:inline-block;min-width:280px}
+.expr-row{display:flex;gap:3px;align-items:center;margin-bottom:6px}
+.expr-cell{min-width:34px;height:42px;padding:0 8px;display:flex;align-items:center;justify-content:center;font:700 16px var(--font-mono);border-radius:5px;background:#475569;color:#e2e8f0;border:2px solid transparent;transition:all .3s;position:relative}
+.expr-cell.ec-num{background:#fff;color:#1e293b}
+.expr-cell.ec-op{background:#FEF3C7;color:#78350F;border-color:#B45309;font-size:18px}
+.expr-cell.ec-current{background:#FEF3C7!important;color:#78350F!important;border-color:#B45309!important;animation:pulse-node 1.1s infinite;transform:scale(1.15);z-index:2}
+.expr-cell.ec-split{background:#FCEBEB!important;color:#791F1F!important;border-color:#E24B4A!important;animation:shake .5s}
+.expr-cell.ec-future{opacity:.5}
+.expr-cell.ec-leftpart{background:#DCFCE7;color:#14532D;border-color:#15803D}
+.expr-cell.ec-rightpart{background:#EEEDFE;color:#3C3489;border-color:#534AB7}
+.expr-idx{position:absolute;top:-12px;left:50%;transform:translateX(-50%);font:500 8px var(--font-mono);color:#94a3b8}
+.expr-split-info{display:flex;gap:10px;margin-top:8px;padding:6px 10px;background:#0d1117;border-radius:5px;font:600 11px var(--font-mono);color:#a5d6ff}
+.expr-split-info span{color:#e6edf3}
+.split-tag{display:inline-block;padding:1px 6px;border-radius:3px;margin-right:4px;font-size:9px;font-weight:700}
+.split-tag.st-left{background:#15803D;color:#fff}
+.split-tag.st-op{background:#B45309;color:#fff}
+.split-tag.st-right{background:#534AB7;color:#fff}
+
+@keyframes pulse-node{0%,100%{box-shadow:0 0 4px var(--accent-indigo)}50%{box-shadow:0 0 12px var(--accent-indigo)}}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-3px)}75%{transform:translateX(3px)}}
+@keyframes win-pulse{0%,100%{box-shadow:0 0 3px rgba(21,128,61,.5)}50%{box-shadow:0 0 12px rgba(21,128,61,.9)}}
+
+/* CALL STACK */
+.call-stack{display:flex;flex-direction:column-reverse;gap:5px;min-height:200px;width:100%;padding:8px;background:var(--bg-secondary);border-radius:var(--radius-md);border:2px dashed var(--border-color);position:relative;min-width:240px}
+.call-stack::before{content:'TOP (current)';position:absolute;top:-8px;left:50%;transform:translateX(-50%);font:700 8px var(--font-mono);color:var(--text-tertiary);background:var(--bg-card);padding:0 6px;letter-spacing:.05em}
+.call-stack::after{content:'BOTTOM (initial call)';position:absolute;bottom:-8px;left:50%;transform:translateX(-50%);font:700 8px var(--font-mono);color:var(--text-tertiary);background:var(--bg-card);padding:0 6px;letter-spacing:.05em}
+.frame{padding:7px 10px;background:var(--bg-card);border:2px solid var(--border-color);border-radius:var(--radius-sm);font:600 11px var(--font-mono);position:relative}
+.frame.fr-top{background:var(--accent-indigo-bg);border-color:var(--accent-indigo);box-shadow:0 0 8px rgba(83,74,183,.3);animation:pulse-node 1.4s infinite}
+.frame.fr-resolved{background:var(--accent-green-bg);border-color:var(--accent-green)}
+.frame .fr-depth{display:inline-block;font-size:9px;font-weight:700;background:var(--accent-amber);color:#fff;padding:1px 5px;border-radius:99px;margin-right:6px}
+.frame .fr-expr{font-weight:700;color:var(--accent-indigo-text)}
+.frame .fr-meta{font-size:9.5px;color:var(--text-tertiary);margin-top:3px;font-weight:500}
+.frame .fr-results{margin-top:4px;display:flex;gap:3px;flex-wrap:wrap}
+.frame .fr-results code{font:700 10px var(--font-mono);background:var(--accent-green-bg);color:var(--accent-green-text);padding:1px 5px;border-radius:3px;border:1px solid var(--accent-green)}
+.stack-empty{font-size:11px;color:var(--text-tertiary);font-style:italic;text-align:center;padding:30px 0}
+
+/* RESULTS LIST */
+.results-box{padding:12px;background:var(--bg-card);border:2px solid var(--border-color);border-radius:var(--radius-md);min-width:200px}
+.results-box.rb-found{border-color:var(--accent-green);background:var(--accent-green-bg);animation:win-pulse 1.6s infinite}
+.results-list{display:flex;gap:5px;flex-wrap:wrap;margin-top:6px}
+.results-list code{font:700 14px var(--font-mono);padding:5px 10px;background:#fff;border:2px solid var(--accent-green);color:var(--accent-green-text);border-radius:5px}
+.res-empty{color:var(--text-tertiary);font-style:italic;font-size:11px;padding:8px 0}
+
+/* COMBINE BOX — for showing l OP r computation */
+.combine-box{padding:12px 16px;background:var(--accent-amber-bg);border:2px solid var(--accent-amber);border-radius:var(--radius-md);min-width:240px}
+.combine-formula{display:flex;align-items:center;justify-content:center;gap:8px;font:700 18px var(--font-mono);flex-wrap:wrap}
+.combine-formula .cb-l,.combine-formula .cb-r{color:var(--accent-indigo-text);background:#fff;padding:5px 10px;border-radius:5px;border:2px solid var(--accent-indigo)}
+.combine-formula .cb-op{color:var(--accent-amber-text);font-size:22px;font-weight:700}
+.combine-formula .cb-eq{color:var(--text-tertiary)}
+.combine-formula .cb-res{color:var(--accent-green-text);background:#fff;padding:5px 12px;border-radius:5px;border:2px solid var(--accent-green);font-weight:700}
+
+.result-banner{margin-top:10px;padding:10px 14px;border-radius:var(--radius-md);background:var(--accent-green-bg);border:2px solid var(--accent-green);color:var(--accent-green-text);font-weight:700;text-align:center;display:none}
+.result-banner.show{display:block;animation:win-pulse 1.4s infinite}
+
+/* LOG POPUP */
+.log-popup{--log-scale:1;position:fixed;bottom:52px;right:14px;width:calc(480px*var(--log-scale));max-width:92vw;max-height:75vh;border-radius:var(--radius-lg);box-shadow:0 10px 32px rgba(0,0,0,.14);border:1px solid var(--border-color);background:var(--bg-card);overflow:hidden;display:flex;flex-direction:column;z-index:100;transition:opacity .15s,transform .15s;transform-origin:bottom right}
+.log-popup--hidden{opacity:0;transform:scale(.92);pointer-events:none}
+.log-popup-body{flex:1;overflow:auto;padding:0}
+.log-popup-body>.log-card{border-radius:0;border:none;border-left:0}
+
+.log-card{border-radius:var(--radius-md);overflow:hidden;border:1px solid var(--border-color);border-left-width:4px;font-size:var(--fs-xs);background:var(--bg-card)}
+.log-card-header{display:flex;align-items:center;gap:6px;padding:8px 10px 6px;background:var(--bg-secondary);border-bottom:1px solid var(--border-light)}
+.log-badge{font-family:system-ui,"Segoe UI Emoji",sans-serif;font-size:10px;font-weight:700;padding:2px 7px;border-radius:4px;background:var(--bg-card);border:1px solid var(--border-color)}
+.log-line-ref{font:700 10px var(--font-mono);color:var(--accent-indigo);background:var(--accent-indigo-bg);padding:1px 6px;border-radius:4px;border:1px solid var(--accent-indigo)}
+.log-status-pill{font-family:system-ui,"Segoe UI Emoji",sans-serif;font-size:9px;font-weight:700;padding:2px 7px;border-radius:99px;text-transform:uppercase;margin-left:auto}
+.log-status--success{background:var(--accent-green-bg);color:var(--accent-green-text);border:1px solid var(--accent-green)}
+.log-status--fail{background:var(--accent-red-bg);color:var(--accent-red-text);border:1px solid var(--accent-red)}
+.log-status--skip{background:var(--bg-tertiary);color:var(--text-tertiary);border:1px solid var(--border-color)}
+.log-status--loop{background:rgba(56,139,253,.14);color:#185FA5;border:1px solid #388bfd}
+.log-status--prune{background:var(--accent-red-bg);color:var(--accent-red-text);border:1px solid var(--accent-red)}
+.log-status--info{background:rgba(130,80,255,.14);color:#3C3489;border:1px solid #8250ff}
+
+.log-section{padding:7px 10px;border-bottom:1px dashed var(--border-light)}
+.log-section:last-child{border-bottom:none}
+.log-section-title{font-family:system-ui,"Segoe UI Emoji",sans-serif;font:700 8px var(--font-mono);text-transform:uppercase;letter-spacing:.06em;color:var(--text-tertiary);margin-bottom:4px;display:flex;align-items:center;gap:4px}
+.log-section-title-icon{font-family:system-ui,"Segoe UI Emoji",sans-serif;font-size:11px}
+.log-code-snippet{font:600 11px var(--font-mono);background:#0d1117;color:#e6edf3;padding:6px 9px;border-radius:4px;display:block;overflow-x:auto;white-space:pre;border:1px solid #30363d}
+.log-code-snippet .ck{color:#ff7b72}.log-code-snippet .cs{color:#a5d6ff}.log-code-snippet .cn{color:#79c0ff}.log-code-snippet .cf{color:#d2a8ff}.log-code-snippet .cc{color:#8b949e;font-style:italic}
+.log-kv-row{display:flex;flex-wrap:wrap;gap:4px}
+.log-kv{display:inline-flex;align-items:center;gap:3px;font:11px var(--font-mono);padding:2px 7px;border-radius:4px;background:var(--bg-secondary);border:1px solid var(--border-light)}
+.log-kv-key{color:var(--text-tertiary);font-weight:500}
+.log-kv-val{color:var(--text-primary);font-weight:700}
+.log-kv--in{background:rgba(56,139,253,.08);border-color:rgba(56,139,253,.3)}
+.log-kv--out{background:rgba(63,185,80,.08);border-color:rgba(63,185,80,.4)}
+.log-kv--out .log-kv-val{color:#15803D}
+.log-kv--changed{background:rgba(180,83,9,.10);border-color:rgba(180,83,9,.4)}
+.log-verdict{display:flex;align-items:center;gap:6px;font:600 11px var(--font-mono);padding:5px 8px;border-radius:5px;background:var(--bg-secondary);border:1px solid var(--border-light)}
+.log-verdict--true{background:var(--accent-green-bg);border-color:var(--accent-green);color:var(--accent-green-text)}
+.log-verdict--false{background:var(--accent-red-bg);border-color:var(--accent-red);color:var(--accent-red-text)}
+.log-why{font-size:11px;line-height:1.55;padding:2px 0}
+.log-why strong{color:var(--accent-indigo-text)}
+.log-why code{font:600 10.5px var(--font-mono);background:var(--bg-secondary);padding:1px 4px;border-radius:3px;color:var(--accent-indigo-text)}
+.log-analogy{font:italic 11px var(--font-sans);color:var(--text-secondary);background:#FFF8E7;border:1px solid #FBE8A6;border-left:3px solid var(--accent-amber);padding:6px 9px;border-radius:4px;line-height:1.55}
+.log-analogy strong{color:var(--accent-amber-text);font-style:normal;font-weight:700}
+
+/* FOOTER */
+.footer-bar{display:flex;flex-shrink:0;border-top:1px solid var(--border-color);background:var(--bg-card);font-family:system-ui,"Segoe UI Emoji",sans-serif}
+.footer-left{width:33%;min-width:140px;max-width:45vw;display:flex;align-items:center;gap:8px;padding:7px 12px;border-right:1px solid var(--border-light)}
+.footer-right{flex:1;display:flex;align-items:center;gap:7px;padding:7px 16px;flex-wrap:wrap}
+.step-info{font:700 12px var(--font-mono);color:var(--text-secondary)}
+.action-badge{font-family:system-ui,"Segoe UI Emoji",sans-serif;font:700 10.5px var(--font-mono);padding:3px 9px;border-radius:99px;text-transform:uppercase;letter-spacing:.04em}
+.action-badge--func-def,.action-badge--init,.action-badge--call,.action-badge--return{background:rgba(130,80,255,.14);color:#3C3489;border:1px solid #8250ff}
+.action-badge--for-check,.action-badge--while-check,.action-badge--if-check{background:rgba(56,139,253,.14);color:#185FA5;border:1px solid #388bfd}
+.action-badge--mark,.action-badge--push,.action-badge--pop,.action-badge--restore,.action-badge--found{background:var(--accent-green-bg);color:var(--accent-green-text);border:1px solid var(--accent-green)}
+.action-badge--remove,.action-badge--prune,.action-badge--fail{background:var(--accent-red-bg);color:var(--accent-red-text);border:1px solid var(--accent-red)}
+.action-badge--exit,.action-badge--skip{background:var(--bg-tertiary);color:var(--text-secondary);border:1px solid var(--border-color)}
+
+.kbd-hints{font-size:10.5px;color:var(--text-tertiary);font-family:var(--font-mono)}
+kbd{font-family:system-ui,"Segoe UI Emoji",var(--font-mono);font-size:10px;padding:1px 5px;background:var(--bg-secondary);border:1px solid var(--border-color);border-radius:3px}
+.btn{font-family:system-ui,"Segoe UI Emoji",sans-serif;font-size:11.5px;font-weight:600;padding:5px 10px;border-radius:var(--radius-sm);background:var(--bg-secondary);color:var(--text-primary);border:1px solid var(--border-color);cursor:pointer;transition:all var(--ease)}
+.btn:hover{background:var(--bg-tertiary);border-color:var(--border-focus)}
+.btn-primary{background:var(--accent-indigo);color:#fff;border-color:var(--accent-indigo)}
+.btn-primary:hover{background:var(--accent-indigo-hover);border-color:var(--accent-indigo-hover)}
+.fb-sep{color:var(--border-color)}
+.log-toggle-btn--off{background:var(--bg-tertiary);opacity:.7}
+.zoom-label{font:600 11px var(--font-mono);min-width:42px;text-align:center;color:var(--text-secondary)}
+
+</style>
+</head>
+<body>
+<div class="app-shell">
+
+<div class="problem-card">
+  <header class="prob-header">
+    <div class="prob-header-left">
+      <a href="../00_HomePage/gt_learn_homepage.html" class="gt-home-btn">GT LEARN</a>
+      <span class="prob-num">#241</span>
+      <span class="prob-name">🎨 Different Ways to Add Parentheses</span>
+      <span class="prob-diff--medium">MEDIUM</span>
+      <span class="prob-tag">Divide & Conquer</span>
+      <span class="prob-tag">Recursion</span>
+    </div>
+    <div class="prob-header-right">
+      <span class="top-label">expression=</span>
+      <input id="inputExpr" class="top-input" value="2-1-1">
+      <span id="expectedBadge" class="top-expected">exp: [0, 2]</span>
+      <button id="probToggleBtn" class="prob-toggle-btn" type="button" onclick="toggleProblem()">▲ Hide</button>
+    </div>
+  </header>
+  <div class="problem-body" id="problemBody">
+    <div class="pb-left">
+      <div class="pb-section">
+        <h4>📝 Problem Statement</h4>
+        <p>Diya gaya hai ek string <code>expression</code> jisme numbers aur operators (<code>+</code>, <code>-</code>, <code>*</code>) hain. <strong>Sare possible results</strong> return karo jo <strong>different parenthesization</strong> se mil sakte hain.</p>
+        <p style="margin-top:6px">Example: <code>"2-1-1"</code> ko 2 tarah parenthesize kar sakte hain: <code>(2-1)-1=0</code> ya <code>2-(1-1)=2</code>. Toh answer = <code>[0, 2]</code>.</p>
+      </div>
+      <div class="pb-section">
+        <h4>🧠 Solving Approach</h4>
+        <p><strong>Divide & Conquer:</strong> Har operator ko split point maano. Operator ke <strong>left side</strong> ko recursively solve karo (saare possible values), <strong>right side</strong> ko bhi. Phir har <code>(left, right)</code> pair ke liye operator apply karke result combine karo.</p>
+      </div>
+      <div class="pb-section">
+        <h4>🎯 Core Concepts</h4>
+        <div class="concept-block"><strong>Base case:</strong> Agar expression mein koi operator nahi hai (pure number), toh <code>[int(expr)]</code> return karo.</div>
+        <div class="concept-block"><strong>Split:</strong> Har <code>i</code> pe agar <code>expr[i]</code> operator hai, toh left = <code>expr[:i]</code>, right = <code>expr[i+1:]</code> bana ke recurse karo.</div>
+        <div class="concept-block"><strong>Combine:</strong> Cartesian product — har <code>l</code> from leftResults × har <code>r</code> from rightResults pe operator apply karo.</div>
+      </div>
+      <div class="complexity-row">
+        <span class="cx-chip">Time: O(Catalan(n))</span>
+        <span class="cx-chip">Space: O(Catalan(n))</span>
+      </div>
+    </div>
+    <div class="pb-right">
+      <div class="pb-section">
+        <h4>🧪 Test Cases</h4>
+        <div class="tc-chip" onclick='loadTest("2-1-1", "[0, 2]")'>
+          <div class="tc-top"><span class="pt-tag">basic</span><span class="tc-label">expr:</span><span class="tc-arrow">→</span><span class="tc-exp">[0, 2]</span></div>
+          <div class="tc-vals"><code>"2-1-1"</code></div>
+        </div>
+        <div class="tc-chip" onclick='loadTest("2*3-4*5", "[-34, -14, -10, -10, 10]")'>
+          <div class="tc-top"><span class="pt-tag">classic</span><span class="tc-label">expr:</span><span class="tc-arrow">→</span><span class="tc-exp">[-34,-14,-10,-10,10]</span></div>
+          <div class="tc-vals"><code>"2*3-4*5"</code></div>
+        </div>
+        <div class="tc-chip" onclick='loadTest("11", "[11]")'>
+          <div class="tc-top"><span class="pt-tag">single</span><span class="tc-label">expr:</span><span class="tc-arrow">→</span><span class="tc-exp">[11]</span></div>
+          <div class="tc-vals"><code>"11"</code></div>
+        </div>
+        <div class="tc-chip" onclick='loadTest("2+3", "[5]")'>
+          <div class="tc-top"><span class="pt-tag">tiny</span><span class="tc-label">expr:</span><span class="tc-arrow">→</span><span class="tc-exp">[5]</span></div>
+          <div class="tc-vals"><code>"2+3"</code></div>
+        </div>
+        <button class="run-btn" type="button" onclick="resetWithInput()">▶ Run</button>
+        <div class="live-output">Output: <span id="liveOutput">—</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="main-row">
+  <div class="col col-code" id="col1">
+    <div class="section-label">📜 Python Code</div>
+    <div class="code-panel" id="codePanel"></div>
+  </div>
+  <div class="resize-handle" id="resizeH1"></div>
+  <div class="col col-viz">
+    <div class="section-label">📊 Visualization</div>
+    <div class="viz-panel" id="vizPanel"></div>
+    <div class="log-popup" id="logPopup">
+      <div class="log-popup-body" id="logPopupBody"></div>
+    </div>
+  </div>
+</div>
+
+<div class="footer-bar">
+  <div class="footer-left" id="footerLeft">
+    <span class="step-info" id="stepInfo">0/0</span>
+    <span class="action-badge" id="actionBadge">—</span>
+  </div>
+  <div class="footer-right">
+    <span class="kbd-hints"><kbd>←</kbd><kbd>→</kbd></span>
+    <button class="btn" type="button" onclick="resetStep()" title="Reset (R)">↺</button>
+    <button class="btn" type="button" onclick="stepBy(-1)" title="Prev (←)">◀</button>
+    <button class="btn btn-primary" type="button" onclick="stepBy(1)" title="Next (→)">▶ Next</button>
+    <span class="fb-sep">|</span>
+    <button class="btn" type="button" id="logToggleBtn" onclick="toggleLogPreview()">📋 ON</button>
+    <button class="btn" type="button" onclick="logZoom(-1)">−</button>
+    <span class="zoom-label" id="logZoomLabel">100%</span>
+    <button class="btn" type="button" onclick="logZoom(1)">+</button>
+    <button class="btn" type="button" onclick="logZoomReset()">↺</button>
+    <span class="fb-sep">|</span>
+    <button class="btn" type="button" onclick="toggleFullscreen()" title="Fullscreen">⛶</button>
+  </div>
+</div>
+
+</div>
+
+<script>
+// ============ STATE ============
+var codeLines = [
+  "def diffWaysToCompute(expression):",
+  "    results = []",
+  "    for i in range(len(expression)):",
+  "        c = expression[i]",
+  "        if c in '+-*':",
+  "            left = diffWaysToCompute(expression[:i])",
+  "            right = diffWaysToCompute(expression[i+1:])",
+  "            for l in left:",
+  "                for r in right:",
+  "                    if c == '+': results.append(l + r)",
+  "                    elif c == '-': results.append(l - r)",
+  "                    else: results.append(l * r)",
+  "    if not results:",
+  "        results.append(int(expression))",
+  "    return results"
+];
+
+var steps = [];
+var currentStep = 0;
+var codeWidthUserSet = false;
+var curResult = null;
+var logEnabled = true;
+var logZoomLevel = 100;
+
+var LOG_BADGE = {
+  "func-def":"📌 DEF","init":"⚙️ INIT","call":"📞 CALL","return":"🏆 RETURN",
+  "for-check":"🔁 FOR","while-check":"🔁 WHILE","if-check":"🔎 IF",
+  "mark":"✅ MARK","push":"⬆ PUSH","pop":"⬇ POP","restore":"↩ RESTORE","found":"🎉 FOUND",
+  "remove":"✏️ EDIT","prune":"✂️ PRUNE","fail":"❌ FAIL",
+  "exit":"🔚 EXIT","skip":"⏭ SKIP"
+};
+var BADGE_LABEL = {
+  "func-def":"DEF","init":"INIT","call":"CALL","return":"RETURN",
+  "for-check":"FOR","while-check":"WHILE","if-check":"IF",
+  "mark":"MARK","push":"PUSH","pop":"POP","restore":"RESTORE","found":"FOUND",
+  "remove":"EDIT","prune":"PRUNE","fail":"FAIL",
+  "exit":"EXIT","skip":"SKIP"
+};
+
+// ============ CODE RENDERER ============
+function renderCode() {
+  var p = document.getElementById('codePanel');
+  p.innerHTML = codeLines.map(function(raw, i) {
+    var h = raw;
+    h = h.replace(/("[^"]*"|'[^']*')/g, '\x01STR\x02$1\x03');
+    h = h.replace(/\b(def|for|in|if|return|break|continue|and|else|elif|True|False|None|not|or|while|lambda)\b/g, '\x01KW\x02$1\x03');
+    h = h.replace(/\b(len|range|int|str|list|append|pop|sorted|min|max|sum|abs|enumerate|zip|print|set|add)\b/g, '\x01FN\x02$1\x03');
+    h = h.replace(/(?<![.\w"\x01\x02\x03])(-?\d+)\b/g, '\x01NUM\x02$1\x03');
+    h = h.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    h = h.replace(/\x01([A-Z]+)\x02/g, function(_, c) { return '<span class="' + c.toLowerCase() + '">'; }).replace(/\x03/g, '</span>');
+    return '<div class="code-line" data-line="' + i + '"><span class="ln">' + (i+1) + '</span><span class="code-content">' + h + '</span></div>';
+  }).join('');
+}
+
+function fitCodeWidth() {
+  if (codeWidthUserSet) return;
+  var col = document.getElementById('col1');
+  var maxW = Math.min(col.offsetWidth, window.innerWidth * 0.45);
+  col.style.width = Math.max(280, Math.min(420, maxW)) + 'px';
+  syncFooterWidth();
+}
+
+function hlCode(raw) {
+  var h = raw;
+  h = h.replace(/("[^"]*"|'[^']*')/g, '\x01s\x02$1\x03');
+  h = h.replace(/\b(def|for|in|if|return|break|continue|and|else|elif|True|False|None|not|or|while|lambda)\b/g, '\x01k\x02$1\x03');
+  h = h.replace(/\b(len|range|int|str|list|append|pop|sorted|min|max|sum|abs|enumerate|zip|print|set|add)\b/g, '\x01f\x02$1\x03');
+  h = h.replace(/(?<![.\w"\x01\x02\x03])(-?\d+)\b/g, '\x01n\x02$1\x03');
+  h = h.replace(/(#.*$)/gm, '\x01c\x02$1\x03');
+  h = h.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  h = h.replace(/\x01([a-z])\x02/g, function(_, c) { return '<span class="c' + c + '">'; }).replace(/\x03/g, '</span>');
+  return h;
+}
+
+function richLog(opts) {
+  var statusMap = {
+    success:"✅ Success", fail:"❌ Failed", skip:"⏭ Skipped",
+    loop:"🔁 Loop iter", prune:"✂️ Pruned", info:"ℹ️ Info"
+  };
+  var status = opts.status || "info";
+  var html = '<div class="log-card">';
+  html += '<div class="log-card-header">';
+  html += '<span class="log-badge">'+(LOG_BADGE[opts.action]||opts.action)+'</span>';
+  html += '<span class="log-line-ref">L'+(opts.line+1)+'</span>';
+  html += '<span class="log-status-pill log-status--'+status+'">'+statusMap[status]+'</span>';
+  html += '</div>';
+  if (opts.code) {
+    html += '<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">📜</span>Code Executing</div>';
+    html += '<code class="log-code-snippet">'+hlCode(opts.code)+'</code></div>';
+  }
+  if (opts.inputs && opts.inputs.length) {
+    html += '<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">📥</span>Input Values (line is using these)</div><div class="log-kv-row">';
+    opts.inputs.forEach(function(kv){
+      html += '<span class="log-kv log-kv--in"><span class="log-kv-key">'+kv.k+'=</span><span class="log-kv-val">'+kv.v+'</span></span>';
+    });
+    html += '</div></div>';
+  }
+  if (opts.outputs && opts.outputs.length) {
+    html += '<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">📤</span>Output / State After Line</div><div class="log-kv-row">';
+    opts.outputs.forEach(function(kv){
+      var cls = kv.changed ? 'log-kv--changed' : 'log-kv--out';
+      html += '<span class="log-kv '+cls+'"><span class="log-kv-key">'+kv.k+'=</span><span class="log-kv-val">'+kv.v+'</span></span>';
+    });
+    html += '</div></div>';
+  }
+  if (opts.verdict) {
+    var vCls = opts.verdictTrue===true ? 'log-verdict--true' : (opts.verdictTrue===false ? 'log-verdict--false' : '');
+    var vIcon = opts.verdictTrue===true ? '✓' : (opts.verdictTrue===false ? '✗' : '•');
+    html += '<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">⚖️</span>Verdict / Decision</div>';
+    html += '<div class="log-verdict '+vCls+'">'+vIcon+' '+opts.verdict+'</div></div>';
+  }
+  if (opts.why) {
+    html += '<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">💡</span>Why This Happens</div>';
+    html += '<div class="log-why">'+opts.why+'</div></div>';
+  }
+  if (opts.analogy) {
+    html += '<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">🎭</span>Real-Life Analogy</div>';
+    html += '<div class="log-analogy">'+opts.analogy+'</div></div>';
+  }
+  html += '</div>';
+  return html;
+}
+
+// ============ HELPERS ============
+function isOp(c) { return c === '+' || c === '-' || c === '*'; }
+function applyOp(a, b, op) {
+  if (op === '+') return a + b;
+  if (op === '-') return a - b;
+  return a * b;
+}
+
+// ============ buildSteps ============
+// Mirrors the Python recursion. Maintains a "call stack" of frames for visualization.
+function buildSteps(expression) {
+  var st = [];
+  var MAX_STEPS = 6000;
+
+  // Frame: { id, depth, expr, results, splitIdx, leftResults, rightResults, status, parentId }
+  // status: 'active' | 'computing-left' | 'computing-right' | 'combining' | 'resolved'
+  var frames = []; // ordered: bottom (initial) → top (current). frames[len-1] = current top.
+  var nextFrameId = 1;
+  // Highlight info for current step
+  var hl = {
+    splitIdx: null,     // which i is the operator split being processed
+    leftRange: null,    // [start, end) — left part chars
+    rightRange: null,   // [start, end)
+    activeChar: null,   // i for c = expression[i]
+    combineL: null,     // current l value
+    combineR: null,     // current r value
+    combineOp: null,
+    combineRes: null,
+    showCombine: false
+  };
+
+  function topFrame() { return frames[frames.length - 1]; }
+
+  function snap(extra) {
+    return Object.assign({
+      rootExpr: expression,
+      frames: frames.map(function(f){
+        return {
+          id: f.id, depth: f.depth, expr: f.expr,
+          results: f.results.slice(),
+          splitIdx: f.splitIdx, activeI: f.activeI,
+          leftResults: f.leftResults ? f.leftResults.slice() : null,
+          rightResults: f.rightResults ? f.rightResults.slice() : null,
+          status: f.status,
+          parentId: f.parentId
+        };
+      }),
+      hl: Object.assign({}, hl)
+    }, extra || {});
+  }
+
+  function pushStep(o) {
+    if (st.length >= MAX_STEPS) return;
+    st.push(Object.assign({line:0, action:"init", logHTML:""}, snap(o)));
+  }
+
+  function clearHl() {
+    hl = { splitIdx:null, leftRange:null, rightRange:null, activeChar:null,
+           combineL:null, combineR:null, combineOp:null, combineRes:null, showCombine:false };
+  }
+
+  // Recursive simulator
+  function compute(expr, depth, parentId) {
+    var frameId = nextFrameId++;
+    var frame = {
+      id: frameId, depth: depth, expr: expr,
+      results: [], splitIdx: null, activeI: null,
+      leftResults: null, rightResults: null,
+      status: 'active', parentId: parentId
+    };
+    frames.push(frame);
+
+    // === L0: function call entry ===
+    pushStep({
+      line: 0,
+      action: "call",
+      logHTML: richLog({
+        line: 0, action: "call",
+        code: 'diffWaysToCompute("'+expr+'")  # depth='+depth,
+        status: "info",
+        inputs: [{k:"expression", v:'"'+expr+'"'}, {k:"depth", v:depth}],
+        outputs: [{k:"new frame", v:"#"+frameId, changed:true}],
+        why: "<strong>Naya recursion call</strong> shuru hua. Sub-expression <code>\""+expr+"\"</code> ko depth <code>"+depth+"</code> pe solve karenge. Yeh frame call stack pe push hua.",
+        analogy: "Jaise <strong>matryoshka doll khol rahe ho</strong> — har layer ek nayi recursive call. Yeh "+depth+"-th level ki doll hai!"
+      })
+    });
+
+    // === L1: results = [] ===
+    pushStep({
+      line: 1,
+      action: "init",
+      logHTML: richLog({
+        line: 1, action: "init",
+        code: "results = []",
+        status: "success",
+        outputs: [{k:"results", v:"[]", changed:true}],
+        why: "Is frame ka local <code>results</code> list initialize ho gayi. Yahan accumulate karenge saare possible values jo is sub-expression se mil sakte hain.",
+        analogy: "Jaise <strong>khaali notebook leke baith gaye</strong> — jitne bhi answer milenge, sab yahin likhenge!"
+      })
+    });
+
+    // === L2: for i in range(len(expression)) ===
+    var n = expr.length;
+    for (var i = 0; i < n; i++) {
+      frame.activeI = i;
+      hl.activeChar = i;
+
+      pushStep({
+        line: 2,
+        action: "for-check",
+        logHTML: richLog({
+          line: 2, action: "for-check",
+          code: 'for i in range(len(expression)):  # i='+i+', len="'+expr+'"='+n,
+          status: "loop",
+          inputs: [{k:"i", v:i}, {k:"len(expression)", v:n}],
+          outputs: [{k:"i", v:i, changed:true}],
+          verdict: "iteration "+(i+1)+" of "+n,
+          verdictTrue: true,
+          why: "Loop chala raha hai char-by-char. Abhi <code>i="+i+"</code> pe hain — character <code>'"+expr[i]+"'</code> check karenge.",
+          analogy: "Jaise <strong>ek string ki har position pe finger rakh ke check kar rahe ho</strong> — operator hai ya number?"
+        })
+      });
+
+      // === L3: c = expression[i] ===
+      var c = expr[i];
+      pushStep({
+        line: 3,
+        action: "init",
+        logHTML: richLog({
+          line: 3, action: "init",
+          code: 'c = expression[i]  # c = "'+expr+'"['+i+'] = "'+c+'"',
+          status: "success",
+          inputs: [{k:"expression", v:'"'+expr+'"'}, {k:"i", v:i}],
+          outputs: [{k:"c", v:'"'+c+'"', changed:true}],
+          why: "Position <code>"+i+"</code> ka character extract kiya: <code>c = \""+c+"\"</code>.",
+          analogy: "Jaise <strong>ek-ek tile uthake dekh rahe ho</strong> — yeh kya hai, number ya operator sign?"
+        })
+      });
+
+      // === L4: if c in '+-*' ===
+      var cIsOp = isOp(c);
+      pushStep({
+        line: 4,
+        action: "if-check",
+        logHTML: richLog({
+          line: 4, action: "if-check",
+          code: 'if c in \'+-*\':  # "'+c+'" -> '+(cIsOp?'True':'False'),
+          status: cIsOp ? "success" : "skip",
+          inputs: [{k:"c", v:'"'+c+'"'}],
+          verdict: '"'+c+'" '+(cIsOp?"is":"is NOT")+" an operator",
+          verdictTrue: cIsOp,
+          why: cIsOp
+            ? "<code>'"+c+"'</code> ek <strong>operator</strong> hai! Iska matlab is position pe split karke <strong>divide & conquer</strong> apply karenge."
+            : "<code>'"+c+"'</code> operator nahi hai (digit hai). Skip karke agla character check karenge.",
+          analogy: cIsOp
+            ? "Jaise <strong>cake katne ki line dikh gayi</strong> — yahin se 2 hisson mein divide karo!"
+            : "Jaise <strong>cake ke beech ka cream layer dikha</strong> — yahan se nahi katenge, aur dekho."
+        })
+      });
+
+      if (cIsOp) {
+        // === L5: left = diffWaysToCompute(expression[:i]) ===
+        frame.splitIdx = i;
+        hl.splitIdx = i;
+        hl.leftRange = [0, i];
+        hl.rightRange = [i+1, n];
+        frame.status = 'computing-left';
+
+        pushStep({
+          line: 5,
+          action: "call",
+          logHTML: richLog({
+            line: 5, action: "call",
+            code: 'left = diffWaysToCompute("'+expr.slice(0,i)+'")  # left part',
+            status: "info",
+            inputs: [{k:"expression[:i]", v:'"'+expr.slice(0,i)+'"'}, {k:"i", v:i}],
+            why: "<strong>Left side</strong> ko recursively solve kar rahe hain. Sub-expression = <code>\""+expr.slice(0,i)+"\"</code>. Naya frame stack pe push hoga.",
+            analogy: "Jaise <strong>'pehle yeh half wala kaam complete karo'</strong> bola — current task hold pe, naye task mein dive kiya."
+          })
+        });
+
+        var leftRes = compute(expr.slice(0, i), depth + 1, frameId);
+
+        // After left returns
+        frame.leftResults = leftRes.slice();
+        frame.status = 'computing-right';
+        // restore hl context after child returns
+        hl.splitIdx = i;
+        hl.leftRange = [0, i];
+        hl.rightRange = [i+1, n];
+        hl.activeChar = i;
+        pushStep({
+          line: 5,
+          action: "return",
+          logHTML: richLog({
+            line: 5, action: "return",
+            code: 'left = '+JSON.stringify(leftRes)+'  # got back from recursion',
+            status: "success",
+            inputs: [{k:"expression[:i]", v:'"'+expr.slice(0,i)+'"'}],
+            outputs: [{k:"left", v:JSON.stringify(leftRes), changed:true}],
+            why: "Left side ki recursion <strong>khatam!</strong> Wapas mil gaya: <code>left = "+JSON.stringify(leftRes)+"</code>. Yeh saare possible values hain jo <code>\""+expr.slice(0,i)+"\"</code> se ban sakte hain.",
+            analogy: "Jaise <strong>chhote bhai ne homework karke laa diya</strong> — ab uska answer use karke apna kaam aage badhao!"
+          })
+        });
+
+        // === L6: right = diffWaysToCompute(expression[i+1:]) ===
+        pushStep({
+          line: 6,
+          action: "call",
+          logHTML: richLog({
+            line: 6, action: "call",
+            code: 'right = diffWaysToCompute("'+expr.slice(i+1)+'")  # right part',
+            status: "info",
+            inputs: [{k:"expression[i+1:]", v:'"'+expr.slice(i+1)+'"'}, {k:"i", v:i}],
+            why: "<strong>Right side</strong> ko bhi recursively solve karenge. Sub-expression = <code>\""+expr.slice(i+1)+"\"</code>.",
+            analogy: "Jaise <strong>'ab dusra half kaam karo'</strong> — left ho gaya, ab right side ka turn!"
+          })
+        });
+
+        var rightRes = compute(expr.slice(i + 1), depth + 1, frameId);
+
+        frame.rightResults = rightRes.slice();
+        frame.status = 'combining';
+        hl.splitIdx = i;
+        hl.leftRange = [0, i];
+        hl.rightRange = [i+1, n];
+        hl.activeChar = i;
+        pushStep({
+          line: 6,
+          action: "return",
+          logHTML: richLog({
+            line: 6, action: "return",
+            code: 'right = '+JSON.stringify(rightRes)+'  # got back from recursion',
+            status: "success",
+            inputs: [{k:"expression[i+1:]", v:'"'+expr.slice(i+1)+'"'}],
+            outputs: [{k:"right", v:JSON.stringify(rightRes), changed:true}],
+            why: "Right side ki recursion bhi khatam! <code>right = "+JSON.stringify(rightRes)+"</code>. Ab dono sides ke values combine karenge using operator <code>'"+c+"'</code>.",
+            analogy: "Jaise <strong>dono bhaiyon ne apna apna kaam de diya</strong> — ab tum dono answers ko mix-and-match karke final answers banao!"
+          })
+        });
+
+        // === L7-L11: nested loops + combine ===
+        for (var li = 0; li < leftRes.length; li++) {
+          pushStep({
+            line: 7,
+            action: "for-check",
+            logHTML: richLog({
+              line: 7, action: "for-check",
+              code: 'for l in left:  # l='+leftRes[li]+' (idx '+li+'/'+leftRes.length+')',
+              status: "loop",
+              inputs: [{k:"left", v:JSON.stringify(leftRes)}, {k:"li", v:li}],
+              outputs: [{k:"l", v:leftRes[li], changed:true}],
+              verdict: "left iter "+(li+1)+"/"+leftRes.length,
+              verdictTrue: true,
+              why: "Left ki list mein se <code>l = "+leftRes[li]+"</code> pick kiya. Ab har right value ke saath pair banayenge.",
+              analogy: "Jaise <strong>menu se ek dish select ki</strong> — ab har side dish ke saath try karenge!"
+            })
+          });
+
+          for (var ri = 0; ri < rightRes.length; ri++) {
+            var l = leftRes[li], r = rightRes[ri];
+            pushStep({
+              line: 8,
+              action: "for-check",
+              logHTML: richLog({
+                line: 8, action: "for-check",
+                code: 'for r in right:  # r='+r+' (idx '+ri+'/'+rightRes.length+')',
+                status: "loop",
+                inputs: [{k:"right", v:JSON.stringify(rightRes)}, {k:"ri", v:ri}],
+                outputs: [{k:"r", v:r, changed:true}],
+                verdict: "right iter "+(ri+1)+"/"+rightRes.length,
+                verdictTrue: true,
+                why: "Right list se <code>r = "+r+"</code> pick kiya. Pair = <code>(l="+l+", r="+r+")</code>. Ab operator <code>'"+c+"'</code> apply karenge.",
+                analogy: "Jaise <strong>"+leftRes[li]+" wali main dish ke saath "+r+" wali side</strong> — combo banao!"
+              })
+            });
+
+            // L9/L10/L11 — operator dispatch
+            var resVal = applyOp(l, r, c);
+            hl.combineL = l; hl.combineR = r; hl.combineOp = c; hl.combineRes = resVal; hl.showCombine = true;
+
+            var opLine, opCodeStr, opLabel;
+            if (c === '+') { opLine = 9;  opCodeStr = "if c == '+': results.append(l + r)  # "+l+" + "+r+" = "+resVal; opLabel = "addition"; }
+            else if (c === '-') { opLine = 10; opCodeStr = "elif c == '-': results.append(l - r)  # "+l+" - "+r+" = "+resVal; opLabel = "subtraction"; }
+            else { opLine = 11; opCodeStr = "else: results.append(l * r)  # "+l+" * "+r+" = "+resVal; opLabel = "multiplication"; }
+
+            // For + we show L9 hit; for - we show L9 fail then L10 hit; for * we show L9 fail, L10 fail, L11 hit
+            if (c === '+') {
+              pushStep({
+                line: 9, action: "if-check",
+                logHTML: richLog({
+                  line:9, action:"if-check",
+                  code: opCodeStr,
+                  status:"success",
+                  inputs:[{k:"c",v:'"'+c+'"'},{k:"l",v:l},{k:"r",v:r}],
+                  outputs:[{k:"results", v:JSON.stringify(frame.results.concat([resVal])), changed:true}],
+                  verdict: 'c == "+" matched -> '+l+' + '+r+' = '+resVal,
+                  verdictTrue: true,
+                  why: "Operator <code>'+'</code> match — addition apply ki: <code>"+l+" + "+r+" = "+resVal+"</code>. Result <code>results</code> mein append.",
+                  analogy: "Jaise <strong>do team ke runs jod diye</strong> — total ban gaya "+resVal+"!"
+                })
+              });
+              frame.results.push(resVal);
+            } else if (c === '-') {
+              pushStep({
+                line: 9, action: "if-check",
+                logHTML: richLog({
+                  line:9, action:"if-check",
+                  code: 'if c == \'+\':  # "'+c+'" == "+" -> False',
+                  status:"skip",
+                  inputs:[{k:"c",v:'"'+c+'"'}],
+                  verdict: '"'+c+'" == "+"',
+                  verdictTrue:false,
+                  why:"<code>c</code> '+' nahi hai. Skip karke <code>elif</code> check karenge.",
+                  analogy:"Jaise <strong>menu pe scroll</strong> — yeh dish nahi, agle option pe jao."
+                })
+              });
+              pushStep({
+                line:10, action:"if-check",
+                logHTML: richLog({
+                  line:10, action:"if-check",
+                  code: opCodeStr,
+                  status:"success",
+                  inputs:[{k:"c",v:'"'+c+'"'},{k:"l",v:l},{k:"r",v:r}],
+                  outputs:[{k:"results", v:JSON.stringify(frame.results.concat([resVal])), changed:true}],
+                  verdict: 'c == "-" matched -> '+l+' - '+r+' = '+resVal,
+                  verdictTrue:true,
+                  why:"Operator <code>'-'</code> match — subtraction apply: <code>"+l+" - "+r+" = "+resVal+"</code>.",
+                  analogy:"Jaise <strong>budget se kharcha minus</strong> — bacha "+resVal+"!"
+                })
+              });
+              frame.results.push(resVal);
+            } else { // *
+              pushStep({
+                line: 9, action: "if-check",
+                logHTML: richLog({
+                  line:9, action:"if-check",
+                  code: 'if c == \'+\':  # "'+c+'" == "+" -> False',
+                  status:"skip",
+                  inputs:[{k:"c",v:'"'+c+'"'}],
+                  verdict: '"'+c+'" == "+"',
+                  verdictTrue:false,
+                  why:"Yeh '+' nahi hai. Aage check karenge.",
+                  analogy:"Pehla option reject — dusra dekho."
+                })
+              });
+              pushStep({
+                line:10, action:"if-check",
+                logHTML: richLog({
+                  line:10, action:"if-check",
+                  code: 'elif c == \'-\':  # "'+c+'" == "-" -> False',
+                  status:"skip",
+                  inputs:[{k:"c",v:'"'+c+'"'}],
+                  verdict: '"'+c+'" == "-"',
+                  verdictTrue:false,
+                  why:"Yeh '-' bhi nahi hai. <code>else</code> branch lena padega — multiplication.",
+                  analogy:"Dusra option bhi reject — default option (else) lo!"
+                })
+              });
+              pushStep({
+                line:11, action:"if-check",
+                logHTML: richLog({
+                  line:11, action:"if-check",
+                  code: opCodeStr,
+                  status:"success",
+                  inputs:[{k:"c",v:'"'+c+'"'},{k:"l",v:l},{k:"r",v:r}],
+                  outputs:[{k:"results", v:JSON.stringify(frame.results.concat([resVal])), changed:true}],
+                  verdict: 'else (c == "*") -> '+l+' * '+r+' = '+resVal,
+                  verdictTrue:true,
+                  why:"Default <code>else</code> hit — multiplication: <code>"+l+" * "+r+" = "+resVal+"</code>. Append to results.",
+                  analogy:"Jaise <strong>"+l+" packets mein "+r+" chocolates</strong> — total "+resVal+"!"
+                })
+              });
+              frame.results.push(resVal);
+            }
+
+            // clear combine highlight after a moment by leaving it through next iteration
+          }
+
+          // After inner-r loop EXITS for this l
+          pushStep({
+            line: 8,
+            action: "exit",
+            logHTML: richLog({
+              line: 8, action: "exit",
+              code: 'for r in right:  # inner loop EXIT (l='+leftRes[li]+' done with all right values)',
+              status: "info",
+              inputs: [{k:"right.length", v:rightRes.length}],
+              verdict: "all "+rightRes.length+" right values combined with l="+leftRes[li],
+              verdictTrue: false,
+              why: "Inner loop khatam — current <code>l="+leftRes[li]+"</code> ne har <code>r</code> ke saath pair bana liya. Ab agle <code>l</code> pe jaayenge.",
+              analogy: "Jaise <strong>ek main dish ki saari combos try kar lin</strong> — agli main dish pe move karo!"
+            })
+          });
+        }
+
+        // After outer-l loop EXITS
+        pushStep({
+          line: 7,
+          action: "exit",
+          logHTML: richLog({
+            line: 7, action: "exit",
+            code: 'for l in left:  # outer loop EXIT (all left values processed)',
+            status: "info",
+            inputs: [{k:"left.length", v:leftRes.length}],
+            verdict: "all "+leftRes.length+" left values combined with all right values",
+            verdictTrue: false,
+            why: "Outer loop khatam! Saare <code>(l, r)</code> pairs pe operator <code>'"+c+"'</code> apply ho gaya. Total <code>"+(leftRes.length*rightRes.length)+"</code> combinations is split se mile.",
+            analogy: "Jaise <strong>full menu ki har combo try kar li</strong> — sab dishes notebook mein note ho gayi!"
+          })
+        });
+
+        hl.showCombine = false;
+        hl.combineL = null; hl.combineR = null; hl.combineOp = null; hl.combineRes = null;
+      }
+    }
+
+    // === L2: for loop EXIT ===
+    frame.activeI = null;
+    hl.activeChar = null;
+    pushStep({
+      line: 2,
+      action: "exit",
+      logHTML: richLog({
+        line: 2, action: "exit",
+        code: 'for i in range(len(expression)):  # outer for-i loop EXIT, all '+n+' chars scanned',
+        status: "info",
+        inputs: [{k:"len(expression)", v:n}],
+        verdict: "all "+n+" characters scanned",
+        verdictTrue: false,
+        why: "Saare characters check ho gaye. Ab <strong>base case check</strong> karenge — agar koi operator hi nahi tha, toh <code>results</code> abhi empty hogi.",
+        analogy: "Jaise <strong>poori string scan kar li</strong> — ab final stocktaking: kya results khaali hain?"
+      })
+    });
+
+    // === L12: if not results ===
+    var isBaseCase = (frame.results.length === 0);
+    pushStep({
+      line: 12,
+      action: "if-check",
+      logHTML: richLog({
+        line: 12, action: "if-check",
+        code: 'if not results:  # results.length='+frame.results.length+' -> '+(isBaseCase?'True':'False'),
+        status: isBaseCase ? "success" : "skip",
+        inputs: [{k:"results", v:JSON.stringify(frame.results)}, {k:"len(results)", v:frame.results.length}],
+        verdict: "not results -> "+(isBaseCase?"True (empty - base case)":"False (already populated)"),
+        verdictTrue: isBaseCase,
+        why: isBaseCase
+          ? "<strong>Base case HIT!</strong> Results khaali hai matlab koi operator nahi tha is sub-expression mein. Yeh pure number hai — direct integer banake return karenge."
+          : "Results pehle se filled hai (operator splits se aaye). Base case lagana zaroori nahi.",
+        analogy: isBaseCase
+          ? "Jaise <strong>kaagaz pe bas ek number likha hai</strong> — kuch calculate nahi karna, jaisa hai waisa de do!"
+          : "Results mein kuch hai already — base case ki zaroorat nahi, skip kar do."
+      })
+    });
+
+    if (isBaseCase) {
+      var num = parseInt(expr, 10);
+      frame.results.push(num);
+      pushStep({
+        line: 13,
+        action: "push",
+        logHTML: richLog({
+          line: 13, action: "push",
+          code: 'results.append(int(expression))  # int("'+expr+'") = '+num,
+          status: "success",
+          inputs: [{k:"expression", v:'"'+expr+'"'}],
+          outputs: [{k:"results", v:JSON.stringify(frame.results), changed:true}],
+          why: "Pure number <code>\""+expr+"\"</code> ko integer <code>"+num+"</code> banake <code>results</code> mein daal diya. Yeh base case ka answer hai.",
+          analogy: "Jaise <strong>cheque pe bas amount likhi hai</strong> — wahi value as-is convert karke return kar do!"
+        })
+      });
+    }
+
+    // === L14: return results ===
+    frame.status = 'resolved';
+    pushStep({
+      line: 14,
+      action: "return",
+      logHTML: richLog({
+        line: 14, action: "return",
+        code: 'return results  # '+JSON.stringify(frame.results),
+        status: "success",
+        inputs: [{k:"results", v:JSON.stringify(frame.results)}],
+        outputs: [{k:"return value", v:JSON.stringify(frame.results)}],
+        why: "🏆 Frame <code>#"+frameId+"</code> (depth "+depth+") ne <strong>"+frame.results.length+" value(s)</strong> return ki: <code>"+JSON.stringify(frame.results)+"</code>. Ab parent frame mein wapas jaayenge.",
+        analogy: "Jaise <strong>chhota task khatam karke parent ko answer de diya</strong> — apna kaam complete, ab bade kaam mein use ho!"
+      })
+    });
+
+    // Pop frame from stack (it has resolved)
+    var resolvedResults = frame.results.slice();
+    frames.pop();
+
+    return resolvedResults;
+  }
+
+  // Kick off
+  var finalRes = compute(expression, 0, null);
+  curResult = finalRes.slice();
+
+  return st;
+}
+
+// ============ RENDER VIZ ============
+function renderViz(s) {
+  var v = document.getElementById('vizPanel');
+  var h = '';
+
+  // Top frame for vars strip
+  var top = s.frames.length ? s.frames[s.frames.length-1] : null;
+
+  // Vars strip
+  h += '<div class="vars-strip">';
+  h += '<span class="var-chip vc-active"><span class="vk">root:</span>"'+s.rootExpr+'"</span>';
+  h += '<span class="var-chip"><span class="vk">stack.depth:</span>'+s.frames.length+'</span>';
+  if (top) {
+    h += '<span class="var-chip vc-active"><span class="vk">curr.expr:</span>"'+top.expr+'"</span>';
+    h += '<span class="var-chip"><span class="vk">curr.depth:</span>'+top.depth+'</span>';
+    if (top.activeI !== null && top.activeI !== undefined) {
+      h += '<span class="var-chip vc-warn"><span class="vk">i:</span>'+top.activeI+'</span>';
+      h += '<span class="var-chip vc-warn"><span class="vk">c:</span>"'+top.expr[top.activeI]+'"</span>';
+    }
+    h += '<span class="var-chip vc-safe"><span class="vk">curr.results:</span>'+JSON.stringify(top.results)+'</span>';
+  }
+  if (s.hl.combineL !== null) {
+    h += '<span class="var-chip vc-active"><span class="vk">l:</span>'+s.hl.combineL+'</span>';
+    h += '<span class="var-chip vc-active"><span class="vk">r:</span>'+s.hl.combineR+'</span>';
+  }
+  h += '</div>';
+
+  // ===== Current Expression Display =====
+  if (top) {
+    h += '<div class="viz-card" style="margin-bottom:14px;display:inline-block">';
+    h += '<div class="viz-card-title">📋 Current Frame Expression</div>';
+    h += '<div class="expr-display">';
+    h += '<div class="expr-row">';
+    var exprStr = top.expr;
+    var leftRange = s.hl.leftRange, rightRange = s.hl.rightRange, splitIdx = s.hl.splitIdx, activeChar = s.hl.activeChar;
+    for (var ci = 0; ci < exprStr.length; ci++) {
+      var ch = exprStr[ci];
+      var chIsOp = isOp(ch);
+      var cls = 'expr-cell ' + (chIsOp ? 'ec-op' : 'ec-num');
+      if (splitIdx !== null && ci === splitIdx) cls += ' ec-split';
+      else if (activeChar !== null && ci === activeChar && splitIdx === null) cls += ' ec-current';
+      else if (leftRange && ci >= leftRange[0] && ci < leftRange[1]) cls += ' ec-leftpart';
+      else if (rightRange && ci >= rightRange[0] && ci < rightRange[1]) cls += ' ec-rightpart';
+      h += '<div class="'+cls+'"><span class="expr-idx">'+ci+'</span>'+ch+'</div>';
+    }
+    h += '</div>';
+    if (splitIdx !== null) {
+      h += '<div class="expr-split-info">';
+      h += '<span><span class="split-tag st-left">LEFT</span>"'+exprStr.slice(0,splitIdx)+'"</span>';
+      h += '<span><span class="split-tag st-op">OP</span>"'+exprStr[splitIdx]+'"</span>';
+      h += '<span><span class="split-tag st-right">RIGHT</span>"'+exprStr.slice(splitIdx+1)+'"</span>';
+      h += '</div>';
+    }
+    h += '</div>';
+    h += '</div>';
+  }
+
+  // ===== Combine box (l OP r = res) =====
+  if (s.hl.showCombine) {
+    h += '<div class="viz-card" style="margin-bottom:14px;display:inline-block;margin-left:14px;vertical-align:top">';
+    h += '<div class="viz-card-title">🧮 Combining (l OP r)</div>';
+    h += '<div class="combine-box">';
+    h += '<div class="combine-formula">';
+    h += '<span class="cb-l">'+s.hl.combineL+'</span>';
+    h += '<span class="cb-op">'+s.hl.combineOp+'</span>';
+    h += '<span class="cb-r">'+s.hl.combineR+'</span>';
+    h += '<span class="cb-eq">=</span>';
+    h += '<span class="cb-res">'+s.hl.combineRes+'</span>';
+    h += '</div>';
+    h += '</div>';
+    h += '</div>';
+  }
+
+  // ===== Call Stack + Results row =====
+  h += '<div class="viz-row">';
+
+  // Call stack
+  h += '<div class="viz-card" style="flex:2;min-width:280px">';
+  h += '<div class="viz-card-title">🗂️ Recursion Call Stack</div>';
+  h += '<div class="call-stack">';
+  if (s.frames.length === 0) {
+    h += '<div class="stack-empty">📭 stack empty (all returned)</div>';
+  } else {
+    s.frames.forEach(function(fr, idx) {
+      var isTop = (idx === s.frames.length - 1);
+      var cls = 'frame' + (isTop ? ' fr-top' : '') + (fr.status === 'resolved' ? ' fr-resolved' : '');
+      h += '<div class="'+cls+'">';
+      h += '<span class="fr-depth">d='+fr.depth+'</span>';
+      h += '<span class="fr-expr">"'+fr.expr+'"</span>';
+      var statusTxt = fr.status === 'computing-left' ? '⏳ awaiting LEFT'
+                    : fr.status === 'computing-right' ? '⏳ awaiting RIGHT'
+                    : fr.status === 'combining' ? '🧮 combining'
+                    : fr.status === 'resolved' ? '✅ resolved'
+                    : '🟢 active';
+      h += '<div class="fr-meta">frame #'+fr.id+' • '+statusTxt+(fr.splitIdx!==null?' • split@'+fr.splitIdx:'')+'</div>';
+      if (fr.results.length > 0) {
+        h += '<div class="fr-results">';
+        fr.results.forEach(function(rv){ h += '<code>'+rv+'</code>'; });
+        h += '</div>';
+      }
+      h += '</div>';
+    });
+  }
+  h += '</div>';
+  h += '</div>';
+
+  // Results — only shown when stack is empty (final answer)
+  h += '<div class="viz-card" style="flex:1;min-width:200px">';
+  h += '<div class="viz-card-title">🎁 Final Answer (when stack empties)</div>';
+  var rbCls = (s.frames.length === 0) ? 'results-box rb-found' : 'results-box';
+  h += '<div class="'+rbCls+'">';
+  if (s.frames.length === 0 && curResult !== null) {
+    h += '<div style="font-size:11px;color:var(--text-secondary);margin-bottom:4px">All recursion returned. Final result:</div>';
+    h += '<div class="results-list">';
+    curResult.forEach(function(rv){ h += '<code>'+rv+'</code>'; });
+    h += '</div>';
+  } else {
+    h += '<div class="res-empty">⏳ Waiting for stack to fully unwind...</div>';
+  }
+  h += '</div>';
+  h += '</div>';
+
+  h += '</div>';
+
+  if (s.frames.length === 0 && curResult !== null) {
+    h += '<div class="result-banner show">🎉 SUCCESS! Got '+curResult.length+' possible value(s): '+JSON.stringify(curResult)+'</div>';
+  }
+
+  v.innerHTML = h;
+}
+
+// ============ STEP CONTROL ============
+function renderStep(idx) {
+  if (!steps.length) return;
+  var s = steps[idx];
+  currentStep = idx;
+  document.getElementById('stepInfo').textContent = (idx+1)+'/'+steps.length;
+  var bd = document.getElementById('actionBadge');
+  bd.textContent = BADGE_LABEL[s.action] || s.action;
+  bd.className = 'action-badge action-badge--'+s.action;
+  document.querySelectorAll('.code-line').forEach(function(el){ el.classList.remove('active'); });
+  var al = document.querySelector('.code-line[data-line="'+s.line+'"]');
+  if (al) { al.classList.add('active'); al.scrollIntoView({block:'nearest'}); }
+  renderViz(s);
+  showLogPreview(s);
+}
+
+function showLogPreview(s) {
+  if (!logEnabled) return;
+  document.getElementById('logPopupBody').innerHTML = s.logHTML || '';
+  document.getElementById('logPopup').classList.remove('log-popup--hidden');
+}
+
+function stepBy(d) {
+  var n = currentStep + d;
+  if (n < 0 || n >= steps.length) return;
+  renderStep(n);
+}
+
+function resetStep() { renderStep(0); }
+
+function parseInputs() {
+  var raw = document.getElementById('inputExpr').value.trim();
+  if (!raw) return "2-1-1";
+  // Validate: only digits and +,-,*
+  if (!/^[\d+\-*]+$/.test(raw)) {
+    alert('Invalid expression. Only digits and + - * allowed.');
+    return "2-1-1";
+  }
+  return raw;
+}
+
+function resetWithInput() {
+  curResult = null;
+  var expr = parseInputs();
+  renderCode();
+  fitCodeWidth();
+  steps = buildSteps(expr);
+  currentStep = 0;
+  renderStep(0);
+  document.getElementById('liveOutput').textContent = curResult !== null ? JSON.stringify(curResult) : '—';
+}
+
+function loadTest(expr, exp) {
+  document.getElementById('inputExpr').value = expr;
+  document.getElementById('expectedBadge').textContent = 'exp: '+exp;
+  resetWithInput();
+}
+
+// ============ LOG POPUP CONTROLS ============
+function toggleLogPreview() {
+  logEnabled = !logEnabled;
+  var btn = document.getElementById('logToggleBtn');
+  btn.textContent = logEnabled ? '📋 ON' : '📋 OFF';
+  btn.classList.toggle('log-toggle-btn--off', !logEnabled);
+  if (!logEnabled) hideLogPopup();
+  else if (steps.length) showLogPreview(steps[currentStep]);
+}
+
+function hideLogPopup() {
+  document.getElementById('logPopup').classList.add('log-popup--hidden');
+}
+
+function logZoom(dir) {
+  logZoomLevel = Math.max(60, Math.min(180, logZoomLevel + dir*20));
+  updateLogZoom();
+}
+function logZoomReset() { logZoomLevel = 100; updateLogZoom(); }
+function updateLogZoom() {
+  document.getElementById('logZoomLabel').textContent = logZoomLevel+'%';
+  document.getElementById('logPopup').style.setProperty('--log-scale', logZoomLevel/100);
+}
+
+function toggleFullscreen() {
+  var viz = document.querySelector('.col-viz');
+  if (!document.fullscreenElement) viz.requestFullscreen().catch(function(){});
+  else document.exitFullscreen();
+}
+
+function toggleProblem() {
+  var body = document.getElementById('problemBody');
+  var btn = document.getElementById('probToggleBtn');
+  body.classList.toggle('problem-body--hidden');
+  btn.textContent = body.classList.contains('problem-body--hidden') ? '▼ Show' : '▲ Hide';
+}
+
+// ============ RESIZE HANDLE ============
+(function(){
+  var col1 = document.getElementById('col1');
+  document.getElementById('resizeH1').addEventListener('mousedown', function(e){
+    e.preventDefault();
+    codeWidthUserSet = true;
+    var startX = e.clientX, startW = col1.offsetWidth, h = this;
+    document.body.classList.add('no-select');
+    h.classList.add('active');
+    function mv(e){
+      col1.style.width = Math.max(140, startW + (e.clientX - startX)) + 'px';
+      syncFooterWidth();
+    }
+    function up(){
+      document.removeEventListener('mousemove', mv);
+      document.removeEventListener('mouseup', up);
+      document.body.classList.remove('no-select');
+      h.classList.remove('active');
+    }
+    document.addEventListener('mousemove', mv);
+    document.addEventListener('mouseup', up);
+  });
+})();
+
+function syncFooterWidth() {
+  document.getElementById('footerLeft').style.width =
+    document.getElementById('col1').offsetWidth + 'px';
+}
+
+window.addEventListener('resize', function(){
+  if (!codeWidthUserSet) fitCodeWidth();
+  else syncFooterWidth();
+});
+
+// ============ KEYBOARD ============
+document.addEventListener('keydown', function(e){
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
+  if (e.key === 'ArrowRight') { e.preventDefault(); stepBy(1); }
+  else if (e.key === 'ArrowLeft') { e.preventDefault(); stepBy(-1); }
+  else if (e.key === 'r' || e.key === 'R') { e.preventDefault(); resetStep(); }
+});
+
+// ============ INIT ============
+window.addEventListener('load', function(){
+  renderCode();
+  fitCodeWidth();
+  resetWithInput();
+});
+
+</script>
+</body>
+</html>

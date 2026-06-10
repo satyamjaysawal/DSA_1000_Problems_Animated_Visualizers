@@ -1,0 +1,1007 @@
+﻿
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LC #12 — Integer to Roman (Dry-Run)</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Cinzel:wght@600;700&display=swap');
+
+:root {
+  --bg-primary:#FAFAF8; --bg-secondary:#F1EFE8; --bg-tertiary:#E2E0D8; --bg-card:#FFFFFF;
+  --text-primary:#2C2C2A; --text-secondary:#5F5E5A; --text-tertiary:#888780;
+  --border-color:rgba(0,0,0,0.11); --border-light:rgba(0,0,0,0.06); --border-focus:#534AB7;
+  --accent-indigo:#534AB7; --accent-indigo-bg:#EEEDFE; --accent-indigo-text:#3C3489; --accent-indigo-hover:#4740A0;
+  --accent-teal:#0F6E56; --accent-teal-bg:#E1F5EE; --accent-teal-text:#085041;
+  --accent-red:#E24B4A; --accent-red-bg:#FCEBEB; --accent-red-text:#791F1F;
+  --accent-amber:#B45309; --accent-amber-bg:#FEF3C7; --accent-amber-text:#78350F;
+  --accent-green:#15803D; --accent-green-bg:#DCFCE7; --accent-green-text:#14532D;
+  --syn-keyword:#534AB7; --syn-function:#185FA5; --syn-number:#993C1D; --syn-string:#0F6E56;
+  --active-line-bg:#EEEDFE;
+  --radius-sm:4px; --radius-md:6px; --radius-lg:10px; --radius-xl:14px;
+  --font-sans:'DM Sans',system-ui,sans-serif;
+  --font-mono:'JetBrains Mono','Fira Code',monospace;
+  --font-roman:'Cinzel',serif;
+  --fs-xs:11px; --fs-sm:12px; --fs-base:14px;
+  --lh-normal:1.6; --lh-code:1.9;
+  --ease:.18s ease;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:var(--font-sans);background:var(--bg-primary);color:var(--text-primary);font-size:var(--fs-base);line-height:var(--lh-normal);overflow:hidden}
+body.no-select{user-select:none}
+::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border-color);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:var(--text-tertiary)}
+
+.app-shell{display:flex;flex-direction:column;height:100vh;overflow:hidden}
+.problem-card{flex-shrink:0;border-bottom:1px solid var(--border-color);background:var(--bg-card)}
+.main-row{flex:1;display:flex;overflow:hidden;min-height:0}
+.col{display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.col-code{width:33%;min-width:140px;max-width:45vw;background:var(--bg-card);border-right:1px solid var(--border-color)}
+.col-viz{flex:1;min-width:0;background:var(--bg-primary)}
+.resize-h{width:5px;cursor:col-resize;background:transparent;flex-shrink:0;transition:background var(--ease)}
+.resize-h:hover,.resize-h.active{background:var(--accent-indigo)}
+.footer-bar{display:flex;flex-shrink:0;border-top:1px solid var(--border-color);background:#FFFFFF}
+.footer-left{width:33%;min-width:140px;max-width:45vw;display:flex;align-items:center;gap:8px;padding:7px 12px;border-right:1px solid var(--border-light)}
+.footer-right{flex:1;display:flex;align-items:center;gap:8px;padding:7px 20px;flex-wrap:wrap}
+.footer-sep{width:1px;height:18px;background:var(--border-color);margin:0 4px}
+
+/* Problem header */
+.prob-header{display:flex;align-items:center;justify-content:space-between;padding:8px 14px;gap:12px;flex-wrap:wrap}
+.prob-header-left{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.gt-home-btn{font-family:var(--font-sans);font-weight:700;font-size:11px;letter-spacing:.06em;background:var(--accent-indigo);color:#fff;border:none;padding:5px 12px;border-radius:99px;cursor:pointer;transition:background var(--ease)}
+.gt-home-btn:hover{background:var(--accent-indigo-hover)}
+.prob-num{font:700 13px var(--font-mono);color:var(--text-tertiary)}
+.prob-name{font-weight:700;font-size:15px}
+.prob-diff--med{font:700 9px var(--font-mono);background:var(--accent-amber-bg);color:var(--accent-amber-text);padding:3px 8px;border-radius:99px;text-transform:uppercase;letter-spacing:.06em;border:1px solid var(--accent-amber)}
+.prob-tag{font:600 9px var(--font-mono);background:var(--accent-indigo-bg);color:var(--accent-indigo-text);padding:3px 8px;border-radius:99px;text-transform:uppercase;letter-spacing:.06em;border:1px solid var(--accent-indigo)}
+.prob-header-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.top-label{font:600 11px var(--font-mono);color:var(--text-tertiary)}
+.input{font:500 12px var(--font-mono);padding:4px 8px;border:1px solid var(--border-color);border-radius:var(--radius-sm);background:var(--bg-card);width:90px}
+.input:focus{outline:none;border-color:var(--border-focus)}
+.top-expected{font:600 11px var(--font-mono);background:var(--accent-teal-bg);color:var(--accent-teal-text);padding:4px 8px;border-radius:var(--radius-sm);border:1px solid var(--accent-teal)}
+.prob-toggle-btn{font-family:system-ui,"Segoe UI Emoji",sans-serif;font-size:11px;font-weight:600;background:var(--bg-secondary);color:var(--text-secondary);border:1px solid var(--border-color);padding:4px 10px;border-radius:var(--radius-sm);cursor:pointer}
+
+.prob-body{display:grid;grid-template-columns:1.4fr 1fr;gap:14px;padding:0 14px 12px}
+.prob-body--hidden{display:none}
+.prob-section h3{font-size:12px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
+.prob-statement{font-size:12.5px;line-height:1.6;margin-bottom:8px}
+.prob-statement code{font:600 11px var(--font-mono);background:var(--bg-secondary);padding:1px 5px;border-radius:3px;color:var(--accent-indigo-text)}
+.concept-block{background:var(--bg-secondary);border-left:3px solid var(--accent-indigo);padding:6px 10px;border-radius:var(--radius-sm);margin-bottom:6px;font-size:11.5px;line-height:1.5}
+.concept-block strong{color:var(--accent-indigo-text)}
+.complexity-row{display:flex;gap:8px;margin-top:6px;flex-wrap:wrap}
+.complexity-chip{font:600 11px var(--font-mono);background:var(--accent-amber-bg);color:var(--accent-amber-text);padding:3px 8px;border-radius:var(--radius-sm);border:1px solid var(--accent-amber)}
+
+.tc-list{display:flex;flex-direction:column;gap:6px;margin-bottom:8px}
+.tc-chip{display:flex;flex-direction:column;gap:3px;padding:6px 9px;background:var(--bg-secondary);border:1px solid var(--border-color);border-radius:var(--radius-sm);cursor:pointer;transition:all var(--ease)}
+.tc-chip:hover{background:var(--accent-indigo-bg);border-color:var(--accent-indigo)}
+.tc-row1{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.pt-tag{font:700 9px var(--font-mono);background:var(--accent-indigo);color:#fff;padding:2px 6px;border-radius:3px;text-transform:uppercase}
+.tc-label{font-size:11px;color:var(--text-secondary);font-weight:600;flex:1}
+.tc-expected{font:700 11px var(--font-mono);background:var(--accent-teal-bg);color:var(--accent-teal-text);padding:2px 6px;border-radius:3px;border:1px solid var(--accent-teal)}
+.tc-vals{display:flex;gap:4px;flex-wrap:wrap}
+.tc-vals code{font:600 11px var(--font-mono);background:#fff;padding:2px 6px;border-radius:3px;border:1px solid var(--border-color)}
+.tc-run{display:flex;align-items:center;gap:8px;margin-top:6px}
+.btn-run{font-family:system-ui,"Segoe UI Emoji",sans-serif;font-size:12px;font-weight:700;background:var(--accent-indigo);color:#fff;border:none;padding:6px 14px;border-radius:var(--radius-sm);cursor:pointer}
+.btn-run:hover{background:var(--accent-indigo-hover)}
+.live-output{font:700 12px var(--font-mono);background:var(--bg-secondary);padding:5px 10px;border-radius:var(--radius-sm);border:1px solid var(--border-color)}
+
+/* Code panel */
+.code-panel{flex:1;overflow-y:auto;padding:8px 0;font-family:var(--font-mono);font-size:12px;line-height:var(--lh-code)}
+.code-line{display:flex;align-items:flex-start;padding:0 14px 0 8px;transition:background .12s;border-left:3px solid transparent}
+.code-line:hover{background:var(--bg-secondary)}
+.code-line.active{background:var(--active-line-bg);border-left-color:var(--accent-indigo)}
+.code-line .ln{display:inline-block;width:26px;color:var(--text-tertiary);font-size:10.5px;text-align:right;padding-right:8px;flex-shrink:0;user-select:none}
+.code-content{white-space:pre;flex:1}
+.code-content .kw{color:var(--syn-keyword);font-weight:600}
+.code-content .fn{color:var(--syn-function)}
+.code-content .num{color:var(--syn-number)}
+.code-content .str{color:var(--syn-string)}
+
+/* Viz panel */
+.viz-panel{flex:1;overflow:auto;padding:14px}
+.viz-row{display:flex;gap:12px;align-items:flex-start;flex-wrap:wrap;margin-bottom:14px}
+.viz-card{background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius-md);padding:10px;flex:1;min-width:240px}
+.viz-title{font:700 11px var(--font-mono);color:var(--text-secondary);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;padding-bottom:5px;border-bottom:1px dashed var(--border-light)}
+
+/* Vars strip */
+.vars-strip{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;padding:8px;background:var(--bg-card);border-radius:var(--radius-md);border:1px solid var(--border-color)}
+.var-chip{display:inline-flex;align-items:center;gap:5px;font:600 12px var(--font-mono);background:var(--bg-secondary);padding:4px 9px;border-radius:var(--radius-sm);border:1px solid var(--border-light)}
+.var-chip-key{color:var(--text-tertiary);font-weight:500}
+.var-chip-val{color:var(--text-primary);font-weight:700}
+.vc-active{background:var(--accent-indigo-bg);border-color:var(--accent-indigo)}
+.vc-active .var-chip-val{color:var(--accent-indigo-text)}
+.vc-safe{background:var(--accent-green-bg);border-color:var(--accent-green)}
+.vc-safe .var-chip-val{color:var(--accent-green-text)}
+.vc-warn{background:var(--accent-amber-bg);border-color:var(--accent-amber)}
+.vc-warn .var-chip-val{color:var(--accent-amber-text)}
+
+/* Big num display */
+.num-display{display:flex;flex-direction:column;align-items:center;gap:6px;padding:14px;background:linear-gradient(135deg,#EEEDFE 0%,#FAFAF8 100%);border-radius:var(--radius-md);border:1px solid var(--accent-indigo)}
+.num-label{font:600 10px var(--font-mono);text-transform:uppercase;letter-spacing:.08em;color:var(--accent-indigo-text)}
+.num-value{font:700 42px var(--font-mono);color:var(--accent-indigo-text);line-height:1;letter-spacing:-1px}
+.num-value.changed{animation:pulse-node 1s}
+.num-sub{font:500 10.5px var(--font-mono);color:var(--text-tertiary);text-align:center}
+
+/* Roman result display */
+.roman-display{display:flex;flex-direction:column;align-items:center;gap:6px;padding:14px;background:linear-gradient(135deg,#FEF3C7 0%,#FAFAF8 100%);border-radius:var(--radius-md);border:1px solid var(--accent-amber);min-height:120px}
+.roman-label{font:600 10px var(--font-mono);text-transform:uppercase;letter-spacing:.08em;color:var(--accent-amber-text)}
+.roman-value{font-family:var(--font-roman);font-size:36px;font-weight:700;color:var(--accent-amber-text);line-height:1.1;letter-spacing:2px;text-align:center;word-break:break-all;min-height:42px;display:flex;align-items:center;justify-content:center}
+.roman-value .new-sym{display:inline-block;animation:roman-pop .6s ease-out}
+.roman-empty{font-style:italic;font-size:14px;color:var(--text-tertiary);font-family:var(--font-sans);font-weight:500;letter-spacing:0}
+.roman-sub{font:500 10.5px var(--font-mono);color:var(--text-tertiary)}
+
+@keyframes roman-pop{
+  0%{opacity:0;transform:scale(0.4) translateY(-8px);color:#E24B4A}
+  60%{opacity:1;transform:scale(1.3) translateY(0);color:#15803D}
+  100%{opacity:1;transform:scale(1) translateY(0);color:var(--accent-amber-text)}
+}
+
+/* Denomination ladder */
+.denom-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(72px,1fr));gap:6px}
+.denom-card{display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 6px;background:var(--bg-secondary);border:1px solid var(--border-light);border-radius:var(--radius-sm);transition:all .25s;position:relative}
+.denom-card.passed{opacity:.5;background:var(--bg-tertiary)}
+.denom-card.passed::after{content:'✓';position:absolute;top:2px;right:5px;font-size:10px;color:var(--accent-green);font-weight:700}
+.denom-card.active{background:var(--accent-amber-bg);border-color:var(--accent-amber);border-width:2px;transform:scale(1.06);animation:pulse-node 1.2s infinite;z-index:2;box-shadow:0 4px 12px rgba(180,83,9,.2)}
+.denom-card.consumed{background:var(--accent-green-bg);border-color:var(--accent-green)}
+.denom-card.consumed::after{content:'✓ used';position:absolute;top:-7px;right:3px;font-size:8px;background:var(--accent-green);color:#fff;padding:1px 5px;border-radius:99px;font-weight:700}
+.denom-val{font:700 13px var(--font-mono);color:var(--text-primary)}
+.denom-card.passed .denom-val{color:var(--text-tertiary)}
+.denom-sym{font-family:var(--font-roman);font-weight:700;font-size:18px;color:var(--accent-indigo-text);line-height:1}
+.denom-card.active .denom-sym{color:var(--accent-amber-text)}
+.denom-card.consumed .denom-sym{color:var(--accent-green-text)}
+.denom-idx{font:500 8px var(--font-mono);color:var(--text-tertiary);text-transform:uppercase}
+.denom-uses{font:700 9px var(--font-mono);background:#fff;padding:1px 5px;border-radius:99px;border:1px solid var(--border-color);color:var(--text-secondary);min-height:14px;display:inline-flex;align-items:center;gap:2px}
+.denom-card.consumed .denom-uses{background:var(--accent-green);color:#fff;border-color:var(--accent-green)}
+
+/* History table */
+.hist-table{width:100%;border-collapse:collapse;font:500 11px var(--font-mono)}
+.hist-table th{background:var(--bg-secondary);color:var(--text-secondary);font-weight:700;text-align:left;padding:5px 8px;font-size:10px;text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid var(--border-color)}
+.hist-table td{padding:4px 8px;border-bottom:1px solid var(--border-light)}
+.hist-table tr.curr{background:var(--accent-indigo-bg)}
+.hist-table tr.curr td{font-weight:700}
+.hist-table .hist-sym{font-family:var(--font-roman);font-weight:700;color:var(--accent-amber-text);font-size:13px}
+.hist-empty{font-style:italic;color:var(--text-tertiary);text-align:center;padding:14px;font-size:11px}
+
+/* Result banner */
+.result-banner{margin-top:12px;padding:14px 18px;border-radius:var(--radius-md);background:linear-gradient(135deg,#FEF3C7 0%,#FFFFFF 100%);border:2px solid var(--accent-amber);display:flex;align-items:center;gap:14px;animation:win-pulse 2s infinite}
+.result-banner-icon{font-size:24px}
+.result-banner-text{font-size:13px;color:var(--accent-amber-text);font-weight:600}
+.result-banner-roman{font-family:var(--font-roman);font-size:24px;font-weight:700;color:var(--accent-amber-text);letter-spacing:2px;margin-left:auto}
+
+@keyframes pulse-node{0%,100%{box-shadow:0 0 4px var(--accent-indigo)}50%{box-shadow:0 0 12px var(--accent-indigo);transform:scale(1.04)}}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-3px)}75%{transform:translateX(3px)}}
+@keyframes win-pulse{0%,100%{box-shadow:0 0 3px rgba(234,179,8,.5)}50%{box-shadow:0 0 14px rgba(234,179,8,.9)}}
+
+/* Footer */
+.step-info{font:700 12px var(--font-mono);color:var(--text-secondary)}
+.action-badge{font-family:system-ui,"Segoe UI Emoji",sans-serif;font-size:10px;font-weight:700;padding:3px 8px;border-radius:99px;text-transform:uppercase;letter-spacing:.05em;border:1px solid;background:var(--bg-secondary);color:var(--text-secondary);border-color:var(--border-color)}
+.action-badge--func-def,.action-badge--init,.action-badge--call,.action-badge--return{background:rgba(130,80,255,.14);color:#3C3489;border-color:#8250ff}
+.action-badge--for-check,.action-badge--while-check,.action-badge--if-check{background:rgba(56,139,253,.14);color:#185FA5;border-color:#388bfd}
+.action-badge--mark,.action-badge--push,.action-badge--pop,.action-badge--restore,.action-badge--found{background:var(--accent-green-bg);color:var(--accent-green-text);border-color:var(--accent-green)}
+.action-badge--remove,.action-badge--prune,.action-badge--fail{background:var(--accent-red-bg);color:var(--accent-red-text);border-color:var(--accent-red)}
+.action-badge--exit,.action-badge--skip{background:var(--bg-tertiary);color:var(--text-secondary);border-color:var(--border-color)}
+
+kbd{font-family:system-ui,"Segoe UI Emoji",sans-serif;font:600 10px var(--font-mono);background:var(--bg-secondary);border:1px solid var(--border-color);border-bottom-width:2px;padding:2px 6px;border-radius:3px;color:var(--text-secondary)}
+.btn{font-family:system-ui,"Segoe UI Emoji",sans-serif;font-size:12px;font-weight:600;background:var(--bg-card);color:var(--text-primary);border:1px solid var(--border-color);padding:5px 11px;border-radius:var(--radius-sm);cursor:pointer;transition:all var(--ease)}
+.btn:hover{background:var(--bg-secondary)}
+.btn-primary{background:var(--accent-indigo);color:#fff;border-color:var(--accent-indigo)}
+.btn-primary:hover{background:var(--accent-indigo-hover)}
+.btn-fullscreen{font-size:14px;padding:5px 9px}
+.log-toggle-btn{font-family:system-ui,"Segoe UI Emoji",sans-serif;font-size:11px;font-weight:700;background:var(--accent-green-bg);color:var(--accent-green-text);border:1px solid var(--accent-green);padding:4px 9px;border-radius:var(--radius-sm);cursor:pointer}
+.log-toggle-btn--off{background:var(--bg-secondary);color:var(--text-tertiary);border-color:var(--border-color)}
+.btn-zoom{font-family:system-ui,"Segoe UI Emoji",sans-serif;font-size:13px;font-weight:700;background:var(--bg-card);color:var(--text-primary);border:1px solid var(--border-color);padding:3px 8px;border-radius:var(--radius-sm);cursor:pointer;min-width:26px}
+.log-zoom-label{font:600 10px var(--font-mono);color:var(--text-tertiary);min-width:36px;text-align:center}
+
+/* Log popup */
+.log-popup{--log-scale:1;position:fixed;bottom:52px;right:14px;width:calc(480px * var(--log-scale));max-width:92vw;max-height:75vh;border-radius:var(--radius-lg);box-shadow:0 10px 32px rgba(0,0,0,.14);border:1px solid var(--border-color);background:var(--bg-card);overflow:hidden;display:flex;flex-direction:column;z-index:100;transition:opacity .15s,transform .15s;transform-origin:bottom right}
+.log-popup--hidden{opacity:0;transform:scale(.92);pointer-events:none}
+.log-popup-body{flex:1;overflow:auto;padding:0}
+.log-popup-body > .log-card{border-radius:0;border:none;border-left:0}
+
+.log-card{border-radius:var(--radius-md);overflow:hidden;border:1px solid var(--border-color);border-left-width:4px;font-size:var(--fs-xs);background:var(--bg-card)}
+.log-card--func-def,.log-card--init,.log-card--call,.log-card--return{border-left-color:#8250ff}
+.log-card--for-check,.log-card--while-check,.log-card--if-check{border-left-color:#388bfd}
+.log-card--mark,.log-card--push,.log-card--pop,.log-card--restore,.log-card--found{border-left-color:#3fb950}
+.log-card--remove,.log-card--prune,.log-card--fail{border-left-color:#f85149}
+.log-card--exit,.log-card--skip{border-left-color:#888780}
+
+.log-card-header{display:flex;align-items:center;gap:6px;padding:8px 10px 6px;background:var(--bg-secondary);border-bottom:1px solid var(--border-light)}
+.log-badge{font-family:system-ui,"Segoe UI Emoji",sans-serif;font:700 9px var(--font-mono);padding:2px 7px;border-radius:99px;text-transform:uppercase;letter-spacing:.05em;border:1px solid;background:var(--bg-card)}
+.log-badge--func-def,.log-badge--init,.log-badge--call,.log-badge--return{background:rgba(130,80,255,.14);color:#3C3489;border-color:#8250ff}
+.log-badge--for-check,.log-badge--while-check,.log-badge--if-check{background:rgba(56,139,253,.14);color:#185FA5;border-color:#388bfd}
+.log-badge--mark,.log-badge--push,.log-badge--pop,.log-badge--restore,.log-badge--found{background:var(--accent-green-bg);color:var(--accent-green-text);border-color:var(--accent-green)}
+.log-badge--remove,.log-badge--prune,.log-badge--fail{background:var(--accent-red-bg);color:var(--accent-red-text);border-color:var(--accent-red)}
+.log-badge--exit,.log-badge--skip{background:var(--bg-tertiary);color:var(--text-secondary);border-color:var(--border-color)}
+
+.log-line-ref{font:700 10px var(--font-mono);color:var(--accent-indigo);background:var(--accent-indigo-bg);padding:1px 6px;border-radius:4px;border:1px solid var(--accent-indigo)}
+.log-status-pill{font-family:system-ui,"Segoe UI Emoji",sans-serif;font-size:9px;font-weight:700;padding:2px 7px;border-radius:99px;text-transform:uppercase;margin-left:auto;border:1px solid}
+.log-status--success{background:var(--accent-green-bg);color:var(--accent-green-text);border-color:var(--accent-green)}
+.log-status--fail{background:var(--accent-red-bg);color:var(--accent-red-text);border-color:var(--accent-red)}
+.log-status--skip{background:var(--bg-tertiary);color:var(--text-tertiary);border-color:var(--border-color)}
+.log-status--loop{background:rgba(56,139,253,.14);color:#185FA5;border-color:#388bfd}
+.log-status--prune{background:var(--accent-red-bg);color:var(--accent-red-text);border-color:var(--accent-red)}
+.log-status--info{background:rgba(130,80,255,.14);color:#3C3489;border-color:#8250ff}
+
+.log-section{padding:7px 10px;border-bottom:1px dashed var(--border-light)}
+.log-section:last-child{border-bottom:none}
+.log-section-title{font-family:system-ui,"Segoe UI Emoji",sans-serif;font:700 8px var(--font-mono);text-transform:uppercase;letter-spacing:.06em;color:var(--text-tertiary);margin-bottom:4px;display:flex;align-items:center;gap:4px}
+.log-section-title-icon{font-family:system-ui,"Segoe UI Emoji",sans-serif;font-size:11px}
+
+.log-code-snippet{font:600 11px var(--font-mono);background:#0d1117;color:#e6edf3;padding:6px 9px;border-radius:4px;display:block;overflow-x:auto;white-space:pre-wrap;word-break:break-word;border:1px solid #30363d}
+.log-code-snippet .ck{color:#ff7b72}
+.log-code-snippet .cs{color:#a5d6ff}
+.log-code-snippet .cn{color:#79c0ff}
+.log-code-snippet .cf{color:#d2a8ff}
+.log-code-snippet .cc{color:#8b949e;font-style:italic}
+
+.log-kv-row{display:flex;flex-wrap:wrap;gap:5px}
+.log-kv{display:inline-flex;align-items:center;gap:3px;font:11px var(--font-mono);padding:2px 7px;border-radius:4px;background:var(--bg-secondary);border:1px solid var(--border-light)}
+.log-kv-key{color:var(--text-tertiary);font-weight:500}
+.log-kv-val{color:var(--text-primary);font-weight:700}
+.log-kv--in{background:rgba(56,139,253,.08);border-color:rgba(56,139,253,.3)}
+.log-kv--out{background:rgba(63,185,80,.08);border-color:rgba(63,185,80,.4)}
+.log-kv--out .log-kv-val{color:#15803D}
+.log-kv--changed{background:rgba(180,83,9,.10);border-color:rgba(180,83,9,.4)}
+.log-kv--changed .log-kv-val{color:var(--accent-amber-text)}
+
+.log-verdict{display:flex;align-items:center;gap:6px;font:600 11px var(--font-mono);padding:5px 8px;border-radius:5px;background:var(--bg-secondary);border:1px solid var(--border-light)}
+.log-verdict--true{background:var(--accent-green-bg);border-color:var(--accent-green);color:var(--accent-green-text)}
+.log-verdict--false{background:var(--accent-red-bg);border-color:var(--accent-red);color:var(--accent-red-text)}
+
+.log-why{font-size:11.5px;line-height:1.55;padding:4px 0}
+.log-why strong{color:var(--accent-indigo-text)}
+.log-why code{font:600 10.5px var(--font-mono);background:var(--bg-secondary);padding:1px 4px;border-radius:3px;color:var(--accent-indigo-text)}
+
+.log-analogy{font:italic 11.5px var(--font-sans);color:var(--text-secondary);background:#FFF8E7;border:1px solid #FBE8A6;border-left:3px solid var(--accent-amber);padding:6px 9px;border-radius:4px;line-height:1.55}
+.log-analogy strong{color:var(--accent-amber-text);font-style:normal;font-weight:700}
+</style>
+</head>
+<body>
+<div class="app-shell">
+
+  <!-- ============= PROBLEM CARD ============= -->
+  <div class="problem-card" id="problemCard">
+    <header class="prob-header">
+      <div class="prob-header-left">
+        <a href="../00_HomePage/gt_learn_homepage.html" class="gt-home-btn">GT LEARN</a>
+        <span class="prob-num">#12</span>
+        <span class="prob-name">🏛️ Integer to Roman</span>
+        <span class="prob-diff--med">MEDIUM</span>
+        <span class="prob-tag">Greedy</span>
+        <span class="prob-tag">Math</span>
+        <span class="prob-tag">String</span>
+      </div>
+      <div class="prob-header-right">
+        <span class="top-label">num=</span>
+        <input id="inputNum" class="input" value="1994" type="number" min="1" max="3999">
+        <span id="expectedBadge" class="top-expected">exp: "MCMXCIV"</span>
+        <button id="probToggleBtn" class="prob-toggle-btn" type="button" onclick="toggleProblem()">▲ Hide</button>
+      </div>
+    </header>
+
+    <div class="prob-body" id="probBody">
+      <div class="prob-section">
+        <h3>📝 Problem Statement</h3>
+        <div class="prob-statement">
+          Roman numerals use seven base symbols: <code>I=1</code>, <code>V=5</code>, <code>X=10</code>, <code>L=50</code>, <code>C=100</code>, <code>D=500</code>, <code>M=1000</code>. Plus six <strong>subtractive pairs</strong>: <code>IV=4</code>, <code>IX=9</code>, <code>XL=40</code>, <code>XC=90</code>, <code>CD=400</code>, <code>CM=900</code>. Given an integer <code>num</code> in range <strong>1 ≤ num ≤ 3999</strong>, return its Roman numeral representation.
+        </div>
+
+        <h3>🧠 Solving Approach</h3>
+        <div class="prob-statement">
+          <strong>Greedy + denomination ladder.</strong> List all 13 values (7 base + 6 subtractive) in <strong>descending order</strong>. For each, repeatedly subtract from <code>num</code> while it fits, appending the symbol each time. Greedy works because the <strong>subtractive pairs</strong> close every gap that would force a worse choice.
+        </div>
+
+        <div class="concept-block">
+          <strong>🎯 Key insight:</strong> Subtractive pairs (<code>CM</code>, <code>CD</code>, <code>XC</code>, <code>XL</code>, <code>IX</code>, <code>IV</code>) are placed in the value list itself — so the greedy never gets stuck "needing to write 4 I's".
+        </div>
+        <div class="concept-block">
+          <strong>♻️ Loop pattern:</strong> Outer <code>for</code> over 13 denominations + inner <code>while num &gt;= value</code> to consume that denomination as many times as possible.
+        </div>
+        <div class="concept-block">
+          <strong>🏁 Termination:</strong> When <code>num == 0</code>, all subsequent <code>while</code> checks fail → loop exits → <code>return result</code>.
+        </div>
+
+        <div class="complexity-row">
+          <span class="complexity-chip">⏱ Time: O(1) — bounded by 3999</span>
+          <span class="complexity-chip">💾 Space: O(1) output buffer</span>
+        </div>
+      </div>
+
+      <div class="prob-section">
+        <h3>🧪 Test Cases</h3>
+        <div class="tc-list">
+          <div class="tc-chip" onclick="loadTest(3, 'III')">
+            <div class="tc-row1"><span class="pt-tag">T1</span><span class="tc-label">smallest — three I's</span><span class="tc-expected">→ "III"</span></div>
+            <div class="tc-vals"><code>num = 3</code></div>
+          </div>
+          <div class="tc-chip" onclick="loadTest(58, 'LVIII')">
+            <div class="tc-row1"><span class="pt-tag">T2</span><span class="tc-label">basic combo (50+5+3)</span><span class="tc-expected">→ "LVIII"</span></div>
+            <div class="tc-vals"><code>num = 58</code></div>
+          </div>
+          <div class="tc-chip" onclick="loadTest(1994, 'MCMXCIV')">
+            <div class="tc-row1"><span class="pt-tag">T3</span><span class="tc-label">all subtractive pairs</span><span class="tc-expected">→ "MCMXCIV"</span></div>
+            <div class="tc-vals"><code>num = 1994</code></div>
+          </div>
+          <div class="tc-chip" onclick="loadTest(9, 'IX')">
+            <div class="tc-row1"><span class="pt-tag">T4</span><span class="tc-label">single subtractive pair</span><span class="tc-expected">→ "IX"</span></div>
+            <div class="tc-vals"><code>num = 9</code></div>
+          </div>
+          <div class="tc-chip" onclick="loadTest(3999, 'MMMCMXCIV')">
+            <div class="tc-row1"><span class="pt-tag">T5</span><span class="tc-label">edge max — 3 M's + pairs</span><span class="tc-expected">→ "MMMCMXCIV"</span></div>
+            <div class="tc-vals"><code>num = 3999</code></div>
+          </div>
+        </div>
+        <div class="tc-run">
+          <button class="btn-run" type="button" onclick="resetWithInput()">▶ Run</button>
+          <span class="live-output">Output: <span id="liveOutput">—</span></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============= MAIN ROW ============= -->
+  <div class="main-row">
+    <div class="col col-code" id="col1">
+      <div class="code-panel" id="codePanel"></div>
+    </div>
+    <div class="resize-h" id="resizeH1"></div>
+    <div class="col col-viz">
+      <div class="viz-panel" id="vizPanel"></div>
+    </div>
+  </div>
+
+  <!-- ============= FOOTER ============= -->
+  <div class="footer-bar">
+    <div class="footer-left" id="footerLeft">
+      <span id="stepInfo" class="step-info">0/0</span>
+      <span id="actionBadge" class="action-badge"></span>
+    </div>
+    <div class="footer-right">
+      <kbd>←</kbd><kbd>→</kbd><kbd>R</kbd>
+      <button class="btn" type="button" onclick="resetStep()">↺</button>
+      <button class="btn" type="button" onclick="stepBy(-1)">◀</button>
+      <button class="btn btn-primary" type="button" onclick="stepBy(1)">▶ Next</button>
+      <span class="footer-sep"></span>
+      <button id="logToggleBtn" class="log-toggle-btn" type="button" onclick="toggleLogPreview()">📋 ON</button>
+      <button class="btn-zoom" type="button" onclick="logZoom(-1)">−</button>
+      <span id="logZoomLabel" class="log-zoom-label">100%</span>
+      <button class="btn-zoom" type="button" onclick="logZoom(1)">+</button>
+      <button class="btn-zoom" type="button" onclick="logZoomReset()">↺</button>
+      <span class="footer-sep"></span>
+      <button class="btn btn-fullscreen" type="button" onclick="toggleFullscreen()">⛶</button>
+    </div>
+  </div>
+</div>
+
+<div class="log-popup" id="logPopup">
+  <div class="log-popup-body" id="logPopupBody"></div>
+</div>
+
+<script>
+// ===================== CODE =====================
+var codeLines = [
+  "def intToRoman(num: int) -> str:",
+  "    values  = [1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1]",
+  "    symbols = ['M','CM','D','CD','C','XC','L','XL','X','IX','V','IV','I']",
+  "    result = ''",
+  "    for i in range(len(values)):",
+  "        while num >= values[i]:",
+  "            result = result + symbols[i]",
+  "            num = num - values[i]",
+  "    return result"
+];
+
+var DENOM_VALUES  = [1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1];
+var DENOM_SYMBOLS = ['M','CM','D','CD','C','XC','L','XL','X','IX','V','IV','I'];
+
+var LOG_BADGE = {
+  "func-def":"📌 DEF","init":"⚙️ INIT","call":"📞 CALL","return":"🏆 RETURN",
+  "for-check":"🔁 FOR","while-check":"🔁 WHILE","if-check":"🔎 IF",
+  "mark":"✅ MARK","push":"⬆ PUSH","pop":"⬇ POP","restore":"↩ RESTORE","found":"🎉 FOUND",
+  "remove":"✏️ EDIT","prune":"✂️ PRUNE","fail":"❌ FAIL","exit":"🔚 EXIT","skip":"⏭ SKIP"
+};
+var BADGE_LABEL = {
+  "func-def":"DEF","init":"INIT","call":"CALL","return":"RETURN",
+  "for-check":"FOR","while-check":"WHILE","if-check":"IF",
+  "mark":"MARK","push":"PUSH","pop":"POP","restore":"RESTORE","found":"FOUND",
+  "remove":"EDIT","prune":"PRUNE","fail":"FAIL","exit":"EXIT","skip":"SKIP"
+};
+
+// ===================== STATE =====================
+var steps = [];
+var currentStep = 0;
+var codeWidthUserSet = false;
+var curResult = null;
+var logEnabled = true;
+var logZoomLevel = 100;
+
+// ===================== RENDER CODE =====================
+function renderCode() {
+  var p = document.getElementById('codePanel');
+  p.innerHTML = codeLines.map(function(raw, i) {
+    var h = raw;
+    h = h.replace(/("[^"]*"|'[^']*')/g, '\x01STR\x02$1\x03');
+    h = h.replace(/\b(def|for|in|if|return|break|continue|and|else|elif|True|False|None|not|or|while|lambda)\b/g, '\x01KW\x02$1\x03');
+    h = h.replace(/\b(len|range|int|str|list|append|pop|sorted|min|max|sum|abs|enumerate|zip|print|set|add)\b/g, '\x01FN\x02$1\x03');
+    h = h.replace(/(?<![.\w"\x01\x02\x03])(-?\d+)\b/g, '\x01NUM\x02$1\x03');
+    h = h.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    h = h.replace(/\x01([A-Z]+)\x02/g, function(_, c) { return '<span class="' + c.toLowerCase() + '">'; }).replace(/\x03/g, '</span>');
+    return '<div class="code-line" data-line="' + i + '"><span class="ln">' + (i+1) + '</span><span class="code-content">' + h + '</span></div>';
+  }).join('');
+}
+
+function hlCode(raw) {
+  var h = raw;
+  h = h.replace(/("[^"]*"|'[^']*')/g, '\x01s\x02$1\x03');
+  h = h.replace(/\b(def|for|in|if|return|break|continue|and|else|elif|True|False|None|not|or|while|lambda)\b/g, '\x01k\x02$1\x03');
+  h = h.replace(/\b(len|range|int|str|list|append|pop|sorted|min|max|sum|abs|enumerate|zip|print|set|add)\b/g, '\x01f\x02$1\x03');
+  h = h.replace(/(?<![.\w"\x01\x02\x03])(-?\d+)\b/g, '\x01n\x02$1\x03');
+  h = h.replace(/(#.*$)/gm, '\x01c\x02$1\x03');
+  h = h.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  h = h.replace(/\x01([a-z])\x02/g, function(_, c) { return '<span class="c' + c + '">'; }).replace(/\x03/g, '</span>');
+  return h;
+}
+
+// ===================== richLog =====================
+function richLog(opts) {
+  var statusMap = {
+    success:"✅ Success", fail:"❌ Failed", skip:"⏭ Skipped",
+    loop:"🔁 Loop iter", prune:"✂️ Pruned", info:"ℹ️ Info"
+  };
+  var status = opts.status || "info";
+  var html = '<div class="log-card log-card--' + opts.action + '">';
+  html += '<div class="log-card-header">';
+  html += '<span class="log-badge log-badge--' + opts.action + '">' + (LOG_BADGE[opts.action] || opts.action) + '</span>';
+  html += '<span class="log-line-ref">L' + (opts.line + 1) + '</span>';
+  html += '<span class="log-status-pill log-status--' + status + '">' + statusMap[status] + '</span>';
+  html += '</div>';
+
+  if (opts.code) {
+    html += '<div class="log-section">';
+    html += '<div class="log-section-title"><span class="log-section-title-icon">📜</span>Code Executing</div>';
+    html += '<code class="log-code-snippet">' + hlCode(opts.code) + '</code></div>';
+  }
+  if (opts.inputs && opts.inputs.length) {
+    html += '<div class="log-section">';
+    html += '<div class="log-section-title"><span class="log-section-title-icon">📥</span>Input Values (line is using these)</div>';
+    html += '<div class="log-kv-row">';
+    opts.inputs.forEach(function(kv) {
+      html += '<span class="log-kv log-kv--in"><span class="log-kv-key">' + kv.k + '</span>=<span class="log-kv-val">' + kv.v + '</span></span>';
+    });
+    html += '</div></div>';
+  }
+  if (opts.outputs && opts.outputs.length) {
+    html += '<div class="log-section">';
+    html += '<div class="log-section-title"><span class="log-section-title-icon">📤</span>Output / State After Line</div>';
+    html += '<div class="log-kv-row">';
+    opts.outputs.forEach(function(kv) {
+      var cls = kv.changed ? 'log-kv--changed' : 'log-kv--out';
+      html += '<span class="log-kv ' + cls + '"><span class="log-kv-key">' + kv.k + '</span>=<span class="log-kv-val">' + kv.v + '</span></span>';
+    });
+    html += '</div></div>';
+  }
+  if (opts.verdict) {
+    var vCls = opts.verdictTrue === true ? 'log-verdict--true' : (opts.verdictTrue === false ? 'log-verdict--false' : '');
+    var vIcon = opts.verdictTrue === true ? '✓' : (opts.verdictTrue === false ? '✗' : '•');
+    html += '<div class="log-section">';
+    html += '<div class="log-section-title"><span class="log-section-title-icon">⚖️</span>Verdict / Decision</div>';
+    html += '<div class="log-verdict ' + vCls + '">' + vIcon + ' ' + opts.verdict + '</div></div>';
+  }
+  if (opts.why) {
+    html += '<div class="log-section">';
+    html += '<div class="log-section-title"><span class="log-section-title-icon">💡</span>Why This Happens</div>';
+    html += '<div class="log-why">' + opts.why + '</div></div>';
+  }
+  if (opts.analogy) {
+    html += '<div class="log-section">';
+    html += '<div class="log-section-title"><span class="log-section-title-icon">🎭</span>Real-Life Analogy</div>';
+    html += '<div class="log-analogy">' + opts.analogy + '</div></div>';
+  }
+  html += '</div>';
+  return html;
+}
+
+function escQ(s) { return '"' + s + '"'; }
+
+// ===================== buildSteps =====================
+function buildSteps(numInput) {
+  var st = [];
+  var MAX_STEPS = 4000;
+
+  var values  = DENOM_VALUES.slice();
+  var symbols = DENOM_SYMBOLS.slice();
+  var num = numInput;
+  var initialNum = numInput;
+  var result = "";
+  var i = 0;
+  var iterFor = 0;
+  var nLen = values.length;
+
+  // Per-denomination usage tracker for viz
+  var denomUses = values.map(function(){ return 0; });
+
+  // Highlight tracking
+  var numChanged = false;
+  var resultChanged = false;
+  var newSymbolJustAppended = "";
+  var doneFinal = false;
+  var activeDenomIdx = -1;
+  var lastCheckedIdx = -1;
+
+  // History of additions: [{i, value, symbol, numBefore, numAfter, resultAfter}]
+  var history = [];
+
+  function snap(extra) {
+    return Object.assign({
+      values: values.slice(),
+      symbols: symbols.slice(),
+      num: num,
+      initialNum: initialNum,
+      result: result,
+      i: i,
+      iterFor: iterFor,
+      nLen: nLen,
+      denomUses: denomUses.slice(),
+      numChanged: numChanged,
+      resultChanged: resultChanged,
+      newSymbolJustAppended: newSymbolJustAppended,
+      doneFinal: doneFinal,
+      activeDenomIdx: activeDenomIdx,
+      lastCheckedIdx: lastCheckedIdx,
+      history: history.map(function(h){ return Object.assign({}, h); })
+    }, extra || {});
+  }
+
+  function pushStep(o) {
+    if (st.length >= MAX_STEPS) return;
+    st.push(Object.assign({ line:0, action:"init", logHTML:"" }, snap(o)));
+  }
+
+  // --------- L0: function definition ----------
+  pushStep({
+    line:0, action:"func-def",
+    logHTML: richLog({
+      line:0, action:"func-def",
+      code: "def intToRoman(num: int) -> str:   # num=" + num,
+      status:"info",
+      inputs:[{k:"num", v: num}],
+      why: "Function shuru ho rahi hai with input <code>num=" + num + "</code>. Yeh integer ko <strong>Roman numeral string</strong> mein convert karega using greedy approach — sabse badi denomination se shuru karke chhoti tak.",
+      analogy: "Jaise <strong>cashier ATM se paise nikaal rahi hai</strong> — pehle bade notes (₹2000) try karega, jab woh nahi fit ho toh chhote notes (₹500, ₹100, etc.). <em>'" + num + " rupay nikaalo'</em> kehkar customer aaya."
+    })
+  });
+
+  // --------- L1: values = [...] ----------
+  pushStep({
+    line:1, action:"init",
+    logHTML: richLog({
+      line:1, action:"init",
+      code: "values = [1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1]",
+      status:"success",
+      outputs:[{k:"values", v:"[1000,900,500,400,100,90,50,40,10,9,5,4,1]", changed:true}, {k:"len", v: 13}],
+      why: "<strong>13 denominations</strong> set kar diye in <strong>descending order</strong>. Notice — base symbols (1000, 500, 100, ...) ke beech mein <strong>subtractive pairs</strong> (900=CM, 400=CD, 90=XC, 40=XL, 9=IX, 4=IV) bhi included hain.",
+      analogy: "Jaise <strong>currency drawer</strong> mein notes alag-alag denominations ke compartments mein rakhte hain — bade se chhote tak. Yahan 13 'compartments' ready hain."
+    })
+  });
+
+  // --------- L2: symbols = [...] ----------
+  pushStep({
+    line:2, action:"init",
+    logHTML: richLog({
+      line:2, action:"init",
+      code: "symbols = ['M','CM','D','CD','C','XC','L','XL','X','IX','V','IV','I']",
+      status:"success",
+      outputs:[{k:"symbols", v:"['M','CM','D',...,'I']", changed:true}],
+      why: "Parallel array banaya — <code>values[i]</code> ka Roman symbol <code>symbols[i]</code> mein. Index-by-index mapping: <code>1000→M</code>, <code>900→CM</code>, <code>500→D</code>, etc.",
+      analogy: "Jaise <strong>spice rack</strong> ke labels — har bottle (value) pe naam ki sticker (symbol) chipki hui. Same order mein dono arrays."
+    })
+  });
+
+  // --------- L3: result = '' ----------
+  pushStep({
+    line:3, action:"init",
+    logHTML: richLog({
+      line:3, action:"init",
+      code: "result = ''",
+      status:"success",
+      outputs:[{k:"result", v: '""', changed:true}],
+      why: "Output buffer <code>result</code> ko <strong>empty string</strong> set kar diya. Yahan hum Roman symbols append karte jaayenge as we consume the integer.",
+      analogy: "Jaise <strong>khaali receipt paper</strong> nikaal liya — abhi kuch print nahi hua, jaise jaise items scan honge waise waise likhte jaayenge."
+    })
+  });
+
+  // --------- L4: for i in range(len(values)) — ENTRY ----------
+  // ============================ MAIN LOOP ============================
+  for (i = 0; i < nLen; i++) {
+    if (st.length >= MAX_STEPS) break;
+    iterFor++;
+    activeDenomIdx = i;
+    lastCheckedIdx = i;
+
+    // L4 — for-check entry for this iteration
+    pushStep({
+      line:4, action:"for-check",
+      logHTML: richLog({
+        line:4, action:"for-check",
+        code: "for i in range(13):   # i=" + i + "  →  values[" + i + "]=" + values[i] + ", symbols[" + i + "]=" + escQ(symbols[i]),
+        status:"loop",
+        inputs:[{k:"i", v: i}, {k:"len(values)", v: nLen}, {k:"num", v: num}],
+        outputs:[{k:"values[i]", v: values[i]}, {k:"symbols[i]", v: escQ(symbols[i])}],
+        verdict: "i (" + i + ") < " + nLen + " — iteration " + iterFor,
+        verdictTrue: true,
+        why: "For-loop ka <strong>iteration " + iterFor + "</strong> shuru. Ab hum denomination <code>" + values[i] + "</code> (symbol <strong>" + symbols[i] + "</strong>) ko try karenge. Andar while loop dekhega ki yeh denomination kitni baar fit hoti hai <code>num=" + num + "</code> mein.",
+        analogy: "Cashier ne <strong>" + values[i] + " ka note</strong> uthaya — ab dekhega <em>'" + num + " rupay mein kitne " + values[i] + " ke note fit honge?'</em>"
+      })
+    });
+
+    // ============================ INNER WHILE ============================
+    var innerIter = 0;
+    while (true) {
+      if (st.length >= MAX_STEPS) break;
+      var fits = (num >= values[i]);
+
+      // L5 — while-check
+      pushStep({
+        line:5, action:"while-check",
+        logHTML: richLog({
+          line:5, action:"while-check",
+          code: "while num >= values[i]:   # " + num + " >= " + values[i] + " ?",
+          status: fits ? "loop" : "info",
+          inputs:[{k:"num", v: num}, {k:"values[i]", v: values[i]}, {k:"i", v: i}],
+          verdict: num + " >= " + values[i],
+          verdictTrue: fits,
+          why: fits
+            ? "Condition <strong>True</strong> — <code>num=" + num + "</code> abhi bhi <code>" + values[i] + "</code> se bada ya barabar hai. Matlab is denomination ka <strong>ek aur copy fit ho sakti hai</strong>. Body andar jao!"
+            : "Condition <strong>False</strong> — <code>num=" + num + "</code> ab <code>" + values[i] + "</code> se chhota hai. Is denomination ka kaam khatam, <strong>while loop exit</strong>. Aage agla denomination try karenge.",
+          analogy: fits
+            ? "<strong>" + num + " rupay</strong> mein abhi bhi ek <strong>" + values[i] + " ka note</strong> fit hoga — nikalo!"
+            : "<strong>" + num + " rupay</strong> bach gaye — yeh <strong>" + values[i] + " ke note</strong> se kam hain. Ab chhote note try karenge."
+        })
+      });
+
+      if (!fits) break;
+
+      innerIter++;
+      // L6 — result = result + symbols[i]
+      var oldResult = result;
+      result = result + symbols[i];
+      resultChanged = true;
+      newSymbolJustAppended = symbols[i];
+      pushStep({
+        line:6, action:"found",
+        logHTML: richLog({
+          line:6, action:"found",
+          code: "result = result + symbols[i]   # " + escQ(oldResult) + " + " + escQ(symbols[i]) + " = " + escQ(result),
+          status:"success",
+          inputs:[{k:"result (old)", v: escQ(oldResult)}, {k:"symbols[i]", v: escQ(symbols[i])}],
+          outputs:[{k:"result (new)", v: escQ(result), changed:true}],
+          why: "Symbol <strong>" + symbols[i] + "</strong> ko result ke end mein <strong>append</strong> kar diya. Yeh <code>" + values[i] + "</code> value contribute karega final number mein.",
+          analogy: "Jaise receipt pe <strong>'" + symbols[i] + "'</strong> print ho gaya — ek aur item add ho gaya bill mein. <code>" + escQ(oldResult) + " → " + escQ(result) + "</code>."
+        })
+      });
+      resultChanged = false;
+      newSymbolJustAppended = "";
+
+      // L7 — num = num - values[i]
+      var oldNum = num;
+      num = num - values[i];
+      numChanged = true;
+      denomUses[i]++;
+      history.push({
+        i: i, value: values[i], symbol: symbols[i],
+        numBefore: oldNum, numAfter: num, resultAfter: result
+      });
+      pushStep({
+        line:7, action:"remove",
+        logHTML: richLog({
+          line:7, action:"remove",
+          code: "num = num - values[i]   # " + oldNum + " - " + values[i] + " = " + num,
+          status:"success",
+          inputs:[{k:"num (old)", v: oldNum}, {k:"values[i]", v: values[i]}],
+          outputs:[{k:"num (new)", v: num, changed:true}, {k:"denom uses", v: denomUses[i]}],
+          why: "<code>num</code> mein se <strong>" + values[i] + "</strong> minus kar diya. Ab <code>num=" + num + "</code> bacha hai. " + (num === 0 ? "<strong>num zero ho gaya — kaam khatam!</strong>" : "Hum yeh denomination phir try karenge while loop mein — yaa next denomination pe move karenge agar yeh ab fit nahi hoti.") + "",
+          analogy: "<strong>" + values[i] + " ka note nikal liya</strong> drawer se — bachi hui amount <code>" + num + "</code>. " + (num === 0 ? "Customer satisfied — <strong>kaam over!</strong>" : "Aur dene hain " + num + " rupay.") + ""
+        })
+      });
+      numChanged = false;
+
+      if (innerIter > 4000) break;
+    }
+
+    // Continue to next i — for-loop iterate
+    if (st.length >= MAX_STEPS) break;
+  }
+
+  // --------- L4: for-loop EXIT ----------
+  activeDenomIdx = -1;
+  pushStep({
+    line:4, action:"exit",
+    logHTML: richLog({
+      line:4, action:"exit",
+      code: "# for loop exit: i reached " + nLen + " (all denominations tried)",
+      status:"info",
+      inputs:[{k:"i (final)", v: nLen}, {k:"num", v: num}, {k:"result", v: escQ(result)}],
+      verdict: "i (" + nLen + ") < " + nLen,
+      verdictTrue: false,
+      why: "<strong>For loop khatam</strong> — saari 13 denominations try ho gayi. Ab <code>num=" + num + "</code> hai (zero hona chahiye for valid input) aur <code>result=" + escQ(result) + "</code> ready hai return ke liye.",
+      analogy: "Cashier ne <strong>saare denominations check kar liye</strong> — ab amount fully count ho gaya. Receipt taiyaar — bas customer ko dena baki hai!"
+    })
+  });
+
+  // --------- L8: return result ----------
+  doneFinal = true;
+  pushStep({
+    line:8, action:"return",
+    logHTML: richLog({
+      line:8, action:"return",
+      code: "return result   # = " + escQ(result),
+      status:"success",
+      inputs:[{k:"result", v: escQ(result)}],
+      outputs:[{k:"return value", v: escQ(result), changed:true}],
+      why: "Final answer ready! <code>" + initialNum + "</code> ka Roman numeral hai <strong>" + result + "</strong>. Total " + history.length + " symbol(s) append kiye gaye, breakdown: " + history.map(function(h){ return h.symbol + "(" + h.value + ")"; }).join(" + ") + " = " + initialNum + ".",
+      analogy: "<strong>🏆 Kaam khatam!</strong> Cashier ne customer ko bola: <em>'Aapke " + initialNum + " rupay ka Roman receipt: " + result + "'</em>. Bill print, ghar jao!"
+    })
+  });
+
+  curResult = result;
+  return st;
+}
+
+// ===================== RENDER VIZ =====================
+function renderViz(s) {
+  var v = document.getElementById('vizPanel');
+  var h = '';
+
+  // --- Vars strip ---
+  h += '<div class="vars-strip">';
+  h += '<span class="var-chip vc-active"><span class="var-chip-key">num</span>=<span class="var-chip-val">' + s.num + '</span></span>';
+  h += '<span class="var-chip vc-warn"><span class="var-chip-key">result</span>=<span class="var-chip-val">' + (s.result.length ? '"' + s.result + '"' : '""') + '</span></span>';
+  h += '<span class="var-chip"><span class="var-chip-key">i</span>=<span class="var-chip-val">' + (s.activeDenomIdx >= 0 ? s.activeDenomIdx : (s.doneFinal ? s.nLen : '—')) + '</span></span>';
+  h += '<span class="var-chip vc-safe"><span class="var-chip-key">consumed</span>=<span class="var-chip-val">' + (s.initialNum - s.num) + '</span></span>';
+  h += '<span class="var-chip"><span class="var-chip-key">initial</span>=<span class="var-chip-val">' + s.initialNum + '</span></span>';
+  h += '</div>';
+
+  // --- Top row: num display + roman result display ---
+  h += '<div class="viz-row">';
+  h += '<div class="viz-card" style="flex:1;min-width:200px">';
+  h += '<div class="viz-title">🔢 Remaining Number</div>';
+  h += '<div class="num-display">';
+  h += '<span class="num-label">num</span>';
+  h += '<span class="num-value' + (s.numChanged ? ' changed' : '') + '">' + s.num + '</span>';
+  h += '<span class="num-sub">' + (s.num > 0 ? '⌛ still need to consume' : '✅ fully consumed!') + '</span>';
+  h += '</div></div>';
+
+  h += '<div class="viz-card" style="flex:2;min-width:280px">';
+  h += '<div class="viz-title">🏛️ Roman Result Built So Far</div>';
+  h += '<div class="roman-display">';
+  h += '<span class="roman-label">result</span>';
+  if (s.result.length === 0) {
+    h += '<span class="roman-value"><span class="roman-empty">(empty — nothing built yet)</span></span>';
+  } else {
+    var prefixLen = s.result.length - (s.newSymbolJustAppended ? s.newSymbolJustAppended.length : 0);
+    if (prefixLen < 0) prefixLen = s.result.length;
+    var prefix = s.result.substring(0, prefixLen);
+    var suffix = s.result.substring(prefixLen);
+    h += '<span class="roman-value">' + prefix + (suffix ? '<span class="new-sym">' + suffix + '</span>' : '') + '</span>';
+  }
+  h += '<span class="roman-sub">' + (s.result.length ? s.result.length + ' character(s)' : 'awaiting first symbol') + '</span>';
+  h += '</div></div>';
+  h += '</div>';
+
+  // --- Denomination ladder ---
+  h += '<div class="viz-card" style="margin-bottom:14px">';
+  h += '<div class="viz-title">🪙 Denomination Ladder (descending) — i marker shows current pointer</div>';
+  h += '<div class="denom-grid">';
+  for (var d = 0; d < s.values.length; d++) {
+    var cls = '';
+    if (s.doneFinal) {
+      cls = s.denomUses[d] > 0 ? ' consumed' : ' passed';
+    } else if (s.activeDenomIdx === d) {
+      cls = ' active';
+    } else if (s.activeDenomIdx > d || (s.lastCheckedIdx > d)) {
+      cls = s.denomUses[d] > 0 ? ' consumed' : ' passed';
+    }
+    h += '<div class="denom-card' + cls + '">';
+    h += '<span class="denom-idx">i=' + d + '</span>';
+    h += '<span class="denom-val">' + s.values[d] + '</span>';
+    h += '<span class="denom-sym">' + s.symbols[d] + '</span>';
+    h += '<span class="denom-uses">' + (s.denomUses[d] === 0 ? '·' : '×' + s.denomUses[d]) + '</span>';
+    h += '</div>';
+  }
+  h += '</div></div>';
+
+  // --- History table ---
+  h += '<div class="viz-card" style="margin-bottom:14px">';
+  h += '<div class="viz-title">📜 Symbol Append History — kya kya likha aur kab</div>';
+  if (s.history.length === 0) {
+    h += '<div class="hist-empty">No symbols appended yet — waiting for first match</div>';
+  } else {
+    h += '<table class="hist-table">';
+    h += '<thead><tr><th>#</th><th>i</th><th>value</th><th>symbol</th><th>num before</th><th>num after</th><th>result after</th></tr></thead><tbody>';
+    s.history.forEach(function(row, idx) {
+      var isCurr = (idx === s.history.length - 1) && (s.line === 6 || s.line === 7) && !s.doneFinal;
+      h += '<tr' + (isCurr ? ' class="curr"' : '') + '>';
+      h += '<td>' + (idx+1) + '</td>';
+      h += '<td>' + row.i + '</td>';
+      h += '<td>' + row.value + '</td>';
+      h += '<td><span class="hist-sym">' + row.symbol + '</span></td>';
+      h += '<td>' + row.numBefore + '</td>';
+      h += '<td>' + row.numAfter + '</td>';
+      h += '<td>"' + row.resultAfter + '"</td>';
+      h += '</tr>';
+    });
+    h += '</tbody></table>';
+  }
+  h += '</div>';
+
+  // --- Result banner ---
+  if (s.doneFinal) {
+    h += '<div class="result-banner">';
+    h += '<span class="result-banner-icon">🏆</span>';
+    h += '<span class="result-banner-text"><strong>' + s.initialNum + '</strong> in Roman: ' + s.history.map(function(hr){return hr.symbol;}).join('+') + ' = </span>';
+    h += '<span class="result-banner-roman">' + s.result + '</span>';
+    h += '</div>';
+  }
+
+  v.innerHTML = h;
+}
+
+// ===================== STEP CONTROLLER =====================
+function renderStep(idx) {
+  if (!steps.length) return;
+  var s = steps[idx];
+  currentStep = idx;
+  document.getElementById('stepInfo').textContent = (idx+1) + '/' + steps.length;
+  var bd = document.getElementById('actionBadge');
+  bd.textContent = BADGE_LABEL[s.action] || s.action;
+  bd.className = 'action-badge action-badge--' + s.action;
+  document.querySelectorAll('.code-line').forEach(function(el){ el.classList.remove('active'); });
+  var al = document.querySelector('.code-line[data-line="' + s.line + '"]');
+  if (al) { al.classList.add('active'); al.scrollIntoView({block:'nearest'}); }
+  renderViz(s);
+  showLogPreview(s);
+}
+
+function showLogPreview(s) {
+  if (!logEnabled) return;
+  document.getElementById('logPopupBody').innerHTML = s.logHTML || '';
+  document.getElementById('logPopup').classList.remove('log-popup--hidden');
+}
+function hideLogPopup() {
+  document.getElementById('logPopup').classList.add('log-popup--hidden');
+}
+
+function stepBy(d) {
+  var ni = Math.max(0, Math.min(steps.length-1, currentStep + d));
+  if (ni !== currentStep) renderStep(ni);
+}
+function resetStep() { renderStep(0); }
+
+// ===================== INPUT/RESET =====================
+function parseInputs() {
+  var raw = document.getElementById('inputNum').value;
+  var n = parseInt(raw, 10);
+  if (isNaN(n) || n < 1) n = 1;
+  if (n > 3999) n = 3999;
+  return n;
+}
+
+function resetWithInput() {
+  curResult = null;
+  var n = parseInputs();
+  renderCode();
+  fitCodeWidth();
+  steps = buildSteps(n);
+  currentStep = 0;
+  renderStep(0);
+  document.getElementById('liveOutput').textContent = curResult !== null ? '"' + curResult + '"' : '—';
+}
+
+function loadTest(n, expected) {
+  document.getElementById('inputNum').value = n;
+  document.getElementById('expectedBadge').textContent = 'exp: "' + expected + '"';
+  resetWithInput();
+}
+
+// ===================== UI HELPERS =====================
+function toggleProblem() {
+  var body = document.getElementById('probBody');
+  var btn = document.getElementById('probToggleBtn');
+  if (body.classList.contains('prob-body--hidden')) {
+    body.classList.remove('prob-body--hidden');
+    btn.textContent = '▲ Hide';
+  } else {
+    body.classList.add('prob-body--hidden');
+    btn.textContent = '▼ Show';
+  }
+}
+
+function toggleLogPreview() {
+  logEnabled = !logEnabled;
+  var btn = document.getElementById('logToggleBtn');
+  btn.textContent = logEnabled ? '📋 ON' : '📋 OFF';
+  btn.classList.toggle('log-toggle-btn--off', !logEnabled);
+  if (!logEnabled) hideLogPopup();
+  else if (steps.length) showLogPreview(steps[currentStep]);
+}
+
+function logZoom(dir) {
+  logZoomLevel = Math.max(60, Math.min(180, logZoomLevel + dir * 20));
+  updateLogZoom();
+}
+function logZoomReset() { logZoomLevel = 100; updateLogZoom(); }
+function updateLogZoom() {
+  document.getElementById('logZoomLabel').textContent = logZoomLevel + '%';
+  document.getElementById('logPopup').style.setProperty('--log-scale', logZoomLevel/100);
+}
+
+function toggleFullscreen() {
+  var viz = document.querySelector('.col-viz');
+  if (!document.fullscreenElement) viz.requestFullscreen().catch(function(){});
+  else document.exitFullscreen();
+}
+
+function fitCodeWidth() {
+  var col1 = document.getElementById('col1');
+  var panel = document.getElementById('codePanel');
+  if (!panel) return;
+  var lines = panel.querySelectorAll('.code-line');
+  var maxW = 0;
+  lines.forEach(function(ln) {
+    var c = ln.querySelector('.code-content');
+    if (c) maxW = Math.max(maxW, c.scrollWidth);
+  });
+  var target = Math.min(Math.max(180, maxW + 60), window.innerWidth * 0.45);
+  col1.style.width = target + 'px';
+  syncFooterWidth();
+}
+
+function syncFooterWidth() {
+  document.getElementById('footerLeft').style.width =
+    document.getElementById('col1').offsetWidth + 'px';
+}
+
+// ===================== RESIZE HANDLE =====================
+(function() {
+  var col1 = document.getElementById('col1');
+  document.getElementById('resizeH1').addEventListener('mousedown', function(e) {
+    e.preventDefault();
+    codeWidthUserSet = true;
+    var startX = e.clientX, startW = col1.offsetWidth, h = this;
+    document.body.classList.add('no-select');
+    h.classList.add('active');
+    function mv(e) {
+      col1.style.width = Math.max(140, Math.min(window.innerWidth*0.45, startW + (e.clientX - startX))) + 'px';
+      syncFooterWidth();
+    }
+    function up() {
+      document.removeEventListener('mousemove', mv);
+      document.removeEventListener('mouseup', up);
+      document.body.classList.remove('no-select');
+      h.classList.remove('active');
+    }
+    document.addEventListener('mousemove', mv);
+    document.addEventListener('mouseup', up);
+  });
+})();
+
+window.addEventListener('resize', function() {
+  if (!codeWidthUserSet) fitCodeWidth();
+  else syncFooterWidth();
+});
+
+// ===================== KEYBOARD =====================
+document.addEventListener('keydown', function(e) {
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
+  if (e.key === 'ArrowRight') { e.preventDefault(); stepBy(1); }
+  else if (e.key === 'ArrowLeft') { e.preventDefault(); stepBy(-1); }
+  else if (e.key === 'r' || e.key === 'R') { e.preventDefault(); resetStep(); }
+});
+
+// ===================== BOOT =====================
+resetWithInput();
+</script>
+</body>
+</html>

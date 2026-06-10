@@ -1,0 +1,1011 @@
+﻿
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LC 96 — Unique Binary Search Trees | DSA Dry-Run Visualizer</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+:root {
+  --bg-primary:#FAFAF8; --bg-secondary:#F1EFE8; --bg-tertiary:#E2E0D8; --bg-card:#FFFFFF;
+  --text-primary:#2C2C2A; --text-secondary:#5F5E5A; --text-tertiary:#888780;
+  --border-color:rgba(0,0,0,0.11); --border-light:rgba(0,0,0,0.06); --border-focus:#534AB7;
+  --accent-indigo:#534AB7; --accent-indigo-bg:#EEEDFE; --accent-indigo-text:#3C3489; --accent-indigo-hover:#4740A0;
+  --accent-teal:#0F6E56; --accent-teal-bg:#E1F5EE; --accent-teal-text:#085041;
+  --accent-red:#E24B4A; --accent-red-bg:#FCEBEB; --accent-red-text:#791F1F;
+  --accent-amber:#B45309; --accent-amber-bg:#FEF3C7; --accent-amber-text:#78350F;
+  --accent-green:#15803D; --accent-green-bg:#DCFCE7; --accent-green-text:#14532D;
+  --syn-keyword:#534AB7; --syn-function:#185FA5; --syn-number:#993C1D; --syn-string:#0F6E56;
+  --active-line-bg:#EEEDFE;
+  --radius-sm:4px; --radius-md:6px; --radius-lg:10px; --radius-xl:14px;
+  --font-sans:'DM Sans', system-ui, sans-serif;
+  --font-mono:'JetBrains Mono', 'Fira Code', monospace;
+  --fs-xs:11px; --fs-sm:12px; --fs-base:14px; --fs-md:15px; --fs-lg:18px;
+  --lh-normal:1.6; --lh-code:1.9;
+  --ease:.18s ease;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans);background:var(--bg-primary);color:var(--text-primary);font-size:var(--fs-base);line-height:var(--lh-normal);overflow:hidden}
+.no-select{user-select:none}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border-color);border-radius:99px}
+
+.app-shell{display:flex;flex-direction:column;height:100vh;overflow:hidden;background:var(--bg-primary)}
+
+/* Problem card */
+.problem-card{flex-shrink:0;border-bottom:1px solid var(--border-color);background:var(--bg-card)}
+.pc-header{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--border-light);flex-wrap:wrap}
+.gt-learn{background:var(--accent-indigo);color:#fff;font-weight:700;font-size:11px;padding:4px 10px;border-radius:99px;border:none;cursor:pointer;letter-spacing:.04em}
+.pc-num{font:700 12px var(--font-mono);color:var(--text-tertiary)}
+.pc-title{font-size:16px;font-weight:700}
+.pc-diff{font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;background:var(--accent-amber-bg);color:var(--accent-amber-text);border:1px solid var(--accent-amber);text-transform:uppercase}
+.pc-tag{font-size:10px;font-weight:600;padding:2px 7px;border-radius:99px;background:var(--accent-indigo-bg);color:var(--accent-indigo-text);border:1px solid var(--accent-indigo)}
+.pc-header-right{margin-left:auto;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.pc-input-label{font:600 11px var(--font-mono);color:var(--text-secondary)}
+.pc-input{font:600 12px var(--font-mono);padding:3px 8px;border-radius:5px;border:1px solid var(--border-color);background:var(--bg-secondary);width:50px;text-align:center}
+.pc-expected{font:600 11px var(--font-mono);padding:3px 9px;border-radius:5px;background:var(--accent-green-bg);color:var(--accent-green-text);border:1px solid var(--accent-green)}
+.btn-toggle{font-family:system-ui,"Segoe UI Emoji",sans-serif;background:var(--bg-secondary);border:1px solid var(--border-color);color:var(--text-primary);padding:3px 9px;border-radius:5px;font-size:11px;cursor:pointer;font-weight:600}
+
+.pc-body{display:flex;gap:14px;padding:12px 14px}
+.pc-body--hidden{display:none}
+.pc-body-left{flex:1.4;display:flex;flex-direction:column;gap:8px}
+.pc-body-right{flex:1;display:flex;flex-direction:column;gap:6px}
+.pc-section{font-size:12.5px;line-height:1.55}
+.pc-section h4{font-size:11px;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;font-weight:700}
+.pc-section code{font:600 11.5px var(--font-mono);background:var(--accent-indigo-bg);color:var(--accent-indigo-text);padding:1px 5px;border-radius:3px}
+.pc-section em{font-style:normal;background:var(--accent-amber-bg);color:var(--accent-amber-text);padding:1px 5px;border-radius:3px;font-weight:600}
+.concept-block{background:var(--bg-secondary);border-left:3px solid var(--accent-indigo);padding:6px 9px;border-radius:4px;font-size:11.5px;margin-top:4px}
+.concept-block strong{color:var(--accent-indigo-text)}
+.cplx-row{display:flex;gap:6px;margin-top:5px;flex-wrap:wrap}
+.cplx-chip{font:600 10.5px var(--font-mono);padding:2px 8px;border-radius:99px;background:var(--accent-teal-bg);color:var(--accent-teal-text);border:1px solid var(--accent-teal)}
+
+.tc-chip{display:flex;flex-direction:column;gap:3px;background:var(--bg-secondary);border:1px solid var(--border-color);border-radius:6px;padding:6px 9px;cursor:pointer;transition:all var(--ease)}
+.tc-chip:hover{border-color:var(--accent-indigo);background:var(--accent-indigo-bg)}
+.tc-chip-top{display:flex;align-items:center;gap:6px;font-size:11px}
+.pt-tag{font:700 9px var(--font-mono);padding:1px 6px;border-radius:99px;background:var(--accent-indigo);color:#fff;text-transform:uppercase}
+.tc-label{flex:1;font-weight:600;color:var(--text-secondary)}
+.tc-expected{font:700 10.5px var(--font-mono);color:var(--accent-green-text)}
+.tc-vals{display:flex;gap:4px;flex-wrap:wrap}
+.tc-vals code{font:600 11px var(--font-mono);background:#fff;padding:2px 7px;border-radius:4px;border:1px solid var(--border-light);color:var(--text-primary)}
+.run-row{display:flex;align-items:center;gap:8px;margin-top:4px}
+.btn-run{font-family:system-ui,"Segoe UI Emoji",sans-serif;background:var(--accent-indigo);color:#fff;border:none;padding:6px 14px;border-radius:5px;font-weight:700;cursor:pointer;font-size:12px}
+.btn-run:hover{background:var(--accent-indigo-hover)}
+.live-out{font:700 12px var(--font-mono);color:var(--accent-teal-text);background:var(--accent-teal-bg);padding:4px 10px;border-radius:5px;border:1px solid var(--accent-teal)}
+
+/* Main */
+.main-row{flex:1;display:flex;overflow:hidden;min-height:0}
+.col{display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.col-code{width:33%;min-width:140px;max-width:45vw;background:var(--bg-card);border-right:1px solid var(--border-color)}
+.col-viz{flex:1;min-width:0;background:var(--bg-primary);position:relative}
+.section-label{font-family:system-ui,"Segoe UI Emoji",sans-serif;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-tertiary);padding:7px 12px;border-bottom:1px solid var(--border-light);background:var(--bg-secondary);flex-shrink:0}
+.code-panel{flex:1;overflow-y:auto;font-family:var(--font-mono);font-size:12px;line-height:var(--lh-code);padding:8px 0}
+.code-line{display:flex;padding:0 12px;white-space:pre;color:var(--text-primary)}
+.code-line.active{background:var(--active-line-bg);border-left:3px solid var(--accent-indigo);padding-left:9px}
+.code-ln{display:inline-block;width:24px;color:var(--text-tertiary);user-select:none;text-align:right;margin-right:10px;font-size:10.5px}
+.kw{color:var(--syn-keyword);font-weight:600}
+.fn{color:var(--syn-function);font-weight:600}
+.num{color:var(--syn-number);font-weight:600}
+.str{color:var(--syn-string)}
+
+.viz-panel{flex:1;overflow:auto;padding:10px 12px}
+
+.resize-h{width:5px;background:transparent;cursor:ew-resize;flex-shrink:0;transition:background var(--ease)}
+.resize-h:hover,.resize-h.active{background:var(--accent-indigo)}
+
+/* Vars strip */
+.vars-strip{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.var-chip{font:600 11px var(--font-mono);padding:3px 9px;border-radius:5px;background:var(--bg-card);border:1px solid var(--border-color);color:var(--text-primary)}
+.var-chip strong{color:var(--text-tertiary);font-weight:500;margin-right:3px}
+.vc-active{background:var(--accent-indigo-bg);border-color:var(--accent-indigo);color:var(--accent-indigo-text)}
+.vc-safe{background:var(--accent-green-bg);border-color:var(--accent-green);color:var(--accent-green-text)}
+.vc-warn{background:var(--accent-amber-bg);border-color:var(--accent-amber);color:var(--accent-amber-text)}
+
+/* viz-row */
+.viz-row{display:flex;gap:12px;align-items:flex-start;flex-wrap:wrap}
+.viz-card{background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius-md);padding:10px;min-width:180px}
+.viz-card h5{font-size:11px;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:.06em;margin-bottom:7px;font-weight:700;display:flex;align-items:center;gap:5px}
+
+/* DP cells */
+.dp-strip{display:flex;gap:5px;flex-wrap:wrap}
+.dp-cell{display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:46px;padding:5px 6px;border-radius:5px;background:var(--bg-secondary);border:2px solid var(--border-color);transition:all var(--ease)}
+.dp-cell-idx{font:600 9px var(--font-mono);color:var(--text-tertiary)}
+.dp-cell-val{font:700 14px var(--font-mono);color:var(--text-primary)}
+.dp-cell--init{background:var(--accent-teal-bg);border-color:var(--accent-teal)}
+.dp-cell--init .dp-cell-val{color:var(--accent-teal-text)}
+.dp-cell--computed{background:var(--accent-green-bg);border-color:var(--accent-green)}
+.dp-cell--computed .dp-cell-val{color:var(--accent-green-text)}
+.dp-cell--target{background:var(--accent-indigo-bg);border-color:var(--accent-indigo);animation:pulse-node 1.4s infinite}
+.dp-cell--target .dp-cell-val{color:var(--accent-indigo-text)}
+.dp-cell--reading-l{background:#FFF2D5;border-color:#D97706;animation:pulse-amber 1.2s infinite}
+.dp-cell--reading-l .dp-cell-val{color:var(--accent-amber-text)}
+.dp-cell--reading-r{background:#FEF3C7;border-color:#D97706;animation:pulse-amber 1.2s infinite}
+.dp-cell--reading-r .dp-cell-val{color:var(--accent-amber-text)}
+.dp-cell--unset{opacity:.45}
+
+/* Formula board */
+.formula-board{background:#0d1117;color:#e6edf3;padding:10px 12px;border-radius:var(--radius-md);font:600 13px var(--font-mono);border:1px solid #30363d;line-height:1.7}
+.formula-board .fb-line{display:block}
+.formula-board .fb-tok-i{color:#79c0ff;font-weight:700}
+.formula-board .fb-tok-j{color:#ffa657;font-weight:700}
+.formula-board .fb-tok-l{color:#7ee787;font-weight:700}
+.formula-board .fb-tok-r{color:#d2a8ff;font-weight:700}
+.formula-board .fb-tok-acc{color:#ff7b72;font-weight:700}
+.formula-board .fb-comment{color:#8b949e;font-style:italic;font-size:11px}
+
+/* Root choices (j values) */
+.root-row{display:flex;gap:4px;flex-wrap:wrap;margin-top:6px}
+.root-tile{min-width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:5px;background:var(--bg-secondary);border:1px solid var(--border-color);font:700 12px var(--font-mono);color:var(--text-tertiary);position:relative}
+.root-tile--done{background:var(--accent-green-bg);border-color:var(--accent-green);color:var(--accent-green-text)}
+.root-tile--curr{background:var(--accent-indigo-bg);border-color:var(--accent-indigo);color:var(--accent-indigo-text);animation:pulse-node 1.4s infinite}
+.root-tile-contrib{position:absolute;bottom:-13px;left:50%;transform:translateX(-50%);font:600 8.5px var(--font-mono);color:var(--text-tertiary);white-space:nowrap}
+
+/* Catalan formula reference */
+.catalan-ref{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.catalan-chip{font:600 10.5px var(--font-mono);padding:3px 7px;border-radius:4px;background:var(--bg-secondary);border:1px solid var(--border-color);color:var(--text-secondary)}
+.catalan-chip strong{color:var(--accent-indigo-text)}
+
+/* Result banner */
+.result-banner{margin-top:10px;padding:10px 14px;background:linear-gradient(90deg,var(--accent-amber-bg),#FEF9C3);border:2px solid var(--accent-amber);border-radius:var(--radius-md);font-weight:700;color:var(--accent-amber-text);text-align:center;animation:win-pulse 1.6s infinite}
+
+@keyframes pulse-node{0%,100%{box-shadow:0 0 4px var(--accent-indigo)}50%{box-shadow:0 0 12px var(--accent-indigo)}}
+@keyframes pulse-amber{0%,100%{box-shadow:0 0 3px rgba(180,83,9,.4)}50%{box-shadow:0 0 9px rgba(180,83,9,.8)}}
+@keyframes win-pulse{0%,100%{box-shadow:0 0 3px rgba(234,179,8,.5)}50%{box-shadow:0 0 8px rgba(234,179,8,.9)}}
+
+/* Footer */
+.footer-bar{display:flex;flex-shrink:0;border-top:1px solid var(--border-color);background:var(--bg-card)}
+.footer-left{width:33%;min-width:140px;max-width:45vw;display:flex;align-items:center;gap:8px;padding:7px 12px;border-right:1px solid var(--border-light)}
+.footer-right{flex:1;display:flex;align-items:center;gap:8px;padding:7px 14px;flex-wrap:wrap}
+.step-info{font:700 12px var(--font-mono);color:var(--text-primary);background:var(--bg-secondary);padding:3px 10px;border-radius:5px;border:1px solid var(--border-color)}
+.action-badge{font-family:system-ui,"Segoe UI Emoji",sans-serif;font-size:10px;font-weight:700;padding:3px 8px;border-radius:99px;color:#fff;background:#888}
+.action-badge--func-def,.action-badge--init,.action-badge--call,.action-badge--return{background:#8250ff}
+.action-badge--for-check,.action-badge--while-check,.action-badge--if-check{background:#388bfd}
+.action-badge--mark,.action-badge--push,.action-badge--pop,.action-badge--restore,.action-badge--found{background:#3fb950}
+.action-badge--remove,.action-badge--prune,.action-badge--fail{background:#f85149}
+.action-badge--exit,.action-badge--skip{background:#555450}
+
+kbd{font-family:system-ui,"Segoe UI Emoji",sans-serif;font-size:10px;background:var(--bg-secondary);border:1px solid var(--border-color);border-radius:3px;padding:1px 5px;color:var(--text-secondary)}
+.btn{font-family:system-ui,"Segoe UI Emoji",sans-serif;background:var(--bg-secondary);border:1px solid var(--border-color);color:var(--text-primary);padding:4px 10px;border-radius:5px;font-size:12px;cursor:pointer;font-weight:600}
+.btn:hover{background:var(--bg-tertiary)}
+.btn-primary{background:var(--accent-indigo);color:#fff;border-color:var(--accent-indigo)}
+.btn-primary:hover{background:var(--accent-indigo-hover)}
+.btn-fullscreen{font-size:14px}
+.footer-sep{width:1px;height:20px;background:var(--border-color);margin:0 3px}
+.log-toggle-btn{font-family:system-ui,"Segoe UI Emoji",sans-serif;background:var(--accent-green-bg);color:var(--accent-green-text);border:1px solid var(--accent-green);padding:4px 10px;border-radius:5px;font-size:11px;cursor:pointer;font-weight:700}
+.log-toggle-btn--off{background:var(--bg-secondary);color:var(--text-tertiary);border-color:var(--border-color)}
+.btn-zoom{font-family:system-ui,"Segoe UI Emoji",sans-serif;background:var(--bg-secondary);border:1px solid var(--border-color);color:var(--text-primary);padding:3px 8px;border-radius:4px;font-size:13px;cursor:pointer;font-weight:700;min-width:24px}
+.log-zoom-label{font:600 10.5px var(--font-mono);color:var(--text-secondary);min-width:34px;text-align:center}
+
+/* Log popup */
+.log-popup{--log-scale:1;position:fixed;bottom:52px;right:14px;width:calc(480px * var(--log-scale));max-width:92vw;max-height:75vh;border-radius:var(--radius-lg);box-shadow:0 10px 32px rgba(0,0,0,.14);border:1px solid var(--border-color);background:var(--bg-card);overflow:hidden;display:flex;flex-direction:column;z-index:100;transition:opacity .15s, transform .15s;transform-origin:bottom right}
+.log-popup--hidden{opacity:0;transform:scale(.92);pointer-events:none}
+.log-popup-body{flex:1;overflow:auto;padding:0}
+.log-popup-body > .log-card{border-radius:0;border:none;border-left:0}
+
+.log-card{border-radius:var(--radius-md);overflow:hidden;border:1px solid var(--border-color);border-left-width:4px;font-size:var(--fs-xs);background:var(--bg-card)}
+.log-card--func-def,.log-card--init,.log-card--call,.log-card--return{border-left-color:#8250ff}
+.log-card--for-check,.log-card--while-check,.log-card--if-check{border-left-color:#388bfd}
+.log-card--mark,.log-card--push,.log-card--pop,.log-card--restore,.log-card--found{border-left-color:#3fb950}
+.log-card--remove,.log-card--prune,.log-card--fail{border-left-color:#f85149}
+.log-card--exit,.log-card--skip{border-left-color:#555450}
+
+.log-card-header{display:flex;align-items:center;gap:6px;padding:8px 10px 6px;background:var(--bg-secondary);border-bottom:1px solid var(--border-light)}
+.log-badge{font-family:system-ui,"Segoe UI Emoji",sans-serif;font-size:10px;font-weight:700;padding:2px 7px;border-radius:99px;color:#fff;background:#888}
+.log-badge--func-def,.log-badge--init,.log-badge--call,.log-badge--return{background:#8250ff}
+.log-badge--for-check,.log-badge--while-check,.log-badge--if-check{background:#388bfd}
+.log-badge--mark,.log-badge--push,.log-badge--pop,.log-badge--restore,.log-badge--found{background:#3fb950}
+.log-badge--remove,.log-badge--prune,.log-badge--fail{background:#f85149}
+.log-badge--exit,.log-badge--skip{background:#555450}
+.log-line-ref{font:700 10px var(--font-mono);color:var(--accent-indigo);background:var(--accent-indigo-bg);padding:1px 6px;border-radius:4px;border:1px solid var(--accent-indigo)}
+.log-status-pill{font-family:system-ui,"Segoe UI Emoji",sans-serif;font-size:9px;font-weight:700;padding:2px 7px;border-radius:99px;text-transform:uppercase;margin-left:auto}
+.log-status--success{background:var(--accent-green-bg);color:var(--accent-green-text);border:1px solid var(--accent-green)}
+.log-status--fail{background:var(--accent-red-bg);color:var(--accent-red-text);border:1px solid var(--accent-red)}
+.log-status--skip{background:var(--bg-tertiary);color:var(--text-tertiary);border:1px solid var(--border-color)}
+.log-status--loop{background:rgba(56,139,253,.14);color:#185FA5;border:1px solid #388bfd}
+.log-status--prune{background:var(--accent-red-bg);color:var(--accent-red-text);border:1px solid var(--accent-red)}
+.log-status--info{background:rgba(130,80,255,.14);color:#3C3489;border:1px solid #8250ff}
+
+.log-section{padding:7px 10px;border-bottom:1px dashed var(--border-light)}
+.log-section:last-child{border-bottom:none}
+.log-section-title{font:700 8px var(--font-mono);text-transform:uppercase;letter-spacing:.06em;color:var(--text-tertiary);margin-bottom:4px;display:flex;align-items:center;gap:4px}
+.log-section-title-icon{font-family:system-ui,"Segoe UI Emoji",sans-serif}
+
+.log-code-snippet{font:600 11px var(--font-mono);background:#0d1117;color:#e6edf3;padding:6px 9px;border-radius:4px;display:block;overflow-x:auto;white-space:pre;border:1px solid #30363d}
+.log-code-snippet .ck{color:#ff7b72}
+.log-code-snippet .cs{color:#a5d6ff}
+.log-code-snippet .cn{color:#79c0ff}
+.log-code-snippet .cf{color:#d2a8ff}
+.log-code-snippet .cc{color:#8b949e;font-style:italic}
+
+.log-kv-row{display:flex;flex-wrap:wrap;gap:4px}
+.log-kv{display:inline-flex;align-items:center;gap:3px;font:11px var(--font-mono);padding:2px 7px;border-radius:4px;background:var(--bg-secondary);border:1px solid var(--border-light)}
+.log-kv-key{color:var(--text-tertiary);font-weight:500}
+.log-kv-val{color:var(--text-primary);font-weight:700}
+.log-kv--in{background:rgba(56,139,253,.08);border-color:rgba(56,139,253,.3)}
+.log-kv--out{background:rgba(63,185,80,.08);border-color:rgba(63,185,80,.4)}
+.log-kv--out .log-kv-val{color:#15803D}
+.log-kv--changed{background:rgba(180,83,9,.10);border-color:rgba(180,83,9,.4)}
+.log-kv--changed .log-kv-val{color:var(--accent-amber-text)}
+
+.log-verdict{display:flex;align-items:center;gap:6px;font:600 11px var(--font-mono);padding:5px 8px;border-radius:5px;background:var(--bg-secondary);border:1px solid var(--border-light)}
+.log-verdict--true{background:var(--accent-green-bg);border-color:var(--accent-green);color:var(--accent-green-text)}
+.log-verdict--false{background:var(--accent-red-bg);border-color:var(--accent-red);color:var(--accent-red-text)}
+
+.log-analogy{font:italic 11px var(--font-sans);color:var(--text-secondary);background:#FFF8E7;border:1px solid #FBE8A6;border-left:3px solid var(--accent-amber);padding:6px 9px;border-radius:4px;line-height:1.55}
+.log-analogy strong{color:var(--accent-amber-text);font-style:normal;font-weight:700}
+
+.log-why{font-size:11px;line-height:1.55;color:var(--text-primary);padding:3px 0}
+.log-why strong{color:var(--accent-indigo-text)}
+.log-why code{font:600 10.5px var(--font-mono);background:var(--bg-secondary);padding:1px 5px;border-radius:3px;color:var(--accent-indigo-text)}
+</style>
+</head>
+<body>
+<div class="app-shell">
+
+  <!-- ============ PROBLEM CARD ============ -->
+  <div class="problem-card" id="problemCard">
+    <div class="pc-header">
+      <a href="../00_HomePage/gt_learn_homepage.html" class="gt-learn">GT LEARN</a>
+      <span class="pc-num">#96</span>
+      <span class="pc-title">🎯 Unique Binary Search Trees</span>
+      <span class="pc-diff">MEDIUM</span>
+      <span class="pc-tag">DP</span>
+      <span class="pc-tag">Catalan</span>
+      <span class="pc-tag">Math</span>
+      <div class="pc-header-right">
+        <span class="pc-input-label">n=</span>
+        <input class="pc-input" id="inN" type="number" min="0" max="9" value="3">
+        <span class="pc-expected" id="expectedBadge">expected: 5</span>
+        <button class="btn-toggle" onclick="toggleProblem()" id="toggleBtn">▲ Hide</button>
+      </div>
+    </div>
+    <div class="pc-body" id="pcBody">
+      <div class="pc-body-left">
+        <div class="pc-section">
+          <h4>📝 Problem Statement</h4>
+          Given an integer <code>n</code>, return the <em>number</em> of structurally unique BSTs which has exactly <code>n</code> nodes of unique values from <code>1</code> to <code>n</code>. Constraints: <em>1 ≤ n ≤ 19</em>.
+        </div>
+        <div class="pc-section">
+          <h4>🧠 Solving Approach</h4>
+          Classic <strong>Catalan number</strong> DP. Let <code>dp[i]</code> = number of unique BSTs with <code>i</code> nodes. For each root choice <code>j</code> in <code>[1..i]</code>: left subtree has <code>j-1</code> nodes, right has <code>i-j</code> nodes → contributes <code>dp[j-1] × dp[i-j]</code>.
+        </div>
+        <div class="pc-section">
+          <h4>🎯 Core Concepts & Base Case</h4>
+          <div class="concept-block"><strong>Base Case:</strong> <code>dp[0] = 1</code> (empty tree counts as 1 way) and <code>dp[1] = 1</code>.</div>
+          <div class="concept-block"><strong>Recurrence:</strong> <code>dp[i] = Σ dp[j-1] × dp[i-j]</code> for j in [1..i].</div>
+          <div class="concept-block"><strong>Insight:</strong> The <em>structure</em> count is independent of values — only depends on node count. So 1..3 has same count as 5..7.</div>
+        </div>
+        <div class="cplx-row">
+          <span class="cplx-chip">Time: O(n²)</span>
+          <span class="cplx-chip">Space: O(n)</span>
+          <span class="cplx-chip">Catalan: C(n) = (2n)! / ((n+1)! · n!)</span>
+        </div>
+      </div>
+      <div class="pc-body-right">
+        <div class="tc-chip" onclick="loadTest(1, 1)">
+          <div class="tc-chip-top"><span class="pt-tag">T1</span><span class="tc-label">smallest</span><span class="tc-expected">→ 1</span></div>
+          <div class="tc-vals"><code>n=1</code></div>
+        </div>
+        <div class="tc-chip" onclick="loadTest(2, 2)">
+          <div class="tc-chip-top"><span class="pt-tag">T2</span><span class="tc-label">two nodes</span><span class="tc-expected">→ 2</span></div>
+          <div class="tc-vals"><code>n=2</code></div>
+        </div>
+        <div class="tc-chip" onclick="loadTest(3, 5)">
+          <div class="tc-chip-top"><span class="pt-tag">T3</span><span class="tc-label">classic three</span><span class="tc-expected">→ 5</span></div>
+          <div class="tc-vals"><code>n=3</code></div>
+        </div>
+        <div class="tc-chip" onclick="loadTest(4, 14)">
+          <div class="tc-chip-top"><span class="pt-tag">T4</span><span class="tc-label">four nodes</span><span class="tc-expected">→ 14</span></div>
+          <div class="tc-vals"><code>n=4</code></div>
+        </div>
+        <div class="tc-chip" onclick="loadTest(0, 1)">
+          <div class="tc-chip-top"><span class="pt-tag">T5</span><span class="tc-label">edge: zero</span><span class="tc-expected">→ 1</span></div>
+          <div class="tc-vals"><code>n=0</code></div>
+        </div>
+        <div class="run-row">
+          <button class="btn-run" onclick="resetWithInput()">▶ Run</button>
+          <span class="live-out" id="liveOutput">—</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ MAIN ============ -->
+  <div class="main-row">
+    <div class="col col-code" id="col1">
+      <div class="section-label">📜 Python Code</div>
+      <div class="code-panel" id="codePanel"></div>
+    </div>
+    <div class="resize-h" id="resizeH1"></div>
+    <div class="col col-viz">
+      <div class="section-label">📊 Visualization</div>
+      <div class="viz-panel" id="vizPanel"></div>
+      <div class="log-popup" id="logPopup">
+        <div class="log-popup-body" id="logPopupBody"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ FOOTER ============ -->
+  <div class="footer-bar">
+    <div class="footer-left" id="footerLeft">
+      <span id="stepInfo" class="step-info">0/0</span>
+      <span id="actionBadge" class="action-badge"></span>
+    </div>
+    <div class="footer-right">
+      <kbd>←</kbd><kbd>→</kbd><kbd>R</kbd>
+      <button class="btn" type="button" onclick="resetStep()">↺</button>
+      <button class="btn" type="button" onclick="stepBy(-1)">◀</button>
+      <button class="btn btn-primary" type="button" onclick="stepBy(1)">▶ Next</button>
+      <span class="footer-sep"></span>
+      <button id="logToggleBtn" class="log-toggle-btn" type="button" onclick="toggleLogPreview()">📋 ON</button>
+      <button class="btn-zoom" type="button" onclick="logZoom(-1)">−</button>
+      <span id="logZoomLabel" class="log-zoom-label">100%</span>
+      <button class="btn-zoom" type="button" onclick="logZoom(1)">+</button>
+      <button class="btn-zoom" type="button" onclick="logZoomReset()">↺</button>
+      <span class="footer-sep"></span>
+      <button class="btn btn-fullscreen" type="button" onclick="toggleFullscreen()">⛶</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+/* ============ CODE LINES ============ */
+var codeLines = [
+  "def numTrees(n):",
+  "    if n == 0:",
+  "        return 1",
+  "    dp = [0] * (n + 1)",
+  "    dp[0] = 1",
+  "    dp[1] = 1",
+  "    for i in range(2, n + 1):",
+  "        for j in range(1, i + 1):",
+  "            dp[i] += dp[j - 1] * dp[i - j]",
+  "    return dp[n]"
+];
+
+/* ============ SYNTAX HIGHLIGHTER ============ */
+function renderCode() {
+  var p = document.getElementById('codePanel');
+  p.innerHTML = codeLines.map(function(raw, i) {
+    var h = raw;
+    h = h.replace(/("[^"]*"|'[^']*')/g, '\x01STR\x02$1\x03');
+    h = h.replace(/\b(def|for|in|if|return|break|continue|and|else|elif|True|False|None|not|or|while|lambda)\b/g, '\x01KW\x02$1\x03');
+    h = h.replace(/\b(len|range|int|str|list|append|pop|sorted|min|max|sum|abs|enumerate|zip|print|set|add)\b/g, '\x01FN\x02$1\x03');
+    h = h.replace(/(?<![.\w"\x01\x02\x03])(-?\d+)\b/g, '\x01NUM\x02$1\x03');
+    h = h.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    h = h.replace(/\x01STR\x02/g, '<span class="str">').replace(/\x01KW\x02/g, '<span class="kw">').replace(/\x01FN\x02/g, '<span class="fn">').replace(/\x01NUM\x02/g, '<span class="num">').replace(/\x03/g, '</span>');
+    return '<div class="code-line" data-line="' + i + '"><span class="code-ln">' + (i+1) + '</span>' + h + '</div>';
+  }).join('');
+}
+
+/* ============ MINI HIGHLIGHTER ============ */
+function hlCode(raw) {
+  var h = raw;
+  h = h.replace(/("[^"]*"|'[^']*')/g, '\x01s\x02$1\x03');
+  h = h.replace(/\b(def|for|in|if|return|break|continue|and|else|elif|True|False|None|not|or|while|lambda)\b/g, '\x01k\x02$1\x03');
+  h = h.replace(/\b(len|range|int|str|list|append|pop|sorted|min|max|sum|abs|enumerate|zip|print|set|add|numTrees)\b/g, '\x01f\x02$1\x03');
+  h = h.replace(/(?<![.\w"\x01\x02\x03])(-?\d+)\b/g, '\x01n\x02$1\x03');
+  h = h.replace(/(#.*$)/gm, '\x01c\x02$1\x03');
+  h = h.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  h = h.replace(/\x01([a-z])\x02/g, function(_, c) { return '<span class="c' + c + '">'; }).replace(/\x03/g, '</span>');
+  return h;
+}
+
+/* ============ BADGES ============ */
+var LOG_BADGE = {
+  "func-def":"📌 DEF","init":"⚙️ INIT","call":"📞 CALL","return":"🏆 RETURN",
+  "for-check":"🔁 FOR","while-check":"🔁 WHILE","if-check":"🔎 IF",
+  "mark":"✅ MARK","push":"⬆ PUSH","pop":"⬇ POP","restore":"↩ RESTORE","found":"🎉 FOUND",
+  "remove":"✏️ EDIT","prune":"✂️ PRUNE","fail":"❌ FAIL",
+  "exit":"🔚 EXIT","skip":"⏭ SKIP"
+};
+var BADGE_LABEL = {
+  "func-def":"DEF","init":"INIT","call":"CALL","return":"RETURN",
+  "for-check":"FOR","while-check":"WHILE","if-check":"IF",
+  "mark":"MARK","push":"PUSH","pop":"POP","restore":"RESTORE","found":"FOUND",
+  "remove":"EDIT","prune":"PRUNE","fail":"FAIL",
+  "exit":"EXIT","skip":"SKIP"
+};
+
+/* ============ richLog ============ */
+function richLog(opts) {
+  var statusMap = {
+    success:"✅ Success", fail:"❌ Failed", skip:"⏭ Skipped",
+    loop:"🔁 Loop iter", prune:"✂️ Pruned", info:"ℹ️ Info"
+  };
+  var status = opts.status || "info";
+  var html = '<div class="log-card log-card--' + opts.action + '">';
+  html += '<div class="log-card-header">';
+  html += '<span class="log-badge log-badge--' + opts.action + '">' + (LOG_BADGE[opts.action] || opts.action) + '</span>';
+  html += '<span class="log-line-ref">L' + (opts.line + 1) + '</span>';
+  html += '<span class="log-status-pill log-status--' + status + '">' + statusMap[status] + '</span>';
+  html += '</div>';
+  if (opts.code) {
+    html += '<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">📜</span>Code Executing</div>';
+    html += '<code class="log-code-snippet">' + hlCode(opts.code) + '</code></div>';
+  }
+  if (opts.inputs && opts.inputs.length) {
+    html += '<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">📥</span>Input Values (line is using these)</div><div class="log-kv-row">';
+    opts.inputs.forEach(function(kv){
+      html += '<span class="log-kv log-kv--in"><span class="log-kv-key">' + kv.k + '</span>=<span class="log-kv-val">' + kv.v + '</span></span>';
+    });
+    html += '</div></div>';
+  }
+  if (opts.outputs && opts.outputs.length) {
+    html += '<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">📤</span>Output / State After Line</div><div class="log-kv-row">';
+    opts.outputs.forEach(function(kv){
+      var cls = kv.changed ? 'log-kv--changed' : 'log-kv--out';
+      html += '<span class="log-kv ' + cls + '"><span class="log-kv-key">' + kv.k + '</span>=<span class="log-kv-val">' + kv.v + '</span></span>';
+    });
+    html += '</div></div>';
+  }
+  if (opts.verdict) {
+    var vCls = opts.verdictTrue === true ? 'log-verdict--true' : (opts.verdictTrue === false ? 'log-verdict--false' : '');
+    var vIcon = opts.verdictTrue === true ? '✓' : (opts.verdictTrue === false ? '✗' : '•');
+    html += '<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">⚖️</span>Verdict / Decision</div>';
+    html += '<div class="log-verdict ' + vCls + '">' + vIcon + ' ' + opts.verdict + '</div></div>';
+  }
+  if (opts.why) {
+    html += '<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">💡</span>Why This Happens</div>';
+    html += '<div class="log-why">' + opts.why + '</div></div>';
+  }
+  if (opts.analogy) {
+    html += '<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">🎭</span>Real-Life Analogy</div>';
+    html += '<div class="log-analogy">' + opts.analogy + '</div></div>';
+  }
+  html += '</div>';
+  return html;
+}
+
+/* ============ STATE ============ */
+var steps = [];
+var currentStep = 0;
+var codeWidthUserSet = false;
+var curResult = null;
+var logEnabled = true;
+var logZoomLevel = 100;
+
+var CATALAN_REF = [1, 1, 2, 5, 14, 42, 132, 429, 1430, 4862];
+
+/* ============ buildSteps ============ */
+function buildSteps(n) {
+  var st = [];
+  var MAX_STEPS = 4000;
+
+  // Track which dp cells have been set ("init" vs "computed" vs "unset")
+  var dp = new Array(n + 1).fill(0);
+  var dpStatus = new Array(n + 1).fill("unset"); // "unset" | "init" | "computed"
+
+  // Pointer hints for visualization
+  var curI = null;
+  var curJ = null;
+  var readIdxL = null;  // dp[j-1]
+  var readIdxR = null;  // dp[i-j]
+  var rootContribs = {}; // { j: contribution_value } for current i
+
+  function snap(extra) {
+    return Object.assign({
+      n: n,
+      dp: dp.slice(),
+      dpStatus: dpStatus.slice(),
+      curI: curI,
+      curJ: curJ,
+      readIdxL: readIdxL,
+      readIdxR: readIdxR,
+      rootContribs: Object.assign({}, rootContribs)
+    }, extra || {});
+  }
+
+  function pushStep(o) {
+    if (st.length >= MAX_STEPS) return;
+    st.push(Object.assign({ line: 0, action: "init", logHTML: "" }, snap(o)));
+  }
+
+  // L0: function def
+  pushStep({
+    line: 0, action: "func-def",
+    logHTML: richLog({
+      line: 0, action: "func-def",
+      code: "def numTrees(n):",
+      status: "info",
+      inputs: [{k:"n", v:n}],
+      why: "<strong>Function entry</strong> — <code>numTrees(" + n + ")</code> ko call kiya gaya. Hum DP table build karke total unique BST count laayenge.",
+      analogy: "Jaise ek <strong>accountant</strong> ko bola — '" + n + " students ke saath kitne unique seating arrangements ban sakte hain — count karke bata.' Calculator on, kaam shuru."
+    })
+  });
+
+  // L1: if n == 0
+  var nZero = (n === 0);
+  pushStep({
+    line: 1, action: "if-check",
+    logHTML: richLog({
+      line: 1, action: "if-check",
+      code: "if n == 0:",
+      status: nZero ? "success" : "skip",
+      inputs: [{k:"n", v:n}],
+      verdict: "n (" + n + ") == 0",
+      verdictTrue: nZero,
+      why: nZero
+        ? "<strong>n=0</strong> hai. Empty tree ko <strong>1 valid arrangement</strong> count karte hain (DP convention). Direct return."
+        : "n=" + n + " hai (non-zero), main DP loop chalana padega. Skip and proceed.",
+      analogy: nZero
+        ? "Khaali hall mein <strong>'kursi nahi lagani'</strong> bhi to ek valid arrangement hai — count = 1."
+        : n + " students ka actual setup karna hai — accountant calculator nikalta hai."
+    })
+  });
+
+  if (nZero) {
+    pushStep({
+      line: 2, action: "return",
+      logHTML: richLog({
+        line: 2, action: "return",
+        code: "return 1",
+        status: "success",
+        outputs: [{k:"return", v:1, changed:true}],
+        why: "🎉 <strong>Empty BST = 1 way</strong>. This is the canonical DP base.",
+        analogy: "Khaali plate bhi <strong>ek valid presentation</strong> hai — bill = 1."
+      })
+    });
+    curResult = 1;
+    return st;
+  }
+
+  // L3: dp = [0] * (n+1)
+  pushStep({
+    line: 3, action: "init",
+    logHTML: richLog({
+      line: 3, action: "init",
+      code: "dp = [0] * (" + n + " + 1)",
+      status: "success",
+      outputs: [{k:"dp.length", v:(n+1), changed:true}, {k:"dp", v:"["+ new Array(n+1).fill(0).join(",") +"]", changed:true}],
+      why: "<strong>DP array</strong> initialize kiya size <code>" + (n+1) + "</code> with all zeros. <code>dp[i]</code> store karega 'i nodes ke saath kitne unique BSTs ban sakte hain'.",
+      analogy: "Accountant ne <strong>register table</strong> banayi — har row mein 'i students ke saath count' likhega. Abhi sab rows blank (0)."
+    })
+  });
+
+  // L4: dp[0] = 1
+  dp[0] = 1;
+  dpStatus[0] = "init";
+  pushStep({
+    line: 4, action: "init",
+    logHTML: richLog({
+      line: 4, action: "init",
+      code: "dp[0] = 1",
+      status: "success",
+      outputs: [{k:"dp[0]", v:1, changed:true}],
+      verdict: "dp[0] := 1",
+      verdictTrue: true,
+      why: "<strong>Base case 1:</strong> Empty tree = 1 valid arrangement. Yeh seed hai jisse aage saari values build hongi.",
+      analogy: "Register pe pehli entry — '<strong>0 students = 1 way</strong> (empty hall)'. Yeh starting reference point hai."
+    })
+  });
+
+  // L5: dp[1] = 1
+  if (n >= 1) {
+    dp[1] = 1;
+    dpStatus[1] = "init";
+  }
+  pushStep({
+    line: 5, action: "init",
+    logHTML: richLog({
+      line: 5, action: "init",
+      code: "dp[1] = 1",
+      status: "success",
+      outputs: [{k:"dp[1]", v:1, changed:true}],
+      verdict: "dp[1] := 1",
+      verdictTrue: true,
+      why: "<strong>Base case 2:</strong> 1 node = sirf 1 tree (just that root). No left, no right.",
+      analogy: "Register pe doosri entry — '<strong>1 student = 1 arrangement</strong> (akela baith jao)'. Simple."
+    })
+  });
+
+  // L6 + L7 loops
+  for (var i = 2; i <= n; i++) {
+    curI = i;
+    rootContribs = {};
+
+    pushStep({
+      line: 6, action: "for-check",
+      logHTML: richLog({
+        line: 6, action: "for-check",
+        code: "for i in range(2, " + (n+1) + "): i=" + i,
+        status: "loop",
+        inputs: [{k:"n", v:n}],
+        outputs: [{k:"i", v:i, changed:true}],
+        verdict: "i (" + i + ") in [2.." + n + "]",
+        verdictTrue: true,
+        why: "Outer loop iteration <strong>i=" + i + "</strong>. Ab calculate karenge <code>dp[" + i + "]</code> = '" + i + " nodes ke saath kitne unique BSTs'.",
+        analogy: "Accountant ab <strong>" + i + " students wali row</strong> bhar raha — har possible 'main student' (root) ko try karega."
+      })
+    });
+
+    for (var j = 1; j <= i; j++) {
+      curJ = j;
+      var leftSize = j - 1;
+      var rightSize = i - j;
+      readIdxL = leftSize;
+      readIdxR = rightSize;
+
+      pushStep({
+        line: 7, action: "for-check",
+        logHTML: richLog({
+          line: 7, action: "for-check",
+          code: "for j in range(1, " + (i+1) + "): j=" + j,
+          status: "loop",
+          inputs: [{k:"i", v:i}],
+          outputs: [{k:"j (root)", v:j, changed:true}],
+          verdict: "j (" + j + ") in [1.." + i + "]",
+          verdictTrue: true,
+          why: "Inner loop: <strong>j=" + j + "</strong> ko <strong>root</strong> banane try karenge. Iska left subtree mein <code>" + leftSize + "</code> nodes, right mein <code>" + rightSize + "</code> nodes honge.",
+          analogy: "<strong>Student #" + j + "</strong> ko 'class monitor' (root) banaya. Uske <strong>left mein " + leftSize + " students</strong>, right mein <strong>" + rightSize + " students</strong>."
+        })
+      });
+
+      var leftVal = dp[leftSize];
+      var rightVal = dp[rightSize];
+      var contribution = leftVal * rightVal;
+      var oldDpI = dp[i];
+      dp[i] += contribution;
+      rootContribs[j] = contribution;
+
+      pushStep({
+        line: 8, action: "found",
+        logHTML: richLog({
+          line: 8, action: "found",
+          code: "dp[" + i + "] += dp[" + leftSize + "] * dp[" + rightSize + "]  # " + leftVal + " * " + rightVal + " = " + contribution,
+          status: "success",
+          inputs: [
+            {k:"dp[j-1]=dp[" + leftSize + "]", v:leftVal},
+            {k:"dp[i-j]=dp[" + rightSize + "]", v:rightVal}
+          ],
+          outputs: [
+            {k:"contribution", v:contribution, changed:true},
+            {k:"dp[" + i + "]", v:oldDpI + " → " + dp[i], changed:true}
+          ],
+          verdict: "dp[" + i + "] += " + leftVal + " × " + rightVal + " = " + contribution,
+          verdictTrue: true,
+          why: "<strong>Recurrence step:</strong> Root <code>" + j + "</code> ke saath <code>" + leftVal + "</code> left-subtree shapes × <code>" + rightVal + "</code> right-subtree shapes = <strong>" + contribution + " unique trees</strong>. Yeh sum mein add karo.",
+          analogy: "Monitor <strong>#" + j + "</strong> ke peeche " + leftVal + " left-arrangements × " + rightVal + " right-arrangements = <strong>" + contribution + " total combinations</strong>. Register mein <code>dp[" + i + "]</code> ke total mein add ho gaya."
+        })
+      });
+
+      // mark dp[i] as in-progress (still computing) — leave dpStatus as "unset" until inner loop ends
+    }
+
+    // L7 exit
+    pushStep({
+      line: 7, action: "exit",
+      logHTML: richLog({
+        line: 7, action: "exit",
+        code: "# inner for j exit (saare " + i + " roots try ho gaye)",
+        status: "info",
+        inputs: [{k:"i", v:i}],
+        outputs: [{k:"dp[" + i + "]", v:dp[i], changed:false}],
+        why: "Inner loop khatam — <strong>saare " + i + " roots</strong> (j=1 to " + i + ") consider ho gaye. Final <code>dp[" + i + "] = " + dp[i] + "</code>.",
+        analogy: "Saare " + i + " students ko monitor banake try kar liya — <strong>total " + dp[i] + " unique arrangements</strong> mile."
+      })
+    });
+
+    // mark dp[i] computed
+    dpStatus[i] = "computed";
+    curJ = null;
+    readIdxL = null;
+    readIdxR = null;
+
+    pushStep({
+      line: 6, action: "mark",
+      logHTML: richLog({
+        line: 6, action: "mark",
+        code: "# dp[" + i + "] computed = " + dp[i] + (CATALAN_REF[i] !== undefined ? "  (Catalan C(" + i + "))" : ""),
+        status: "success",
+        outputs: [{k:"dp[" + i + "]", v:dp[i], changed:true}],
+        why: "<strong>dp[" + i + "] finalized</strong> = " + dp[i] + ". This is the <strong>" + i + "th Catalan number</strong> C(" + i + ").",
+        analogy: "Register ki <strong>row #" + i + "</strong> seal kar di — yeh number ab fixed hai, future iterations isi ko padhenge."
+      })
+    });
+  }
+
+  // L6 outer exit
+  curI = null;
+  pushStep({
+    line: 6, action: "exit",
+    logHTML: richLog({
+      line: 6, action: "exit",
+      code: "# outer for i exit — dp table fully computed",
+      status: "info",
+      inputs: [{k:"n", v:n}],
+      outputs: [{k:"dp", v:"[" + dp.join(",") + "]", changed:false}],
+      why: "Outer loop khatam — saari rows <code>dp[2]</code> se <code>dp[" + n + "]</code> tak fill ho gayi. Ab final answer return karna hai.",
+      analogy: "<strong>Pura register ban gaya</strong> — har row mein uska Catalan number likha hai. Ab answer chunna hai."
+    })
+  });
+
+  // L9: return dp[n]
+  curResult = dp[n];
+  pushStep({
+    line: 9, action: "return",
+    logHTML: richLog({
+      line: 9, action: "return",
+      code: "return dp[" + n + "]  # = " + dp[n],
+      status: "success",
+      outputs: [{k:"answer", v:dp[n], changed:true}],
+      why: "🎉 <strong>Final answer:</strong> <code>dp[" + n + "] = " + dp[n] + "</code> unique BSTs with " + n + " nodes.",
+      analogy: "Accountant ne <strong>register se row #" + n + "</strong> uthayi aur boss ko answer diya — '<strong>" + dp[n] + " unique arrangements</strong> possible hain!'"
+    })
+  });
+
+  return st;
+}
+
+/* ============ RENDER VIZ ============ */
+function renderViz(s) {
+  var p = document.getElementById('vizPanel');
+  var h = '';
+
+  // Vars strip
+  h += '<div class="vars-strip">';
+  h += '<span class="var-chip"><strong>n</strong>=' + s.n + '</span>';
+  if (s.curI !== null) {
+    h += '<span class="var-chip vc-active"><strong>i</strong>=' + s.curI + '</span>';
+  }
+  if (s.curJ !== null) {
+    h += '<span class="var-chip vc-warn"><strong>j (root)</strong>=' + s.curJ + '</span>';
+  }
+  if (s.curI !== null && s.curJ !== null) {
+    h += '<span class="var-chip"><strong>left size</strong>=' + (s.curJ - 1) + '</span>';
+    h += '<span class="var-chip"><strong>right size</strong>=' + (s.curI - s.curJ) + '</span>';
+  }
+  if (s.curI !== null) {
+    h += '<span class="var-chip vc-safe"><strong>dp[' + s.curI + ']</strong>=' + s.dp[s.curI] + '</span>';
+  }
+  h += '</div>';
+
+  // ===== viz-row 1: DP table + Formula =====
+  h += '<div class="viz-row">';
+
+  // Card 1: DP table
+  h += '<div class="viz-card" style="flex:1;min-width:280px"><h5>📊 DP Table — dp[i] = unique BSTs with i nodes</h5>';
+  h += '<div class="dp-strip">';
+  for (var k = 0; k <= s.n; k++) {
+    var cls = 'dp-cell';
+    if (s.dpStatus[k] === "init") cls += ' dp-cell--init';
+    else if (s.dpStatus[k] === "computed") cls += ' dp-cell--computed';
+    else cls += ' dp-cell--unset';
+
+    if (k === s.curI) cls += ' dp-cell--target';
+    if (k === s.readIdxL && k !== s.curI) cls += ' dp-cell--reading-l';
+    if (k === s.readIdxR && k !== s.curI && k !== s.readIdxL) cls += ' dp-cell--reading-r';
+
+    h += '<div class="' + cls + '"><div class="dp-cell-idx">dp[' + k + ']</div><div class="dp-cell-val">' + s.dp[k] + '</div></div>';
+  }
+  h += '</div>';
+  h += '<div style="display:flex;gap:8px;margin-top:8px;font-size:9.5px;color:var(--text-tertiary);flex-wrap:wrap">';
+  h += '<span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:var(--accent-teal-bg);border:1px solid var(--accent-teal);vertical-align:middle"></span> base (init)</span>';
+  h += '<span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:var(--accent-green-bg);border:1px solid var(--accent-green);vertical-align:middle"></span> computed</span>';
+  h += '<span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:var(--accent-indigo-bg);border:1px solid var(--accent-indigo);vertical-align:middle"></span> target (i)</span>';
+  h += '<span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#FFF2D5;border:1px solid #D97706;vertical-align:middle"></span> reading (j-1, i-j)</span>';
+  h += '</div>';
+  h += '</div>';
+
+  // Card 2: Formula board
+  h += '<div class="viz-card" style="flex:1;min-width:240px"><h5>✏️ Recurrence Formula</h5>';
+  h += '<div class="formula-board">';
+  if (s.curI !== null && s.curJ !== null) {
+    h += '<span class="fb-line"><span class="fb-tok-acc">dp[<span class="fb-tok-i">' + s.curI + '</span>]</span> += <span class="fb-tok-l">dp[' + (s.curJ - 1) + ']</span> × <span class="fb-tok-r">dp[' + (s.curI - s.curJ) + ']</span></span>';
+    h += '<span class="fb-line"><span class="fb-comment"># with j=' + s.curJ + ' as root</span></span>';
+    h += '<span class="fb-line"><span class="fb-tok-acc">dp[' + s.curI + ']</span> += <span class="fb-tok-l">' + s.dp[s.curJ - 1] + '</span> × <span class="fb-tok-r">' + s.dp[s.curI - s.curJ] + '</span> = <strong style="color:#3fb950">' + (s.dp[s.curJ - 1] * s.dp[s.curI - s.curJ]) + '</strong></span>';
+  } else if (s.curI !== null) {
+    h += '<span class="fb-line"><span class="fb-tok-acc">dp[<span class="fb-tok-i">' + s.curI + '</span>]</span> = Σ <span class="fb-tok-l">dp[j-1]</span> × <span class="fb-tok-r">dp[i-j]</span></span>';
+    h += '<span class="fb-line"><span class="fb-comment"># for j = 1 to ' + s.curI + '</span></span>';
+    h += '<span class="fb-line"><span class="fb-tok-acc">dp[' + s.curI + ']</span> = <strong style="color:#3fb950">' + s.dp[s.curI] + '</strong></span>';
+  } else {
+    h += '<span class="fb-line"><span class="fb-tok-acc">dp[i]</span> = Σ<sub>j=1..i</sub> <span class="fb-tok-l">dp[j-1]</span> × <span class="fb-tok-r">dp[i-j]</span></span>';
+    h += '<span class="fb-line"><span class="fb-comment"># Catalan recurrence</span></span>';
+    h += '<span class="fb-line"><span class="fb-tok-acc">dp[0]</span> = 1, <span class="fb-tok-acc">dp[1]</span> = 1</span>';
+  }
+  h += '</div>';
+
+  // Catalan reference
+  h += '<div style="margin-top:8px;font-size:10px;color:var(--text-tertiary);font-weight:600">Catalan reference C(n):</div>';
+  h += '<div class="catalan-ref">';
+  for (var ci = 0; ci <= Math.min(s.n, 9); ci++) {
+    var ccls = (ci === s.curI) ? 'catalan-chip' : 'catalan-chip';
+    h += '<span class="' + ccls + (ci === s.curI ? '" style="background:var(--accent-indigo-bg);border-color:var(--accent-indigo)"' : '"') + '><strong>C(' + ci + ')</strong>=' + CATALAN_REF[ci] + '</span>';
+  }
+  h += '</div>';
+  h += '</div>';
+
+  h += '</div>'; // end viz-row 1
+
+  // ===== Card 3: Root choices breakdown for current i =====
+  if (s.curI !== null) {
+    h += '<div class="viz-card" style="margin-top:12px"><h5>🌳 Root Choices for i=' + s.curI + ' (each j contributes dp[j-1] × dp[i-j])</h5>';
+    h += '<div class="root-row" style="margin-bottom:18px">';
+    for (var j = 1; j <= s.curI; j++) {
+      var rcls = 'root-tile';
+      if (s.rootContribs && s.rootContribs[j] !== undefined) {
+        rcls += (j === s.curJ) ? ' root-tile--curr' : ' root-tile--done';
+      }
+      var contrib = s.rootContribs && s.rootContribs[j] !== undefined ? s.rootContribs[j] : '?';
+      h += '<div class="' + rcls + '">' + j;
+      h += '<div class="root-tile-contrib">+' + contrib + '</div>';
+      h += '</div>';
+    }
+    h += '</div>';
+    var sumSoFar = 0;
+    Object.keys(s.rootContribs).forEach(function(k){ sumSoFar += s.rootContribs[k]; });
+    h += '<div style="font-size:11px;color:var(--text-secondary);margin-top:6px">';
+    h += 'Sum so far: <strong style="color:var(--accent-green-text);font-family:var(--font-mono)">' + sumSoFar + '</strong>';
+    if (s.curJ !== null) {
+      h += ' &nbsp;·&nbsp; Currently trying root <strong style="color:var(--accent-indigo-text);font-family:var(--font-mono)">j=' + s.curJ + '</strong>';
+      h += ' &nbsp;→&nbsp; left=<code style="font-family:var(--font-mono);color:var(--accent-amber-text);background:var(--accent-amber-bg);padding:1px 5px;border-radius:3px">dp[' + (s.curJ - 1) + ']=' + s.dp[s.curJ - 1] + '</code>';
+      h += ' × right=<code style="font-family:var(--font-mono);color:var(--accent-amber-text);background:var(--accent-amber-bg);padding:1px 5px;border-radius:3px">dp[' + (s.curI - s.curJ) + ']=' + s.dp[s.curI - s.curJ] + '</code>';
+    }
+    h += '</div>';
+    h += '</div>';
+  }
+
+  // Result banner
+  if (s.line === 9 && curResult !== null) {
+    h += '<div class="result-banner">🎉 Answer: ' + curResult + ' unique BSTs for n=' + s.n + ' (Catalan number C(' + s.n + '))</div>';
+  }
+
+  p.innerHTML = h;
+}
+
+/* ============ STEP CONTROL ============ */
+function renderStep(idx) {
+  if (!steps.length) return;
+  var s = steps[idx];
+  currentStep = idx;
+  document.getElementById('stepInfo').textContent = (idx + 1) + '/' + steps.length;
+  var bd = document.getElementById('actionBadge');
+  bd.textContent = BADGE_LABEL[s.action] || s.action;
+  bd.className = 'action-badge action-badge--' + s.action;
+  document.querySelectorAll('.code-line').forEach(function(el){ el.classList.remove('active'); });
+  var al = document.querySelector('.code-line[data-line="' + s.line + '"]');
+  if (al) { al.classList.add('active'); al.scrollIntoView({block:'nearest'}); }
+  renderViz(s);
+  showLogPreview(s);
+}
+
+function showLogPreview(s) {
+  if (!logEnabled) return;
+  document.getElementById('logPopupBody').innerHTML = s.logHTML || '';
+  document.getElementById('logPopup').classList.remove('log-popup--hidden');
+}
+
+function stepBy(d) {
+  var nx = currentStep + d;
+  if (nx < 0 || nx >= steps.length) return;
+  renderStep(nx);
+}
+
+function resetStep() {
+  if (steps.length) renderStep(0);
+}
+
+/* ============ INPUT / RUN ============ */
+function parseInputs() {
+  var n = parseInt(document.getElementById('inN').value, 10);
+  if (isNaN(n) || n < 0) n = 0;
+  if (n > 9) n = 9;
+  return n;
+}
+
+function resetWithInput() {
+  curResult = null;
+  var n = parseInputs();
+  document.getElementById('inN').value = n;
+  renderCode();
+  fitCodeWidth();
+  steps = buildSteps(n);
+  currentStep = 0;
+  renderStep(0);
+  document.getElementById('liveOutput').textContent = curResult !== null ? curResult : '—';
+}
+
+function loadTest(n, expected) {
+  document.getElementById('inN').value = n;
+  document.getElementById('expectedBadge').textContent = 'expected: ' + expected;
+  resetWithInput();
+}
+
+/* ============ LOG CONTROLS ============ */
+function toggleLogPreview() {
+  logEnabled = !logEnabled;
+  var btn = document.getElementById('logToggleBtn');
+  btn.textContent = logEnabled ? '📋 ON' : '📋 OFF';
+  btn.classList.toggle('log-toggle-btn--off', !logEnabled);
+  if (!logEnabled) document.getElementById('logPopup').classList.add('log-popup--hidden');
+  else if (steps.length) showLogPreview(steps[currentStep]);
+}
+
+function logZoom(dir) {
+  logZoomLevel = Math.max(60, Math.min(180, logZoomLevel + dir * 20));
+  updateLogZoom();
+}
+function logZoomReset() { logZoomLevel = 100; updateLogZoom(); }
+function updateLogZoom() {
+  document.getElementById('logZoomLabel').textContent = logZoomLevel + '%';
+  document.getElementById('logPopup').style.setProperty('--log-scale', logZoomLevel / 100);
+}
+
+function toggleFullscreen() {
+  var viz = document.querySelector('.col-viz');
+  if (!document.fullscreenElement) viz.requestFullscreen().catch(function(){});
+  else document.exitFullscreen();
+}
+
+function toggleProblem() {
+  var body = document.getElementById('pcBody');
+  var btn = document.getElementById('toggleBtn');
+  body.classList.toggle('pc-body--hidden');
+  btn.textContent = body.classList.contains('pc-body--hidden') ? '▼ Show' : '▲ Hide';
+}
+
+/* ============ LAYOUT ============ */
+function fitCodeWidth() {
+  if (codeWidthUserSet) return;
+  var col = document.getElementById('col1');
+  var maxLen = 0;
+  codeLines.forEach(function(l){ if (l.length > maxLen) maxLen = l.length; });
+  var px = Math.min(maxLen * 8 + 60, window.innerWidth * 0.45);
+  px = Math.max(220, px);
+  col.style.width = px + 'px';
+  syncFooterWidth();
+}
+
+function syncFooterWidth() {
+  document.getElementById('footerLeft').style.width =
+    document.getElementById('col1').offsetWidth + 'px';
+}
+
+(function() {
+  var col1 = document.getElementById('col1');
+  document.getElementById('resizeH1').addEventListener('mousedown', function(e) {
+    e.preventDefault();
+    codeWidthUserSet = true;
+    var startX = e.clientX, startW = col1.offsetWidth, h = this;
+    document.body.classList.add('no-select');
+    h.classList.add('active');
+    function mv(e) {
+      col1.style.width = Math.max(140, Math.min(window.innerWidth * 0.45, startW + (e.clientX - startX))) + 'px';
+      syncFooterWidth();
+    }
+    function up() {
+      document.removeEventListener('mousemove', mv);
+      document.removeEventListener('mouseup', up);
+      document.body.classList.remove('no-select');
+      h.classList.remove('active');
+    }
+    document.addEventListener('mousemove', mv);
+    document.addEventListener('mouseup', up);
+  });
+})();
+
+window.addEventListener('resize', function() {
+  if (!codeWidthUserSet) fitCodeWidth();
+  else syncFooterWidth();
+});
+
+document.addEventListener('keydown', function(e) {
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
+  if (e.key === 'ArrowRight') { e.preventDefault(); stepBy(1); }
+  else if (e.key === 'ArrowLeft') { e.preventDefault(); stepBy(-1); }
+  else if (e.key === 'r' || e.key === 'R') { e.preventDefault(); resetStep(); }
+});
+
+/* ============ INIT ============ */
+renderCode();
+fitCodeWidth();
+steps = buildSteps(3);
+renderStep(0);
+document.getElementById('liveOutput').textContent = curResult !== null ? curResult : '—';
+</script>
+</body>
+</html>

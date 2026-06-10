@@ -1,0 +1,1136 @@
+﻿
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LC 670 — Maximum Swap | DSA Dry-Run Visualizer</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+:root {
+  --bg-primary:#FAFAF8; --bg-secondary:#F1EFE8; --bg-tertiary:#E2E0D8; --bg-card:#FFFFFF;
+  --text-primary:#2C2C2A; --text-secondary:#5F5E5A; --text-tertiary:#888780;
+  --border-color:rgba(0,0,0,0.11); --border-light:rgba(0,0,0,0.06); --border-focus:#534AB7;
+  --accent-indigo:#534AB7; --accent-indigo-bg:#EEEDFE; --accent-indigo-text:#3C3489; --accent-indigo-hover:#4740A0;
+  --accent-teal:#0F6E56; --accent-teal-bg:#E1F5EE; --accent-teal-text:#085041;
+  --accent-red:#E24B4A; --accent-red-bg:#FCEBEB; --accent-red-text:#791F1F;
+  --accent-amber:#B45309; --accent-amber-bg:#FEF3C7; --accent-amber-text:#78350F;
+  --accent-green:#15803D; --accent-green-bg:#DCFCE7; --accent-green-text:#14532D;
+  --syn-keyword:#534AB7; --syn-function:#185FA5; --syn-number:#993C1D; --syn-string:#0F6E56;
+  --active-line-bg:#EEEDFE;
+  --radius-sm:4px; --radius-md:6px; --radius-lg:10px; --radius-xl:14px;
+  --font-sans:'DM Sans', system-ui, sans-serif;
+  --font-mono:'JetBrains Mono', 'Fira Code', monospace;
+  --fs-xs:11px; --fs-sm:12px; --fs-base:14px; --fs-md:15px; --fs-lg:18px;
+  --lh-normal:1.6; --lh-code:1.9;
+  --ease:.18s ease;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans);background:var(--bg-primary);color:var(--text-primary);font-size:var(--fs-base);line-height:var(--lh-normal);overflow:hidden}
+.no-select{user-select:none}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border-color);border-radius:99px}
+
+.app-shell{display:flex;flex-direction:column;height:100vh;overflow:hidden;background:var(--bg-primary)}
+
+/* Problem card */
+.problem-card{flex-shrink:0;border-bottom:1px solid var(--border-color);background:var(--bg-card)}
+.pc-header{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--border-light);flex-wrap:wrap}
+.gt-learn{background:var(--accent-indigo);color:#fff;font-weight:700;font-size:11px;padding:4px 10px;border-radius:99px;border:none;cursor:pointer;letter-spacing:.04em}
+.pc-num{font:700 12px var(--font-mono);color:var(--text-tertiary)}
+.pc-title{font-size:16px;font-weight:700}
+.pc-diff{font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;background:var(--accent-amber-bg);color:var(--accent-amber-text);border:1px solid var(--accent-amber);text-transform:uppercase}
+.pc-tag{font-size:10px;font-weight:600;padding:2px 7px;border-radius:99px;background:var(--accent-indigo-bg);color:var(--accent-indigo-text);border:1px solid var(--accent-indigo)}
+.pc-header-right{margin-left:auto;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.pc-input-label{font:600 11px var(--font-mono);color:var(--text-secondary)}
+.pc-input{font:600 12px var(--font-mono);padding:3px 8px;border-radius:5px;border:1px solid var(--border-color);background:var(--bg-secondary);width:110px;text-align:center}
+.pc-expected{font:600 11px var(--font-mono);padding:3px 9px;border-radius:5px;background:var(--accent-green-bg);color:var(--accent-green-text);border:1px solid var(--accent-green)}
+.btn-toggle{font-family:system-ui,"Segoe UI Emoji",sans-serif;background:var(--bg-secondary);border:1px solid var(--border-color);color:var(--text-primary);padding:3px 9px;border-radius:5px;font-size:11px;cursor:pointer;font-weight:600}
+
+.pc-body{display:flex;gap:14px;padding:12px 14px}
+.pc-body--hidden{display:none}
+.pc-body-left{flex:1.4;display:flex;flex-direction:column;gap:8px}
+.pc-body-right{flex:1;display:flex;flex-direction:column;gap:6px}
+.pc-section{font-size:12.5px;line-height:1.55}
+.pc-section h4{font-size:11px;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;font-weight:700}
+.pc-section code{font:600 11.5px var(--font-mono);background:var(--accent-indigo-bg);color:var(--accent-indigo-text);padding:1px 5px;border-radius:3px}
+.pc-section em{font-style:normal;background:var(--accent-amber-bg);color:var(--accent-amber-text);padding:1px 5px;border-radius:3px;font-weight:600}
+.concept-block{background:var(--bg-secondary);border-left:3px solid var(--accent-indigo);padding:6px 9px;border-radius:4px;font-size:11.5px;margin-top:4px}
+.concept-block strong{color:var(--accent-indigo-text)}
+.cplx-row{display:flex;gap:6px;margin-top:5px;flex-wrap:wrap}
+.cplx-chip{font:600 10.5px var(--font-mono);padding:2px 8px;border-radius:99px;background:var(--accent-teal-bg);color:var(--accent-teal-text);border:1px solid var(--accent-teal)}
+
+.tc-chip{display:flex;flex-direction:column;gap:3px;background:var(--bg-secondary);border:1px solid var(--border-color);border-radius:6px;padding:6px 9px;cursor:pointer;transition:all var(--ease)}
+.tc-chip:hover{border-color:var(--accent-indigo);background:var(--accent-indigo-bg)}
+.tc-chip-top{display:flex;align-items:center;gap:6px;font-size:11px}
+.pt-tag{font:700 9px var(--font-mono);padding:1px 6px;border-radius:99px;background:var(--accent-indigo);color:#fff;text-transform:uppercase}
+.tc-label{flex:1;font-weight:600;color:var(--text-secondary)}
+.tc-expected{font:700 10.5px var(--font-mono);color:var(--accent-green-text)}
+.tc-vals{display:flex;gap:4px;flex-wrap:wrap}
+.tc-vals code{font:600 11px var(--font-mono);background:#fff;padding:2px 7px;border-radius:4px;border:1px solid var(--border-light);color:var(--text-primary)}
+.run-row{display:flex;align-items:center;gap:8px;margin-top:4px}
+.btn-run{font-family:system-ui,"Segoe UI Emoji",sans-serif;background:var(--accent-indigo);color:#fff;border:none;padding:6px 14px;border-radius:5px;font-weight:700;cursor:pointer;font-size:12px}
+.btn-run:hover{background:var(--accent-indigo-hover)}
+.live-out{font:700 12px var(--font-mono);color:var(--accent-teal-text);background:var(--accent-teal-bg);padding:4px 10px;border-radius:5px;border:1px solid var(--accent-teal)}
+
+/* Main */
+.main-row{flex:1;display:flex;overflow:hidden;min-height:0}
+.col{display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.col-code{width:33%;min-width:140px;max-width:45vw;background:var(--bg-card);border-right:1px solid var(--border-color)}
+.col-viz{flex:1;min-width:0;background:var(--bg-primary);position:relative}
+.section-label{font-family:system-ui,"Segoe UI Emoji",sans-serif;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-tertiary);padding:7px 12px;border-bottom:1px solid var(--border-light);background:var(--bg-secondary);flex-shrink:0}
+.code-panel{flex:1;overflow-y:auto;font-family:var(--font-mono);font-size:12px;line-height:var(--lh-code);padding:8px 0}
+.code-line{display:flex;padding:0 12px;white-space:pre;color:var(--text-primary)}
+.code-line.active{background:var(--active-line-bg);border-left:3px solid var(--accent-indigo);padding-left:9px}
+.ln{display:inline-block;width:24px;color:var(--text-tertiary);user-select:none;text-align:right;margin-right:10px;font-size:10.5px}
+.kw{color:var(--syn-keyword);font-weight:600}
+.fn{color:var(--syn-function);font-weight:600}
+.num{color:var(--syn-number);font-weight:600}
+.str{color:var(--syn-string)}
+
+.viz-panel{flex:1;overflow:auto;padding:10px 12px}
+.resize-h{width:5px;background:transparent;cursor:ew-resize;flex-shrink:0;transition:background var(--ease)}
+.resize-h:hover,.resize-h.active{background:var(--accent-indigo)}
+
+/* Vars strip */
+.vars-strip{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.var-chip{font:600 11px var(--font-mono);padding:3px 9px;border-radius:5px;background:var(--bg-card);border:1px solid var(--border-color);color:var(--text-primary)}
+.var-chip strong{color:var(--text-tertiary);font-weight:500;margin-right:3px}
+.vc-active{background:var(--accent-indigo-bg);border-color:var(--accent-indigo);color:var(--accent-indigo-text)}
+.vc-safe{background:var(--accent-green-bg);border-color:var(--accent-green);color:var(--accent-green-text)}
+.vc-warn{background:var(--accent-amber-bg);border-color:var(--accent-amber);color:var(--accent-amber-text)}
+.vc-blue{background:#DBEAFE;border-color:#3B82F6;color:#1E40AF}
+.vc-pink{background:#FCE7F3;border-color:#DB2777;color:#9D174D}
+.vc-fail{background:var(--accent-red-bg);border-color:var(--accent-red);color:var(--accent-red-text)}
+
+/* viz-row */
+.viz-row{display:flex;gap:12px;align-items:flex-start;flex-wrap:wrap}
+.viz-card{background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius-md);padding:10px}
+.viz-card h5{font-size:11px;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:.06em;margin-bottom:7px;font-weight:700;display:flex;align-items:center;gap:5px}
+
+/* ===== DIGIT TILES ===== */
+.digits-row{display:flex;gap:6px;padding:14px;background:linear-gradient(135deg,#1e293b 0%,#334155 100%);border-radius:8px;border:2px solid #475569;flex-wrap:wrap;justify-content:center;min-height:80px;align-items:center}
+.digit-tile{display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:54px;min-height:62px;padding:6px;background:#fff;border:2px solid #94a3b8;border-radius:8px;font-family:var(--font-mono);font-weight:700;position:relative;transition:all .25s}
+.digit-tile-idx{font-size:9px;color:var(--text-tertiary);font-weight:600;background:rgba(0,0,0,.06);padding:1px 5px;border-radius:99px;margin-bottom:3px}
+.digit-tile-val{font-size:22px;font-weight:700;color:var(--text-primary);font-family:var(--font-mono)}
+.digit-tile--curr-i{background:#FEF3C7!important;border-color:#B45309!important;animation:pulse-amber 1.1s infinite;transform:scale(1.1);z-index:3;box-shadow:0 0 14px rgba(180,83,9,.6)}
+.digit-tile--curr-i .digit-tile-val{color:#78350F!important}
+.digit-tile--swap-target{background:#DBEAFE!important;border-color:#3B82F6!important;animation:pulse-blue 1.2s infinite;z-index:2}
+.digit-tile--swap-target .digit-tile-val{color:#1E40AF!important}
+.digit-tile--scanned{background:#E2E8F0;border-color:#64748b;opacity:.7}
+.digit-tile--scanned .digit-tile-val{color:#64748b}
+.digit-tile--swapped-from{background:#DCFCE7!important;border-color:#15803D!important;animation:swap-glow 1.5s infinite}
+.digit-tile--swapped-from .digit-tile-val{color:#14532D!important}
+.digit-tile--swapped-to{background:#FCE7F3!important;border-color:#DB2777!important;animation:swap-glow 1.5s infinite}
+.digit-tile--swapped-to .digit-tile-val{color:#9D174D!important}
+.digit-pos-arrow{position:absolute;top:-22px;font-size:18px;color:#fbbf24;animation:bounce-down 1.2s infinite}
+
+@keyframes pulse-amber{0%,100%{box-shadow:0 0 4px rgba(180,83,9,.5)}50%{box-shadow:0 0 14px rgba(180,83,9,.9)}}
+@keyframes pulse-blue{0%,100%{box-shadow:0 0 3px rgba(59,130,246,.5)}50%{box-shadow:0 0 11px rgba(59,130,246,.85)}}
+@keyframes pulse-pink{0%,100%{box-shadow:0 0 3px rgba(219,39,119,.5)}50%{box-shadow:0 0 11px rgba(219,39,119,.85)}}
+@keyframes swap-glow{0%,100%{box-shadow:0 0 6px rgba(21,128,61,.6)}50%{box-shadow:0 0 16px rgba(21,128,61,1)}}
+@keyframes bounce-down{0%,100%{transform:translateY(0)}50%{transform:translateY(4px)}}
+@keyframes win-pulse{0%,100%{box-shadow:0 0 3px rgba(234,179,8,.5)}50%{box-shadow:0 0 12px rgba(234,179,8,.95)}}
+
+/* ===== LAST ARRAY ===== */
+.last-arr{display:grid;grid-template-columns:repeat(10, 1fr);gap:4px;padding:12px;background:#0d1117;border-radius:8px;border:2px solid #30363d}
+.last-cell{display:flex;flex-direction:column;align-items:center;padding:6px 4px;background:#1e293b;border:2px solid #334155;border-radius:6px;font-family:var(--font-mono);transition:all .25s;min-width:40px}
+.last-cell-d{font-size:9px;color:#94a3b8;font-weight:600;text-transform:uppercase;letter-spacing:.04em}
+.last-cell-v{font-size:16px;font-weight:700;color:#e2e8f0;margin-top:2px}
+.last-cell--unset .last-cell-v{color:#475569;font-style:italic}
+.last-cell--curr-d{background:#FEF3C7!important;border-color:#B45309!important;animation:pulse-amber 1.2s infinite;transform:scale(1.08);z-index:2}
+.last-cell--curr-d .last-cell-d{color:#78350F!important}
+.last-cell--curr-d .last-cell-v{color:#78350F!important}
+.last-cell--scanning{background:#3b3a5a;border-color:#534AB7}
+.last-cell--just-set{background:#15803D!important;border-color:#22c55e!important}
+.last-cell--just-set .last-cell-v{color:#fff}
+.last-cell--just-set .last-cell-d{color:#bbf7d0}
+
+/* Scan indicator */
+.scan-marker{display:inline-flex;align-items:center;gap:4px;font:700 11px var(--font-mono);padding:3px 8px;border-radius:5px;background:var(--accent-indigo-bg);color:var(--accent-indigo-text);border:1px solid var(--accent-indigo)}
+
+/* Compare board */
+.compare-board{display:flex;gap:14px;justify-content:center;align-items:center;padding:12px;background:var(--bg-secondary);border-radius:6px;flex-wrap:wrap}
+.compare-side{display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 12px;border:2px solid;border-radius:8px;min-width:90px}
+.compare-side--left{background:#FEF3C7;border-color:#B45309}
+.compare-side--right{background:#FCE7F3;border-color:#DB2777}
+.compare-side--found{background:#DCFCE7;border-color:#15803D}
+.compare-label{font:700 10px var(--font-mono);text-transform:uppercase;letter-spacing:.05em;color:var(--text-secondary)}
+.compare-val{font:700 22px var(--font-mono);color:var(--text-primary)}
+.compare-sub{font:11px var(--font-mono);color:var(--text-tertiary);font-style:italic}
+.compare-op{font:700 22px var(--font-mono);color:var(--accent-indigo)}
+
+/* Result banner */
+.result-banner{margin-top:10px;padding:10px 14px;background:linear-gradient(90deg,var(--accent-amber-bg),#FEF9C3);border:2px solid var(--accent-amber);border-radius:var(--radius-md);font-weight:700;color:var(--accent-amber-text);text-align:center;animation:win-pulse 1.6s infinite}
+
+/* Footer */
+.footer-bar{display:flex;flex-shrink:0;border-top:1px solid var(--border-color);background:var(--bg-card)}
+.footer-left{width:33%;min-width:140px;max-width:45vw;display:flex;align-items:center;gap:8px;padding:7px 12px;border-right:1px solid var(--border-light)}
+.footer-right{flex:1;display:flex;align-items:center;gap:8px;padding:7px 14px;flex-wrap:wrap}
+.step-info{font:700 12px var(--font-mono);color:var(--text-primary);background:var(--bg-secondary);padding:3px 10px;border-radius:5px;border:1px solid var(--border-color)}
+.action-badge{font-family:system-ui,"Segoe UI Emoji",sans-serif;font-size:10px;font-weight:700;padding:3px 8px;border-radius:99px;color:#fff;background:#888}
+.action-badge--func-def,.action-badge--init,.action-badge--call,.action-badge--return{background:#8250ff}
+.action-badge--for-check,.action-badge--while-check,.action-badge--if-check{background:#388bfd}
+.action-badge--mark,.action-badge--push,.action-badge--pop,.action-badge--restore,.action-badge--found{background:#3fb950}
+.action-badge--remove,.action-badge--prune,.action-badge--fail{background:#f85149}
+.action-badge--exit,.action-badge--skip{background:#555450}
+
+kbd{font-family:system-ui,"Segoe UI Emoji",sans-serif;font-size:10px;background:var(--bg-secondary);border:1px solid var(--border-color);border-radius:3px;padding:1px 5px;color:var(--text-secondary)}
+.btn{font-family:system-ui,"Segoe UI Emoji",sans-serif;background:var(--bg-secondary);border:1px solid var(--border-color);color:var(--text-primary);padding:4px 10px;border-radius:5px;font-size:12px;cursor:pointer;font-weight:600}
+.btn:hover{background:var(--bg-tertiary)}
+.btn-primary{background:var(--accent-indigo);color:#fff;border-color:var(--accent-indigo)}
+.btn-primary:hover{background:var(--accent-indigo-hover)}
+.btn-fullscreen{font-size:14px}
+.footer-sep{width:1px;height:20px;background:var(--border-color);margin:0 3px}
+.log-toggle-btn{font-family:system-ui,"Segoe UI Emoji",sans-serif;background:var(--accent-green-bg);color:var(--accent-green-text);border:1px solid var(--accent-green);padding:4px 10px;border-radius:5px;font-size:11px;cursor:pointer;font-weight:700}
+.log-toggle-btn--off{background:var(--bg-secondary);color:var(--text-tertiary);border-color:var(--border-color)}
+.btn-zoom{font-family:system-ui,"Segoe UI Emoji",sans-serif;background:var(--bg-secondary);border:1px solid var(--border-color);color:var(--text-primary);padding:3px 8px;border-radius:4px;font-size:13px;cursor:pointer;font-weight:700;min-width:24px}
+.log-zoom-label{font:600 10.5px var(--font-mono);color:var(--text-secondary);min-width:34px;text-align:center}
+
+/* Log popup */
+.log-popup{--log-scale:1;position:fixed;bottom:52px;right:14px;width:calc(480px * var(--log-scale));max-width:92vw;max-height:75vh;border-radius:var(--radius-lg);box-shadow:0 10px 32px rgba(0,0,0,.14);border:1px solid var(--border-color);background:var(--bg-card);overflow:hidden;display:flex;flex-direction:column;z-index:100;transition:opacity .15s, transform .15s;transform-origin:bottom right}
+.log-popup--hidden{opacity:0;transform:scale(.92);pointer-events:none}
+.log-popup-body{flex:1;overflow:auto;padding:0}
+.log-popup-body > .log-card{border-radius:0;border:none;border-left:0}
+
+.log-card{border-radius:var(--radius-md);overflow:hidden;border:1px solid var(--border-color);border-left-width:4px;font-size:var(--fs-xs);background:var(--bg-card)}
+.log-card--func-def,.log-card--init,.log-card--call,.log-card--return{border-left-color:#8250ff}
+.log-card--for-check,.log-card--while-check,.log-card--if-check{border-left-color:#388bfd}
+.log-card--mark,.log-card--push,.log-card--pop,.log-card--restore,.log-card--found{border-left-color:#3fb950}
+.log-card--remove,.log-card--prune,.log-card--fail{border-left-color:#f85149}
+.log-card--exit,.log-card--skip{border-left-color:#555450}
+
+.log-card-header{display:flex;align-items:center;gap:6px;padding:8px 10px 6px;background:var(--bg-secondary);border-bottom:1px solid var(--border-light)}
+.log-badge{font-family:system-ui,"Segoe UI Emoji",sans-serif;font-size:10px;font-weight:700;padding:2px 7px;border-radius:99px;color:#fff;background:#888}
+.log-badge--func-def,.log-badge--init,.log-badge--call,.log-badge--return{background:#8250ff}
+.log-badge--for-check,.log-badge--while-check,.log-badge--if-check{background:#388bfd}
+.log-badge--mark,.log-badge--push,.log-badge--pop,.log-badge--restore,.log-badge--found{background:#3fb950}
+.log-badge--remove,.log-badge--prune,.log-badge--fail{background:#f85149}
+.log-badge--exit,.log-badge--skip{background:#555450}
+.log-line-ref{font:700 10px var(--font-mono);color:var(--accent-indigo);background:var(--accent-indigo-bg);padding:1px 6px;border-radius:4px;border:1px solid var(--accent-indigo)}
+.log-status-pill{font-family:system-ui,"Segoe UI Emoji",sans-serif;font-size:9px;font-weight:700;padding:2px 7px;border-radius:99px;text-transform:uppercase;margin-left:auto}
+.log-status--success{background:var(--accent-green-bg);color:var(--accent-green-text);border:1px solid var(--accent-green)}
+.log-status--fail{background:var(--accent-red-bg);color:var(--accent-red-text);border:1px solid var(--accent-red)}
+.log-status--skip{background:var(--bg-tertiary);color:var(--text-tertiary);border:1px solid var(--border-color)}
+.log-status--loop{background:rgba(56,139,253,.14);color:#185FA5;border:1px solid #388bfd}
+.log-status--prune{background:var(--accent-red-bg);color:var(--accent-red-text);border:1px solid var(--accent-red)}
+.log-status--info{background:rgba(130,80,255,.14);color:#3C3489;border:1px solid #8250ff}
+
+.log-section{padding:7px 10px;border-bottom:1px dashed var(--border-light)}
+.log-section:last-child{border-bottom:none}
+.log-section-title{font:700 8px var(--font-mono);text-transform:uppercase;letter-spacing:.06em;color:var(--text-tertiary);margin-bottom:4px;display:flex;align-items:center;gap:4px}
+.log-section-title-icon{font-family:system-ui,"Segoe UI Emoji",sans-serif}
+
+.log-code-snippet{font:600 11px var(--font-mono);background:#0d1117;color:#e6edf3;padding:6px 9px;border-radius:4px;display:block;overflow-x:auto;white-space:pre;border:1px solid #30363d}
+.log-code-snippet .ck{color:#ff7b72}
+.log-code-snippet .cs{color:#a5d6ff}
+.log-code-snippet .cn{color:#79c0ff}
+.log-code-snippet .cf{color:#d2a8ff}
+.log-code-snippet .cc{color:#8b949e;font-style:italic}
+
+.log-kv-row{display:flex;flex-wrap:wrap;gap:4px}
+.log-kv{display:inline-flex;align-items:center;gap:3px;font:11px var(--font-mono);padding:2px 7px;border-radius:4px;background:var(--bg-secondary);border:1px solid var(--border-light)}
+.log-kv-key{color:var(--text-tertiary);font-weight:500}
+.log-kv-val{color:var(--text-primary);font-weight:700}
+.log-kv--in{background:rgba(56,139,253,.08);border-color:rgba(56,139,253,.3)}
+.log-kv--out{background:rgba(63,185,80,.08);border-color:rgba(63,185,80,.4)}
+.log-kv--out .log-kv-val{color:#15803D}
+.log-kv--changed{background:rgba(180,83,9,.10);border-color:rgba(180,83,9,.4)}
+.log-kv--changed .log-kv-val{color:var(--accent-amber-text)}
+
+.log-verdict{display:flex;align-items:center;gap:6px;font:600 11px var(--font-mono);padding:5px 8px;border-radius:5px;background:var(--bg-secondary);border:1px solid var(--border-light)}
+.log-verdict--true{background:var(--accent-green-bg);border-color:var(--accent-green);color:var(--accent-green-text)}
+.log-verdict--false{background:var(--accent-red-bg);border-color:var(--accent-red);color:var(--accent-red-text)}
+
+.log-analogy{font:italic 11px var(--font-sans);color:var(--text-secondary);background:#FFF8E7;border:1px solid #FBE8A6;border-left:3px solid var(--accent-amber);padding:6px 9px;border-radius:4px;line-height:1.55}
+.log-analogy strong{color:var(--accent-amber-text);font-style:normal;font-weight:700}
+
+.log-why{font-size:11px;line-height:1.55;color:var(--text-primary);padding:3px 0}
+.log-why strong{color:var(--accent-indigo-text)}
+.log-why code{font:600 10.5px var(--font-mono);background:var(--bg-secondary);padding:1px 5px;border-radius:3px;color:var(--accent-indigo-text)}
+</style>
+</head>
+<body>
+<div class="app-shell">
+
+  <!-- ============ PROBLEM CARD ============ -->
+  <div class="problem-card" id="problemCard">
+    <div class="pc-header">
+      <a href="../00_HomePage/gt_learn_homepage.html" class="gt-learn">GT LEARN</a>
+      <span class="pc-num">#670</span>
+      <span class="pc-title">🔢 Maximum Swap</span>
+      <span class="pc-diff">MEDIUM</span>
+      <span class="pc-tag">Greedy</span>
+      <span class="pc-tag">String</span>
+      <span class="pc-tag">Math</span>
+      <div class="pc-header-right">
+        <span class="pc-input-label">num=</span>
+        <input class="pc-input" id="inNum" type="number" min="0" value="2736">
+        <span class="pc-expected" id="expectedBadge">expected: 7236</span>
+        <button class="btn-toggle" onclick="toggleProblem()" id="toggleBtn">▲ Hide</button>
+      </div>
+    </div>
+    <div class="pc-body" id="pcBody">
+      <div class="pc-body-left">
+        <div class="pc-section">
+          <h4>📝 Problem Statement</h4>
+          Given a non-negative integer <code>num</code>, you can swap two digits <strong>at most once</strong>. Return the <strong>maximum value</strong> you can get.
+        </div>
+        <div class="pc-section">
+          <h4>🧠 Solving Approach — Greedy O(n)</h4>
+          For each digit (left to right), check if there's a <em>strictly larger</em> digit somewhere to its right. If yes, swap with the <strong>rightmost occurrence</strong> of the largest such digit and we're done. We use a <code>last[10]</code> array to remember the rightmost index of each digit 0–9.
+        </div>
+        <div class="pc-section">
+          <h4>🎯 Core Insight</h4>
+          <div class="concept-block"><strong>Why leftmost mismatch?</strong> Swapping a leftmost smaller digit with a bigger one gives the biggest place-value gain.</div>
+          <div class="concept-block"><strong>Why rightmost occurrence?</strong> If digit <code>9</code> appears twice to the right, swap with the <em>later</em> one — pushes the smaller digit further right, increasing the result more.</div>
+          <div class="concept-block"><strong>Why try d from 9 downward?</strong> We want the LARGEST possible digit at the leftmost slot.</div>
+        </div>
+        <div class="cplx-row">
+          <span class="cplx-chip">Time: O(n)</span>
+          <span class="cplx-chip">Space: O(1)</span>
+          <span class="cplx-chip">At most 1 swap</span>
+        </div>
+      </div>
+      <div class="pc-body-right">
+        <div class="tc-chip" onclick="loadTest(2736, 7236)">
+          <div class="tc-chip-top"><span class="pt-tag">T1</span><span class="tc-label">classic swap</span><span class="tc-expected">→ 7236</span></div>
+          <div class="tc-vals"><code>num=2736</code></div>
+        </div>
+        <div class="tc-chip" onclick="loadTest(9973, 9973)">
+          <div class="tc-chip-top"><span class="pt-tag">T2</span><span class="tc-label">already max</span><span class="tc-expected">→ 9973</span></div>
+          <div class="tc-vals"><code>num=9973</code></div>
+        </div>
+        <div class="tc-chip" onclick="loadTest(1993, 9913)">
+          <div class="tc-chip-top"><span class="pt-tag">T3</span><span class="tc-label">duplicate digit</span><span class="tc-expected">→ 9913</span></div>
+          <div class="tc-vals"><code>num=1993</code></div>
+        </div>
+        <div class="tc-chip" onclick="loadTest(98368, 98863)">
+          <div class="tc-chip-top"><span class="pt-tag">T4</span><span class="tc-label">middle swap</span><span class="tc-expected">→ 98863</span></div>
+          <div class="tc-vals"><code>num=98368</code></div>
+        </div>
+        <div class="tc-chip" onclick="loadTest(11, 11)">
+          <div class="tc-chip-top"><span class="pt-tag">T5</span><span class="tc-label">all same</span><span class="tc-expected">→ 11</span></div>
+          <div class="tc-vals"><code>num=11</code></div>
+        </div>
+        <div class="run-row">
+          <button class="btn-run" onclick="resetWithInput()">▶ Run</button>
+          <span class="live-out" id="liveOutput">—</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ MAIN ============ -->
+  <div class="main-row">
+    <div class="col col-code" id="col1">
+      <div class="section-label">📜 Python Code</div>
+      <div class="code-panel" id="codePanel"></div>
+    </div>
+    <div class="resize-h" id="resizeH1"></div>
+    <div class="col col-viz">
+      <div class="section-label">📊 Visualization</div>
+      <div class="viz-panel" id="vizPanel"></div>
+      <div class="log-popup" id="logPopup">
+        <div class="log-popup-body" id="logPopupBody"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ FOOTER ============ -->
+  <div class="footer-bar">
+    <div class="footer-left" id="footerLeft">
+      <span id="stepInfo" class="step-info">0/0</span>
+      <span id="actionBadge" class="action-badge"></span>
+    </div>
+    <div class="footer-right">
+      <kbd>←</kbd><kbd>→</kbd><kbd>R</kbd>
+      <button class="btn" type="button" onclick="resetStep()">↺</button>
+      <button class="btn" type="button" onclick="stepBy(-1)">◀</button>
+      <button class="btn btn-primary" type="button" onclick="stepBy(1)">▶ Next</button>
+      <span class="footer-sep"></span>
+      <button id="logToggleBtn" class="log-toggle-btn" type="button" onclick="toggleLogPreview()">📋 ON</button>
+      <button class="btn-zoom" type="button" onclick="logZoom(-1)">−</button>
+      <span id="logZoomLabel" class="log-zoom-label">100%</span>
+      <button class="btn-zoom" type="button" onclick="logZoom(1)">+</button>
+      <button class="btn-zoom" type="button" onclick="logZoomReset()">↺</button>
+      <span class="footer-sep"></span>
+      <button class="btn btn-fullscreen" type="button" onclick="toggleFullscreen()">⛶</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+/* ============ CODE LINES ============ */
+var codeLines = [
+  "def maximumSwap(num):",
+  "    digits = list(str(num))",
+  "    n = len(digits)",
+  "    last = [-1] * 10",
+  "    for i in range(n):",
+  "        last[int(digits[i])] = i",
+  "    for i in range(n):",
+  "        for d in range(9, int(digits[i]), -1):",
+  "            if last[d] > i:",
+  "                digits[i], digits[last[d]] = digits[last[d]], digits[i]",
+  "                return int(''.join(digits))",
+  "    return num"
+];
+
+/* ============ SYNTAX HIGHLIGHTER ============ */
+function renderCode() {
+  var p = document.getElementById('codePanel');
+  p.innerHTML = codeLines.map(function(raw, i) {
+    var h = raw;
+    h = h.replace(/("[^"]*"|'[^']*')/g, '\x01STR\x02$1\x03');
+    h = h.replace(/\b(def|for|in|if|return|break|continue|and|else|elif|True|False|None|not|or|while|lambda)\b/g, '\x01KW\x02$1\x03');
+    h = h.replace(/\b(len|range|int|str|list|append|pop|sorted|min|max|sum|abs|enumerate|zip|print|set|add|join)\b/g, '\x01FN\x02$1\x03');
+    h = h.replace(/(?<![.\w"\x01\x02\x03])(-?\d+)\b/g, '\x01NUM\x02$1\x03');
+    h = h.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    h = h.replace(/\x01STR\x02/g, '<span class="str">').replace(/\x01KW\x02/g, '<span class="kw">').replace(/\x01FN\x02/g, '<span class="fn">').replace(/\x01NUM\x02/g, '<span class="num">').replace(/\x03/g, '</span>');
+    return '<div class="code-line" data-line="' + i + '"><span class="ln">' + (i+1) + '</span>' + h + '</div>';
+  }).join('');
+}
+
+/* ============ MINI HIGHLIGHTER ============ */
+function hlCode(raw) {
+  var h = raw;
+  h = h.replace(/("[^"]*"|'[^']*')/g, '\x01s\x02$1\x03');
+  h = h.replace(/\b(def|for|in|if|return|break|continue|and|else|elif|True|False|None|not|or|while|lambda)\b/g, '\x01k\x02$1\x03');
+  h = h.replace(/\b(len|range|int|str|list|append|pop|sorted|min|max|sum|abs|enumerate|zip|print|set|add|join|maximumSwap)\b/g, '\x01f\x02$1\x03');
+  h = h.replace(/(?<![.\w"\x01\x02\x03])(-?\d+)\b/g, '\x01n\x02$1\x03');
+  h = h.replace(/(#.*$)/gm, '\x01c\x02$1\x03');
+  h = h.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  h = h.replace(/\x01([a-z])\x02/g, function(_, c) { return '<span class="c' + c + '">'; }).replace(/\x03/g, '</span>');
+  return h;
+}
+
+/* ============ BADGES ============ */
+var LOG_BADGE = {
+  "func-def":"📌 DEF","init":"⚙️ INIT","call":"📞 CALL","return":"🏆 RETURN",
+  "for-check":"🔁 FOR","while-check":"🔁 WHILE","if-check":"🔎 IF",
+  "mark":"✅ MARK","push":"⬆ PUSH","pop":"⬇ POP","restore":"↩ RESTORE","found":"🎉 FOUND",
+  "remove":"🔀 SWAP","prune":"✂️ PRUNE","fail":"❌ FAIL",
+  "exit":"🔚 EXIT","skip":"⏭ SKIP"
+};
+var BADGE_LABEL = {
+  "func-def":"DEF","init":"INIT","call":"CALL","return":"RETURN",
+  "for-check":"FOR","while-check":"WHILE","if-check":"IF",
+  "mark":"MARK","push":"PUSH","pop":"POP","restore":"RESTORE","found":"FOUND",
+  "remove":"SWAP","prune":"PRUNE","fail":"FAIL",
+  "exit":"EXIT","skip":"SKIP"
+};
+
+/* ============ richLog ============ */
+function richLog(opts) {
+  var statusMap = {
+    success:"✅ Success", fail:"❌ Failed", skip:"⏭ Skipped",
+    loop:"🔁 Loop iter", prune:"✂️ Pruned", info:"ℹ️ Info"
+  };
+  var status = opts.status || "info";
+  var html = '<div class="log-card log-card--' + opts.action + '">';
+  html += '<div class="log-card-header">';
+  html += '<span class="log-badge log-badge--' + opts.action + '">' + (LOG_BADGE[opts.action] || opts.action) + '</span>';
+  html += '<span class="log-line-ref">L' + (opts.line + 1) + '</span>';
+  html += '<span class="log-status-pill log-status--' + status + '">' + statusMap[status] + '</span>';
+  html += '</div>';
+  if (opts.code) {
+    html += '<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">📜</span>Code Executing</div>';
+    html += '<code class="log-code-snippet">' + hlCode(opts.code) + '</code></div>';
+  }
+  if (opts.inputs && opts.inputs.length) {
+    html += '<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">📥</span>Input Values (line is using these)</div><div class="log-kv-row">';
+    opts.inputs.forEach(function(kv){
+      html += '<span class="log-kv log-kv--in"><span class="log-kv-key">' + kv.k + '</span>=<span class="log-kv-val">' + kv.v + '</span></span>';
+    });
+    html += '</div></div>';
+  }
+  if (opts.outputs && opts.outputs.length) {
+    html += '<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">📤</span>Output / State After Line</div><div class="log-kv-row">';
+    opts.outputs.forEach(function(kv){
+      var cls = kv.changed ? 'log-kv--changed' : 'log-kv--out';
+      html += '<span class="log-kv ' + cls + '"><span class="log-kv-key">' + kv.k + '</span>=<span class="log-kv-val">' + kv.v + '</span></span>';
+    });
+    html += '</div></div>';
+  }
+  if (opts.verdict) {
+    var vCls = opts.verdictTrue === true ? 'log-verdict--true' : (opts.verdictTrue === false ? 'log-verdict--false' : '');
+    var vIcon = opts.verdictTrue === true ? '✓' : (opts.verdictTrue === false ? '✗' : '•');
+    html += '<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">⚖️</span>Verdict / Decision</div>';
+    html += '<div class="log-verdict ' + vCls + '">' + vIcon + ' ' + opts.verdict + '</div></div>';
+  }
+  if (opts.why) {
+    html += '<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">💡</span>Why This Happens</div>';
+    html += '<div class="log-why">' + opts.why + '</div></div>';
+  }
+  if (opts.analogy) {
+    html += '<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">🎭</span>Real-Life Analogy</div>';
+    html += '<div class="log-analogy">' + opts.analogy + '</div></div>';
+  }
+  html += '</div>';
+  return html;
+}
+
+/* ============ STATE ============ */
+var steps = [];
+var currentStep = 0;
+var codeWidthUserSet = false;
+var curResult = null;
+var logEnabled = true;
+var logZoomLevel = 100;
+
+/* ============ buildSteps ============ */
+function buildSteps(num) {
+  var st = [];
+  var MAX_STEPS = 5000;
+
+  // live algo state
+  var digits = null;
+  var n = null;
+  var last = null;
+  var i = null;
+  var d = null;
+  var phase = "init"; // "build-last" | "scan" | "swap" | "done"
+  // highlight markers
+  var hl = {
+    currI: null,           // current outer-loop position (leftmost candidate)
+    swapTarget: null,      // last[d] (the rightmost-larger-digit index)
+    scannedUpTo: -1,       // how far the build-last loop has scanned
+    currLastD: null,       // which last[d] cell is being read/written
+    justSetLastD: null,    // last[d] that was just written (for green flash)
+    swappedFrom: null,     // i (after swap)
+    swappedTo: null        // last[d] (after swap)
+  };
+  var lastBreakVal = null;
+  var lastSurviveVal = null;
+
+  function snap(extra) {
+    return Object.assign({
+      num: num,
+      digits: digits ? digits.slice() : null,
+      n: n,
+      last: last ? last.slice() : null,
+      i: i, d: d,
+      phase: phase,
+      hl: {
+        currI: hl.currI, swapTarget: hl.swapTarget,
+        scannedUpTo: hl.scannedUpTo, currLastD: hl.currLastD,
+        justSetLastD: hl.justSetLastD,
+        swappedFrom: hl.swappedFrom, swappedTo: hl.swappedTo
+      }
+    }, extra || {});
+  }
+
+  function pushStep(o) {
+    if (st.length >= MAX_STEPS) return;
+    st.push(Object.assign({ line: 0, action: "init", logHTML: "" }, snap(o)));
+  }
+
+  // L0: function def
+  pushStep({
+    line: 0, action: "func-def",
+    logHTML: richLog({
+      line: 0, action: "func-def",
+      code: "def maximumSwap(num=" + num + "):",
+      status: "info",
+      inputs: [{k:"num", v:num}],
+      why: "<strong>Function entry:</strong> <code>num=" + num + "</code> diya gaya hai. Goal — at most ek swap karke maximum value generate karna. Greedy approach use karenge with O(n) time.",
+      analogy: "Imagine karo tumhare paas ek <strong>number plate</strong> hai with digits — sirf <strong>ek baar do digits exchange</strong> kar sakte ho. Maximum value kaise nikalo? Sabse pehle leftmost chhoti digit ko sabse badi possible digit se swap karna hai!"
+    })
+  });
+
+  // L1: digits = list(str(num))
+  digits = String(num).split('');
+  n = digits.length;
+  pushStep({
+    line: 1, action: "init",
+    logHTML: richLog({
+      line: 1, action: "init",
+      code: "digits = list(str(" + num + "))  # " + JSON.stringify(digits),
+      status: "success",
+      inputs: [{k:"num", v:num}],
+      outputs: [{k:"digits", v:JSON.stringify(digits), changed:true}],
+      why: "<strong>Number ko character list mein convert</strong> kar diya. Easier hai individual digits ko access aur modify karna list mein.",
+      analogy: "Jaise <strong>number plate ke har digit ka tile</strong> alag-alag rakh diya — ab kisi bhi do tiles ko aasaani se swap kar sakte hain."
+    })
+  });
+
+  // L2: n = len(digits)
+  pushStep({
+    line: 2, action: "init",
+    logHTML: richLog({
+      line: 2, action: "init",
+      code: "n = len(digits)  # = " + n,
+      status: "success",
+      inputs: [{k:"digits", v:JSON.stringify(digits)}],
+      outputs: [{k:"n", v:n, changed:true}],
+      why: "<strong>Length store</strong> kar liya — total <code>" + n + " digits</code> hain. Loops mein bound use hoga.",
+      analogy: "Number plate mein <strong>" + n + " tiles</strong> hain — yeh count yaad rakhna zaroori hai."
+    })
+  });
+
+  // L3: last = [-1] * 10
+  last = [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1];
+  pushStep({
+    line: 3, action: "init",
+    logHTML: richLog({
+      line: 3, action: "init",
+      code: "last = [-1] * 10",
+      status: "success",
+      outputs: [{k:"last", v:"[-1, -1, ..., -1] (size 10)", changed:true}],
+      why: "<strong>last array initialize</strong> with -1 for digits 0–9. <code>last[d]</code> store karega digit <code>d</code> ka <strong>rightmost (latest) index</strong> in <code>digits</code>.",
+      analogy: "<strong>10 lockers</strong> banaye — ek har digit (0 se 9) ke liye. Har locker mein likhenge 'yeh digit number plate mein last kahan dikha'. Abhi sab khali (-1)."
+    })
+  });
+
+  // L4-5: for i in range(n): last[int(digits[i])] = i  (build-last phase)
+  phase = "build-last";
+  for (var ii = 0; ii < n; ii++) {
+    i = ii;
+    hl.scannedUpTo = ii;
+    hl.currI = ii;
+    hl.currLastD = parseInt(digits[ii], 10);
+
+    // L4: for-check
+    pushStep({
+      line: 4, action: "for-check",
+      logHTML: richLog({
+        line: 4, action: "for-check",
+        code: "for i in range(" + n + "):  i=" + ii,
+        status: "loop",
+        inputs: [{k:"n", v:n}],
+        outputs: [{k:"i", v:ii, changed:true}],
+        verdict: "i (" + ii + ") in [0.." + (n-1) + "]",
+        verdictTrue: true,
+        why: "<strong>Build-last loop</strong> ka iteration #" + (ii+1) + ". Abhi position <code>i=" + ii + "</code> pe digit <code>'" + digits[ii] + "'</code> hai — iska last index update karenge.",
+        analogy: "<strong>Number plate scan kar rahe hain</strong> left-to-right — har digit ke last position ko apne locker mein note kar rahe hain."
+      })
+    });
+
+    // L5: last[int(digits[i])] = i
+    var dig = parseInt(digits[ii], 10);
+    var oldLastD = last[dig];
+    last[dig] = ii;
+    hl.justSetLastD = dig;
+    pushStep({
+      line: 5, action: "mark",
+      logHTML: richLog({
+        line: 5, action: "mark",
+        code: "last[int(digits[" + ii + "])] = " + ii + "  # last[" + dig + "] = " + ii,
+        status: "success",
+        inputs: [
+          {k:"digits[" + ii + "]", v:"'" + digits[ii] + "'"},
+          {k:"int(digits[" + ii + "])", v:dig}
+        ],
+        outputs: [{k:"last[" + dig + "]", v:oldLastD + " → " + ii, changed:true}],
+        why: "<strong>Locker update:</strong> Digit <code>" + dig + "</code> ke locker mein <code>" + ii + "</code> likh diya — kyunki yeh iska <strong>latest (rightmost so far)</strong> position hai. Agar yeh digit pehle bhi tha (last[" + dig + "]=" + oldLastD + "), toh overwrite kar diya — humein rightmost chahiye.",
+        analogy: "<strong>Locker " + dig + ":</strong> 'Last seen at position " + ii + "' — pehle ka entry mita do, naya likh do. Aage badhne pe agar phir mila toh phir update karenge."
+      })
+    });
+    hl.justSetLastD = null;
+  }
+
+  // L4 exit
+  i = null;
+  hl.currI = null;
+  hl.currLastD = null;
+  pushStep({
+    line: 4, action: "exit",
+    logHTML: richLog({
+      line: 4, action: "exit",
+      code: "# build-last loop exit — saare " + n + " digits scan ho gaye",
+      status: "info",
+      inputs: [{k:"n", v:n}],
+      outputs: [{k:"last", v:JSON.stringify(last)}],
+      why: "<strong>Build-last loop khatam.</strong> Ab <code>last</code> array mein har digit (0-9) ka <strong>rightmost index</strong> stored hai. Yeh O(n) preprocessing thi — ab actual swap dhundhna hai.",
+      analogy: "<strong>Saare 10 lockers update ho gaye</strong> — ab har digit ke liye uska 'last appearance position' pata hai. Ab actual swap decision lene ka time."
+    })
+  });
+
+  // L6-10: scan + swap phase
+  phase = "scan";
+  var swapped = false;
+  for (var ii2 = 0; ii2 < n && !swapped; ii2++) {
+    i = ii2;
+    hl.currI = ii2;
+    hl.currLastD = null;
+
+    // L6: outer for-check
+    pushStep({
+      line: 6, action: "for-check",
+      logHTML: richLog({
+        line: 6, action: "for-check",
+        code: "for i in range(" + n + "):  i=" + ii2 + "  # current digit = '" + digits[ii2] + "'",
+        status: "loop",
+        inputs: [{k:"n", v:n}, {k:"digits[" + ii2 + "]", v:"'" + digits[ii2] + "'"}],
+        outputs: [{k:"i", v:ii2, changed:true}],
+        verdict: "i (" + ii2 + ") in [0.." + (n-1) + "]",
+        verdictTrue: true,
+        why: "<strong>Scan loop</strong> — position <code>" + ii2 + "</code> pe digit <code>'" + digits[ii2] + "'</code>. Check karna hai ki iske aage koi <em>strictly bigger</em> digit hai ya nahi — agar hai toh swap karenge.",
+        analogy: "<strong>Leftmost se chal rahe hain:</strong> Yahan rakhi <strong>'" + digits[ii2] + "'</strong> ko replace kar saktein hain kya — koi badi digit milegi aage?"
+      })
+    });
+
+    // L7: for d in range(9, int(digits[i]), -1)
+    var curDigit = parseInt(digits[ii2], 10);
+    var didSwap = false;
+
+    if (curDigit === 9) {
+      // empty range — skip step
+      pushStep({
+        line: 7, action: "skip",
+        logHTML: richLog({
+          line: 7, action: "skip",
+          code: "for d in range(9, " + curDigit + ", -1):  # range(9, 9, -1) is EMPTY",
+          status: "skip",
+          inputs: [{k:"digits[" + ii2 + "]", v:curDigit}],
+          verdict: "range(9, " + curDigit + ", -1) is empty",
+          verdictTrue: false,
+          why: "<strong>Range empty hai!</strong> <code>digits[" + ii2 + "] = 9</code> already maximum digit hai — isse badi koi digit ho hi nahi sakti. Inner loop body execute hi nahi hoga.",
+          analogy: "<strong>9 already top hai</strong> — isse badi digit exist hi nahi karti. Skip karo, agle position pe jaao."
+        })
+      });
+    } else {
+      for (var dd = 9; dd > curDigit; dd--) {
+        d = dd;
+
+        // L7: for-check (inner)
+        pushStep({
+          line: 7, action: "for-check",
+          logHTML: richLog({
+            line: 7, action: "for-check",
+            code: "for d in range(9, " + curDigit + ", -1):  d=" + dd,
+            status: "loop",
+            inputs: [{k:"digits[" + ii2 + "]", v:curDigit}],
+            outputs: [{k:"d", v:dd, changed:true}],
+            verdict: "d (" + dd + ") > digits[i] (" + curDigit + ")",
+            verdictTrue: true,
+            why: "<strong>Trying d=" + dd + "</strong> — agar digit <code>" + dd + "</code> position <code>" + ii2 + "</code> ke baad kahin exist karta hai, toh use ke saath swap karenge. Top-down try kar rahe hain (9, 8, 7...) so that <strong>biggest possible</strong> digit milte hi swap kar dein.",
+            analogy: "<strong>Bada se chhota try:</strong> 9 hai? 8 hai? — Jo sabse pehla bada digit milega aage, woh hi best swap candidate hai."
+          })
+        });
+
+        // L8: if last[d] > i
+        var lastD = last[dd];
+        var condTrue = lastD > ii2;
+        hl.currLastD = dd;
+        pushStep({
+          line: 8, action: "if-check",
+          logHTML: richLog({
+            line: 8, action: "if-check",
+            code: "if last[" + dd + "] > " + ii2 + ":  # " + lastD + " > " + ii2 + " → " + (condTrue ? "True" : "False"),
+            status: condTrue ? "success" : "skip",
+            inputs: [{k:"last[" + dd + "]", v:lastD}, {k:"i", v:ii2}],
+            verdict: "last[" + dd + "] (" + lastD + ") > i (" + ii2 + ")",
+            verdictTrue: condTrue,
+            why: condTrue
+              ? "<strong>JACKPOT!</strong> Digit <code>" + dd + "</code> position <code>" + lastD + "</code> pe hai (jo <code>" + ii2 + "</code> se aage hai) — yeh swap valid hai. Iss bigger digit ko leftmost chhoti slot mein laayenge."
+              : "<strong>No luck:</strong> Digit <code>" + dd + "</code> ya toh exist nahi karta (last=-1) ya position <code>" + lastD + "</code> pe hai jo <code>" + ii2 + "</code> ke <strong>peeche</strong> hai. Aage waale digit ko replace nahi kar sakte peeche se. Try smaller d.",
+            analogy: condTrue
+              ? "<strong>Sahi swap mil gaya:</strong> Locker " + dd + " mein position " + lastD + " likha hai — yeh humare <strong>aage</strong> hai, toh swap kar sakte hain!"
+              : "<strong>Yeh option bekaar:</strong> Locker " + dd + " ka position humse <strong>peeche</strong> hai (ya khali hai). Aage waala digit replace nahi kar sakte peeche waale se. Next try."
+          })
+        });
+
+        if (condTrue) {
+          // L9: swap
+          var iCopy = ii2, lastDCopy = lastD;
+          var oldDigitsI = digits[iCopy];
+          var oldDigitsLastD = digits[lastDCopy];
+          digits[iCopy] = oldDigitsLastD;
+          digits[lastDCopy] = oldDigitsI;
+          hl.swappedFrom = iCopy;
+          hl.swappedTo = lastDCopy;
+          hl.swapTarget = lastDCopy;
+          phase = "swap";
+
+          pushStep({
+            line: 9, action: "remove",
+            logHTML: richLog({
+              line: 9, action: "remove",
+              code: "digits[" + iCopy + "], digits[" + lastDCopy + "] = digits[" + lastDCopy + "], digits[" + iCopy + "]  # swap '" + oldDigitsI + "' ↔ '" + oldDigitsLastD + "'",
+              status: "success",
+              inputs: [
+                {k:"digits[" + iCopy + "] (before)", v:"'" + oldDigitsI + "'"},
+                {k:"digits[" + lastDCopy + "] (before)", v:"'" + oldDigitsLastD + "'"}
+              ],
+              outputs: [
+                {k:"digits[" + iCopy + "] (after)", v:"'" + oldDigitsLastD + "'", changed:true},
+                {k:"digits[" + lastDCopy + "] (after)", v:"'" + oldDigitsI + "'", changed:true},
+                {k:"digits", v:JSON.stringify(digits), changed:true}
+              ],
+              why: "<strong>SWAP execute!</strong> Position <code>" + iCopy + "</code> ('" + oldDigitsI + "') aur position <code>" + lastDCopy + "</code> ('" + oldDigitsLastD + "') exchange kar diye. Ab leftmost slot mein bigger digit aa gayi — number maximize ho gaya!",
+              analogy: "🔀 <strong>Tile swap done!</strong> Number plate pe " + iCopy + " aur " + lastDCopy + " positions ki tiles exchange — ab leftmost pe <strong>'" + oldDigitsLastD + "'</strong> chamak rahi hai!"
+            })
+          });
+
+          // L10: return
+          var resultStr = digits.join('');
+          var resultNum = parseInt(resultStr, 10);
+          curResult = resultNum;
+          phase = "done";
+          pushStep({
+            line: 10, action: "return",
+            logHTML: richLog({
+              line: 10, action: "return",
+              code: "return int(''.join(digits))  # int('" + resultStr + "') = " + resultNum,
+              status: "success",
+              inputs: [{k:"digits", v:JSON.stringify(digits)}],
+              outputs: [{k:"answer", v:resultNum, changed:true}],
+              why: "🎉 <strong>Final answer:</strong> Swap ke baad digits ko join karke int mein convert kar diya — <code>" + resultNum + "</code>. Greedy proof: leftmost mismatch + biggest available + rightmost occurrence = guaranteed maximum.",
+              analogy: "<strong>Lottery jeet gaye:</strong> '<strong>" + resultNum + "</strong>' — original " + num + " se zyada! Boss ko answer de diya, kaam khatam!"
+            })
+          });
+
+          didSwap = true;
+          swapped = true;
+          break;
+        }
+      }
+      // After inner for loop — if no swap, log inner exit
+      if (!didSwap) {
+        d = null;
+        hl.currLastD = null;
+        pushStep({
+          line: 7, action: "exit",
+          logHTML: richLog({
+            line: 7, action: "exit",
+            code: "# inner for loop exit — saari d in (9.." + (curDigit+1) + ") try ho gayi, koi valid swap nahi mila",
+            status: "info",
+            inputs: [{k:"i", v:ii2}, {k:"digits[i]", v:curDigit}],
+            why: "<strong>Inner loop khatam:</strong> Position <code>" + ii2 + "</code> pe digit <code>" + curDigit + "</code> hai — iske aage koi bigger digit nahi mili (ya jo mili woh peeche thi). Yeh position already optimal hai, agle index pe jaate hain.",
+            analogy: "Iss tile ke liye koi <strong>upgrade nahi mil saka</strong> — agle tile ko check karte hain."
+          })
+        });
+      }
+    }
+  }
+
+  // L6 exit (only if no swap happened — natural loop exit)
+  if (!swapped) {
+    i = null;
+    hl.currI = null;
+    pushStep({
+      line: 6, action: "exit",
+      logHTML: richLog({
+        line: 6, action: "exit",
+        code: "# outer for loop exit — saare positions check ho gaye, koi swap nahi mila",
+        status: "info",
+        inputs: [{k:"n", v:n}],
+        why: "<strong>Outer loop khatam:</strong> Saari positions check kar liye, par koi profitable swap nahi mila. Matlab number already maximum form mein hai (ya digits non-increasing hain like 9973).",
+        analogy: "<strong>Number already top form mein hai:</strong> Koi swap karoge toh number chhota ho jayega. As-is return karna best."
+      })
+    });
+
+    // L11: return num
+    curResult = num;
+    pushStep({
+      line: 11, action: "return",
+      logHTML: richLog({
+        line: 11, action: "return",
+        code: "return num  # = " + num,
+        status: "success",
+        outputs: [{k:"answer", v:num, changed:true}],
+        why: "🎉 <strong>Final answer:</strong> Original <code>num=" + num + "</code> as-is return kar rahe hain — yeh already maximum hai (digits non-increasing, ya all-same).",
+        analogy: "<strong>Boss, kuch karne ki zaroorat hi nahi:</strong> Number plate already perfect arrangement mein hai. Koi swap = chhota number. Original best!"
+      })
+    });
+  }
+
+  return st;
+}
+
+/* ============ RENDER VIZ ============ */
+function renderViz(s) {
+  var p = document.getElementById('vizPanel');
+  var h = '';
+
+  // ===== Vars strip =====
+  h += '<div class="vars-strip">';
+  h += '<span class="var-chip"><strong>num</strong>=' + s.num + '</span>';
+  if (s.digits) h += '<span class="var-chip"><strong>digits</strong>=' + JSON.stringify(s.digits) + '</span>';
+  if (s.n !== null) h += '<span class="var-chip"><strong>n</strong>=' + s.n + '</span>';
+  if (s.i !== null) h += '<span class="var-chip vc-warn"><strong>i</strong>=' + s.i + '</span>';
+  if (s.d !== null) h += '<span class="var-chip vc-blue"><strong>d</strong>=' + s.d + '</span>';
+  if (s.hl.swapTarget !== null) h += '<span class="var-chip vc-pink"><strong>last[d]</strong>=' + s.hl.swapTarget + '</span>';
+  h += '<span class="var-chip vc-active"><strong>phase</strong>=' + s.phase + '</span>';
+  h += '</div>';
+
+  // ===== viz-row 1: Digit tiles =====
+  h += '<div class="viz-row">';
+  h += '<div class="viz-card" style="flex:1;min-width:340px"><h5>🔢 Digits — original number plate</h5>';
+  if (s.digits) {
+    h += '<div class="digits-row">';
+    s.digits.forEach(function(dg, idx){
+      var cls = 'digit-tile';
+      var arrow = '';
+      // Highlight logic
+      if (s.phase === "build-last") {
+        if (idx === s.hl.currI) {
+          cls += ' digit-tile--curr-i';
+          arrow = '<span class="digit-pos-arrow">↓</span>';
+        } else if (idx < s.hl.scannedUpTo) {
+          cls += ' digit-tile--scanned';
+        }
+      } else if (s.phase === "scan") {
+        if (idx === s.hl.currI) {
+          cls += ' digit-tile--curr-i';
+          arrow = '<span class="digit-pos-arrow">↓</span>';
+        } else if (idx < s.hl.currI) {
+          cls += ' digit-tile--scanned';
+        }
+        // Show swap target candidate
+        if (s.hl.currLastD !== null && s.last && idx === s.last[s.hl.currLastD] && s.last[s.hl.currLastD] > s.hl.currI) {
+          cls += ' digit-tile--swap-target';
+        }
+      } else if (s.phase === "swap" || s.phase === "done") {
+        if (idx === s.hl.swappedFrom) {
+          cls += ' digit-tile--swapped-from';
+          arrow = '<span class="digit-pos-arrow">↓</span>';
+        } else if (idx === s.hl.swappedTo) {
+          cls += ' digit-tile--swapped-to';
+          arrow = '<span class="digit-pos-arrow">↓</span>';
+        }
+      }
+      h += '<div class="' + cls + '">' + arrow + '<span class="digit-tile-idx">i=' + idx + '</span><span class="digit-tile-val">' + dg + '</span></div>';
+    });
+    h += '</div>';
+
+    // Legend
+    h += '<div style="display:flex;gap:8px;margin-top:8px;font-size:9.5px;color:var(--text-tertiary);flex-wrap:wrap">';
+    h += '<span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#FEF3C7;border:1px solid #B45309;vertical-align:middle"></span>current i</span>';
+    h += '<span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#DBEAFE;border:1px solid #3B82F6;vertical-align:middle"></span>swap target (last[d])</span>';
+    h += '<span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#DCFCE7;border:1px solid #15803D;vertical-align:middle"></span>swapped from</span>';
+    h += '<span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#FCE7F3;border:1px solid #DB2777;vertical-align:middle"></span>swapped to</span>';
+    h += '<span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#E2E8F0;border:1px solid #64748b;vertical-align:middle"></span>scanned</span>';
+    h += '</div>';
+  } else {
+    h += '<div style="padding:20px;color:var(--text-tertiary);font-style:italic;text-align:center">digits not yet initialized</div>';
+  }
+  h += '</div>'; // end card 1
+  h += '</div>'; // end viz-row 1
+
+  // ===== viz-row 2: last[] array =====
+  h += '<div class="viz-row" style="margin-top:10px">';
+  h += '<div class="viz-card" style="flex:1;min-width:340px"><h5>🗂️ last[] — rightmost index of each digit (0–9)</h5>';
+  if (s.last) {
+    h += '<div class="last-arr">';
+    for (var dd = 0; dd <= 9; dd++) {
+      var lcls = 'last-cell';
+      if (s.last[dd] === -1) lcls += ' last-cell--unset';
+      if (s.hl.justSetLastD === dd) lcls += ' last-cell--just-set';
+      else if (s.hl.currLastD === dd) lcls += ' last-cell--curr-d';
+      var lv = s.last[dd] === -1 ? '∅' : s.last[dd];
+      h += '<div class="' + lcls + '"><span class="last-cell-d">d=' + dd + '</span><span class="last-cell-v">' + lv + '</span></div>';
+    }
+    h += '</div>';
+    h += '<div style="margin-top:6px;font-size:10px;color:var(--text-tertiary);font-style:italic;text-align:center">';
+    h += 'Each cell stores the <strong style="color:var(--accent-indigo-text)">rightmost index</strong> where that digit appears in the number';
+    h += '</div>';
+  } else {
+    h += '<div style="padding:14px;color:var(--text-tertiary);font-style:italic;text-align:center">last[] not yet initialized</div>';
+  }
+  h += '</div>'; // end card 2
+  h += '</div>'; // end viz-row 2
+
+  // ===== viz-row 3: Compare board (when in scan phase, evaluating last[d] > i) =====
+  if (s.phase === "scan" && s.d !== null && s.last) {
+    var lastD = s.last[s.d];
+    var condOk = lastD > s.i;
+    h += '<div class="viz-row" style="margin-top:10px">';
+    h += '<div class="viz-card" style="flex:1"><h5>⚖️ Decision Board — is this swap valid?</h5>';
+    h += '<div class="compare-board">';
+    h += '<div class="compare-side ' + (condOk ? 'compare-side--found' : 'compare-side--left') + '">';
+    h += '<span class="compare-label">last[' + s.d + ']</span>';
+    h += '<span class="compare-val">' + lastD + '</span>';
+    h += '<span class="compare-sub">where digit ' + s.d + ' lives</span>';
+    h += '</div>';
+    h += '<span class="compare-op">' + (condOk ? '>' : '≤') + '</span>';
+    h += '<div class="compare-side compare-side--right">';
+    h += '<span class="compare-label">i (current)</span>';
+    h += '<span class="compare-val">' + s.i + '</span>';
+    h += '<span class="compare-sub">left slot to fill</span>';
+    h += '</div>';
+    h += '<span class="compare-op">→</span>';
+    h += '<div class="compare-side ' + (condOk ? 'compare-side--found' : 'compare-side--left') + '" style="' + (condOk ? '' : 'background:#FCEBEB;border-color:#E24B4A') + '">';
+    h += '<span class="compare-label">verdict</span>';
+    h += '<span class="compare-val" style="font-size:18px">' + (condOk ? '✓ SWAP!' : '✗ skip') + '</span>';
+    h += '<span class="compare-sub">' + (condOk ? "digit " + s.d + " is ahead — grab it!" : "digit " + s.d + " not ahead") + '</span>';
+    h += '</div>';
+    h += '</div>';
+    h += '</div></div>';
+  }
+
+  // ===== Final answer banner =====
+  if ((s.line === 10 || s.line === 11) && curResult !== null) {
+    h += '<div class="result-banner">🎉 Maximum Swap Result: ' + curResult + (curResult === s.num ? ' (no swap — already max)' : ' (swapped from ' + s.num + ')') + '</div>';
+  }
+
+  // ===== Strategy hint =====
+  h += '<div style="margin-top:10px;padding:8px 11px;background:var(--bg-secondary);border-radius:5px;font-size:10.5px;color:var(--text-secondary);border:1px dashed var(--border-color);line-height:1.5">';
+  h += '<strong style="color:var(--accent-indigo-text)">💡 Greedy strategy:</strong> ';
+  if (s.phase === "init") h += 'Initialize digits and last[] array.';
+  else if (s.phase === "build-last") h += 'Phase 1 — build last[d] = rightmost index of digit d. O(n) preprocessing.';
+  else if (s.phase === "scan") h += 'Phase 2 — for each i (left to right), try d=9,8,...; if last[d] > i, SWAP and return.';
+  else if (s.phase === "swap") h += 'Swap executed — biggest possible upgrade at leftmost mismatch.';
+  else if (s.phase === "done") h += 'Done! Single swap was enough to reach the maximum.';
+  h += '</div>';
+
+  p.innerHTML = h;
+}
+
+/* ============ STEP CONTROL ============ */
+function renderStep(idx) {
+  if (!steps.length) return;
+  var s = steps[idx];
+  currentStep = idx;
+  document.getElementById('stepInfo').textContent = (idx + 1) + '/' + steps.length;
+  var bd = document.getElementById('actionBadge');
+  bd.textContent = BADGE_LABEL[s.action] || s.action;
+  bd.className = 'action-badge action-badge--' + s.action;
+  document.querySelectorAll('.code-line').forEach(function(el){ el.classList.remove('active'); });
+  var al = document.querySelector('.code-line[data-line="' + s.line + '"]');
+  if (al) { al.classList.add('active'); al.scrollIntoView({block:'nearest'}); }
+  renderViz(s);
+  showLogPreview(s);
+}
+
+function showLogPreview(s) {
+  if (!logEnabled) return;
+  document.getElementById('logPopupBody').innerHTML = s.logHTML || '';
+  document.getElementById('logPopup').classList.remove('log-popup--hidden');
+}
+
+function stepBy(d) {
+  var nx = currentStep + d;
+  if (nx < 0 || nx >= steps.length) return;
+  renderStep(nx);
+}
+
+function resetStep() {
+  if (steps.length) renderStep(0);
+}
+
+/* ============ INPUT / RUN ============ */
+function parseInputs() {
+  var num = parseInt(document.getElementById('inNum').value, 10);
+  if (isNaN(num) || num < 0) num = 0;
+  if (num > 999999999) num = 999999999;
+  return { num: num };
+}
+
+function resetWithInput() {
+  curResult = null;
+  var p = parseInputs();
+  document.getElementById('inNum').value = p.num;
+  renderCode();
+  fitCodeWidth();
+  steps = buildSteps(p.num);
+  currentStep = 0;
+  renderStep(0);
+  document.getElementById('liveOutput').textContent = curResult !== null ? curResult : '—';
+}
+
+function loadTest(num, expected) {
+  document.getElementById('inNum').value = num;
+  document.getElementById('expectedBadge').textContent = 'expected: ' + expected;
+  resetWithInput();
+}
+
+/* ============ LOG CONTROLS ============ */
+function toggleLogPreview() {
+  logEnabled = !logEnabled;
+  var btn = document.getElementById('logToggleBtn');
+  btn.textContent = logEnabled ? '📋 ON' : '📋 OFF';
+  btn.classList.toggle('log-toggle-btn--off', !logEnabled);
+  if (!logEnabled) document.getElementById('logPopup').classList.add('log-popup--hidden');
+  else if (steps.length) showLogPreview(steps[currentStep]);
+}
+
+function logZoom(dir) {
+  logZoomLevel = Math.max(60, Math.min(180, logZoomLevel + dir * 20));
+  updateLogZoom();
+}
+function logZoomReset() { logZoomLevel = 100; updateLogZoom(); }
+function updateLogZoom() {
+  document.getElementById('logZoomLabel').textContent = logZoomLevel + '%';
+  document.getElementById('logPopup').style.setProperty('--log-scale', logZoomLevel / 100);
+}
+
+function toggleFullscreen() {
+  var viz = document.querySelector('.col-viz');
+  if (!document.fullscreenElement) viz.requestFullscreen().catch(function(){});
+  else document.exitFullscreen();
+}
+
+function toggleProblem() {
+  var body = document.getElementById('pcBody');
+  var btn = document.getElementById('toggleBtn');
+  body.classList.toggle('pc-body--hidden');
+  btn.textContent = body.classList.contains('pc-body--hidden') ? '▼ Show' : '▲ Hide';
+}
+
+/* ============ LAYOUT ============ */
+function fitCodeWidth() {
+  if (codeWidthUserSet) return;
+  var col = document.getElementById('col1');
+  var maxLen = 0;
+  codeLines.forEach(function(l){ if (l.length > maxLen) maxLen = l.length; });
+  var px = Math.min(maxLen * 8 + 60, window.innerWidth * 0.45);
+  px = Math.max(280, px);
+  col.style.width = px + 'px';
+  syncFooterWidth();
+}
+
+function syncFooterWidth() {
+  document.getElementById('footerLeft').style.width =
+    document.getElementById('col1').offsetWidth + 'px';
+}
+
+(function() {
+  var col1 = document.getElementById('col1');
+  document.getElementById('resizeH1').addEventListener('mousedown', function(e) {
+    e.preventDefault();
+    codeWidthUserSet = true;
+    var startX = e.clientX, startW = col1.offsetWidth, h = this;
+    document.body.classList.add('no-select');
+    h.classList.add('active');
+    function mv(e) {
+      col1.style.width = Math.max(140, Math.min(window.innerWidth * 0.45, startW + (e.clientX - startX))) + 'px';
+      syncFooterWidth();
+    }
+    function up() {
+      document.removeEventListener('mousemove', mv);
+      document.removeEventListener('mouseup', up);
+      document.body.classList.remove('no-select');
+      h.classList.remove('active');
+    }
+    document.addEventListener('mousemove', mv);
+    document.addEventListener('mouseup', up);
+  });
+})();
+
+window.addEventListener('resize', function() {
+  if (!codeWidthUserSet) fitCodeWidth();
+  else syncFooterWidth();
+});
+
+document.addEventListener('keydown', function(e) {
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
+  if (e.key === 'ArrowRight') { e.preventDefault(); stepBy(1); }
+  else if (e.key === 'ArrowLeft') { e.preventDefault(); stepBy(-1); }
+  else if (e.key === 'r' || e.key === 'R') { e.preventDefault(); resetStep(); }
+});
+
+/* ============ INIT ============ */
+renderCode();
+fitCodeWidth();
+steps = buildSteps(2736);
+renderStep(0);
+document.getElementById('liveOutput').textContent = curResult !== null ? curResult : '—';
+</script>
+</body>
+</html>

@@ -1,0 +1,1288 @@
+﻿
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LC 3633 — Earliest Finish Time for Land and Water Rides I</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+:root{
+  --bg-primary:#FAFAF8;--bg-secondary:#F1EFE8;--bg-tertiary:#E2E0D8;--bg-card:#FFFFFF;
+  --text-primary:#2C2C2A;--text-secondary:#5F5E5A;--text-tertiary:#888780;
+  --border-color:rgba(0,0,0,0.11);--border-light:rgba(0,0,0,0.06);--border-focus:#534AB7;
+  --accent-indigo:#534AB7;--accent-indigo-bg:#EEEDFE;--accent-indigo-text:#3C3489;--accent-indigo-hover:#4740A0;
+  --accent-teal:#0F6E56;--accent-teal-bg:#E1F5EE;--accent-teal-text:#085041;
+  --accent-red:#E24B4A;--accent-red-bg:#FCEBEB;--accent-red-text:#791F1F;
+  --accent-amber:#B45309;--accent-amber-bg:#FEF3C7;--accent-amber-text:#78350F;
+  --accent-green:#15803D;--accent-green-bg:#DCFCE7;--accent-green-text:#14532D;
+  --syn-keyword:#534AB7;--syn-function:#185FA5;--syn-number:#993C1D;--syn-string:#0F6E56;
+  --active-line-bg:#EEEDFE;
+  --radius-sm:4px;--radius-md:6px;--radius-lg:10px;--radius-xl:14px;
+  --font-sans:'DM Sans',system-ui,sans-serif;--font-mono:'JetBrains Mono','Fira Code',monospace;
+  --fs-xs:11px;--fs-sm:12px;--fs-base:14px;
+  --ease:.18s ease;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans);background:var(--bg-primary);color:var(--text-primary);font-size:var(--fs-base);line-height:1.6;overflow:hidden}
+.no-select{user-select:none}
+::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border-color);border-radius:99px}
+
+.app-shell{display:flex;flex-direction:column;height:100vh;overflow:hidden;background:var(--bg-primary)}
+.problem-card{flex-shrink:0;border-bottom:1px solid var(--border-color);background:var(--bg-card)}
+.prob-header{display:flex;align-items:center;justify-content:space-between;padding:8px 14px;gap:10px;flex-wrap:wrap}
+.prob-header-left{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.prob-header-right{display:flex;align-items:center;gap:4px;flex-wrap:nowrap}
+.gt-home-btn{font-family:var(--font-sans);font-weight:700;font-size:11px;letter-spacing:.08em;background:var(--accent-indigo);color:#fff;border:none;padding:5px 11px;border-radius:99px;cursor:pointer;transition:var(--ease)}
+.gt-home-btn:hover{background:var(--accent-indigo-hover)}
+.prob-num{font-family:var(--font-mono);font-weight:700;font-size:13px;color:var(--text-tertiary)}
+.prob-name{font-weight:700;font-size:15px}
+.prob-diff--med{background:var(--accent-amber-bg);color:var(--accent-amber-text);font-size:9px;font-weight:700;padding:2px 7px;border-radius:99px;border:1px solid var(--accent-amber)}
+.prob-tag{font-size:10px;background:var(--bg-secondary);color:var(--text-secondary);padding:2px 7px;border-radius:99px;border:1px solid var(--border-color)}
+.top-label{font-size:10px;color:var(--text-tertiary);font-weight:600}
+.input{font-family:var(--font-mono);font-size:10px;padding:4px 6px;border:1px solid var(--border-color);border-radius:var(--radius-sm);background:var(--bg-card);color:var(--text-primary);width:68px}
+.input:focus{outline:none;border-color:var(--border-focus)}
+.top-expected{font-family:var(--font-mono);font-size:10px;background:var(--accent-teal-bg);color:var(--accent-teal-text);padding:3px 7px;border-radius:var(--radius-sm);border:1px solid var(--accent-teal)}
+.prob-toggle-btn{font-family:system-ui,"Segoe UI Emoji",sans-serif;font-size:11px;background:var(--bg-secondary);border:1px solid var(--border-color);padding:4px 9px;border-radius:var(--radius-sm);cursor:pointer;color:var(--text-secondary);margin-left:4px}
+.top-label--sep{margin-left:4px}
+.top-expected{margin-left:4px}
+
+.prob-body{display:grid;grid-template-columns:1.4fr 1fr;gap:14px;padding:0 14px 12px}
+.prob-body--hidden{display:none}
+.prob-section-title{font-size:11px;font-weight:700;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px}
+.prob-text{font-size:12px;line-height:1.6;color:var(--text-secondary);margin-bottom:8px}
+.prob-text code{font-family:var(--font-mono);font-size:11px;background:var(--bg-secondary);padding:1px 4px;border-radius:3px;color:var(--accent-indigo-text)}
+.prob-text strong{color:var(--text-primary);font-weight:700}
+.concept-block{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+.concept-card{flex:1;min-width:160px;background:var(--bg-secondary);border:1px solid var(--border-color);border-left:3px solid var(--accent-indigo);border-radius:var(--radius-sm);padding:7px 10px}
+.concept-card-title{font-size:10px;font-weight:700;color:var(--accent-indigo-text);margin-bottom:3px}
+.concept-card-text{font-size:11px;color:var(--text-secondary);line-height:1.5}
+.complexity-row{display:flex;gap:6px}
+.complexity-chip{font-family:var(--font-mono);font-size:10px;background:var(--accent-indigo-bg);color:var(--accent-indigo-text);padding:3px 8px;border-radius:99px;border:1px solid var(--accent-indigo);font-weight:600}
+
+.test-list{display:flex;flex-direction:column;gap:5px;margin-bottom:8px}
+.test-chip{display:flex;align-items:center;gap:6px;background:var(--bg-secondary);border:1px solid var(--border-color);border-radius:var(--radius-sm);padding:5px 8px;cursor:pointer;transition:var(--ease);font-size:11px}
+.test-chip:hover{background:var(--bg-tertiary);border-color:var(--accent-indigo)}
+.test-chip-num{font-family:var(--font-mono);font-weight:700;color:var(--accent-indigo);font-size:10px}
+.test-chip-input{font-family:var(--font-mono);font-size:9px;color:var(--text-secondary);overflow:hidden;text-overflow:ellipsis;flex:1}
+.pt-tag{font-size:9px;background:var(--accent-amber-bg);color:var(--accent-amber-text);padding:1px 5px;border-radius:99px;border:1px solid var(--accent-amber);white-space:nowrap}
+.test-chip-exp{font-family:var(--font-mono);font-size:10px;color:var(--accent-teal-text);font-weight:600}
+.run-row{display:flex;gap:8px;align-items:center;padding-top:6px;border-top:1px dashed var(--border-color)}
+.btn-run{font-family:system-ui,"Segoe UI Emoji",sans-serif;background:var(--accent-teal);color:#fff;border:none;padding:5px 13px;border-radius:var(--radius-sm);font-size:11px;font-weight:700;cursor:pointer}
+.live-out{font-family:var(--font-mono);font-size:10px;color:var(--text-secondary)}
+.live-out strong{color:var(--accent-teal-text)}
+
+.main-row{flex:1;display:flex;overflow:hidden;min-height:0}
+.col{display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.col-code{width:33%;min-width:140px;max-width:45vw}
+.col-viz{flex:1;min-width:0}
+.section-label{font-family:system-ui,"Segoe UI Emoji",sans-serif;padding:6px 12px;font-size:10px;font-weight:700;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:.06em;background:var(--bg-secondary);border-bottom:1px solid var(--border-color)}
+
+#codePanel{flex:1;overflow:auto;padding:8px 0;background:var(--bg-card);font-family:var(--font-mono);font-size:11px;line-height:1.85}
+.code-line{display:flex;padding:1px 12px;align-items:flex-start;border-left:3px solid transparent;transition:background .15s}
+.code-line.active{background:var(--active-line-bg);border-left-color:var(--accent-indigo)}
+.code-line .ln{display:inline-block;width:20px;color:var(--text-tertiary);font-size:10px;font-weight:500;text-align:right;margin-right:8px;flex-shrink:0;user-select:none}
+.code-content{white-space:pre}
+.kw{color:var(--syn-keyword);font-weight:600}.fn{color:var(--syn-function)}.num{color:var(--syn-number)}.str{color:var(--syn-string)}
+
+.resize-h{width:5px;cursor:col-resize;background:transparent;flex-shrink:0;transition:background .15s;position:relative;z-index:5}
+.resize-h:hover,.resize-h.active{background:var(--accent-indigo)}
+
+#vizPanel{flex:1;overflow:auto;padding:12px;background:var(--bg-primary)}
+.vars-strip{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;padding:7px 10px;background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius-md)}
+.var-chip{font-family:var(--font-mono);font-size:10px;padding:3px 8px;border-radius:99px;background:var(--bg-secondary);border:1px solid var(--border-color);display:inline-flex;align-items:center;gap:4px}
+.var-chip-key{color:var(--text-tertiary);font-weight:500}
+.var-chip-val{color:var(--text-primary);font-weight:700}
+.vc-active{background:var(--accent-indigo-bg);border-color:var(--accent-indigo)}
+.vc-active .var-chip-val{color:var(--accent-indigo-text)}
+.vc-safe{background:var(--accent-green-bg);border-color:var(--accent-green)}
+.vc-safe .var-chip-val{color:var(--accent-green-text)}
+.vc-flip{background:var(--accent-amber-bg);border-color:var(--accent-amber)}
+.vc-flip .var-chip-val{color:var(--accent-amber-text)}
+
+.viz-row{display:flex;gap:12px;align-items:flex-start;flex-wrap:wrap;margin-bottom:10px}
+.viz-card{background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius-md);padding:10px;min-width:180px}
+.viz-title{font-size:11px;font-weight:700;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:.06em;margin-bottom:7px;display:flex;align-items:center;gap:5px}
+
+/* Ride cards */
+.rides-grid{display:flex;gap:6px;flex-wrap:wrap}
+.ride-card{display:flex;align-items:center;gap:5px;padding:6px 9px;background:var(--bg-secondary);border:2px solid var(--border-color);border-radius:var(--radius-sm);font-family:var(--font-mono);font-size:11px;transition:all .25s;min-width:120px}
+.ride-card--land{border-left:4px solid #16a34a}
+.ride-card--water{border-left:4px solid #0284c7}
+.ride-card--curr{background:var(--accent-indigo-bg);border-color:var(--accent-indigo);box-shadow:0 0 8px rgba(83,74,183,.3);animation:pulse-node 1.2s infinite;transform:scale(1.04)}
+.ride-card--best{background:var(--accent-green-bg);border-color:var(--accent-green);animation:win-pulse 1.4s infinite}
+.ride-card--dim{opacity:.45}
+.ride-emoji{font-size:14px}
+.ride-idx{font-size:9px;color:var(--text-tertiary);font-weight:700}
+.ride-times{display:flex;flex-direction:column;line-height:1.2}
+.ride-times small{font-size:8px;color:var(--text-tertiary);font-weight:400}
+.ride-times strong{font-size:11px;font-weight:700;color:var(--text-primary)}
+.ride-end{font-size:9px;color:var(--accent-teal-text);font-weight:700;margin-left:auto;background:var(--accent-teal-bg);padding:2px 5px;border-radius:3px;border:1px solid var(--accent-teal)}
+
+/* Timeline */
+.timeline-wrap{padding:8px;background:#1e293b;border-radius:8px;border:2px solid #334155}
+.timeline-svg{display:block;width:100%}
+.tl-axis{stroke:#64748b;stroke-width:1}
+.tl-tick{stroke:#94a3b8;stroke-width:1}
+.tl-tick-text{font-family:var(--font-mono);font-size:9px;fill:#cbd5e1;text-anchor:middle}
+.tl-bar-wait{fill:#475569;opacity:.6}
+.tl-bar-land{fill:#16a34a;stroke:#15803d;stroke-width:1.5}
+.tl-bar-water{fill:#0284c7;stroke:#0369a1;stroke-width:1.5}
+.tl-bar-label{font-family:var(--font-mono);font-size:9px;font-weight:700;fill:#fff;text-anchor:middle;dominant-baseline:central}
+.tl-marker{stroke:#fbbf24;stroke-width:2;stroke-dasharray:3,2}
+.tl-marker-text{font-family:var(--font-mono);font-size:9px;font-weight:700;fill:#fbbf24}
+.tl-finish-circle{fill:#fbbf24;stroke:#fff;stroke-width:1.5}
+.tl-finish-text{font-family:var(--font-mono);font-size:10px;font-weight:700;fill:#1e293b;text-anchor:middle;dominant-baseline:central}
+
+/* ans display */
+.ans-bigbox{display:flex;align-items:center;gap:10px;padding:10px 14px;background:linear-gradient(90deg,#FEF3C7,#FFF8E7);border:2px solid var(--accent-amber);border-radius:var(--radius-md);font-family:var(--font-mono)}
+.ans-label{font-size:10px;color:var(--accent-amber-text);font-weight:700;text-transform:uppercase}
+.ans-value{font-size:22px;font-weight:700;color:var(--accent-amber-text)}
+.ans-value--inf{color:var(--text-tertiary);font-style:italic;font-size:14px}
+
+.cand-display{display:flex;align-items:center;gap:6px;padding:6px 10px;background:var(--bg-secondary);border:1px solid var(--border-color);border-radius:var(--radius-sm);font-family:var(--font-mono);font-size:11px;flex-wrap:wrap}
+.cand-display strong{color:var(--accent-indigo-text);font-weight:700}
+.cand-arrow{color:var(--text-tertiary);font-size:14px}
+.cand-eq{color:var(--text-secondary)}
+.cand-result{font-weight:700;color:var(--accent-teal-text);background:var(--accent-teal-bg);padding:2px 6px;border-radius:3px;border:1px solid var(--accent-teal)}
+.cand-result--new{background:var(--accent-green-bg);color:var(--accent-green-text);border-color:var(--accent-green);animation:win-pulse 1s infinite}
+
+.phase-chip{font-family:system-ui,"Segoe UI Emoji",sans-serif;font-size:11px;font-weight:700;padding:3px 9px;border-radius:99px;background:var(--accent-indigo-bg);color:var(--accent-indigo-text);border:1px solid var(--accent-indigo)}
+.phase-chip--p2{background:#e0f2fe;color:#0369a1;border-color:#0284c7}
+.phase-chip--done{background:var(--accent-green-bg);color:var(--accent-green-text);border-color:var(--accent-green)}
+
+@keyframes pulse-node{0%,100%{box-shadow:0 0 4px var(--accent-indigo)}50%{box-shadow:0 0 12px var(--accent-indigo)}}
+@keyframes win-pulse{0%,100%{box-shadow:0 0 3px rgba(234,179,8,.5)}50%{box-shadow:0 0 8px rgba(234,179,8,.9)}}
+
+.legend{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px}
+.legend span{display:inline-flex;align-items:center;gap:5px;font-size:10px;color:var(--text-secondary)}
+.legend i{display:inline-block;width:14px;height:10px;border-radius:2px}
+
+.result-banner{margin-top:10px;padding:10px 14px;background:linear-gradient(90deg,#DCFCE7,#E1F5EE);border:2px solid var(--accent-green);border-radius:var(--radius-md);font-weight:700;font-size:13px;color:var(--accent-green-text);text-align:center;animation:win-pulse 1.4s infinite}
+
+/* Footer */
+.footer-bar{display:flex;flex-shrink:0;border-top:1px solid var(--border-color);background:var(--bg-card)}
+.footer-left{width:33%;min-width:140px;max-width:45vw;display:flex;align-items:center;gap:8px;padding:7px 12px;border-right:1px solid var(--border-light)}
+.footer-right{flex:1;display:flex;align-items:center;gap:8px;padding:7px 16px;flex-wrap:wrap}
+.step-info{font-family:var(--font-mono);font-size:11px;font-weight:700;color:var(--text-secondary);min-width:48px}
+.action-badge{font-family:system-ui,"Segoe UI Emoji",sans-serif;font-size:10px;font-weight:700;padding:2px 7px;border-radius:99px;text-transform:uppercase;letter-spacing:.04em}
+.action-badge--func-def,.action-badge--init,.action-badge--call,.action-badge--return{background:rgba(130,80,255,.14);color:#3C3489;border:1px solid #8250ff}
+.action-badge--for-check,.action-badge--while-check,.action-badge--if-check{background:rgba(56,139,253,.14);color:#185FA5;border:1px solid #388bfd}
+.action-badge--mark,.action-badge--push,.action-badge--pop,.action-badge--restore,.action-badge--found{background:var(--accent-green-bg);color:var(--accent-green-text);border:1px solid var(--accent-green)}
+.action-badge--remove,.action-badge--prune,.action-badge--fail{background:var(--accent-red-bg);color:var(--accent-red-text);border:1px solid var(--accent-red)}
+.action-badge--exit,.action-badge--skip{background:var(--bg-tertiary);color:var(--text-tertiary);border:1px solid var(--border-color)}
+
+kbd{font-family:system-ui,"Segoe UI Emoji",sans-serif;font-size:10px;background:var(--bg-secondary);border:1px solid var(--border-color);border-bottom-width:2px;border-radius:3px;padding:1px 5px;color:var(--text-secondary)}
+.btn{font-family:system-ui,"Segoe UI Emoji",sans-serif;background:var(--bg-secondary);color:var(--text-primary);border:1px solid var(--border-color);padding:4px 10px;border-radius:var(--radius-sm);font-size:11px;font-weight:600;cursor:pointer;transition:var(--ease)}
+.btn:hover{background:var(--bg-tertiary)}
+.btn-primary{background:var(--accent-indigo);color:#fff;border-color:var(--accent-indigo)}
+.btn-primary:hover{background:var(--accent-indigo-hover)}
+.footer-sep{width:1px;height:18px;background:var(--border-color);margin:0 3px}
+.log-toggle-btn{font-family:system-ui,"Segoe UI Emoji",sans-serif;background:var(--accent-green-bg);color:var(--accent-green-text);border:1px solid var(--accent-green);padding:4px 9px;border-radius:var(--radius-sm);font-size:10px;font-weight:700;cursor:pointer}
+.log-toggle-btn--off{background:var(--bg-secondary);color:var(--text-tertiary);border-color:var(--border-color)}
+.btn-zoom{background:var(--bg-secondary);border:1px solid var(--border-color);padding:3px 8px;border-radius:var(--radius-sm);font-size:11px;font-weight:700;cursor:pointer;font-family:system-ui,sans-serif}
+.log-zoom-label{font-family:var(--font-mono);font-size:10px;color:var(--text-secondary);font-weight:600;min-width:34px;text-align:center}
+
+/* Log popup */
+.log-popup{--log-scale:1;position:fixed;bottom:52px;right:14px;width:calc(480px * var(--log-scale));max-width:92vw;max-height:75vh;border-radius:var(--radius-lg);box-shadow:0 10px 32px rgba(0,0,0,.14);border:1px solid var(--border-color);background:var(--bg-card);overflow:hidden;display:flex;flex-direction:column;z-index:100;transition:opacity .15s,transform .15s;transform-origin:bottom right}
+.log-popup--hidden{opacity:0;transform:scale(.92);pointer-events:none}
+.log-popup-body{flex:1;overflow:auto;padding:0}
+.log-popup-body>.log-card{border-radius:0;border:none;border-left:0}
+
+.log-card{border-radius:var(--radius-md);overflow:hidden;border:1px solid var(--border-color);border-left-width:4px;font-size:var(--fs-xs);background:var(--bg-card)}
+.log-card--func-def,.log-card--init,.log-card--call,.log-card--return{border-left-color:#8250ff}
+.log-card--for-check,.log-card--while-check,.log-card--if-check{border-left-color:#388bfd}
+.log-card--mark,.log-card--push,.log-card--pop,.log-card--restore,.log-card--found{border-left-color:#3fb950}
+.log-card--remove,.log-card--prune,.log-card--fail{border-left-color:#f85149}
+.log-card--exit,.log-card--skip{border-left-color:#888780}
+
+.log-card-header{display:flex;align-items:center;gap:6px;padding:8px 10px 6px;background:var(--bg-secondary);border-bottom:1px solid var(--border-light)}
+.log-badge{font-family:system-ui,"Segoe UI Emoji",sans-serif;font-size:10px;font-weight:700;padding:2px 7px;border-radius:99px;letter-spacing:.04em}
+.log-badge--func-def,.log-badge--init,.log-badge--call,.log-badge--return{background:rgba(130,80,255,.14);color:#3C3489;border:1px solid #8250ff}
+.log-badge--for-check,.log-badge--while-check,.log-badge--if-check{background:rgba(56,139,253,.14);color:#185FA5;border:1px solid #388bfd}
+.log-badge--mark,.log-badge--push,.log-badge--pop,.log-badge--restore,.log-badge--found{background:var(--accent-green-bg);color:var(--accent-green-text);border:1px solid var(--accent-green)}
+.log-badge--remove,.log-badge--prune,.log-badge--fail{background:var(--accent-red-bg);color:var(--accent-red-text);border:1px solid var(--accent-red)}
+.log-badge--exit,.log-badge--skip{background:var(--bg-tertiary);color:var(--text-tertiary);border:1px solid var(--border-color)}
+.log-line-ref{font:700 10px var(--font-mono);color:var(--accent-indigo);background:var(--accent-indigo-bg);padding:1px 6px;border-radius:4px;border:1px solid var(--accent-indigo)}
+.log-status-pill{font-family:system-ui,"Segoe UI Emoji",sans-serif;font-size:9px;font-weight:700;padding:2px 7px;border-radius:99px;text-transform:uppercase;margin-left:auto}
+.log-status--success{background:var(--accent-green-bg);color:var(--accent-green-text);border:1px solid var(--accent-green)}
+.log-status--fail{background:var(--accent-red-bg);color:var(--accent-red-text);border:1px solid var(--accent-red)}
+.log-status--skip{background:var(--bg-tertiary);color:var(--text-tertiary);border:1px solid var(--border-color)}
+.log-status--loop{background:rgba(56,139,253,.14);color:#185FA5;border:1px solid #388bfd}
+.log-status--prune{background:var(--accent-red-bg);color:var(--accent-red-text);border:1px solid var(--accent-red)}
+.log-status--info{background:rgba(130,80,255,.14);color:#3C3489;border:1px solid #8250ff}
+
+.log-section{padding:7px 10px;border-bottom:1px dashed var(--border-light)}
+.log-section:last-child{border-bottom:none}
+.log-section-title{font:700 8px var(--font-mono);text-transform:uppercase;letter-spacing:.06em;color:var(--text-tertiary);margin-bottom:4px;display:flex;align-items:center;gap:4px}
+.log-section-title-icon{font-family:system-ui,"Segoe UI Emoji",sans-serif}
+.log-code-snippet{font:600 11px var(--font-mono);background:#0d1117;color:#e6edf3;padding:6px 9px;border-radius:4px;display:block;overflow-x:auto;white-space:pre;border:1px solid #30363d}
+.log-code-snippet .ck{color:#ff7b72}.log-code-snippet .cs{color:#a5d6ff}.log-code-snippet .cn{color:#79c0ff}.log-code-snippet .cf{color:#d2a8ff}.log-code-snippet .cc{color:#8b949e;font-style:italic}
+.log-kv-row{display:flex;flex-wrap:wrap;gap:4px}
+.log-kv{display:inline-flex;align-items:center;gap:3px;font:11px var(--font-mono);padding:2px 7px;border-radius:4px;background:var(--bg-secondary);border:1px solid var(--border-light)}
+.log-kv-key{color:var(--text-tertiary);font-weight:500}
+.log-kv-val{color:var(--text-primary);font-weight:700}
+.log-kv--in{background:rgba(56,139,253,.08);border-color:rgba(56,139,253,.3)}
+.log-kv--out{background:rgba(63,185,80,.08);border-color:rgba(63,185,80,.4)}
+.log-kv--out .log-kv-val{color:#15803D}
+.log-kv--changed{background:rgba(180,83,9,.10);border-color:rgba(180,83,9,.4)}
+.log-kv--changed .log-kv-val{color:var(--accent-amber-text)}
+.log-verdict{display:flex;align-items:center;gap:6px;font:600 11px var(--font-mono);padding:5px 8px;border-radius:5px;background:var(--bg-secondary);border:1px solid var(--border-light)}
+.log-verdict--true{background:var(--accent-green-bg);border-color:var(--accent-green);color:var(--accent-green-text)}
+.log-verdict--false{background:var(--accent-red-bg);border-color:var(--accent-red);color:var(--accent-red-text)}
+.log-why{font-size:11px;line-height:1.55;color:var(--text-primary);padding:4px 0}
+.log-why strong{color:var(--accent-indigo-text)}
+.log-why code{font-family:var(--font-mono);font-size:10px;background:var(--bg-secondary);padding:1px 4px;border-radius:3px}
+.log-analogy{font:italic 11px var(--font-sans);color:var(--text-secondary);background:#FFF8E7;border:1px solid #FBE8A6;border-left:3px solid var(--accent-amber);padding:6px 9px;border-radius:4px;line-height:1.55}
+.log-analogy strong{color:var(--accent-amber-text);font-style:normal;font-weight:700}
+</style>
+</head>
+<body>
+<div class="app-shell">
+
+<!-- ========== PROBLEM CARD ========== -->
+<section class="problem-card">
+  <header class="prob-header">
+    <div class="prob-header-left">
+      <a href="../00_HomePage/gt_learn_homepage.html" class="gt-home-btn">GT LEARN</a>
+      <span class="prob-num">#3633</span>
+      <span class="prob-name">🎢 Earliest Finish Time for Land &amp; Water Rides I</span>
+      <span class="prob-diff--med">MEDIUM</span>
+      <span class="prob-tag">Greedy</span>
+      <span class="prob-tag">Array</span>
+      <span class="prob-tag">Brute Force</span>
+    </div>
+    <div class="prob-header-right">
+      <span class="top-label top-label--sep">lStart=</span>
+      <input id="inLS" class="input" value="[2,8]">
+      <span class="top-label">lDur=</span>
+      <input id="inLD" class="input" value="[4,1]">
+      <span class="top-label top-label--sep">wStart=</span>
+      <input id="inWS" class="input" value="[6]">
+      <span class="top-label">wDur=</span>
+      <input id="inWD" class="input" value="[3]">
+      <span id="expectedBadge" class="top-expected">exp: 9</span>
+      <button id="probToggleBtn" class="prob-toggle-btn" type="button" onclick="toggleProblem()">▲ Hide</button>
+    </div>
+  </header>
+  <div id="probBody" class="prob-body">
+    <div>
+      <div class="prob-section-title">📝 Problem Statement</div>
+      <p class="prob-text">
+        Tourist ko EXACTLY <strong>1 land ride</strong> aur <strong>1 water ride</strong> dono lene hain (kisi bhi order mein). Har ride <code>i</code> ka <code>start[i]</code> hai (sabse pehle kab open hota hai) aur <code>duration[i]</code> hai (kitna lagta hai). Agar tourist time <code>t</code> pe ride pe pohncha, toh ride <code>max(t, start[i]) + duration[i]</code> pe khatam hogi. Goal: <strong>minimum possible finish time</strong> jab dono rides ho jaayein.
+      </p>
+      <div class="prob-section-title">🧠 Solving Approach</div>
+      <p class="prob-text">
+        Brute force: dono orders try karo — <strong>Land→Water</strong> aur <strong>Water→Land</strong>. Har pair <code>(i, j)</code> ke liye finish time compute karo. Pehli ride normal time pe khatam hoti hai; doosri ride ka start <code>max(prevFinish, start[j])</code> se hota hai. Sab combinations ka <code>min</code> hi answer hai.
+      </p>
+      <div class="concept-block">
+        <div class="concept-card"><div class="concept-card-title">⏱️ End time formula</div><div class="concept-card-text"><code>end = max(arrival, start) + duration</code> — agar early aaye toh wait, late aaye toh straight start.</div></div>
+        <div class="concept-card"><div class="concept-card-title">🔄 Two orders</div><div class="concept-card-text">Phase 1: Land first, then Water. Phase 2: Water first, then Land. Min of both = answer.</div></div>
+        <div class="concept-card"><div class="concept-card-title">🏆 Min tracking</div><div class="concept-card-text">Initialize <code>ans = ∞</code>, har candidate ke saath <code>ans = min(ans, candidate)</code>.</div></div>
+      </div>
+      <div class="complexity-row">
+        <span class="complexity-chip">⏱ Time: O(n·m)</span>
+        <span class="complexity-chip">💾 Space: O(1)</span>
+      </div>
+    </div>
+    <div>
+      <div class="prob-section-title">🧪 Test Cases</div>
+      <div class="test-list">
+        <div class="test-chip" onclick="loadTest('[2,8]','[4,1]','[6]','[3]','9')">
+          <span class="test-chip-num">T1</span>
+          <span class="test-chip-input">L=[(2,4),(8,1)] W=[(6,3)]</span>
+          <span class="pt-tag">water-first wins</span>
+          <span class="test-chip-exp">→ 9</span>
+        </div>
+        <div class="test-chip" onclick="loadTest('[5]','[3]','[1]','[10]','11')">
+          <span class="test-chip-num">T2</span>
+          <span class="test-chip-input">L=[(5,3)] W=[(1,10)]</span>
+          <span class="pt-tag">water early</span>
+          <span class="test-chip-exp">→ 14</span>
+        </div>
+        <div class="test-chip" onclick="loadTest('[1]','[2]','[10]','[3]','13')">
+          <span class="test-chip-num">T3</span>
+          <span class="test-chip-input">L=[(1,2)] W=[(10,3)]</span>
+          <span class="pt-tag">wait gap</span>
+          <span class="test-chip-exp">→ 13</span>
+        </div>
+        <div class="test-chip" onclick="loadTest('[3,7]','[2,5]','[4,9]','[6,1]','11')">
+          <span class="test-chip-num">T4</span>
+          <span class="test-chip-input">L=[(3,2),(7,5)] W=[(4,6),(9,1)]</span>
+          <span class="pt-tag">multi-pair</span>
+          <span class="test-chip-exp">→ 11</span>
+        </div>
+      </div>
+      <div class="run-row">
+        <button class="btn-run" type="button" onclick="resetWithInput()">▶ Run</button>
+        <span class="live-out">Output: <strong id="liveOutput">—</strong></span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== MAIN ROW ========== -->
+<div class="main-row">
+  <div class="col col-code" id="col1">
+    <div class="section-label">📜 Python Code</div>
+    <div id="codePanel"></div>
+  </div>
+  <div class="resize-h" id="resizeH1"></div>
+  <div class="col col-viz">
+    <div class="section-label">📊 Visualization</div>
+    <div id="vizPanel"></div>
+  </div>
+</div>
+
+<!-- ========== FOOTER ========== -->
+<div class="footer-bar">
+  <div class="footer-left" id="footerLeft">
+    <span id="stepInfo" class="step-info">0/0</span>
+    <span id="actionBadge" class="action-badge"></span>
+  </div>
+  <div class="footer-right">
+    <kbd>←</kbd><kbd>→</kbd>
+    <button class="btn" type="button" onclick="resetStep()">↺</button>
+    <button class="btn" type="button" onclick="stepBy(-1)">◀</button>
+    <button class="btn btn-primary" type="button" onclick="stepBy(1)">▶ Next</button>
+    <span class="footer-sep"></span>
+    <button id="logToggleBtn" class="log-toggle-btn" type="button" onclick="toggleLogPreview()">📋 ON</button>
+    <button class="btn-zoom" type="button" onclick="logZoom(-1)">−</button>
+    <span id="logZoomLabel" class="log-zoom-label">100%</span>
+    <button class="btn-zoom" type="button" onclick="logZoom(1)">+</button>
+    <button class="btn-zoom" type="button" onclick="logZoomReset()">↺</button>
+    <span class="footer-sep"></span>
+    <button class="btn" type="button" onclick="toggleFullscreen()">⛶</button>
+  </div>
+</div>
+
+<div class="log-popup" id="logPopup">
+  <div class="log-popup-body" id="logPopupBody"></div>
+</div>
+
+</div>
+
+<script>
+// ============================================================
+// CODE LINES
+// ============================================================
+var codeLines = [
+  "def earliestFinishTime(landStart, landDur, waterStart, waterDur):",
+  "    ans = float('inf')",
+  "    # Phase 1: Land ride first, then Water ride",
+  "    for i in range(len(landStart)):",
+  "        end1 = max(0, landStart[i]) + landDur[i]",
+  "        for j in range(len(waterStart)):",
+  "            end2 = max(end1, waterStart[j]) + waterDur[j]",
+  "            ans = min(ans, end2)",
+  "    # Phase 2: Water ride first, then Land ride",
+  "    for j in range(len(waterStart)):",
+  "        end1 = max(0, waterStart[j]) + waterDur[j]",
+  "        for i in range(len(landStart)):",
+  "            end2 = max(end1, landStart[i]) + landDur[i]",
+  "            ans = min(ans, end2)",
+  "    return ans"
+];
+
+// ============================================================
+// STATE
+// ============================================================
+var steps = [];
+var currentStep = 0;
+var codeWidthUserSet = false;
+var curResult = null;
+var logEnabled = true;
+var logZoomLevel = 100;
+
+var LOG_BADGE = {
+  "func-def":"📌 DEF","init":"⚙️ INIT","call":"📞 CALL","return":"🏆 RETURN",
+  "for-check":"🔁 FOR","while-check":"🔁 WHILE","if-check":"🔎 IF",
+  "mark":"✅ MARK","push":"⬆ PUSH","pop":"⬇ POP","restore":"↩ RESTORE","found":"🎉 FOUND",
+  "remove":"✏️ EDIT","prune":"✂️ PRUNE","fail":"❌ FAIL",
+  "exit":"🔚 EXIT","skip":"⏭ SKIP"
+};
+var BADGE_LABEL = {
+  "func-def":"DEF","init":"INIT","call":"CALL","return":"RETURN",
+  "for-check":"FOR","while-check":"WHILE","if-check":"IF",
+  "mark":"MARK","push":"PUSH","pop":"POP","restore":"RESTORE","found":"FOUND",
+  "remove":"EDIT","prune":"PRUNE","fail":"FAIL",
+  "exit":"EXIT","skip":"SKIP"
+};
+
+// ============================================================
+// CODE RENDERING
+// ============================================================
+function renderCode() {
+  var p = document.getElementById('codePanel');
+  p.innerHTML = codeLines.map(function(raw, i) {
+    var h = raw;
+    h = h.replace(/("[^"]*"|'[^']*')/g, '\x01STR\x02$1\x03');
+    h = h.replace(/\b(def|for|in|if|return|break|continue|and|else|elif|True|False|None|not|or|while|lambda)\b/g, '\x01KW\x02$1\x03');
+    h = h.replace(/\b(len|range|int|str|list|append|pop|sorted|min|max|sum|abs|enumerate|zip|print|set|add|float)\b/g, '\x01FN\x02$1\x03');
+    h = h.replace(/(?<![.\w"\x01\x02\x03])(-?\d+)\b/g, '\x01NUM\x02$1\x03');
+    h = h.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    h = h.replace(/\x01([A-Z]+)\x02/g, function(_, c) { return '<span class="' + c.toLowerCase() + '">'; }).replace(/\x03/g, '</span>');
+    return '<div class="code-line" data-line="' + i + '"><span class="ln">' + (i+1) + '</span><span class="code-content">' + h + '</span></div>';
+  }).join('');
+}
+
+function hlCode(raw) {
+  var h = raw;
+  h = h.replace(/("[^"]*"|'[^']*')/g, '\x01s\x02$1\x03');
+  h = h.replace(/\b(def|for|in|if|return|break|continue|and|else|elif|True|False|None|not|or|while|lambda)\b/g, '\x01k\x02$1\x03');
+  h = h.replace(/\b(len|range|int|str|list|append|pop|sorted|min|max|sum|abs|enumerate|zip|print|set|add|float)\b/g, '\x01f\x02$1\x03');
+  h = h.replace(/(?<![.\w"\x01\x02\x03])(-?\d+)\b/g, '\x01n\x02$1\x03');
+  h = h.replace(/(#.*$)/gm, '\x01c\x02$1\x03');
+  h = h.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  h = h.replace(/\x01([a-z])\x02/g, function(_, c) { return '<span class="c' + c + '">'; }).replace(/\x03/g, '</span>');
+  return h;
+}
+
+// ============================================================
+// RICH LOG
+// ============================================================
+function richLog(opts) {
+  var statusMap = {
+    success:"✅ Success",fail:"❌ Failed",skip:"⏭ Skipped",
+    loop:"🔁 Loop iter",prune:"✂️ Pruned",info:"ℹ️ Info"
+  };
+  var status = opts.status || "info";
+  var html = '<div class="log-card log-card--' + opts.action + '">';
+  html += '<div class="log-card-header">';
+  html += '<span class="log-badge log-badge--' + opts.action + '">' + (LOG_BADGE[opts.action] || opts.action) + '</span>';
+  html += '<span class="log-line-ref">L' + (opts.line + 1) + '</span>';
+  html += '<span class="log-status-pill log-status--' + status + '">' + statusMap[status] + '</span>';
+  html += '</div>';
+
+  if (opts.code) {
+    html += '<div class="log-section">';
+    html += '<div class="log-section-title"><span class="log-section-title-icon">📜</span>Code Executing</div>';
+    html += '<code class="log-code-snippet">' + hlCode(opts.code) + '</code>';
+    html += '</div>';
+  }
+  if (opts.inputs && opts.inputs.length) {
+    html += '<div class="log-section">';
+    html += '<div class="log-section-title"><span class="log-section-title-icon">📥</span>Input Values (line is using these)</div>';
+    html += '<div class="log-kv-row">';
+    opts.inputs.forEach(function(kv) {
+      html += '<span class="log-kv log-kv--in"><span class="log-kv-key">' + kv.k + '</span>=<span class="log-kv-val">' + kv.v + '</span></span>';
+    });
+    html += '</div></div>';
+  }
+  if (opts.outputs && opts.outputs.length) {
+    html += '<div class="log-section">';
+    html += '<div class="log-section-title"><span class="log-section-title-icon">📤</span>Output / State After Line</div>';
+    html += '<div class="log-kv-row">';
+    opts.outputs.forEach(function(kv) {
+      var cls = kv.changed ? 'log-kv--changed' : 'log-kv--out';
+      html += '<span class="log-kv ' + cls + '"><span class="log-kv-key">' + kv.k + '</span>=<span class="log-kv-val">' + kv.v + '</span></span>';
+    });
+    html += '</div></div>';
+  }
+  if (opts.verdict) {
+    var vCls = opts.verdictTrue === true ? 'log-verdict--true' : (opts.verdictTrue === false ? 'log-verdict--false' : '');
+    var vIcon = opts.verdictTrue === true ? '✓' : (opts.verdictTrue === false ? '✗' : '•');
+    html += '<div class="log-section">';
+    html += '<div class="log-section-title"><span class="log-section-title-icon">⚖️</span>Verdict / Decision</div>';
+    html += '<div class="log-verdict ' + vCls + '">' + vIcon + ' ' + opts.verdict + '</div>';
+    html += '</div>';
+  }
+  if (opts.why) {
+    html += '<div class="log-section">';
+    html += '<div class="log-section-title"><span class="log-section-title-icon">💡</span>Why This Happens</div>';
+    html += '<div class="log-why">' + opts.why + '</div>';
+    html += '</div>';
+  }
+  if (opts.analogy) {
+    html += '<div class="log-section">';
+    html += '<div class="log-section-title"><span class="log-section-title-icon">🎭</span>Real-Life Analogy</div>';
+    html += '<div class="log-analogy">' + opts.analogy + '</div>';
+    html += '</div>';
+  }
+  html += '</div>';
+  return html;
+}
+
+// ============================================================
+// PARSE INPUTS
+// ============================================================
+function parseArr(raw) {
+  try {
+    var a = JSON.parse(raw);
+    return Array.isArray(a) ? a : [];
+  } catch(e) { return []; }
+}
+
+// ============================================================
+// BUILD STEPS
+// ============================================================
+function buildSteps(landStart, landDur, waterStart, waterDur) {
+  var st = [];
+  var MAX_STEPS = 3000;
+
+  var ans = Infinity;
+  var phase = "init";
+  var curI = -1, curJ = -1;
+  var end1 = null, end2 = null;
+  var bestPair = null;        // {order, i, j, end1, end2}
+  var hl = {};
+
+  function fmtAns(v){ return v === Infinity ? "∞" : v; }
+
+  function snap(extra){
+    return Object.assign({
+      landStart: landStart.slice(),
+      landDur: landDur.slice(),
+      waterStart: waterStart.slice(),
+      waterDur: waterDur.slice(),
+      ans: ans,
+      phase: phase,
+      curI: curI,
+      curJ: curJ,
+      end1: end1,
+      end2: end2,
+      bestPair: bestPair ? Object.assign({}, bestPair) : null,
+      hl: Object.assign({}, hl)
+    }, extra || {});
+  }
+  function pushStep(o){
+    if (st.length >= MAX_STEPS) return;
+    st.push(Object.assign({line:0, action:"init", logHTML:""}, snap(o)));
+  }
+
+  var nL = landStart.length, nW = waterStart.length;
+
+  // ---------- L1: function def ----------
+  pushStep({
+    line: 0, action: "func-def",
+    logHTML: richLog({
+      line:0, action:"func-def",
+      code: "def earliestFinishTime(landStart, landDur, waterStart, waterDur):",
+      status:"info",
+      inputs:[
+        {k:"landStart", v:JSON.stringify(landStart)},
+        {k:"landDur", v:JSON.stringify(landDur)},
+        {k:"waterStart", v:JSON.stringify(waterStart)},
+        {k:"waterDur", v:JSON.stringify(waterDur)}
+      ],
+      why:"<strong>Function entry</strong>. Tourist ko 1 land aur 1 water ride lena hai. Hum saare possible (i,j) pairs check karenge dono orders mein aur <strong>minimum finish time</strong> dhoondhenge.",
+      analogy:"Jaise <strong>amusement park mein 2 must-do rides</strong> hain — ek roller-coaster (land) aur ek log-flume (water). Konsa pehle lein taaki jaldi nikal jaayein? Sab combinations try karke best plan banayenge."
+    })
+  });
+
+  // ---------- L2: ans = inf ----------
+  phase = "init";
+  pushStep({
+    line: 1, action: "init",
+    logHTML: richLog({
+      line:1, action:"init",
+      code:"ans = float('inf')",
+      status:"success",
+      outputs:[{k:"ans", v:"∞", changed:true}],
+      why:"<strong>Minimum tracker</strong> ko infinity se start kar rahe hain. Jaisa hi koi valid finish time milega, woh infinity se chhota hoga aur <code>ans</code> mein store ho jayega.",
+      analogy:"Jaise <strong>races mein best time track</strong> karte ho — pehle infinite likh do, koi bhi runner aaye toh uska time better hi hoga."
+    })
+  });
+
+  // ---------- L3: comment Phase 1 ----------
+  phase = "phase1";
+  pushStep({
+    line: 2, action: "init",
+    logHTML: richLog({
+      line:2, action:"init",
+      code:"# Phase 1: Land ride first, then Water ride",
+      status:"info",
+      why:"<strong>Phase 1 shuru</strong>: pehle land ride lo, fir water ride. Har <code>(i,j)</code> pair try karenge.",
+      analogy:"Jaise <strong>'pehle Mountain-ride, fir Aqua-blast'</strong> wala plan A — saare combinations try karenge."
+    })
+  });
+
+  // ====================================================
+  // PHASE 1: Land first, then Water
+  // ====================================================
+  for (var i = 0; i < nL; i++) {
+    curI = i;
+    hl = {phase:"p1", landIdx:i};
+
+    // L4 — outer for
+    pushStep({
+      line:3, action:"for-check",
+      logHTML: richLog({
+        line:3, action:"for-check",
+        code: "for i in range(" + nL + "):  # i=" + i,
+        status:"loop",
+        inputs:[{k:"i", v:i}, {k:"len(landStart)", v:nL}],
+        outputs:[{k:"i", v:i, changed:true}],
+        verdict: "i (" + i + ") < len (" + nL + ")",
+        verdictTrue:true,
+        why:"<strong>Phase 1 outer iteration " + (i+1) + "</strong>: Land ride <code>i=" + i + "</code> ko first ride choose kar rahe hain. Yeh ride <code>(start=" + landStart[i] + ", dur=" + landDur[i] + ")</code>.",
+        analogy:"Jaise <strong>land ride " + (i+1) + " ko 'pehla' bana ke try kar rahe ho</strong> — ab dekho iske baad konsa water ride best fit hota hai."
+      })
+    });
+
+    // L5 — end1 = max(0, landStart[i]) + landDur[i]
+    var startL = landStart[i], durL = landDur[i];
+    end1 = Math.max(0, startL) + durL;
+    hl = {phase:"p1", landIdx:i, computingEnd1:true};
+    pushStep({
+      line:4, action:"mark",
+      logHTML: richLog({
+        line:4, action:"mark",
+        code: "end1 = max(0, " + startL + ") + " + durL + " = " + end1,
+        status:"success",
+        inputs:[{k:"landStart["+i+"]", v:startL}, {k:"landDur["+i+"]", v:durL}],
+        outputs:[{k:"end1", v:end1, changed:true}],
+        why:"<strong>First ride ka finish time</strong>: Tourist time 0 pe aaya, ride <code>" + startL + "</code> baje open hoti hai. So actual start = <code>max(0, " + startL + ") = " + Math.max(0, startL) + "</code>, finish = start + duration = <code>" + end1 + "</code>.",
+        analogy:"Jaise <strong>park kholne ka time " + startL + " baje</strong> hai. Tourist 0 baje hi pohnch gaya, toh <strong>" + startL + " baje hi line lagegi</strong>, ride <code>" + durL + "</code> ghante chalegi → <code>" + end1 + "</code> baje khatam."
+      })
+    });
+
+    // L6 — inner for
+    for (var j = 0; j < nW; j++) {
+      curJ = j;
+      hl = {phase:"p1", landIdx:i, waterIdx:j};
+
+      pushStep({
+        line:5, action:"for-check",
+        logHTML: richLog({
+          line:5, action:"for-check",
+          code: "for j in range(" + nW + "):  # j=" + j,
+          status:"loop",
+          inputs:[{k:"j", v:j}, {k:"len(waterStart)", v:nW}],
+          outputs:[{k:"j", v:j, changed:true}],
+          verdict: "j (" + j + ") < len (" + nW + ")",
+          verdictTrue:true,
+          why:"<strong>Phase 1 inner iteration</strong>: Water ride <code>j=" + j + "</code> ko second ride try kar rahe hain. Yeh ride <code>(start=" + waterStart[j] + ", dur=" + waterDur[j] + ")</code>.",
+          analogy:"Jaise <strong>land ride khatam karke ab water ride " + (j+1) + " try</strong> kar rahe ho — kitni jaldi nikal sakte ho?"
+        })
+      });
+
+      // L7 — end2 = max(end1, waterStart[j]) + waterDur[j]
+      var startW = waterStart[j], durW = waterDur[j];
+      var arrival = end1;
+      var actualStart = Math.max(arrival, startW);
+      end2 = actualStart + durW;
+      hl = {phase:"p1", landIdx:i, waterIdx:j, computingEnd2:true};
+      pushStep({
+        line:6, action:"mark",
+        logHTML: richLog({
+          line:6, action:"mark",
+          code: "end2 = max(" + arrival + ", " + startW + ") + " + durW + " = " + end2,
+          status:"success",
+          inputs:[{k:"end1", v:arrival}, {k:"waterStart["+j+"]", v:startW}, {k:"waterDur["+j+"]", v:durW}],
+          outputs:[{k:"end2", v:end2, changed:true}, {k:"actualStart", v:actualStart}],
+          why:"<strong>Second ride ka finish time</strong>: Tourist <code>" + arrival + "</code> baje land ride se nikla. Water ride <code>" + startW + "</code> baje open hoti hai. " + (arrival >= startW ? "Tourist late hai, toh seedha line lag gayi at <code>" + arrival + "</code>." : "Tourist early aaya, toh <code>" + (startW - arrival) + "</code> minute wait karna padega until <code>" + startW + "</code>.") + " Finish = <code>" + actualStart + " + " + durW + " = " + end2 + "</code>.",
+          analogy: arrival >= startW
+            ? "Jaise <strong>tum jab pohnche tab tak gate khula tha</strong> — bina ruke ride lag gayi."
+            : "Jaise <strong>tum jaldi pohnch gaye, gate abhi band</strong> — <code>" + (startW - arrival) + "</code> min ka wait, fir ride start."
+        })
+      });
+
+      // L8 — ans = min(ans, end2)
+      var oldAns = ans;
+      var improved = end2 < ans;
+      if (improved) {
+        ans = end2;
+        bestPair = {order:"L→W", i:i, j:j, end1:end1, end2:end2};
+      }
+      hl = {phase:"p1", landIdx:i, waterIdx:j, candidate:end2, improved:improved};
+      pushStep({
+        line:7, action: improved ? "found" : "skip",
+        logHTML: richLog({
+          line:7, action: improved ? "found" : "skip",
+          code: "ans = min(" + fmtAns(oldAns) + ", " + end2 + ") = " + fmtAns(ans),
+          status: improved ? "success" : "skip",
+          inputs:[{k:"ans (before)", v:fmtAns(oldAns)}, {k:"end2", v:end2}],
+          outputs:[{k:"ans", v:fmtAns(ans), changed:improved}],
+          verdict: end2 + " < " + fmtAns(oldAns),
+          verdictTrue: improved,
+          why: improved
+            ? "<strong>🎉 Naya best!</strong> Yeh combination <code>(L=" + i + ", W=" + j + ")</code> previous best <code>" + fmtAns(oldAns) + "</code> se chhota hai (<code>" + end2 + "</code>). <code>ans</code> update."
+            : "Yeh candidate <code>" + end2 + "</code> existing best <code>" + fmtAns(oldAns) + "</code> se chhota nahi — <code>ans</code> same rahega.",
+          analogy: improved
+            ? "Jaise <strong>race mein naya record</strong> ban gaya — board pe time update kar do!"
+            : "Jaise <strong>aaj ka time kal ke best se zyada</strong> hai — record nahi toota, ignore karo."
+        })
+      });
+    }
+
+    // Inner for exit
+    pushStep({
+      line:5, action:"exit",
+      logHTML: richLog({
+        line:5, action:"exit",
+        code: "# inner for j exhausted (all " + nW + " water rides tried with land=" + i + ")",
+        status:"info",
+        inputs:[{k:"j.final", v:nW-1}, {k:"end1", v:end1}],
+        outputs:[{k:"ans", v:fmtAns(ans)}],
+        why:"<strong>Inner loop khatam</strong>: Land ride <code>" + i + "</code> ke saath saare water rides try ho gaye. Ab agla land ride.",
+        analogy:"Jaise <strong>roller-coaster pe baith ke saare water rides ek-ek karke try</strong> kar liye — ab doosri roller-coaster try karte hain."
+      })
+    });
+  }
+
+  // Outer for exit
+  curI = -1; curJ = -1;
+  pushStep({
+    line:3, action:"exit",
+    logHTML: richLog({
+      line:3, action:"exit",
+      code: "# outer for i exhausted (Phase 1 complete)",
+      status:"info",
+      inputs:[{k:"phase1.pairs.checked", v:nL*nW}],
+      outputs:[{k:"ans", v:fmtAns(ans)}],
+      why:"<strong>Phase 1 complete</strong>! Saare <code>" + nL + "×" + nW + "=" + (nL*nW) + "</code> Land→Water combinations check ho gaye. Best so far: <code>" + fmtAns(ans) + "</code>.",
+      analogy:"Jaise <strong>'pehle land, fir water' wala pura plan A test</strong> ho gaya. Ab plan B (water-first) try karte hain."
+    })
+  });
+
+  // ---------- L9: comment Phase 2 ----------
+  phase = "phase2";
+  pushStep({
+    line:8, action:"init",
+    logHTML: richLog({
+      line:8, action:"init",
+      code:"# Phase 2: Water ride first, then Land ride",
+      status:"info",
+      why:"<strong>Phase 2 shuru</strong>: ab order ulta — pehle water, fir land. Symmetric loop.",
+      analogy:"Jaise <strong>plan B: 'pehle Aqua-blast, fir Mountain-ride'</strong> — same pairs, but reverse order."
+    })
+  });
+
+  // ====================================================
+  // PHASE 2: Water first, then Land
+  // ====================================================
+  for (var j2 = 0; j2 < nW; j2++) {
+    curJ = j2;
+    hl = {phase:"p2", waterIdx:j2};
+
+    // L10 — outer for j
+    pushStep({
+      line:9, action:"for-check",
+      logHTML: richLog({
+        line:9, action:"for-check",
+        code: "for j in range(" + nW + "):  # j=" + j2,
+        status:"loop",
+        inputs:[{k:"j", v:j2}, {k:"len(waterStart)", v:nW}],
+        outputs:[{k:"j", v:j2, changed:true}],
+        verdict: "j (" + j2 + ") < len (" + nW + ")",
+        verdictTrue:true,
+        why:"<strong>Phase 2 outer iteration " + (j2+1) + "</strong>: Water ride <code>j=" + j2 + "</code> ko first ride choose kar rahe hain. <code>(start=" + waterStart[j2] + ", dur=" + waterDur[j2] + ")</code>.",
+        analogy:"Jaise <strong>water ride " + (j2+1) + " ko 'pehla' bana ke try</strong> kar rahe ho — fir koi land ride."
+      })
+    });
+
+    // L11 — end1
+    var startW2 = waterStart[j2], durW2 = waterDur[j2];
+    end1 = Math.max(0, startW2) + durW2;
+    hl = {phase:"p2", waterIdx:j2, computingEnd1:true};
+    pushStep({
+      line:10, action:"mark",
+      logHTML: richLog({
+        line:10, action:"mark",
+        code: "end1 = max(0, " + startW2 + ") + " + durW2 + " = " + end1,
+        status:"success",
+        inputs:[{k:"waterStart["+j2+"]", v:startW2}, {k:"waterDur["+j2+"]", v:durW2}],
+        outputs:[{k:"end1", v:end1, changed:true}],
+        why:"<strong>First ride (water) ka finish time</strong>: Tourist 0 baje aaya, ride <code>" + startW2 + "</code> baje open hoti hai. Finish = <code>" + Math.max(0,startW2) + " + " + durW2 + " = " + end1 + "</code>.",
+        analogy:"Jaise <strong>aqua-blast " + startW2 + " baje shuru</strong> hota hai, <code>" + durW2 + "</code> ghante lagte hain → <code>" + end1 + "</code> baje free."
+      })
+    });
+
+    // L12 — inner for i
+    for (var i2 = 0; i2 < nL; i2++) {
+      curI = i2;
+      hl = {phase:"p2", waterIdx:j2, landIdx:i2};
+
+      pushStep({
+        line:11, action:"for-check",
+        logHTML: richLog({
+          line:11, action:"for-check",
+          code: "for i in range(" + nL + "):  # i=" + i2,
+          status:"loop",
+          inputs:[{k:"i", v:i2}, {k:"len(landStart)", v:nL}],
+          outputs:[{k:"i", v:i2, changed:true}],
+          verdict: "i (" + i2 + ") < len (" + nL + ")",
+          verdictTrue:true,
+          why:"<strong>Phase 2 inner iteration</strong>: Land ride <code>i=" + i2 + "</code> ko second ride try. <code>(start=" + landStart[i2] + ", dur=" + landDur[i2] + ")</code>.",
+          analogy:"Jaise <strong>water ride khatam karke ab land ride " + (i2+1) + "</strong> try kar rahe ho."
+        })
+      });
+
+      // L13 — end2
+      var startL2 = landStart[i2], durL2 = landDur[i2];
+      var arrival2 = end1;
+      var actualStart2 = Math.max(arrival2, startL2);
+      end2 = actualStart2 + durL2;
+      hl = {phase:"p2", waterIdx:j2, landIdx:i2, computingEnd2:true};
+      pushStep({
+        line:12, action:"mark",
+        logHTML: richLog({
+          line:12, action:"mark",
+          code: "end2 = max(" + arrival2 + ", " + startL2 + ") + " + durL2 + " = " + end2,
+          status:"success",
+          inputs:[{k:"end1", v:arrival2}, {k:"landStart["+i2+"]", v:startL2}, {k:"landDur["+i2+"]", v:durL2}],
+          outputs:[{k:"end2", v:end2, changed:true}, {k:"actualStart", v:actualStart2}],
+          why:"<strong>Second ride (land) ka finish time</strong>: " + (arrival2 >= startL2 ? "Tourist <code>" + arrival2 + "</code> baje aaya, ride pehle se khuli — seedha line." : "Tourist <code>" + arrival2 + "</code> baje aaya, ride <code>" + startL2 + "</code> baje khulegi — <code>" + (startL2 - arrival2) + "</code> min wait.") + " Finish = <code>" + end2 + "</code>.",
+          analogy: arrival2 >= startL2
+            ? "Jaise <strong>tum aaye, gate khula tha</strong> — straight ride!"
+            : "Jaise <strong>tum jaldi aaye, ride opening time se pehle</strong> — <code>" + (startL2 - arrival2) + "</code> min wait."
+        })
+      });
+
+      // L14 — ans = min
+      var oldAns2 = ans;
+      var improved2 = end2 < ans;
+      if (improved2) {
+        ans = end2;
+        bestPair = {order:"W→L", i:i2, j:j2, end1:end1, end2:end2};
+      }
+      hl = {phase:"p2", waterIdx:j2, landIdx:i2, candidate:end2, improved:improved2};
+      pushStep({
+        line:13, action: improved2 ? "found" : "skip",
+        logHTML: richLog({
+          line:13, action: improved2 ? "found" : "skip",
+          code: "ans = min(" + fmtAns(oldAns2) + ", " + end2 + ") = " + fmtAns(ans),
+          status: improved2 ? "success" : "skip",
+          inputs:[{k:"ans (before)", v:fmtAns(oldAns2)}, {k:"end2", v:end2}],
+          outputs:[{k:"ans", v:fmtAns(ans), changed:improved2}],
+          verdict: end2 + " < " + fmtAns(oldAns2),
+          verdictTrue: improved2,
+          why: improved2
+            ? "<strong>🎉 Naya best!</strong> Water-first combination <code>(W=" + j2 + ", L=" + i2 + ")</code> ne previous best beat kar diya: <code>" + end2 + " < " + fmtAns(oldAns2) + "</code>."
+            : "Yeh candidate <code>" + end2 + "</code> ans <code>" + fmtAns(oldAns2) + "</code> se chhota nahi — koi update nahi.",
+          analogy: improved2
+            ? "Jaise <strong>plan B ne plan A ka record toda</strong> — leaderboard refresh!"
+            : "Jaise <strong>plan B se time better nahi mila</strong> — purana record bana rehta hai."
+        })
+      });
+    }
+
+    pushStep({
+      line:11, action:"exit",
+      logHTML: richLog({
+        line:11, action:"exit",
+        code: "# inner for i exhausted (all " + nL + " land rides tried with water=" + j2 + ")",
+        status:"info",
+        inputs:[{k:"i.final", v:nL-1}, {k:"end1", v:end1}],
+        outputs:[{k:"ans", v:fmtAns(ans)}],
+        why:"<strong>Inner loop khatam</strong>: Water ride <code>" + j2 + "</code> ke saath saare land rides try ho gaye.",
+        analogy:"Jaise <strong>aqua-blast pe baith ke saare mountain-rides try</strong> kar liye."
+      })
+    });
+  }
+
+  curI = -1; curJ = -1;
+  pushStep({
+    line:9, action:"exit",
+    logHTML: richLog({
+      line:9, action:"exit",
+      code: "# outer for j exhausted (Phase 2 complete)",
+      status:"info",
+      inputs:[{k:"phase2.pairs.checked", v:nL*nW}],
+      outputs:[{k:"ans", v:fmtAns(ans)}],
+      why:"<strong>Phase 2 complete</strong>! Total <code>" + (2*nL*nW) + "</code> combinations dono orders mein check ho gaye. Final answer ready.",
+      analogy:"Jaise <strong>plan  A aur plan B dono test ho gaye</strong> — ab final winner declare karna hai!"
+    })
+  });
+
+  // ---------- L15: return ans ----------
+  curResult = ans;
+  phase = "done";
+  hl = {finalAns: ans, bestPair: bestPair};
+  pushStep({
+    line:14, action:"return",
+    logHTML: richLog({
+      line:14, action:"return",
+      code: "return ans  # = " + fmtAns(ans),
+      status:"success",
+      inputs:[{k:"ans", v:fmtAns(ans)}],
+      outputs:[{k:"return", v:fmtAns(ans), changed:true}],
+      why:"<strong>🏆 FINAL ANSWER</strong>: Earliest possible finish time = <code>" + fmtAns(ans) + "</code>" + (bestPair ? " via order <strong>" + bestPair.order + "</strong> using ride pair <code>(L=" + bestPair.i + ", W=" + bestPair.j + ")</code>" : "") + ". Yeh sabse fast plan hai jismein dono rides ho jaayein.",
+      analogy:"Jaise <strong>park ka best tour-plan finalize</strong> ho gaya — board pe likh do, tourist ko de do, kaam khatam!"
+    })
+  });
+
+  return st;
+}
+
+// ============================================================
+// RENDER VIZ
+// ============================================================
+function renderViz(s) {
+  var v = document.getElementById('vizPanel');
+  var h = '';
+
+  // Vars strip
+  h += '<div class="vars-strip">';
+  var phaseLabel = s.phase === "init" ? "🟣 init" : s.phase === "phase1" ? "🟢 Phase 1: L→W" : s.phase === "phase2" ? "🔵 Phase 2: W→L" : "✅ done";
+  h += '<span class="phase-chip ' + (s.phase==="phase2" ? "phase-chip--p2" : s.phase==="done" ? "phase-chip--done" : "") + '">' + phaseLabel + '</span>';
+  if (s.curI >= 0) h += '<span class="var-chip vc-active"><span class="var-chip-key">i</span><span class="var-chip-val">' + s.curI + '</span></span>';
+  if (s.curJ >= 0) h += '<span class="var-chip vc-active"><span class="var-chip-key">j</span><span class="var-chip-val">' + s.curJ + '</span></span>';
+  if (s.end1 !== null) h += '<span class="var-chip vc-flip"><span class="var-chip-key">end1</span><span class="var-chip-val">' + s.end1 + '</span></span>';
+  if (s.end2 !== null) h += '<span class="var-chip vc-flip"><span class="var-chip-key">end2</span><span class="var-chip-val">' + s.end2 + '</span></span>';
+  h += '<span class="var-chip vc-safe"><span class="var-chip-key">ans</span><span class="var-chip-val">' + (s.ans === Infinity ? "∞" : s.ans) + '</span></span>';
+  h += '</div>';
+
+  // Row 1: Land rides + Water rides
+  h += '<div class="viz-row">';
+  // Land card
+  h += '<div class="viz-card" style="flex:1;min-width:280px">';
+  h += '<div class="viz-title">🏔️ Land Rides (start, dur)</div>';
+  h += '<div class="rides-grid">';
+  s.landStart.forEach(function(st_, i){
+    var endT = Math.max(0, st_) + s.landDur[i];
+    var cls = 'ride-card ride-card--land';
+    var isCurrentLand = (s.hl && s.hl.landIdx === i && (s.phase === "phase1" || s.phase === "phase2"));
+    var isBestLand = (s.bestPair && s.bestPair.i === i);
+    if (isCurrentLand) cls += ' ride-card--curr';
+    else if (s.phase === "done" && isBestLand) cls += ' ride-card--best';
+    h += '<div class="' + cls + '">';
+    h += '<span class="ride-emoji">🏔️</span>';
+    h += '<span class="ride-idx">L' + i + '</span>';
+    h += '<span class="ride-times"><small>start</small><strong>' + st_ + '</strong></span>';
+    h += '<span class="ride-times"><small>dur</small><strong>' + s.landDur[i] + '</strong></span>';
+    h += '<span class="ride-end">end:' + endT + '</span>';
+    h += '</div>';
+  });
+  h += '</div></div>';
+
+  // Water card
+  h += '<div class="viz-card" style="flex:1;min-width:280px">';
+  h += '<div class="viz-title">🌊 Water Rides (start, dur)</div>';
+  h += '<div class="rides-grid">';
+  s.waterStart.forEach(function(st_, j){
+    var endT = Math.max(0, st_) + s.waterDur[j];
+    var cls = 'ride-card ride-card--water';
+    var isCurrentWater = (s.hl && s.hl.waterIdx === j && (s.phase === "phase1" || s.phase === "phase2"));
+    var isBestWater = (s.bestPair && s.bestPair.j === j);
+    if (isCurrentWater) cls += ' ride-card--curr';
+    else if (s.phase === "done" && isBestWater) cls += ' ride-card--best';
+    h += '<div class="' + cls + '">';
+    h += '<span class="ride-emoji">🌊</span>';
+    h += '<span class="ride-idx">W' + j + '</span>';
+    h += '<span class="ride-times"><small>start</small><strong>' + st_ + '</strong></span>';
+    h += '<span class="ride-times"><small>dur</small><strong>' + s.waterDur[j] + '</strong></span>';
+    h += '<span class="ride-end">end:' + endT + '</span>';
+    h += '</div>';
+  });
+  h += '</div></div>';
+  h += '</div>';
+
+  // Row 2: Timeline + Candidate computation
+  h += '<div class="viz-row">';
+  h += '<div class="viz-card" style="flex:2;min-width:380px">';
+  h += '<div class="viz-title">⏱️ Timeline (current pair)</div>';
+  h += renderTimeline(s);
+  h += '<div class="legend">';
+  h += '<span><i style="background:#16a34a"></i>Land ride</span>';
+  h += '<span><i style="background:#0284c7"></i>Water ride</span>';
+  h += '<span><i style="background:#475569;opacity:.6"></i>Wait time</span>';
+  h += '<span><i style="background:#fbbf24"></i>Finish marker</span>';
+  h += '</div>';
+  h += '</div>';
+
+  // Candidate card
+  h += '<div class="viz-card" style="flex:1;min-width:240px">';
+  h += '<div class="viz-title">🎯 Current Candidate</div>';
+  if (s.end1 !== null && s.end2 !== null) {
+    var orderStr = s.phase === "phase1" ? "L" + s.curI + " → W" + s.curJ : "W" + s.curJ + " → L" + s.curI;
+    h += '<div class="cand-display" style="margin-bottom:6px">';
+    h += '<span>order:</span><strong>' + orderStr + '</strong>';
+    h += '</div>';
+    h += '<div class="cand-display" style="margin-bottom:6px">';
+    h += '<span>end1</span><span class="cand-eq">=</span><strong>' + s.end1 + '</strong>';
+    h += '<span class="cand-arrow">→</span>';
+    h += '<span>end2</span><span class="cand-eq">=</span>';
+    var candCls = (s.hl && s.hl.improved) ? 'cand-result cand-result--new' : 'cand-result';
+    h += '<span class="' + candCls + '">' + s.end2 + '</span>';
+    h += '</div>';
+  } else {
+    h += '<div class="cand-display"><em style="color:var(--text-tertiary)">No candidate yet — loop will start soon</em></div>';
+  }
+
+  // Best so far
+  h += '<div style="margin-top:10px">';
+  h += '<div class="ans-bigbox">';
+  h += '<span class="ans-label">best ans</span>';
+  if (s.ans === Infinity) {
+    h += '<span class="ans-value ans-value--inf">∞ (none yet)</span>';
+  } else {
+    h += '<span class="ans-value">' + s.ans + '</span>';
+  }
+  h += '</div>';
+  if (s.bestPair) {
+    h += '<div style="margin-top:6px;font-family:var(--font-mono);font-size:10px;color:var(--text-secondary);text-align:center">via <strong>' + s.bestPair.order + '</strong> pair (L=' + s.bestPair.i + ', W=' + s.bestPair.j + ')</div>';
+  }
+  h += '</div>';
+  h += '</div>';
+  h += '</div>';
+
+  // Result banner on return
+  if (s.line === 14) {
+    h += '<div class="result-banner">🏆 Earliest finish time = ' + s.ans + (s.bestPair ? ' (via ' + s.bestPair.order + ' using L' + s.bestPair.i + ' & W' + s.bestPair.j + ')' : '') + '</div>';
+  }
+
+  v.innerHTML = h;
+}
+
+// ============================================================
+// TIMELINE SVG
+// ============================================================
+function renderTimeline(s) {
+  // Compute max time for scale
+  var maxT = 1;
+  s.landStart.forEach(function(st_, i){ maxT = Math.max(maxT, st_ + s.landDur[i]); });
+  s.waterStart.forEach(function(st_, j){ maxT = Math.max(maxT, st_ + s.waterDur[j]); });
+  if (s.end1 !== null) maxT = Math.max(maxT, s.end1);
+  if (s.end2 !== null) maxT = Math.max(maxT, s.end2);
+  if (s.ans !== Infinity) maxT = Math.max(maxT, s.ans);
+  maxT = Math.max(maxT, 10);
+  // Round up
+  var scaleMax = Math.ceil((maxT + 1) / 5) * 5;
+
+  var W = 540, PAD_L = 30, PAD_R = 20, PAD_T = 14, PAD_B = 24;
+  var innerW = W - PAD_L - PAD_R;
+  var rowH = 24, gapH = 8;
+  var nRows = 2; // first ride row + second ride row
+  var H = PAD_T + nRows * rowH + (nRows - 1) * gapH + PAD_B;
+
+  function xAt(t){ return PAD_L + (t / scaleMax) * innerW; }
+
+  var svg = '<div class="timeline-wrap"><svg class="timeline-svg" width="' + W + '" height="' + H + '" viewBox="0 0 ' + W + ' ' + H + '">';
+
+  // Axis line
+  var axisY = H - PAD_B + 4;
+  svg += '<line class="tl-axis" x1="' + PAD_L + '" y1="' + axisY + '" x2="' + (W - PAD_R) + '" y2="' + axisY + '"/>';
+
+  // Tick marks
+  var step = scaleMax <= 10 ? 1 : scaleMax <= 20 ? 2 : 5;
+  for (var t = 0; t <= scaleMax; t += step) {
+    var x = xAt(t);
+    svg += '<line class="tl-tick" x1="' + x + '" y1="' + axisY + '" x2="' + x + '" y2="' + (axisY+4) + '"/>';
+    svg += '<text class="tl-tick-text" x="' + x + '" y="' + (axisY+15) + '">' + t + '</text>';
+  }
+
+  // Determine current pair to display
+  var rides = []; // {kind:'L'|'W', start, dur, label, arrival}
+  if (s.phase === "phase1" && s.curI >= 0 && s.end1 !== null) {
+    rides.push({kind:"L", idx:s.curI, start:s.landStart[s.curI], dur:s.landDur[s.curI], arrival:0, label:"L"+s.curI});
+    if (s.curJ >= 0 && s.end2 !== null) {
+      rides.push({kind:"W", idx:s.curJ, start:s.waterStart[s.curJ], dur:s.waterDur[s.curJ], arrival:s.end1, label:"W"+s.curJ});
+    }
+  } else if (s.phase === "phase2" && s.curJ >= 0 && s.end1 !== null) {
+    rides.push({kind:"W", idx:s.curJ, start:s.waterStart[s.curJ], dur:s.waterDur[s.curJ], arrival:0, label:"W"+s.curJ});
+    if (s.curI >= 0 && s.end2 !== null) {
+      rides.push({kind:"L", idx:s.curI, start:s.landStart[s.curI], dur:s.landDur[s.curI], arrival:s.end1, label:"L"+s.curI});
+    }
+  } else if (s.phase === "done" && s.bestPair) {
+    var bp = s.bestPair;
+    if (bp.order === "L→W") {
+      rides.push({kind:"L", idx:bp.i, start:s.landStart[bp.i], dur:s.landDur[bp.i], arrival:0, label:"L"+bp.i});
+      rides.push({kind:"W", idx:bp.j, start:s.waterStart[bp.j], dur:s.waterDur[bp.j], arrival:bp.end1, label:"W"+bp.j});
+    } else {
+      rides.push({kind:"W", idx:bp.j, start:s.waterStart[bp.j], dur:s.waterDur[bp.j], arrival:0, label:"W"+bp.j});
+      rides.push({kind:"L", idx:bp.i, start:s.landStart[bp.i], dur:s.landDur[bp.i], arrival:bp.end1, label:"L"+bp.i});
+    }
+  }
+
+  // Draw ride bars
+  rides.forEach(function(r, idx){
+    var rowY = PAD_T + idx * (rowH + gapH);
+    var actualStart = Math.max(r.arrival, r.start);
+    var endT = actualStart + r.dur;
+
+    // Wait/idle segment (if arrival < start)
+    if (r.arrival < actualStart) {
+      var wx1 = xAt(r.arrival), wx2 = xAt(actualStart);
+      svg += '<rect class="tl-bar-wait" x="' + wx1 + '" y="' + rowY + '" width="' + (wx2-wx1) + '" height="' + rowH + '" rx="3"/>';
+      if ((wx2 - wx1) > 18) {
+        svg += '<text class="tl-bar-label" x="' + ((wx1+wx2)/2) + '" y="' + (rowY + rowH/2) + '" style="fill:#cbd5e1">wait</text>';
+      }
+    }
+
+    // Active ride bar
+    var bx1 = xAt(actualStart), bx2 = xAt(endT);
+    var barCls = r.kind === "L" ? "tl-bar-land" : "tl-bar-water";
+    svg += '<rect class="' + barCls + '" x="' + bx1 + '" y="' + rowY + '" width="' + Math.max(2, bx2-bx1) + '" height="' + rowH + '" rx="3"/>';
+    svg += '<text class="tl-bar-label" x="' + ((bx1+bx2)/2) + '" y="' + (rowY + rowH/2) + '">' + r.label + ' (' + r.dur + ')</text>';
+
+    // End marker text
+    svg += '<text class="tl-marker-text" x="' + bx2 + '" y="' + (rowY - 2) + '" text-anchor="middle">' + endT + '</text>';
+  });
+
+  // Final finish marker (vertical dashed line at end2)
+  if (s.end2 !== null) {
+    var fx = xAt(s.end2);
+    svg += '<line class="tl-marker" x1="' + fx + '" y1="' + PAD_T + '" x2="' + fx + '" y2="' + axisY + '"/>';
+    svg += '<circle class="tl-finish-circle" cx="' + fx + '" cy="' + (PAD_T - 2) + '" r="9"/>';
+    svg += '<text class="tl-finish-text" x="' + fx + '" y="' + (PAD_T - 2) + '">' + s.end2 + '</text>';
+  }
+
+  // If no rides yet, show placeholder
+  if (rides.length === 0) {
+    svg += '<text x="' + (W/2) + '" y="' + (PAD_T + rowH) + '" text-anchor="middle" fill="#94a3b8" font-family="sans-serif" font-size="11" font-style="italic">Timeline will appear when loop starts processing pairs</text>';
+  }
+
+  svg += '</svg></div>';
+  return svg;
+}
+
+// ============================================================
+// STEP RENDERING
+// ============================================================
+function renderStep(idx) {
+  if (!steps.length) return;
+  var s = steps[idx];
+  currentStep = idx;
+  document.getElementById('stepInfo').textContent = (idx + 1) + '/' + steps.length;
+  var bd = document.getElementById('actionBadge');
+  bd.textContent = BADGE_LABEL[s.action] || s.action;
+  bd.className = 'action-badge action-badge--' + s.action;
+  document.querySelectorAll('.code-line').forEach(function(el){ el.classList.remove('active'); });
+  var al = document.querySelector('.code-line[data-line="' + s.line + '"]');
+  if (al) { al.classList.add('active'); al.scrollIntoView({block:'nearest'}); }
+  renderViz(s);
+  showLogPreview(s);
+}
+
+function showLogPreview(s) {
+  if (!logEnabled) return;
+  document.getElementById('logPopupBody').innerHTML = s.logHTML || '';
+  document.getElementById('logPopup').classList.remove('log-popup--hidden');
+}
+
+function hideLogPopup() {
+  document.getElementById('logPopup').classList.add('log-popup--hidden');
+}
+
+function stepBy(n) {
+  var idx = Math.max(0, Math.min(steps.length - 1, currentStep + n));
+  renderStep(idx);
+}
+function resetStep(){ renderStep(0); }
+
+// ============================================================
+// INPUT / RUN
+// ============================================================
+function loadTest(ls, ld, ws, wd, exp) {
+  document.getElementById('inLS').value = ls;
+  document.getElementById('inLD').value = ld;
+  document.getElementById('inWS').value = ws;
+  document.getElementById('inWD').value = wd;
+  document.getElementById('expectedBadge').textContent = 'exp: ' + exp;
+  resetWithInput();
+}
+
+function resetWithInput() {
+  curResult = null;
+  var ls = parseArr(document.getElementById('inLS').value);
+  var ld = parseArr(document.getElementById('inLD').value);
+  var ws = parseArr(document.getElementById('inWS').value);
+  var wd = parseArr(document.getElementById('inWD').value);
+  if (ls.length === 0 || ld.length === 0 || ws.length === 0 || wd.length === 0 || ls.length !== ld.length || ws.length !== wd.length) {
+    document.getElementById('liveOutput').textContent = 'invalid input';
+    return;
+  }
+  renderCode();
+  fitCodeWidth();
+  steps = buildSteps(ls, ld, ws, wd);
+  currentStep = 0;
+  renderStep(0);
+  document.getElementById('liveOutput').textContent = curResult !== null ? curResult : '—';
+}
+
+// ============================================================
+// LAYOUT
+// ============================================================
+function fitCodeWidth() {
+  if (codeWidthUserSet) return;
+  var col = document.getElementById('col1');
+  var maxLen = 0;
+  codeLines.forEach(function(l){ if (l.length > maxLen) maxLen = l.length; });
+  var px = Math.min(maxLen * 7 + 60, window.innerWidth * 0.45);
+  col.style.width = Math.max(220, px) + 'px';
+  syncFooterWidth();
+}
+
+function syncFooterWidth() {
+  document.getElementById('footerLeft').style.width =
+    document.getElementById('col1').offsetWidth + 'px';
+}
+
+(function(){
+  var col1 = document.getElementById('col1');
+  document.getElementById('resizeH1').addEventListener('mousedown', function(e){
+    e.preventDefault();
+    codeWidthUserSet = true;
+    var startX = e.clientX, startW = col1.offsetWidth, h = this;
+    document.body.classList.add('no-select');
+    h.classList.add('active');
+    function mv(e){ col1.style.width = Math.max(140, startW + (e.clientX - startX)) + 'px'; syncFooterWidth(); }
+    function up(){
+      document.removeEventListener('mousemove', mv);
+      document.removeEventListener('mouseup', up);
+      document.body.classList.remove('no-select');
+      h.classList.remove('active');
+    }
+    document.addEventListener('mousemove', mv);
+    document.addEventListener('mouseup', up);
+  });
+})();
+
+window.addEventListener('resize', function(){
+  if (!codeWidthUserSet) fitCodeWidth();
+  else syncFooterWidth();
+});
+
+// ============================================================
+// LOG CONTROLS
+// ============================================================
+function toggleLogPreview() {
+  logEnabled = !logEnabled;
+  var btn = document.getElementById('logToggleBtn');
+  btn.textContent = logEnabled ? '📋 ON' : '📋 OFF';
+  btn.classList.toggle('log-toggle-btn--off', !logEnabled);
+  if (!logEnabled) hideLogPopup();
+  else if (steps.length) showLogPreview(steps[currentStep]);
+}
+function logZoom(dir) {
+  logZoomLevel = Math.max(60, Math.min(180, logZoomLevel + dir * 20));
+  updateLogZoom();
+}
+function logZoomReset(){ logZoomLevel = 100; updateLogZoom(); }
+function updateLogZoom(){
+  document.getElementById('logZoomLabel').textContent = logZoomLevel + '%';
+  document.getElementById('logPopup').style.setProperty('--log-scale', logZoomLevel/100);
+}
+
+function toggleProblem() {
+  var body = document.getElementById('probBody');
+  var btn = document.getElementById('probToggleBtn');
+  body.classList.toggle('prob-body--hidden');
+  btn.textContent = body.classList.contains('prob-body--hidden') ? '▼ Show' : '▲ Hide';
+}
+
+function toggleFullscreen() {
+  var viz = document.querySelector('.col-viz');
+  if (!document.fullscreenElement) viz.requestFullscreen().catch(function(){});
+  else document.exitFullscreen();
+}
+
+// ============================================================
+// KEYBOARD
+// ============================================================
+document.addEventListener('keydown', function(e){
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
+  if (e.key === 'ArrowRight') { e.preventDefault(); stepBy(1); }
+  else if (e.key === 'ArrowLeft') { e.preventDefault(); stepBy(-1); }
+  else if (e.key === 'r' || e.key === 'R') { e.preventDefault(); resetStep(); }
+});
+
+// ============================================================
+// BOOT
+// ============================================================
+resetWithInput();
+</script>
+</body>
+</html>

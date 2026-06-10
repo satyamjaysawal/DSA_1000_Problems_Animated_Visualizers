@@ -1,0 +1,1019 @@
+﻿
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>218. The Skyline Problem — Dry Run Visualizer</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=DM+Sans:wght@400;500;600&display=swap');
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{--bg-primary:#FAFAF8;--bg-secondary:#F1EFE8;--bg-tertiary:#E2E0D8;--bg-card:#FFFFFF;--text-primary:#2C2C2A;--text-secondary:#5F5E5A;--text-tertiary:#888780;--border-color:rgba(0,0,0,.11);--border-light:rgba(0,0,0,.06);--border-focus:#534AB7;--accent-indigo:#534AB7;--accent-indigo-bg:#EEEDFE;--accent-indigo-text:#3C3489;--accent-indigo-hover:#4740A0;--accent-teal:#0F6E56;--accent-teal-bg:#E1F5EE;--accent-teal-text:#085041;--accent-red:#E24B4A;--accent-red-bg:#FCEBEB;--accent-red-text:#791F1F;--accent-amber:#B45309;--accent-amber-bg:#FEF3C7;--accent-amber-text:#78350F;--accent-green:#15803D;--accent-green-bg:#DCFCE7;--accent-green-text:#14532D;--syn-keyword:#534AB7;--syn-function:#185FA5;--syn-number:#993C1D;--syn-string:#0F6E56;--active-line-bg:#EEEDFE;--radius-sm:4px;--radius-md:6px;--radius-lg:10px;--sp-2:8px;--sp-3:12px;--sp-5:20px;--font-sans:'DM Sans',system-ui,sans-serif;--font-mono:'JetBrains Mono','Fira Code',monospace;--fs-xs:11px;--fs-sm:12px;--fs-base:14px;--fs-md:15px;--fw-medium:500;--fw-semibold:600;--fw-bold:700;--lh-normal:1.6;--lh-code:1.9;--ease:.18s ease}
+html,body{height:100%;background:var(--bg-primary);color:var(--text-primary);font:var(--fs-base) var(--font-sans)}
+.kw{color:var(--syn-keyword);font-weight:var(--fw-medium)}.fn{color:var(--syn-function)}.num{color:var(--syn-number)}.str{color:var(--syn-string)}
+.btn,.section-label,.action-badge,.log-badge,kbd{font-family:system-ui,"Segoe UI Emoji",var(--font-sans)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:4px;padding:5px var(--sp-3);font-size:var(--fs-sm);font-weight:var(--fw-medium);border:1px solid var(--border-color);border-radius:var(--radius-md);background:var(--bg-card);color:var(--text-primary);cursor:pointer;transition:all var(--ease);white-space:nowrap}.btn:hover{background:var(--bg-secondary)}.btn:active{transform:scale(.96)}.btn-primary{background:var(--accent-indigo);color:#fff;border-color:var(--accent-indigo)}.btn-primary:hover{background:var(--accent-indigo-hover)}
+.btn-zoom{display:inline-flex;align-items:center;justify-content:center;padding:2px 7px;font:700 12px var(--font-mono);border:1px solid var(--border-color);border-radius:var(--radius-sm);background:var(--bg-card);color:var(--text-secondary);cursor:pointer}.btn-zoom:hover{background:var(--accent-indigo-bg);border-color:var(--accent-indigo);color:var(--accent-indigo)}
+.input{padding:4px var(--sp-2);font:var(--fs-sm) var(--font-mono);border:1px solid var(--border-color);border-radius:var(--radius-md);background:var(--bg-card);color:var(--text-primary);outline:none}.input:focus{border-color:var(--border-focus)}
+kbd{display:inline-block;padding:1px 5px;border-radius:var(--radius-sm);font-size:10px;background:var(--bg-secondary);border:1px solid var(--border-color);color:var(--text-secondary);line-height:1.5}
+::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border-color);border-radius:3px}
+@keyframes pulse-node{0%,100%{box-shadow:0 0 4px var(--accent-indigo)}50%{box-shadow:0 0 12px var(--accent-indigo)}}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-3px)}75%{transform:translateX(3px)}}
+@keyframes win-pulse{0%,100%{box-shadow:0 0 3px rgba(234,179,8,.5)}50%{box-shadow:0 0 8px rgba(234,179,8,.9)}}
+@keyframes sweep-pulse{0%,100%{stroke-width:2}50%{stroke-width:4}}
+.app-shell{display:flex;flex-direction:column;height:100vh;overflow:hidden;background:var(--bg-primary)}
+.prob-header{display:flex;align-items:center;gap:var(--sp-2);padding:8px var(--sp-5);border-bottom:1px solid var(--border-color);background:var(--bg-card);flex-wrap:wrap;flex-shrink:0}
+.prob-header-left{display:flex;align-items:center;gap:6px;flex-wrap:wrap;flex:1}
+.prob-header-right{display:flex;align-items:center;gap:var(--sp-2);flex-wrap:wrap}
+.gt-home-btn{padding:3px 10px;font-family:var(--font-sans);font-size:11px;font-weight:700;letter-spacing:.04em;border:1.5px solid var(--accent-indigo);border-radius:var(--radius-md);background:var(--accent-indigo);color:#fff;cursor:pointer;text-transform:uppercase}
+.gt-home-btn:hover{background:var(--accent-indigo-hover)}
+.prob-num{font-size:var(--fs-sm);font-weight:var(--fw-bold);color:var(--accent-indigo);font-family:var(--font-mono)}
+.prob-name{font-size:var(--fs-md);font-weight:var(--fw-semibold)}
+.prob-diff--hard{font-size:10px;padding:2px 8px;border-radius:99px;font-weight:var(--fw-semibold);background:var(--accent-red-bg);color:var(--accent-red-text)}
+.prob-tag{font-size:10px;padding:2px 8px;border-radius:99px;background:var(--bg-tertiary);color:var(--text-tertiary);border:1px solid var(--border-color);font-weight:var(--fw-medium)}
+.top-label{font:var(--fs-xs) var(--font-mono);color:var(--text-tertiary)}
+.top-expected{font:700 10px var(--font-mono);padding:2px 8px;border-radius:99px;background:var(--accent-teal-bg);color:var(--accent-teal-text);border:1px solid var(--accent-teal);max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.prob-toggle-btn{font-family:system-ui,sans-serif;font-size:11px;padding:3px 10px;border-radius:var(--radius-md);background:var(--bg-secondary);border:1px solid var(--border-color);color:var(--text-secondary);cursor:pointer}
+.prob-body{display:flex;gap:var(--sp-5);padding:var(--sp-3) var(--sp-5);border-bottom:1px solid var(--border-color);background:var(--bg-card);flex-shrink:0}
+.problem-body--hidden{display:none!important}
+.prob-body-left{flex:1;min-width:0}.prob-body-right{width:340px;flex-shrink:0}
+.prob-body-left h3,.prob-body-right h3{font-size:var(--fs-sm);font-weight:var(--fw-semibold);color:var(--accent-indigo);margin:8px 0 3px}
+.prob-body-left h3:first-child{margin-top:0}
+.prob-desc{font-size:var(--fs-sm);color:var(--text-secondary);margin-bottom:4px}
+.prob-desc code{font-family:var(--font-mono);background:var(--bg-secondary);padding:1px 4px;border-radius:3px;font-size:var(--fs-xs)}
+.concept-block{background:var(--bg-secondary);border-radius:var(--radius-md);padding:8px 12px;margin:4px 0;font-size:var(--fs-sm);border-left:3px solid var(--accent-teal);color:var(--text-secondary)}
+.concept-block strong{color:var(--accent-teal-text);font-family:var(--font-mono);font-size:var(--fs-xs)}
+.prob-complexity{display:flex;gap:var(--sp-2);margin-top:6px}
+.prob-complexity-chip{font:10px var(--font-mono);padding:2px 8px;border-radius:var(--radius-md);background:var(--bg-secondary);border:1px solid var(--border-color)}
+.cc-label{color:var(--text-tertiary)}.cc-val{color:var(--accent-indigo-text);font-weight:var(--fw-bold)}
+.prob-tests{display:flex;flex-direction:column;gap:4px;margin-bottom:6px}
+.prob-test{display:flex;align-items:center;gap:5px;background:var(--bg-secondary);border:1px solid var(--border-color);border-radius:var(--radius-md);padding:5px 8px;font-size:var(--fs-xs);cursor:pointer;transition:all var(--ease)}
+.prob-test:hover{border-color:var(--accent-indigo)}
+.prob-test--active{border-color:var(--accent-indigo)!important;background:var(--accent-indigo-bg)!important}
+.pt-label{font-size:10px;font-weight:var(--fw-bold);color:var(--text-tertiary)}
+.pt-input{font-family:var(--font-mono);color:var(--text-primary);font-size:9px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pt-tag{font-size:7px;padding:1px 4px;border-radius:99px;background:var(--bg-tertiary);color:var(--text-tertiary);border:1px solid var(--border-color);font-weight:600;font-family:var(--font-mono)}
+.pt-arrow{color:var(--text-tertiary)}
+.pt-expected{font-family:var(--font-mono);font-weight:var(--fw-bold);color:var(--accent-teal);font-size:9px;max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.prob-live{display:flex;align-items:flex-start;gap:6px;padding:6px var(--sp-3);border-radius:var(--radius-md);background:var(--bg-primary);border:1px solid var(--border-color);font-size:var(--fs-sm);margin-bottom:6px}
+.pl-label{font-size:var(--fs-xs);color:var(--text-tertiary);flex-shrink:0}
+.pl-output{font-family:var(--font-mono);font-weight:var(--fw-bold);color:var(--accent-indigo);font-size:10px;word-break:break-all;line-height:1.4}
+.main-row{flex:1;display:flex;overflow:hidden;min-height:0}
+.col{display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.col-code{width:33%;min-width:140px;max-width:45vw}
+.col-viz{flex:1;min-width:0}
+.section-label{padding:5px var(--sp-3);font-size:var(--fs-xs);font-weight:var(--fw-semibold);color:var(--text-tertiary);text-transform:uppercase;letter-spacing:.07em;border-bottom:1px solid var(--border-color);flex-shrink:0;background:var(--bg-secondary)}
+.code-panel{flex:1;overflow-y:auto;padding:var(--sp-3) var(--sp-2);font-family:var(--font-mono);font-size:var(--fs-sm);line-height:var(--lh-code)}
+.code-line{display:flex;align-items:center;gap:var(--sp-2);padding:1px var(--sp-2);border-radius:var(--radius-sm)}
+.code-line.active{background:var(--active-line-bg)}
+.ln{min-width:18px;text-align:right;color:var(--text-tertiary);font-size:10px;user-select:none;flex-shrink:0;opacity:.6}
+.code-content{white-space:pre;flex:1}
+.resize-h{width:5px;cursor:col-resize;flex-shrink:0;background:transparent;position:relative;z-index:10;border-left:1px solid var(--border-color)}
+.resize-h:hover,.resize-h.active{background:rgba(99,102,241,.15)}
+.resize-h::after{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:3px;height:24px;border-radius:2px;background:rgba(0,0,0,.08)}
+.no-select{user-select:none!important;cursor:col-resize}
+.viz-panel{flex:1;overflow:auto;padding:var(--sp-3)}
+.vars-strip{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;padding:6px 10px;background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius-md)}
+.var-chip{display:inline-flex;align-items:center;gap:2px;padding:2px 7px;border-radius:var(--radius-md);background:var(--bg-secondary);border:1px solid var(--border-light);font-family:var(--font-mono);font-size:10px}
+.var-chip.vc-active{border-color:var(--accent-indigo);background:var(--accent-indigo-bg)}
+.var-chip.vc-safe{border-color:var(--accent-green);background:var(--accent-green-bg)}
+.var-chip.vc-flip{border-color:var(--accent-red);background:var(--accent-red-bg)}
+.vn{color:var(--text-tertiary);font-weight:500}.vv{font-weight:var(--fw-bold)}
+.viz-row{display:flex;gap:12px;align-items:flex-start;flex-wrap:wrap}
+.viz-card{background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius-md);padding:10px}
+.viz-title{font:600 9px var(--font-mono);text-transform:uppercase;letter-spacing:.04em;color:var(--text-tertiary);margin-bottom:6px}
+
+/* === SKYLINE SVG === */
+.skyline-svg{display:block;background:linear-gradient(180deg,#dbeafe 0%,#eff6ff 60%,#fef3c7 100%);border-radius:6px;border:1px solid var(--border-color)}
+.bld-rect{transition:all .25s}
+.bld-pending{fill-opacity:.18;stroke-width:1.2;stroke-dasharray:3,2}
+.bld-active{fill-opacity:.55;stroke-width:2}
+.bld-done{fill-opacity:.32;stroke-width:1.2}
+.bld-current{fill-opacity:.7;stroke-width:2.5;filter:drop-shadow(0 0 4px rgba(83,74,183,.5))}
+.sweep-line{stroke:#E24B4A;stroke-width:2.5;stroke-dasharray:4,3;animation:sweep-pulse 1.4s infinite}
+.skyline-poly{fill:none;stroke:#0F6E56;stroke-width:2.5;stroke-linejoin:miter}
+.skyline-pt{fill:#0F6E56;stroke:#fff;stroke-width:1.5}
+.skyline-pt-new{fill:#B45309;stroke:#fff;stroke-width:2;animation:pulse-node 1s infinite}
+.axis-line{stroke:#888780;stroke-width:1}
+.axis-label{font:9px var(--font-mono);fill:#5F5E5A}
+.bld-label{font:700 9px var(--font-mono);fill:#fff;text-anchor:middle;pointer-events:none}
+
+/* Events list */
+.events-list{display:flex;flex-direction:column;gap:3px;max-height:280px;overflow-y:auto;padding:6px;background:var(--bg-secondary);border-radius:var(--radius-md);border:1px dashed var(--border-color);min-width:200px}
+.event-item{display:flex;align-items:center;gap:6px;padding:4px 8px;border-radius:5px;background:#fff;border:1px solid var(--border-light);font:10px var(--font-mono)}
+.event-item--pending{opacity:.55}
+.event-item--current{border-color:var(--accent-indigo)!important;background:var(--accent-indigo-bg)!important;animation:pulse-node 1.2s infinite;font-weight:700}
+.event-item--done{background:var(--accent-green-bg);border-color:var(--accent-green);opacity:.7}
+.event-num{font-weight:700;color:var(--text-tertiary);min-width:18px}
+.event-x{color:var(--accent-indigo-text);font-weight:700}
+.event-type{padding:1px 5px;border-radius:3px;font-size:8px;font-weight:700}
+.event-type--start{background:#fef3c7;color:#78350f}
+.event-type--end{background:#fee2e2;color:#791F1F}
+
+/* Heap */
+.heap-col{display:flex;flex-direction:column;gap:3px;min-height:80px;padding:6px;background:var(--bg-secondary);border-radius:var(--radius-md);border:1px dashed var(--border-color);min-width:180px}
+.heap-item{display:flex;align-items:center;gap:6px;padding:4px 8px;border-radius:5px;font:10px var(--font-mono);background:#fff;border:1px solid var(--border-light)}
+.heap-item--top{background:var(--accent-amber-bg)!important;border-color:var(--accent-amber)!important;color:var(--accent-amber-text);font-weight:700;animation:pulse-node 1.2s infinite}
+.heap-item--new{background:var(--accent-green-bg);border-color:var(--accent-green);color:var(--accent-green-text)}
+.heap-item--popping{background:var(--accent-red-bg)!important;border-color:var(--accent-red)!important;animation:shake .35s}
+.heap-h-pill{font-weight:700;padding:0 5px;background:rgba(0,0,0,.05);border-radius:3px}
+
+/* Result list */
+.result-points{display:flex;flex-direction:column;gap:3px;min-height:80px;padding:6px;background:var(--bg-secondary);border-radius:var(--radius-md);border:1px dashed var(--border-color);min-width:160px;max-height:240px;overflow-y:auto}
+.result-pt{padding:4px 8px;border-radius:5px;background:#fff;border:1px solid var(--border-light);font:10px var(--font-mono);color:var(--accent-teal-text)}
+.result-pt--new{background:var(--accent-green-bg)!important;border-color:var(--accent-green)!important;font-weight:700;animation:pulse-node 1s infinite}
+
+.empty-state{font-size:11px;color:var(--text-tertiary);font-style:italic;text-align:center;padding:8px}
+.legend{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.legend span{display:inline-flex;align-items:center;gap:4px;font-size:10px;color:var(--text-secondary)}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:3px;border:1px solid var(--border-color)}
+.result-banner{margin-top:8px;padding:8px 12px;border-radius:var(--radius-md);font-family:var(--font-mono);font-size:var(--fs-md);font-weight:bold;background:var(--accent-green-bg);border:1.5px solid var(--accent-green);color:var(--accent-green-text);animation:win-pulse 1.6s infinite;word-break:break-all}
+
+.action-badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:var(--radius-sm);font-size:10px;font-weight:var(--fw-bold)}
+.action-badge--func-def,.action-badge--init,.action-badge--call,.action-badge--return,.action-badge--resume{background:rgba(130,80,255,.14);color:#8250ff}
+.action-badge--for-check,.action-badge--if-check,.action-badge--while-check{background:rgba(56,139,253,.14);color:#388bfd}
+.action-badge--mark,.action-badge--push,.action-badge--pop,.action-badge--restore,.action-badge--found,.action-badge--sort{background:rgba(63,185,80,.14);color:#3fb950}
+.action-badge--remove,.action-badge--prune,.action-badge--fail{background:rgba(248,81,73,.14);color:#f85149}
+.action-badge--exit,.action-badge--skip{background:rgba(85,84,80,.14);color:#555450}
+.log-card{border-radius:var(--radius-md);overflow:hidden;border:1px solid var(--border-color);border-left-width:4px;font-size:var(--fs-xs);background:var(--bg-card)}
+.log-card--func-def,.log-card--init,.log-card--call,.log-card--return,.log-card--resume{border-left-color:#8250ff}
+.log-card--for-check,.log-card--if-check,.log-card--while-check{border-left-color:#388bfd}
+.log-card--mark,.log-card--push,.log-card--pop,.log-card--restore,.log-card--found,.log-card--sort{border-left-color:#3fb950}
+.log-card--remove,.log-card--prune,.log-card--fail{border-left-color:#f85149}
+.log-card--exit,.log-card--skip{border-left-color:#555450}
+.log-badge{display:inline-flex;flex-shrink:0;border-radius:var(--radius-sm);font-size:9px;font-weight:var(--fw-bold);padding:2px 6px;white-space:nowrap}
+.log-badge--func-def,.log-badge--init,.log-badge--call,.log-badge--return,.log-badge--resume{background:rgba(130,80,255,.22);color:#8250ff}
+.log-badge--for-check,.log-badge--if-check,.log-badge--while-check{background:rgba(56,139,253,.22);color:#388bfd}
+.log-badge--mark,.log-badge--push,.log-badge--pop,.log-badge--restore,.log-badge--found,.log-badge--sort{background:rgba(63,185,80,.22);color:#3fb950}
+.log-badge--remove,.log-badge--prune,.log-badge--fail{background:rgba(248,81,73,.22);color:#f85149}
+.log-badge--exit,.log-badge--skip{background:rgba(85,84,80,.22);color:#555450}
+.log-card-header{display:flex;align-items:center;gap:6px;padding:8px 10px 6px;background:var(--bg-secondary);border-bottom:1px solid var(--border-light)}
+.log-line-ref{font:700 10px var(--font-mono);color:var(--accent-indigo);background:var(--accent-indigo-bg);padding:1px 6px;border-radius:4px;border:1px solid var(--accent-indigo)}
+.log-status-pill{font-family:system-ui,"Segoe UI Emoji",sans-serif;font-size:9px;font-weight:700;padding:2px 7px;border-radius:99px;text-transform:uppercase;letter-spacing:.04em;margin-left:auto}
+.log-status--success{background:var(--accent-green-bg);color:var(--accent-green-text);border:1px solid var(--accent-green)}
+.log-status--fail{background:var(--accent-red-bg);color:var(--accent-red-text);border:1px solid var(--accent-red)}
+.log-status--skip{background:var(--bg-tertiary);color:var(--text-tertiary);border:1px solid var(--border-color)}
+.log-status--loop{background:rgba(56,139,253,.14);color:#185FA5;border:1px solid #388bfd}
+.log-status--prune{background:var(--accent-red-bg);color:var(--accent-red-text);border:1px solid var(--accent-red)}
+.log-status--info{background:rgba(130,80,255,.14);color:#3C3489;border:1px solid #8250ff}
+.log-section{padding:7px 10px;border-bottom:1px dashed var(--border-light)}
+.log-section:last-child{border-bottom:none}
+.log-section-title{font:700 8px var(--font-mono);text-transform:uppercase;letter-spacing:.06em;color:var(--text-tertiary);margin-bottom:3px;display:flex;align-items:center;gap:4px}
+.log-section-title-icon{font-family:system-ui,"Segoe UI Emoji",sans-serif;font-size:10px}
+.log-code-snippet{font:600 11px var(--font-mono);background:#0d1117;color:#e6edf3;padding:6px 9px;border-radius:4px;display:block;overflow-x:auto;white-space:pre;border:1px solid #30363d}
+.log-code-snippet .ck{color:#ff7b72}.log-code-snippet .cs{color:#a5d6ff}.log-code-snippet .cn{color:#79c0ff}.log-code-snippet .cf{color:#d2a8ff}.log-code-snippet .cc{color:#8b949e;font-style:italic}
+.log-kv-row{display:flex;flex-wrap:wrap;gap:4px;margin-top:2px}
+.log-kv{display:inline-flex;align-items:center;gap:3px;font:11px var(--font-mono);padding:2px 7px;border-radius:4px;background:var(--bg-secondary);border:1px solid var(--border-light)}
+.log-kv-key{color:var(--text-tertiary);font-weight:500}
+.log-kv-val{color:var(--text-primary);font-weight:700}
+.log-kv--in{background:rgba(56,139,253,.08);border-color:rgba(56,139,253,.3)}
+.log-kv--out{background:rgba(63,185,80,.08);border-color:rgba(63,185,80,.4)}
+.log-kv--out .log-kv-val{color:#15803D}
+.log-kv--changed{background:rgba(180,83,9,.10);border-color:rgba(180,83,9,.4)}
+.log-verdict{display:flex;align-items:center;gap:6px;font:600 11px var(--font-mono);padding:5px 8px;border-radius:5px;background:var(--bg-secondary);border:1px solid var(--border-light)}
+.log-verdict--true{background:var(--accent-green-bg);border-color:var(--accent-green);color:var(--accent-green-text)}
+.log-verdict--false{background:var(--accent-red-bg);border-color:var(--accent-red);color:var(--accent-red-text)}
+.log-analogy{font:italic 11px var(--font-sans);color:var(--text-secondary);background:#FFF8E7;border:1px solid #FBE8A6;border-left:3px solid var(--accent-amber);padding:6px 9px;border-radius:4px;line-height:1.55}
+.log-analogy strong{color:var(--accent-amber-text);font-style:normal;font-weight:700}
+.log-why{font-size:11px;line-height:1.55;color:var(--text-primary);padding:4px 0}
+.log-why strong{color:var(--accent-indigo-text)}
+.log-popup{--log-scale:1;position:fixed;bottom:52px;right:14px;width:calc(480px * var(--log-scale));max-width:92vw;max-height:75vh;border-radius:var(--radius-lg);box-shadow:0 10px 32px rgba(0,0,0,.14);border:1px solid var(--border-color);background:var(--bg-card);overflow:hidden;display:flex;flex-direction:column;z-index:100;transition:opacity .15s,transform .15s;transform-origin:bottom right}
+.log-popup--hidden{opacity:0;transform:scale(.92);pointer-events:none}
+.log-popup-body{flex:1;overflow:auto;padding:0}
+.log-popup-body > .log-card{border-radius:0;border:none;border-left:0}
+.footer-bar{display:flex;flex-shrink:0;border-top:1px solid var(--border-color);background:var(--bg-card)}
+.footer-left{width:33%;min-width:140px;max-width:45vw;display:flex;align-items:center;gap:8px;padding:7px 12px;border-right:1px solid var(--border-light)}
+.footer-right{flex:1;display:flex;align-items:center;gap:6px;padding:7px 14px;flex-wrap:wrap}
+.footer-sep{width:1px;height:16px;background:var(--border-color);flex-shrink:0}
+.step-info{font:10px var(--font-mono);color:var(--text-tertiary)}
+.log-toggle-btn{padding:2px 8px;font:700 9px var(--font-mono);border:1px solid var(--accent-green);border-radius:99px;background:var(--accent-green-bg);color:var(--accent-green-text);cursor:pointer}
+.log-toggle-btn--off{background:var(--bg-tertiary);color:var(--text-tertiary);border-color:var(--border-color)}
+.log-zoom-label{font:10px var(--font-mono);color:var(--text-tertiary);min-width:28px;text-align:center}
+.btn-fullscreen{font-size:14px;padding:3px 8px;background:var(--accent-indigo-bg);border-color:var(--accent-indigo);color:var(--accent-indigo)}
+.btn-fullscreen:hover{background:var(--accent-indigo);color:#fff}
+</style>
+</head>
+<body>
+<div class="app-shell">
+  <header class="prob-header">
+    <div class="prob-header-left">
+      <a href="../00_HomePage/gt_learn_homepage.html" class="gt-home-btn">GT LEARN</a>
+      <span class="prob-num">#218</span>
+      <span class="prob-name">🌆 The Skyline Problem</span>
+      <span class="prob-diff--hard">HARD</span>
+      <span class="prob-tag">Heap</span>
+      <span class="prob-tag">Sweep Line</span>
+      <span class="prob-tag">Sorting</span>
+    </div>
+    <div class="prob-header-right">
+      <span class="top-label">buildings=</span>
+      <input id="inputBld" class="input" style="width:280px" value="2,9,10;3,7,15;5,12,12;15,20,10;19,24,8">
+      <span id="expectedBadge" class="top-expected">exp: 7 key points</span>
+      <button id="probToggleBtn" class="prob-toggle-btn" type="button" onclick="toggleProblem()">▲ Hide</button>
+    </div>
+  </header>
+  <div id="probBody" class="prob-body">
+    <div class="prob-body-left">
+      <h3>📝 Problem Statement</h3>
+      <p class="prob-desc">Given <code>buildings[i] = [Lᵢ, Rᵢ, Hᵢ]</code> — left edge, right edge, and height of i-th building — return the <strong>skyline outline</strong> as a list of <code>[x, y]</code> key points. A key point is where the skyline's height changes. Output sorted by x-coordinate. Last point must have y=0 (ground level).</p>
+      <h3>🧠 Solving Approach</h3>
+      <p class="prob-desc">Sweep line + max heap — har building ke <strong>start aur end</strong> ko events mein convert karo, sort karo, fir x-axis pe left-to-right scan karo. Max heap mein active buildings ki heights track karte hain. Jab top-of-heap height change ho, new key point record.</p>
+      <h3>🎯 Core Concepts & Base Case</h3>
+      <div class="concept-block"><strong>Events:</strong> Start event <code>(L, -H, R)</code> negative height ke saath (heap mein max ke liye). End event <code>(R, 0, 0)</code> just marker.</div>
+      <div class="concept-block"><strong>Lazy deletion:</strong> Heap se "expired" buildings ko hatao tabhi jab top pe aaye AND uska end ≤ current x ho.</div>
+      <div class="concept-block"><strong>Key point check:</strong> Current max height ≠ last result height → naya skyline point add.</div>
+      <div class="prob-complexity">
+        <span class="prob-complexity-chip"><span class="cc-label">Time </span><span class="cc-val">O(N log N)</span></span>
+        <span class="prob-complexity-chip"><span class="cc-label">Space </span><span class="cc-val">O(N)</span></span>
+      </div>
+    </div>
+    <div class="prob-body-right">
+      <h3>🧪 Test Cases</h3>
+      <div id="testList" class="prob-tests"></div>
+      <div class="prob-live"><span class="pl-label">Result:</span><span id="liveOutput" class="pl-output">—</span></div>
+      <button class="btn btn-primary" type="button" onclick="resetWithInput()">▶ Run</button>
+      <p style="font-size:9px;color:var(--text-tertiary);margin-top:6px;font-family:var(--font-mono)">Format: <code>L,R,H;L,R,H;...</code></p>
+    </div>
+  </div>
+  <div class="main-row">
+    <div id="col1" class="col col-code">
+      <div class="section-label">📜 Python Code</div>
+      <div id="codePanel" class="code-panel"></div>
+    </div>
+    <div id="resizeH1" class="resize-h"></div>
+    <div class="col col-viz">
+      <div class="section-label">📊 Visualization</div>
+      <div id="vizPanel" class="viz-panel"></div>
+    </div>
+  </div>
+  <div class="footer-bar">
+    <div id="footerLeft" class="footer-left">
+      <span id="stepInfo"  class="step-info">0/0</span>
+      <span id="actionBadge" class="action-badge"></span>
+    </div>
+    <div class="footer-right">
+      <kbd>←</kbd><kbd>→</kbd>
+      <button class="btn" type="button" onclick="resetStep()">↺</button>
+      <button class="btn" type="button" onclick="stepBy(-1)">◀</button>
+      <button class="btn btn-primary" type="button" onclick="stepBy(1)">▶ Next</button>
+      <span class="footer-sep"></span>
+      <button id="logToggleBtn" class="log-toggle-btn" type="button" onclick="toggleLogPreview()">📋 ON</button>
+      <button class="btn-zoom" type="button" onclick="logZoom(-1)">−</button>
+      <span id="logZoomLabel" class="log-zoom-label">100%</span>
+      <button class="btn-zoom" type="button" onclick="logZoom(1)">+</button>
+      <button class="btn-zoom" type="button" onclick="logZoomReset()">↺</button>
+      <span class="footer-sep"></span>
+      <button class="btn btn-fullscreen" type="button" onclick="toggleFullscreen()">⛶</button>
+    </div>
+  </div>
+</div>
+<div id="logPopup" class="log-popup log-popup--hidden">
+  <div id="logPopupBody" class="log-popup-body"></div>
+</div>
+<script>
+var TESTS=[
+  {bld:"2,9,10;3,7,15;5,12,12;15,20,10;19,24,8",e:"[[2,10],[3,15],[7,12],[12,0],[15,10],[20,8],[24,0]]",tag:"classic"},
+  {bld:"0,2,3;2,5,3",e:"[[0,3],[5,0]]",tag:"merge equal"},
+  {bld:"1,2,1;1,2,2;1,2,3",e:"[[1,3],[2,0]]",tag:"nested"},
+  {bld:"1,5,11;2,7,6;3,9,13;12,16,7;14,25,3;19,22,18;23,29,13;24,28,4",e:"complex 8-bld",tag:"big test"},
+  {bld:"4,9,10",e:"[[4,10],[9,0]]",tag:"single"}
+];
+
+var codeLines=[
+  "def getSkyline(buildings):",
+  "    events = []",
+  "    for L, R, H in buildings:",
+  "        events.append((L, -H, R))",
+  "        events.append((R, 0, 0))",
+  "    events.sort()",
+  "    result = []",
+  "    heap = [(0, float('inf'))]",
+  "    for x, negH, R in events:",
+  "        if negH != 0:",
+  "            heapq.heappush(heap, (negH, R))",
+  "        while heap[0][1] <= x:",
+  "            heapq.heappop(heap)",
+  "        currMax = -heap[0][0]",
+  "        if not result or result[-1][1] != currMax:",
+  "            result.append([x, currMax])",
+  "    return result"
+];
+
+var LOG_BADGE={"func-def":"📌 DEF","init":"⚙️ INIT","call":"📞 CALL","resume":"🔄 RESUME","for-check":"🔁 FOR","if-check":"🔎 IF","while-check":"🔁 WHILE","mark":"✅ MARK","push":"⬆ PUSH","pop":"⬇ POP","sort":"🔀 SORT","remove":"✏️ EDIT","restore":"↩ RESTORE","exit":"🔚 EXIT","return":"🏆 RETURN","found":"🎉 FOUND","prune":"✂️ PRUNE","skip":"⏭ SKIP","fail":"❌ FAIL"};
+var BADGE_LABEL={"func-def":"DEF","init":"INIT","call":"CALL","resume":"RESUME","for-check":"FOR","if-check":"IF","while-check":"WHILE","mark":"MARK","push":"PUSH","pop":"POP","sort":"SORT","remove":"EDIT","restore":"RESTORE","exit":"EXIT","return":"RETURN","found":"FOUND","prune":"PRUNE","skip":"SKIP","fail":"FAIL"};
+
+var BLD_COLORS=['#534AB7','#0F6E56','#B45309','#185FA5','#791F1F','#0F766E','#7C2D12','#3730A3','#831843','#1E3A8A'];
+var steps=[],currentStep=0,codeWidthUserSet=false,curResult=null,logEnabled=true,logZoomLevel=100;
+
+function renderTests(){
+  document.getElementById("testList").innerHTML=TESTS.map(function(t,i){
+    return '<div class="prob-test'+(i===0?' prob-test--active':'')+'" onclick="loadTest('+i+',this)">'+
+      '<span class="pt-label">T'+(i+1)+'</span>'+
+      '<span class="pt-input" title="'+t.bld+'">'+t.bld+'</span>'+
+      '<span class="pt-tag">'+t.tag+'</span>'+
+      '<span class="pt-arrow">→</span>'+
+      '<span class="pt-expected" title="'+t.e+'">'+t.e+'</span></div>';
+  }).join("");
+}
+
+function renderCode(){
+  var p=document.getElementById('codePanel');
+  p.innerHTML=codeLines.map(function(raw,i){
+    var h=raw;
+    h=h.replace(/("[^"]*"|'[^']*')/g,'\x01STR\x02$1\x03');
+    h=h.replace(/\b(def|for|in|if|return|break|continue|and|else|elif|True|False|None|not|or|while|lambda)\b/g,'\x01KW\x02$1\x03');
+    h=h.replace(/\b(len|range|int|str|list|append|pop|sorted|min|max|sum|abs|enumerate|zip|print|set|add|float|sort)\b/g,'\x01FN\x02$1\x03');
+    h=h.replace(/(?<![.\w"\x01\x02\x03])(-?\d+)\b/g,'\x01NUM\x02$1\x03');
+    h=h.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    h=h.replace(/\x01([A-Z]+)\x02/g,function(_,c){return '<span class="'+c.toLowerCase()+'">';}).replace(/\x03/g,'</span>');
+    return '<div class="code-line" data-line="'+i+'"><span class="ln">'+(i+1)+'</span><span class="code-content">'+h+'</span></div>';
+  }).join('');
+}
+
+function toggleProblem(){
+  var body=document.getElementById('probBody'),btn=document.getElementById('probToggleBtn');
+  body.classList.toggle('problem-body--hidden');
+  btn.textContent=body.classList.contains('problem-body--hidden')?'▼ Show':'▲ Hide';
+}
+
+function syncFooterWidth(){document.getElementById('footerLeft').style.width=document.getElementById('col1').offsetWidth+'px';}
+
+function fitCodeWidth(){
+  if(codeWidthUserSet)return;
+  var c=document.getElementById('col1');
+  c.style.flex='none';c.style.width='max-content';
+  c.style.width=Math.min(c.offsetWidth,window.innerWidth*.45)+'px';
+  syncFooterWidth();
+}
+
+function hlCode(raw){
+  if(!raw)return '';
+  var h=raw;
+  h=h.replace(/("[^"]*"|'[^']*')/g,'\x01CS\x02$1\x03');
+  h=h.replace(/\b(def|for|in|if|return|break|continue|and|else|elif|True|False|None|not|or|while|lambda)\b/g,'\x01CK\x02$1\x03');
+  h=h.replace(/\b(len|range|int|str|list|append|pop|sort|sorted|set|add|heappush|heappop|float|max|min)\b/g,'\x01CF\x02$1\x03');
+  h=h.replace(/(?<![.\w"\x01\x02\x03])(-?\d+)\b/g,'\x01CN\x02$1\x03');
+  h=h.replace(/(#.*$)/g,'\x01CC\x02$1\x03');
+  h=h.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  h=h.replace(/\x01([A-Z]+)\x02/g,function(_,c){return '<span class="'+c.toLowerCase()+'">';}).replace(/\x03/g,'</span>');
+  return h;
+}
+
+function richLog(opts){
+  var statusMap={success:"✅ Success",fail:"❌ Failed",skip:"⏭ Skipped",loop:"🔁 Loop iter",prune:"✂️ Pruned",info:"ℹ️ Info"};
+  var status=opts.status||"info";
+  var html='<div class="log-card log-card--'+opts.action+'">';
+  html+='<div class="log-card-header">';
+  html+='<span class="log-badge log-badge--'+opts.action+'">'+(LOG_BADGE[opts.action]||opts.action)+'</span>';
+  html+='<span class="log-line-ref">L'+(opts.line+1)+'</span>';
+  html+='<span class="log-status-pill log-status--'+status+'">'+(statusMap[status]||status)+'</span>';
+  html+='</div>';
+  if(opts.code){
+    html+='<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">📜</span>Code Executing</div>';
+    html+='<code class="log-code-snippet">'+hlCode(opts.code)+'</code></div>';
+  }
+  if(opts.inputs&&opts.inputs.length){
+    html+='<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">📥</span>Input Values</div><div class="log-kv-row">';
+    opts.inputs.forEach(function(kv){html+='<span class="log-kv log-kv--in"><span class="log-kv-key">'+kv.k+'</span>=<span class="log-kv-val">'+kv.v+'</span></span>';});
+    html+='</div></div>';
+  }
+  if(opts.outputs&&opts.outputs.length){
+    html+='<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">📤</span>Output / State After Line</div><div class="log-kv-row">';
+    opts.outputs.forEach(function(kv){
+      var cls=kv.changed?'log-kv--changed':'log-kv--out';
+      html+='<span class="log-kv '+cls+'"><span class="log-kv-key">'+kv.k+'</span>=<span class="log-kv-val">'+kv.v+'</span></span>';
+    });
+    html+='</div></div>';
+  }
+  if(opts.verdict){
+    var vCls=opts.verdictTrue===true?'log-verdict--true':(opts.verdictTrue===false?'log-verdict--false':'');
+    var vIcon=opts.verdictTrue===true?'✓':(opts.verdictTrue===false?'✗':'•');
+    html+='<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">⚖️</span>Verdict / Decision</div>';
+    html+='<div class="log-verdict '+vCls+'">'+vIcon+' '+opts.verdict+'</div></div>';
+  }
+  if(opts.why){
+    html+='<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">💡</span>Why This Happens</div>';
+    html+='<div class="log-why">'+opts.why+'</div></div>';
+  }
+  if(opts.analogy){
+    html+='<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">🎭</span>Real-Life Analogy</div>';
+    html+='<div class="log-analogy">'+opts.analogy+'</div></div>';
+  }
+  html+='</div>';
+  return html;
+}
+
+// ── MIN-HEAP (tuples sorted lexicographically; we store (negH, R) so min-heap gives most-negative = max H) ──
+function heapParent(i){return (i-1)>>1;}
+function heapPush(heap,item){
+  heap.push(item);
+  var i=heap.length-1;
+  while(i>0){
+    var p=heapParent(i);
+    if(cmpTuple(heap[i],heap[p])<0){var t=heap[i];heap[i]=heap[p];heap[p]=t;i=p;}else break;
+  }
+}
+function heapPop(heap){
+  var top=heap[0],last=heap.pop();
+  if(heap.length){heap[0]=last;var i=0,n=heap.length;
+    while(true){var l=i*2+1,r=l+1,best=i;
+      if(l<n&&cmpTuple(heap[l],heap[best])<0)best=l;
+      if(r<n&&cmpTuple(heap[r],heap[best])<0)best=r;
+      if(best!==i){var t=heap[i];heap[i]=heap[best];heap[best]=t;i=best;}else break;
+    }
+  }
+  return top;
+}
+function cmpTuple(a,b){if(a[0]!==b[0])return a[0]-b[0];return a[1]-b[1];}
+
+function buildSteps(buildings){
+  var st=[],MAX_STEPS=12000;
+  var events=[],result=[],heap=[];
+  var x_var=null,negH_var=null,R_var=null,L_var=null,H_var=null,curr_R_var=null;
+  var currMax=null,bldIdx=null,evtIdx=null,popping=false,newPushed=false,resultJustAdded=false;
+  var phase="init",sweepX=null;
+
+  function snap(x){
+    return Object.assign({
+      buildings:buildings.map(function(b){return b.slice();}),
+      events:events.map(function(e){return e.slice();}),
+      result:result.map(function(r){return r.slice();}),
+      heap:heap.map(function(h){return h.slice();}),
+      x_var:x_var,negH_var:negH_var,R_var:R_var,L_var:L_var,H_var:H_var,curr_R_var:curr_R_var,
+      currMax:currMax,bldIdx:bldIdx,evtIdx:evtIdx,popping:popping,
+      newPushed:newPushed,resultJustAdded:resultJustAdded,phase:phase,sweepX:sweepX
+    },x||{});
+  }
+  function pushStep(o){if(st.length>=MAX_STEPS)return;st.push(Object.assign({line:0,action:"func-def",logHTML:""},snap(o)));}
+
+  // L1
+  pushStep({line:0,action:"func-def",logHTML:richLog({
+    line:0,action:"func-def",
+    code:"def getSkyline(buildings):  # n="+buildings.length,
+    status:"info",
+    inputs:[{k:"buildings",v:JSON.stringify(buildings)}],
+    outputs:[{k:"function",v:"getSkyline registered"}],
+    why:"<strong>Main function entry</strong>. Goal: skyline outline ke key points dhundhna.",
+    analogy:"<strong>City planner</strong> ko city ka outline banana hai 🌆"
+  })});
+
+  // L2
+  pushStep({line:1,action:"init",logHTML:richLog({
+    line:1,action:"init",
+    code:"events = []",
+    status:"success",
+    outputs:[{k:"events",v:"[]",changed:true}],
+    why:"Events list <strong>initialize</strong> — har building ke start aur end yahan add honge.",
+    analogy:"<strong>Khali notebook</strong> ready — har building ki entry/exit timings note karenge."
+  })});
+
+  // L3 — for loop entry
+  phase="events";
+  pushStep({line:2,action:"for-check",logHTML:richLog({
+    line:2,action:"for-check",
+    code:"for L, R, H in buildings:  # "+buildings.length+" buildings",
+    status:"info",
+    inputs:[{k:"buildings.len",v:buildings.length}],
+    outputs:[{k:"loop iterations",v:buildings.length}],
+    why:"<strong>Buildings ko events mein convert</strong> karenge — har building 2 events deti hai.",
+    analogy:"Har <strong>building ke 2 timestamps</strong> note karenge — kab shuru, kab khatam."
+  })});
+
+  for(var b=0;b<buildings.length;b++){
+    var L=buildings[b][0],R=buildings[b][1],H=buildings[b][2];
+    L_var=L;R_var=R;H_var=H;bldIdx=b;
+    pushStep({line:2,action:"for-check",logHTML:richLog({
+      line:2,action:"for-check",
+      code:"# iter b="+b+": L="+L+", R="+R+", H="+H,
+      status:"loop",
+      inputs:[{k:"buildings["+b+"]",v:"["+L+","+R+","+H+"]"}],
+      outputs:[{k:"L",v:L,changed:true},{k:"R",v:R,changed:true},{k:"H",v:H,changed:true}],
+      why:"Building <strong>#"+b+"</strong> process — coords ("+L+","+R+","+H+").",
+      analogy:"Building "+b+" ka <strong>blueprint</strong> open kiya 📐"
+    })});
+
+    // L4 — start event
+    events.push([L,-H,R]);
+    pushStep({line:3,action:"push",logHTML:richLog({
+      line:3,action:"push",
+      code:"events.append(("+L+", -"+H+", "+R+"))  # START event",
+      status:"success",
+      inputs:[{k:"L",v:L},{k:"H",v:H},{k:"R",v:R}],
+      outputs:[{k:"new event",v:"("+L+",-"+H+","+R+")",changed:true},{k:"events.size",v:events.length,changed:true}],
+      why:"<strong>START event</strong> add — <code>(L="+L+", -H=-"+H+", R="+R+")</code>. Negative height isliye taaki sort mein <strong>tall buildings pehle aaye</strong> at same x.",
+      analogy:"Building "+b+" ka <strong>'opening time'</strong> note kiya — height negative likhi taaki 'tall' = 'small number' in sorting."
+    })});
+
+    // L5 — end event
+    events.push([R,0,0]);
+    pushStep({line:4,action:"push",logHTML:richLog({
+      line:4,action:"push",
+      code:"events.append(("+R+", 0, 0))  # END event marker",
+      status:"success",
+      inputs:[{k:"R",v:R}],
+      outputs:[{k:"new event",v:"("+R+",0,0)",changed:true},{k:"events.size",v:events.length,changed:true}],
+      why:"<strong>END event</strong> add — sirf marker, taaki sweep line yahan rukke check kare top of heap.",
+      analogy:"Building ka <strong>'closing time'</strong> bhi note — 'is x pe heap se expired buildings hatani hain' reminder."
+    })});
+  }
+
+  // L3 exit
+  L_var=null;H_var=null;R_var=null;bldIdx=null;
+  pushStep({line:2,action:"exit",logHTML:richLog({
+    line:2,action:"exit",
+    code:"# for-loop exit — all buildings converted",
+    status:"info",
+    outputs:[{k:"events.size",v:events.length},{k:"phase",v:'"events built"',changed:true}],
+    why:"Saari buildings se <strong>"+events.length+" events</strong> ban gaye ("+(events.length/2)+" start + "+(events.length/2)+" end).",
+    analogy:"Pure city ki <strong>timeline ready</strong> 📅"
+  })});
+
+  // L6 — sort
+  events.sort(function(a,b){if(a[0]!==b[0])return a[0]-b[0];return a[1]-b[1];});
+  pushStep({line:5,action:"sort",logHTML:richLog({
+    line:5,action:"sort",
+    code:"events.sort()  # by (x, negH, R) ascending",
+    status:"success",
+    inputs:[{k:"events (before)",v:"unsorted "+events.length+" items"}],
+    outputs:[{k:"events (sorted)",v:JSON.stringify(events).slice(0,80)+(JSON.stringify(events).length>80?"...":""),changed:true}],
+    why:"Events ko <strong>(x, negH, R)</strong> tuple pe sort. Tie pe — <strong>tall start (more negative H) pehle</strong>, fir end events.",
+    analogy:"<strong>Calendar arrange</strong> kar diya date-wise. Same date pe — important events pehle."
+  })});
+
+  // L7 — result init
+  pushStep({line:6,action:"init",logHTML:richLog({
+    line:6,action:"init",
+    code:"result = []",
+    status:"success",
+    outputs:[{k:"result",v:"[]",changed:true}],
+    why:"<strong>Final answer list</strong> — yahan key points store honge.",
+    analogy:"<strong>Result canvas khali</strong> 🎨 — sketch shuru karenge."
+  })});
+
+  // L8 — heap init
+  heap=[[0,Infinity]];
+  pushStep({line:7,action:"init",logHTML:richLog({
+    line:7,action:"init",
+    code:"heap = [(0, float('inf'))]  # sentinel: ground",
+    status:"success",
+    outputs:[{k:"heap",v:"[(0, ∞)]",changed:true},{k:"heap.size",v:1,changed:true}],
+    why:"<strong>Sentinel entry</strong> — height 0, never expires. Yeh ensure karta hai heap kabhi empty na ho.",
+    analogy:"<strong>Ground level (0)</strong> ko default rakha — agar koi building na ho toh skyline ground hi hai."
+  })});
+
+  // L9 — main sweep loop
+  phase="sweep";
+  pushStep({line:8,action:"for-check",logHTML:richLog({
+    line:8,action:"for-check",
+    code:"for x, negH, R in events:  # "+events.length+" events",
+    status:"info",
+    inputs:[{k:"events.size",v:events.length}],
+    outputs:[{k:"sweep starts",v:"left → right",changed:true}],
+    why:"<strong>SWEEP LINE shuru</strong> — left to right move karenge, har event pe heap update.",
+    analogy:"<strong>Camera zoom-in</strong> — left edge se start ho ke right tak pan karenge 🎬"
+  })});
+
+  for(var ei=0;ei<events.length;ei++){
+    var ev=events[ei];
+    x_var=ev[0];negH_var=ev[1];R_var=ev[2];evtIdx=ei;sweepX=ev[0];
+    newPushed=false;resultJustAdded=false;
+
+    pushStep({line:8,action:"for-check",logHTML:richLog({
+      line:8,action:"for-check",
+      code:"# event "+ei+": x="+ev[0]+", negH="+ev[1]+", R="+ev[2]+(ev[1]<0?"  [START]":"  [END marker]"),
+      status:"loop",
+      inputs:[{k:"event["+ei+"]",v:"("+ev[0]+","+ev[1]+","+ev[2]+")"}],
+      outputs:[{k:"x",v:ev[0],changed:true},{k:"negH",v:ev[1],changed:true},{k:"R",v:ev[2],changed:true},{k:"sweep at",v:"x="+ev[0],changed:true}],
+      why:"Event <strong>#"+ei+"</strong> at x=<strong>"+ev[0]+"</strong>. Type: "+(ev[1]<0?"<strong>START</strong> (height "+(-ev[1])+")":"<strong>END marker</strong>"),
+      analogy:"Sweep line <strong>x="+ev[0]+"</strong> tak pahunch gayi — "+(ev[1]<0?"naya building shuru":"kuch buildings expire ho sakti hain")+"."
+    })});
+
+    // L10 — if negH != 0 (start event)
+    var isStart=(ev[1]!==0);
+    pushStep({line:9,action:"if-check",logHTML:richLog({
+      line:9,action:"if-check",
+      code:"if negH != 0:  # "+ev[1]+" != 0  → "+isStart,
+      status:isStart?"success":"skip",
+      inputs:[{k:"negH",v:ev[1]}],
+      verdict:"negH ("+ev[1]+") "+(isStart?"!=":"==")+" 0",
+      verdictTrue:isStart,
+      why:isStart?"<strong>START event hai</strong> — heap mein push karenge.":"<strong>END marker hai</strong> — push skip, sirf trigger hai cleanup ka.",
+      analogy:isStart?"Naya building <strong>'check-in'</strong> at heap hotel 🏨":"END marker — <strong>'sirf bell baji'</strong>, kuch add nahi."
+    })});
+
+    if(isStart){
+      // L11 — heappush
+      heapPush(heap,[ev[1],ev[2]]);
+      newPushed=true;
+      pushStep({line:10,action:"push",logHTML:richLog({
+        line:10,action:"push",
+        code:"heapq.heappush(heap, ("+ev[1]+", "+ev[2]+"))",
+        status:"success",
+        inputs:[{k:"item",v:"("+ev[1]+","+ev[2]+")"}],
+        outputs:[{k:"heap.size",v:heap.length,changed:true},{k:"heap top",v:"("+heap[0][0]+","+(heap[0][1]===Infinity?"∞":heap[0][1])+")"}],
+        why:"Building height <strong>"+(-ev[1])+"</strong> with end <strong>"+ev[2]+"</strong> heap mein add. Heap min by negH — toh top pe sabse <strong>tall building</strong>.",
+        analogy:"Building hotel mein check-in — <strong>tallest guest top floor pe</strong> 🏨"
+      })});
+    }
+
+    // L12 — while heap[0][1] <= x (lazy deletion)
+    var whileChecks=0;
+    while(true){
+      var topR=heap[0][1];
+      var shouldPop=(topR<=ev[0]);
+      pushStep({line:11,action:"while-check",logHTML:richLog({
+        line:11,action:"while-check",
+        code:"while heap[0][1] <= x:  # heap[0]=("+heap[0][0]+","+(topR===Infinity?"∞":topR)+"), x="+ev[0]+" → "+shouldPop,
+        status:shouldPop?"loop":"info",
+        inputs:[{k:"heap[0]",v:"("+heap[0][0]+","+(topR===Infinity?"∞":topR)+")"},{k:"x",v:ev[0]}],
+        verdict:"heap[0][1] ("+(topR===Infinity?"∞":topR)+") <= x ("+ev[0]+")",
+        verdictTrue:shouldPop,
+        why:shouldPop?"<strong>Top building expired!</strong> Iska end ("+topR+") ≤ current x ("+ev[0]+"). Lazy delete!":"Top building still <strong>active</strong> — end ("+(topR===Infinity?"∞":topR)+") > x ("+ev[0]+"). While loop exit.",
+        analogy:shouldPop?"Top floor guest ka <strong>checkout time aa gaya</strong> — bahar nikalo!":"Top guest abhi <strong>active</strong> — koi cleanup nahi."
+      })});
+      if(!shouldPop)break;
+      // L13 — heappop
+      popping=true;
+      var popped=heapPop(heap);
+      pushStep({line:12,action:"pop",logHTML:richLog({
+        line:12,action:"pop",
+        code:"heapq.heappop(heap)  # popped ("+popped[0]+","+(popped[1]===Infinity?"∞":popped[1])+")",
+        status:"success",
+        inputs:[{k:"popped",v:"("+popped[0]+","+(popped[1]===Infinity?"∞":popped[1])+")"}],
+        outputs:[{k:"heap.size",v:heap.length,changed:true},{k:"new top",v:"("+heap[0][0]+","+(heap[0][1]===Infinity?"∞":heap[0][1])+")",changed:true}],
+        why:"Expired building <strong>height "+(-popped[0])+"</strong> heap se nikal di. Continue checking next top.",
+        analogy:"Guest checkout — <strong>room khali</strong>, ab next tallest active guest top pe."
+      })});
+      popping=false;
+      whileChecks++;
+      if(whileChecks>50)break;
+    }
+
+    // L14 — currMax
+    currMax=-heap[0][0];
+    pushStep({line:13,action:"init",logHTML:richLog({
+      line:13,action:"init",
+      code:"currMax = -heap[0][0] = -("+heap[0][0]+") = "+currMax,
+      status:"success",
+      inputs:[{k:"heap[0][0]",v:heap[0][0]}],
+      outputs:[{k:"currMax",v:currMax,changed:true}],
+      why:"<strong>Current skyline height</strong> = top of heap (negate kiya kyunki store negative). Yeh is x pe maximum active building height hai.",
+      analogy:"<strong>Tallest active guest ki height</strong> = currMax. Yahi skyline ka level hai is moment pe."
+    })});
+
+    // L15 — if not result or result[-1][1] != currMax
+    var resEmpty=result.length===0;
+    var lastY=resEmpty?null:result[result.length-1][1];
+    var isNewKeyPoint=resEmpty||lastY!==currMax;
+    pushStep({line:14,action:"if-check",logHTML:richLog({
+      line:14,action:"if-check",
+      code:"if not result or result[-1][1] != currMax:  # "+(resEmpty?"empty":(lastY+"!="+currMax))+" → "+isNewKeyPoint,
+      status:isNewKeyPoint?"success":"skip",
+      inputs:[{k:"result.size",v:result.length},{k:"last y",v:resEmpty?"none":lastY},{k:"currMax",v:currMax}],
+      verdict:resEmpty?"result is empty (first point)":"last_y ("+lastY+") "+(isNewKeyPoint?"!=":"==")+" currMax ("+currMax+")",
+      verdictTrue:isNewKeyPoint,
+      why:isNewKeyPoint?"<strong>Skyline height changed!</strong> "+(resEmpty?"Pehla key point hai":"Last height "+lastY+" se naya "+currMax+" different")+" — record karna hai.":"<strong>Same height</strong> — pichle point ke barabar, redundant. Skip.",
+      analogy:isNewKeyPoint?"Skyline ka <strong>'jhukav badla'</strong> 📈 — naya turning point note karo!":"Height same — <strong>flat line continue</strong>, koi naya point nahi."
+    })});
+
+    if(isNewKeyPoint){
+      // L16 — result.append
+      result.push([ev[0],currMax]);
+      resultJustAdded=true;
+      pushStep({line:15,action:"found",logHTML:richLog({
+        line:15,action:"found",
+        code:"result.append(["+ev[0]+", "+currMax+"])",
+        status:"success",
+        inputs:[{k:"x",v:ev[0]},{k:"currMax",v:currMax}],
+        outputs:[{k:"new point",v:"["+ev[0]+","+currMax+"]",changed:true},{k:"result.size",v:result.length,changed:true}],
+        why:"🎉 <strong>Key point recorded!</strong> Skyline ka turning point at ("+ev[0]+","+currMax+").",
+        analogy:"<strong>Sketch pe ek aur dot</strong> ✏️ — skyline ke shape mein ek nayi turn."
+      })});
+      resultJustAdded=false;
+    }
+  }
+
+  // L9 — for loop exit
+  x_var=null;negH_var=null;R_var=null;evtIdx=null;sweepX=null;
+  pushStep({line:8,action:"exit",logHTML:richLog({
+    line:8,action:"exit",
+    code:"# main for-loop exit — all events processed",
+    status:"info",
+    outputs:[{k:"result.size",v:result.length},{k:"phase",v:'"sweep done"',changed:true}],
+    why:"<strong>Saare events process ho gaye</strong>. Skyline complete!",
+    analogy:"<strong>Camera ne pura city pan kar liya</strong> 🎥 — sketch tayyar."
+  })});
+
+  curResult=result.map(function(p){return p.slice();});
+  // L17 — return
+  pushStep({line:16,action:"return",logHTML:richLog({
+    line:16,action:"return",
+    code:"return result  # "+result.length+" key points",
+    status:"success",
+    inputs:[{k:"result.size",v:result.length}],
+    outputs:[{k:"return",v:JSON.stringify(result)}],
+    why:"🏆 <strong>"+result.length+" key points</strong> mil gaye — skyline ka complete outline!",
+    analogy:"<strong>City ka final skyline sketch ready</strong> 🌆 — masterpiece!"
+  })});
+  return st;
+}
+
+// ── VIZ HELPERS ──
+function buildingColor(idx){return BLD_COLORS[idx%BLD_COLORS.length];}
+
+function findBldsForEvent(s,evt){
+  // Returns indexes of buildings matching an event (start: L==x && H==-negH; end: R==x && negH==0)
+  var arr=[];
+  if(!evt)return arr;
+  var x=evt[0],negH=evt[1],R=evt[2];
+  for(var i=0;i<s.buildings.length;i++){
+    var b=s.buildings[i];
+    if(negH!==0 && b[0]===x && b[2]===-negH && b[1]===R)arr.push(i);
+    else if(negH===0 && b[1]===x)arr.push(i);
+  }
+  return arr;
+}
+
+function renderViz(s){
+  function chip(n,v,cls){return '<span class="var-chip '+(cls||'')+'"><span class="vn">'+n+'</span><span class="vv">'+v+'</span></span>';}
+
+  // ── VARS STRIP ──
+  var h='<div class="vars-strip">'+
+    chip("📊 phase ",s.phase,"")+
+    chip("🏢 events ",s.events.length,(s.line===5||s.line===2)?"vc-active":"")+
+    chip("📍 sweep x ",s.sweepX===null?"—":s.sweepX,(s.line>=8&&s.line<=15)?"vc-active":"")+
+    chip("L ",s.L_var===null?"—":s.L_var,(s.line===2||s.line===3)?"vc-active":"")+
+    chip("R ",s.R_var===null?"—":s.R_var,(s.line===8||s.line===4)?"vc-active":"")+
+    chip("H ",s.H_var===null?"—":s.H_var,(s.line===3)?"vc-active":"")+
+    chip("negH ",s.negH_var===null?"—":s.negH_var,(s.line===9||s.line===10)?"vc-active":"")+
+    chip("📐 currMax ",s.currMax===null?"—":s.currMax,s.line===13?"vc-active":(s.currMax!==null&&s.currMax>0?"vc-safe":""))+
+    chip("📚 heap ",s.heap.length,(s.line===10||s.line===11||s.line===12)?"vc-active":"")+
+    chip("✅ result ",s.result.length,s.result.length>0?"vc-safe":"")+
+  '</div>';
+
+  // ── SVG SKYLINE DIAGRAM ──
+  var allX=[],maxH=1;
+  for(var bi=0;bi<s.buildings.length;bi++){
+    allX.push(s.buildings[bi][0]);allX.push(s.buildings[bi][1]);
+    if(s.buildings[bi][2]>maxH)maxH=s.buildings[bi][2];
+  }
+  var minX=Math.min.apply(null,allX),maxX=Math.max.apply(null,allX);
+  var spanX=maxX-minX||1;
+  var SVG_W=Math.min(720,Math.max(420,spanX*22));
+  var SVG_H=320,PAD_L=40,PAD_R=20,PAD_T=20,PAD_B=30;
+  function sx(x){return PAD_L+(x-minX)/spanX*(SVG_W-PAD_L-PAD_R);}
+  function sy(y){return SVG_H-PAD_B-(y/maxH)*(SVG_H-PAD_T-PAD_B);}
+
+  h+='<div class="viz-row">';
+  h+='<div class="viz-card"><div class="viz-title">🌆 Buildings + Sweep Line + Skyline</div>';
+  h+='<svg class="skyline-svg" width="'+SVG_W+'" height="'+SVG_H+'" viewBox="0 0 '+SVG_W+' '+SVG_H+'">';
+
+  // Axes
+  h+='<line class="axis-line" x1="'+PAD_L+'" y1="'+(SVG_H-PAD_B)+'" x2="'+(SVG_W-PAD_R)+'" y2="'+(SVG_H-PAD_B)+'"/>';
+  h+='<line class="axis-line" x1="'+PAD_L+'" y1="'+PAD_T+'" x2="'+PAD_L+'" y2="'+(SVG_H-PAD_B)+'"/>';
+  // X labels
+  for(var lx=0;lx<allX.length;lx++){
+    var xv=allX[lx];
+    h+='<line class="axis-line" x1="'+sx(xv)+'" y1="'+(SVG_H-PAD_B)+'" x2="'+sx(xv)+'" y2="'+(SVG_H-PAD_B+3)+'"/>';
+    h+='<text class="axis-label" x="'+sx(xv)+'" y="'+(SVG_H-PAD_B+13)+'" text-anchor="middle">'+xv+'</text>';
+  }
+  // Y labels (0, maxH/2, maxH)
+  [0,Math.round(maxH/2),maxH].forEach(function(yv){
+    h+='<text class="axis-label" x="'+(PAD_L-5)+'" y="'+(sy(yv)+3)+'" text-anchor="end">'+yv+'</text>';
+    h+='<line class="axis-line" x1="'+(PAD_L-3)+'" y1="'+sy(yv)+'" x2="'+PAD_L+'" y2="'+sy(yv)+'" />';
+  });
+
+  // Determine current event's matching buildings
+  var currEvt=(s.evtIdx!==null&&s.evtIdx<s.events.length)?s.events[s.evtIdx]:null;
+  var currentBldIdxs=findBldsForEvent(s,currEvt);
+
+  // Draw buildings — pending (faded), active (in heap), done (after end), current (event match)
+  for(var i=0;i<s.buildings.length;i++){
+    var bb=s.buildings[i];
+    var bx=sx(bb[0]),bw=sx(bb[1])-sx(bb[0]);
+    var bh=(SVG_H-PAD_B)-sy(bb[2]);
+    var by=sy(bb[2]);
+    var col=buildingColor(i);
+    // Status determination
+    var cls='bld-rect ';
+    var isCurrent=currentBldIdxs.indexOf(i)>=0;
+    if(s.sweepX===null)cls+='bld-pending';
+    else if(s.sweepX<bb[0])cls+='bld-pending';
+    else if(s.sweepX>=bb[1])cls+='bld-done';
+    else cls+='bld-active';
+    if(isCurrent)cls='bld-rect bld-current';
+    h+='<rect class="'+cls+'" x="'+bx+'" y="'+by+'" width="'+bw+'" height="'+bh+'" fill="'+col+'" stroke="'+col+'"/>';
+    if(bw>20&&bh>14){
+      h+='<text class="bld-label" x="'+(bx+bw/2)+'" y="'+(by+14)+'">B'+i+'(h='+bb[2]+')</text>';
+    }
+  }
+
+  // Draw skyline polyline from result
+  if(s.result.length>0){
+    var pts="";
+    var prevY=0;
+    for(var ri=0;ri<s.result.length;ri++){
+      var pt=s.result[ri];
+      if(ri>0){
+        // step pattern: horizontal then vertical
+        pts+=(sx(pt[0])+","+sy(prevY)+" ");
+      }
+      pts+=(sx(pt[0])+","+sy(pt[1])+" ");
+      prevY=pt[1];
+    }
+    // extend to last point's x at y=0 (visual ground)
+    if(s.result.length>0){
+      var lastPt=s.result[s.result.length-1];
+      pts+=(sx(lastPt[0])+","+sy(0));
+    }
+    h+='<polyline class="skyline-poly" points="'+pts+'"/>';
+    // Points
+    for(var rj=0;rj<s.result.length;rj++){
+      var rp=s.result[rj];
+      var ptCls=(rj===s.result.length-1&&s.resultJustAdded)?'skyline-pt-new':'skyline-pt';
+      h+='<circle class="'+ptCls+'" cx="'+sx(rp[0])+'" cy="'+sy(rp[1])+'" r="4"/>';
+    }
+  }
+
+  // Sweep line
+  if(s.sweepX!==null){
+    h+='<line class="sweep-line" x1="'+sx(s.sweepX)+'" y1="'+PAD_T+'" x2="'+sx(s.sweepX)+'" y2="'+(SVG_H-PAD_B)+'"/>';
+    h+='<text class="axis-label" x="'+sx(s.sweepX)+'" y="'+(PAD_T-4)+'" text-anchor="middle" style="fill:#E24B4A;font-weight:700">x='+s.sweepX+'</text>';
+  }
+  h+='</svg>';
+  h+='<div class="legend">'+
+    '<span><i style="background:#534AB7;opacity:.5"></i>Pending</span>'+
+    '<span><i style="background:#534AB7"></i>Active (in heap)</span>'+
+    '<span><i style="background:#534AB7;opacity:.3"></i>Done (past)</span>'+
+    '<span><i style="background:#534AB7;border:2px solid #fff;box-shadow:0 0 4px #534AB7"></i>Current event</span>'+
+    '<span><i style="background:#E24B4A"></i>Sweep line</span>'+
+    '<span><i style="background:#0F6E56"></i>Skyline</span>'+
+  '</div></div>';
+  h+='</div>';
+
+  // ── ROW 2: Events list + Heap + Result ──
+  h+='<div class="viz-row" style="margin-top:10px">';
+
+  // Events list
+  h+='<div class="viz-card"><div class="viz-title">📅 Events Queue ('+s.events.length+')</div>';
+  h+='<div class="events-list">';
+  if(!s.events.length){
+    h+='<div class="empty-state">Events not built yet</div>';
+  }else{
+    for(var ev=0;ev<s.events.length;ev++){
+      var e=s.events[ev];
+      var eCls='event-item';
+      if(s.evtIdx===null)eCls+=' event-item--pending';
+      else if(ev<s.evtIdx)eCls+=' event-item--done';
+      else if(ev===s.evtIdx)eCls+=' event-item--current';
+      else eCls+=' event-item--pending';
+      var typeLabel=e[1]<0?'<span class="event-type event-type--start">START h='+(-e[1])+'</span>':'<span class="event-type event-type--end">END</span>';
+      h+='<div class="'+eCls+'"><span class="event-num">#'+ev+'</span><span class="event-x">x='+e[0]+'</span>'+typeLabel+'<span style="color:var(--text-tertiary);font-size:8px">R='+e[2]+'</span></div>';
+    }
+  }
+  h+='</div></div>';
+
+  // Heap
+  h+='<div class="viz-card"><div class="viz-title">🗂️ Max Heap (by -negH) — size '+s.heap.length+'</div>';
+  h+='<div class="heap-col">';
+  if(!s.heap.length){
+    h+='<div class="empty-state">Heap empty</div>';
+  }else{
+    // Sort by negH ascending for display (top = most negative = tallest)
+    var heapDisplay=s.heap.map(function(it,idx){return {it:it,origIdx:idx};});
+    heapDisplay.sort(function(a,b){if(a.it[0]!==b.it[0])return a.it[0]-b.it[0];return a.it[1]-b.it[1];});
+    for(var hi=0;hi<heapDisplay.length;hi++){
+      var hit=heapDisplay[hi].it;
+      var hCls='heap-item';
+      if(hi===0)hCls+=' heap-item--top';
+      if(s.newPushed&&hi>0&&heapDisplay[hi].origIdx===s.heap.length-1)hCls+=' heap-item--new';
+      var hStr=hit[1]===Infinity?'∞':hit[1];
+      var actualH=-hit[0];
+      h+='<div class="'+hCls+'">'+(hi===0?'⭐ ':'')+'<span class="heap-h-pill">h='+actualH+'</span><span style="color:var(--text-tertiary);font-size:9px">end R='+hStr+'</span></div>';
+    }
+  }
+  h+='</div></div>';
+
+  // Result
+  h+='<div class="viz-card"><div class="viz-title">🏆 Result Key Points ('+s.result.length+')</div>';
+  h+='<div class="result-points">';
+  if(!s.result.length){
+    h+='<div class="empty-state">No key points yet</div>';
+  }else{
+    for(var ri2=0;ri2<s.result.length;ri2++){
+      var rp2=s.result[ri2];
+      var rCls='result-pt';
+      if(ri2===s.result.length-1&&s.resultJustAdded)rCls+=' result-pt--new';
+      h+='<div class="'+rCls+'">#'+ri2+': ['+rp2[0]+', '+rp2[1]+']</div>';
+    }
+  }
+  h+='</div></div>';
+
+  h+='</div>';
+
+  // Result banner
+  if(s.line===16){
+    h+='<div class="result-banner">🏆 Skyline: '+JSON.stringify(s.result)+'</div>';
+  }
+
+  document.getElementById("vizPanel").innerHTML=h;
+}
+
+function renderStep(idx){
+  if(!steps.length)return;
+  var s=steps[idx];currentStep=idx;
+  document.getElementById('stepInfo').textContent=(idx+1)+'/'+steps.length;
+  var bd=document.getElementById('actionBadge');
+  bd.textContent=BADGE_LABEL[s.action]||s.action;
+  bd.className='action-badge action-badge--'+s.action;
+  document.querySelectorAll('.code-line').forEach(function(el){el.classList.remove('active');});
+  var al=document.querySelector('.code-line[data-line="'+s.line+'"]');
+  if(al){al.classList.add('active');al.scrollIntoView({block:'nearest'});}
+  renderViz(s);
+  showLogPreview(s);
+}
+
+function showLogPreview(s){
+  if(!logEnabled)return;
+  document.getElementById('logPopupBody').innerHTML=s.logHTML||'';
+  document.getElementById('logPopup').classList.remove('log-popup--hidden');
+}
+function hideLogPopup(){document.getElementById('logPopup').classList.add('log-popup--hidden');}
+function toggleLogPreview(){
+  logEnabled=!logEnabled;
+  var btn=document.getElementById('logToggleBtn');
+  btn.textContent=logEnabled?'📋 ON':'📋 OFF';
+  btn.classList.toggle('log-toggle-btn--off',!logEnabled);
+  if(!logEnabled)hideLogPopup();
+  else if(steps.length)showLogPreview(steps[currentStep]);
+}
+function logZoom(dir){logZoomLevel=Math.max(60,Math.min(180,logZoomLevel+dir*20));updateLogZoom();}
+function logZoomReset(){logZoomLevel=100;updateLogZoom();}
+function updateLogZoom(){
+  document.getElementById('logZoomLabel').textContent=logZoomLevel+'%';
+  document.getElementById('logPopup').style.setProperty('--log-scale',logZoomLevel/100);
+}
+function toggleFullscreen(){
+  var viz=document.querySelector('.col-viz');
+  if(!document.fullscreenElement)viz.requestFullscreen().catch(function(){});
+  else document.exitFullscreen();
+}
+
+function parseInput(raw){
+  raw=raw.trim();
+  if(!raw)return [[2,9,10],[3,7,15],[5,12,12],[15,20,10],[19,24,8]];
+  var rows=raw.split(';').filter(function(r){return r.trim().length>0;});
+  var out=[];
+  for(var i=0;i<rows.length;i++){
+    var parts=rows[i].split(',').map(function(s){return parseInt(s.trim(),10);});
+    if(parts.length===3&&!parts.some(isNaN))out.push(parts);
+  }
+  return out.length?out:[[2,9,10]];
+}
+
+function resetWithInput(){
+  curResult=null;
+  var raw=document.getElementById('inputBld').value;
+  var blds=parseInput(raw);
+  renderCode();fitCodeWidth();
+  steps=buildSteps(blds);
+  currentStep=0;renderStep(0);
+  document.getElementById('liveOutput').textContent=curResult!==null?JSON.stringify(curResult):'—';
+}
+
+function stepBy(d){var nx=currentStep+d;if(nx>=0&&nx<steps.length)renderStep(nx);}
+function resetStep(){renderStep(0);}
+
+function loadTest(i,el){
+  document.querySelectorAll('.prob-test').forEach(function(t){t.classList.remove('prob-test--active');});
+  if(el)el.classList.add('prob-test--active');
+  document.getElementById('inputBld').value=TESTS[i].bld;
+  document.getElementById('expectedBadge').textContent='exp: '+TESTS[i].e;
+  resetWithInput();
+}
+
+document.addEventListener('keydown',function(e){
+  if(e.target.tagName==='INPUT'||e.target.tagName==='SELECT')return;
+  if(e.key==='ArrowRight'){e.preventDefault();stepBy(1);}
+  else if(e.key==='ArrowLeft'){e.preventDefault();stepBy(-1);}
+  else if(e.key==='r'||e.key==='R'){e.preventDefault();resetStep();}
+});
+
+(function(){
+  var col1=document.getElementById('col1');
+  document.getElementById('resizeH1').addEventListener('mousedown',function(e){
+    e.preventDefault();codeWidthUserSet=true;
+    var startX=e.clientX,startW=col1.offsetWidth,h=this;
+    document.body.classList.add('no-select');h.classList.add('active');
+    function mv(e){col1.style.width=Math.max(140,startW+(e.clientX-startX))+'px';syncFooterWidth();}
+    function up(){document.removeEventListener('mousemove',mv);document.removeEventListener('mouseup',up);document.body.classList.remove('no-select');h.classList.remove('active');}
+    document.addEventListener('mousemove',mv);document.addEventListener('mouseup',up);
+  });
+})();
+
+window.addEventListener('resize',function(){if(!codeWidthUserSet)fitCodeWidth();else syncFooterWidth();});
+
+renderTests();renderCode();fitCodeWidth();resetWithInput();
+</script>
+</body>
+</html>

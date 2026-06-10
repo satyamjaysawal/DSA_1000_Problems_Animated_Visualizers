@@ -1,0 +1,1522 @@
+﻿
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LC 3197 — Min Area to Cover All Ones II</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+:root {
+  --bg-primary:#FAFAF8; --bg-secondary:#F1EFE8; --bg-tertiary:#E2E0D8; --bg-card:#FFFFFF;
+  --text-primary:#2C2C2A; --text-secondary:#5F5E5A; --text-tertiary:#888780;
+  --border-color:rgba(0,0,0,0.11); --border-light:rgba(0,0,0,0.06); --border-focus:#534AB7;
+  --accent-indigo:#534AB7; --accent-indigo-bg:#EEEDFE; --accent-indigo-text:#3C3489; --accent-indigo-hover:#4740A0;
+  --accent-teal:#0F6E56; --accent-teal-bg:#E1F5EE; --accent-teal-text:#085041;
+  --accent-red:#E24B4A; --accent-red-bg:#FCEBEB; --accent-red-text:#791F1F;
+  --accent-amber:#B45309; --accent-amber-bg:#FEF3C7; --accent-amber-text:#78350F;
+  --accent-green:#15803D; --accent-green-bg:#DCFCE7; --accent-green-text:#14532D;
+  --syn-keyword:#534AB7; --syn-function:#185FA5; --syn-number:#993C1D; --syn-string:#0F6E56;
+  --active-line-bg:#EEEDFE;
+  --radius-sm:4px; --radius-md:6px; --radius-lg:10px; --radius-xl:14px;
+  --font-sans:'DM Sans',system-ui,sans-serif;
+  --font-mono:'JetBrains Mono','Fira Code',monospace;
+  --fs-xs:11px; --fs-sm:12px; --fs-base:14px; --fs-md:15px; --fs-lg:18px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:var(--font-sans);color:var(--text-primary);background:var(--bg-primary);font-size:var(--fs-base)}
+.app-shell{display:flex;flex-direction:column;height:100vh;overflow:hidden;background:var(--bg-primary)}
+.no-select{user-select:none}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border-color);border-radius:99px}
+
+/* Problem Card */
+.problem-card{flex-shrink:0;border-bottom:1px solid var(--border-color);background:var(--bg-card)}
+.pc-header{display:flex;align-items:center;justify-content:space-between;padding:8px 16px;gap:12px;flex-wrap:wrap}
+.pc-header-left{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.gt-learn{font:700 11px var(--font-mono);background:var(--accent-indigo);color:#fff;padding:5px 10px;border-radius:99px;border:none;cursor:pointer;letter-spacing:.04em}
+.gt-learn:hover{background:var(--accent-indigo-hover)}
+.pc-num{font:700 12px var(--font-mono);color:var(--accent-indigo);background:var(--accent-indigo-bg);padding:3px 8px;border-radius:4px}
+.pc-title{font-size:var(--fs-md);font-weight:700}
+.pc-diff{font:700 10px var(--font-mono);padding:3px 8px;border-radius:99px;background:var(--accent-red-bg);color:var(--accent-red-text);border:1px solid var(--accent-red)}
+.pc-tag{font:600 10px var(--font-mono);padding:3px 8px;border-radius:99px;background:var(--bg-tertiary);color:var(--text-secondary)}
+.pc-header-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.input-grp{display:flex;align-items:center;gap:5px;font:600 11px var(--font-mono)}
+.input-grp input{font:600 11px var(--font-mono);width:170px;padding:4px 7px;border:1px solid var(--border-color);border-radius:var(--radius-sm);background:var(--bg-card);color:var(--text-primary)}
+.input-grp input:focus{outline:none;border-color:var(--border-focus)}
+.expected-badge{font:700 11px var(--font-mono);background:var(--accent-green-bg);color:var(--accent-green-text);padding:3px 8px;border-radius:4px;border:1px solid var(--accent-green)}
+.toggle-btn{font-family:system-ui,"Segoe UI Emoji",sans-serif;font-size:11px;padding:4px 9px;background:var(--bg-secondary);border:1px solid var(--border-color);border-radius:var(--radius-sm);cursor:pointer;color:var(--text-secondary)}
+.toggle-btn:hover{background:var(--bg-tertiary)}
+
+.pc-body{display:grid;grid-template-columns:3fr 2fr;gap:16px;padding:8px 16px 12px;border-top:1px solid var(--border-light)}
+.pc-body.hidden{display:none}
+.pc-section h4{font-size:var(--fs-sm);font-weight:700;margin-bottom:5px;color:var(--accent-indigo-text)}
+.pc-section p{font-size:var(--fs-sm);line-height:1.55;color:var(--text-secondary);margin-bottom:6px}
+.pc-section code{font:600 11px var(--font-mono);background:var(--bg-secondary);padding:1px 5px;border-radius:3px;color:var(--accent-red-text)}
+.concept-block{display:flex;gap:6px;flex-wrap:wrap;margin:5px 0}
+.concept-card{font-size:11px;padding:5px 9px;border-radius:var(--radius-sm);background:var(--accent-indigo-bg);border:1px solid var(--accent-indigo);color:var(--accent-indigo-text);font-weight:500}
+.complexity-chips{display:flex;gap:6px;margin-top:5px}
+.cx-chip{font:700 10px var(--font-mono);padding:3px 7px;border-radius:99px;background:var(--accent-amber-bg);color:var(--accent-amber-text);border:1px solid var(--accent-amber)}
+
+.test-cases{display:flex;flex-direction:column;gap:5px}
+.tc-chip{display:flex;align-items:center;gap:7px;padding:5px 9px;border:1px solid var(--border-color);border-radius:var(--radius-sm);background:var(--bg-card);cursor:pointer;font-size:11px;transition:all .18s ease}
+.tc-chip:hover{background:var(--accent-indigo-bg);border-color:var(--accent-indigo)}
+.tc-input{font:600 11px var(--font-mono);color:var(--text-primary)}
+.pt-tag{font:600 9px var(--font-mono);padding:2px 6px;border-radius:99px;background:var(--bg-tertiary);color:var(--text-secondary)}
+.tc-expected{margin-left:auto;font:700 11px var(--font-mono);color:var(--accent-green-text)}
+.run-btn{font-family:system-ui,"Segoe UI Emoji",sans-serif;font-size:13px;font-weight:700;padding:6px 14px;background:var(--accent-indigo);color:#fff;border:none;border-radius:var(--radius-md);cursor:pointer;margin-top:6px}
+.run-btn:hover{background:var(--accent-indigo-hover)}
+.live-out{margin-top:6px;padding:5px 9px;background:var(--bg-secondary);border-radius:var(--radius-sm);font:600 11px var(--font-mono);color:var(--text-primary)}
+.live-out span{color:var(--accent-green-text);font-weight:700}
+
+/* Main Row */
+.main-row{flex:1;display:flex;overflow:hidden;min-height:0}
+.col{display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.col-code{width:33%;min-width:140px;max-width:45vw;background:var(--bg-card);border-right:1px solid var(--border-color)}
+.col-viz{flex:1;min-width:0;background:var(--bg-primary)}
+.section-label{font-family:system-ui,"Segoe UI Emoji",sans-serif;font-size:var(--fs-sm);font-weight:700;padding:8px 12px;background:var(--bg-secondary);border-bottom:1px solid var(--border-color);color:var(--text-secondary);letter-spacing:.04em}
+
+/* Code Panel */
+.code-panel{flex:1;overflow-y:auto;padding:8px 0;font:500 12px var(--font-mono);line-height:1.9}
+.code-line{display:flex;padding:0 12px;white-space:pre;cursor:default}
+.code-line.active{background:var(--active-line-bg);box-shadow:inset 3px 0 0 var(--accent-indigo)}
+.line-num{display:inline-block;width:30px;color:var(--text-tertiary);user-select:none;text-align:right;padding-right:10px;flex-shrink:0}
+.line-code{flex:1}
+.kw{color:var(--syn-keyword);font-weight:600}
+.fn{color:var(--syn-function);font-weight:500}
+.num{color:var(--syn-number)}
+.str{color:var(--syn-string)}
+
+/* Resize Handle */
+.resize-h{width:5px;background:transparent;cursor:col-resize;flex-shrink:0;position:relative;z-index:5}
+.resize-h:hover,.resize-h.active{background:var(--accent-indigo)}
+
+/* Visualization */
+.viz-panel{flex:1;overflow-y:auto;padding:12px}
+.vars-strip{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.var-chip{display:inline-flex;align-items:center;gap:4px;font:600 11px var(--font-mono);padding:4px 9px;border-radius:99px;background:var(--bg-card);border:1px solid var(--border-color)}
+.var-chip .vk{color:var(--text-tertiary)}
+.var-chip .vv{color:var(--text-primary);font-weight:700}
+.vc-active{background:var(--accent-indigo-bg);border-color:var(--accent-indigo);color:var(--accent-indigo-text)}
+.vc-safe{background:var(--accent-green-bg);border-color:var(--accent-green);color:var(--accent-green-text)}
+.vc-flip{background:var(--accent-red-bg);border-color:var(--accent-red);color:var(--accent-red-text)}
+.vc-warn{background:var(--accent-amber-bg);border-color:var(--accent-amber);color:var(--accent-amber-text)}
+
+.viz-row{display:flex;gap:12px;align-items:flex-start;flex-wrap:wrap;margin-bottom:10px}
+.viz-card{background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius-md);padding:10px;min-width:180px}
+.viz-card h5{font-size:11px;font-weight:700;color:var(--accent-indigo-text);margin-bottom:7px;text-transform:uppercase;letter-spacing:.05em}
+
+/* Grid Visualization */
+.grid-wrap{display:inline-block;border:2px solid var(--border-color);border-radius:var(--radius-sm);background:var(--bg-secondary);padding:3px;position:relative}
+.grid-row{display:flex;gap:2px;margin-bottom:2px}
+.grid-row:last-child{margin-bottom:0}
+.gcell{width:36px;height:36px;display:flex;align-items:center;justify-content:center;font:700 14px var(--font-mono);background:var(--bg-card);border:1px solid var(--border-color);border-radius:3px;position:relative;transition:all .2s ease}
+.gcell.one{background:#FEF3C7;color:var(--accent-amber-text);border-color:var(--accent-amber)}
+.gcell.r1{background:rgba(83,74,183,.20);border-color:var(--accent-indigo);color:var(--accent-indigo-text)}
+.gcell.r2{background:rgba(15,110,86,.20);border-color:var(--accent-teal);color:var(--accent-teal-text)}
+.gcell.r3{background:rgba(180,83,9,.20);border-color:var(--accent-amber);color:var(--accent-amber-text)}
+.gcell.r1.one{background:rgba(83,74,183,.40);font-weight:700}
+.gcell.r2.one{background:rgba(15,110,86,.40);font-weight:700}
+.gcell.r3.one{background:rgba(180,83,9,.45);font-weight:700}
+.gcell.scan{box-shadow:0 0 0 2px var(--accent-indigo);animation:pulse-node 1s infinite}
+
+@keyframes pulse-node{0%,100%{box-shadow:0 0 4px var(--accent-indigo)}50%{box-shadow:0 0 12px var(--accent-indigo)}}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-3px)}75%{transform:translateX(3px)}}
+@keyframes win-pulse{0%,100%{box-shadow:0 0 3px rgba(234,179,8,.5)}50%{box-shadow:0 0 8px rgba(234,179,8,.9)}}
+
+.rect-legend{display:flex;gap:8px;flex-wrap:wrap;margin-top:7px}
+.rect-key{display:inline-flex;align-items:center;gap:4px;font:600 10px var(--font-mono);padding:3px 7px;border-radius:99px}
+.rect-key.r1{background:rgba(83,74,183,.20);color:var(--accent-indigo-text);border:1px solid var(--accent-indigo)}
+.rect-key.r2{background:rgba(15,110,86,.20);color:var(--accent-teal-text);border:1px solid var(--accent-teal)}
+.rect-key.r3{background:rgba(180,83,9,.20);color:var(--accent-amber-text);border:1px solid var(--accent-amber)}
+
+/* Strategy / Areas */
+.strategy-pill{display:inline-block;font:700 11px var(--font-mono);padding:4px 10px;border-radius:99px;background:var(--accent-indigo-bg);color:var(--accent-indigo-text);border:1px solid var(--accent-indigo);margin-bottom:6px}
+.area-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.area-chip{font:600 11px var(--font-mono);padding:4px 9px;border-radius:var(--radius-sm);background:var(--bg-secondary);border:1px solid var(--border-color);color:var(--text-primary)}
+.area-chip.r1{background:rgba(83,74,183,.10);border-color:var(--accent-indigo)}
+.area-chip.r2{background:rgba(15,110,86,.10);border-color:var(--accent-teal)}
+.area-chip.r3{background:rgba(180,83,9,.10);border-color:var(--accent-amber)}
+.area-chip.total{background:var(--accent-green-bg);border-color:var(--accent-green);color:var(--accent-green-text);font-weight:700}
+.area-chip.best{background:linear-gradient(45deg,#FBE8A6,#FEF3C7);border-color:var(--accent-amber);font-weight:700;animation:win-pulse 1.5s infinite}
+
+.partition-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;font:600 11px var(--font-mono)}
+.part-row{display:flex;align-items:center;gap:6px;padding:5px 8px;background:var(--bg-secondary);border-radius:var(--radius-sm);border:1px solid var(--border-light)}
+.part-row.active{background:var(--accent-indigo-bg);border-color:var(--accent-indigo)}
+.part-label{color:var(--text-tertiary);font-size:10px;font-weight:600}
+.part-val{font-weight:700;color:var(--text-primary)}
+.empty-state{font-size:11px;color:var(--text-tertiary);font-style:italic;padding:8px}
+
+/* Footer */
+.footer-bar{display:flex;flex-shrink:0;border-top:1px solid var(--border-color);background:var(--bg-card)}
+.footer-left{width:33%;min-width:140px;max-width:45vw;display:flex;align-items:center;gap:8px;padding:7px 12px;border-right:1px solid var(--border-light)}
+.footer-right{flex:1;display:flex;align-items:center;gap:8px;padding:7px 16px;flex-wrap:wrap}
+.step-info{font:700 12px var(--font-mono);color:var(--text-secondary)}
+.action-badge{font-family:system-ui,"Segoe UI Emoji",sans-serif;font:700 10px var(--font-mono);padding:3px 9px;border-radius:99px;background:var(--bg-secondary);border:1px solid var(--border-color);color:var(--text-secondary);letter-spacing:.04em}
+.action-badge--func-def,.action-badge--init,.action-badge--call,.action-badge--return{background:rgba(130,80,255,.14);color:#3C3489;border-color:#8250ff}
+.action-badge--for-check,.action-badge--while-check,.action-badge--if-check{background:rgba(56,139,253,.14);color:#185FA5;border-color:#388bfd}
+.action-badge--mark,.action-badge--push,.action-badge--pop,.action-badge--restore,.action-badge--found{background:rgba(63,185,80,.14);color:#14532D;border-color:#3fb950}
+.action-badge--remove,.action-badge--prune,.action-badge--fail{background:var(--accent-red-bg);color:var(--accent-red-text);border-color:var(--accent-red)}
+.action-badge--exit,.action-badge--skip{background:var(--bg-tertiary);color:var(--text-tertiary);border-color:var(--border-color)}
+
+kbd{font-family:system-ui,"Segoe UI Emoji",sans-serif;font:600 10px var(--font-mono);padding:1px 5px;background:var(--bg-secondary);border:1px solid var(--border-color);border-radius:3px;color:var(--text-secondary)}
+.btn{font-family:system-ui,"Segoe UI Emoji",sans-serif;font-size:12px;font-weight:600;padding:5px 11px;background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius-sm);cursor:pointer;color:var(--text-primary);transition:all .15s ease}
+.btn:hover{background:var(--bg-secondary);border-color:var(--accent-indigo)}
+.btn-primary{background:var(--accent-indigo);color:#fff;border-color:var(--accent-indigo)}
+.btn-primary:hover{background:var(--accent-indigo-hover)}
+.sep{width:1px;height:20px;background:var(--border-color)}
+.zoom-label{font:700 11px var(--font-mono);color:var(--text-secondary);min-width:38px;text-align:center}
+.log-toggle-btn--off{opacity:.5}
+
+/* Log Popup */
+.log-popup{--log-scale:1;position:fixed;bottom:52px;right:14px;width:calc(480px * var(--log-scale));max-width:92vw;max-height:75vh;border-radius:var(--radius-lg);box-shadow:0 10px 32px rgba(0,0,0,.14);border:1px solid var(--border-color);background:var(--bg-card);overflow:hidden;display:flex;flex-direction:column;z-index:100;transition:opacity .15s,transform .15s;transform-origin:bottom right}
+.log-popup--hidden{opacity:0;transform:scale(.92);pointer-events:none}
+.log-popup-body{flex:1;overflow:auto;padding:0}
+.log-popup-body>.log-card{border-radius:0;border:none;border-left:0}
+
+.log-card{border-radius:var(--radius-md);overflow:hidden;border:1px solid var(--border-color);border-left-width:4px;font-size:var(--fs-xs);background:var(--bg-card)}
+.log-card--success{border-left-color:#3fb950}
+.log-card--fail{border-left-color:#f85149}
+.log-card--skip{border-left-color:#888780}
+.log-card--loop{border-left-color:#388bfd}
+.log-card--prune{border-left-color:#f85149}
+.log-card--info{border-left-color:#8250ff}
+.log-card-header{display:flex;align-items:center;gap:6px;padding:8px 10px 6px;background:var(--bg-secondary);border-bottom:1px solid var(--border-light)}
+.log-badge{font-family:system-ui,"Segoe UI Emoji",sans-serif;font:700 10px var(--font-mono);padding:2px 7px;border-radius:99px;background:var(--bg-card);border:1px solid var(--border-color);color:var(--text-secondary)}
+.log-line-ref{font:700 10px var(--font-mono);color:var(--accent-indigo);background:var(--accent-indigo-bg);padding:1px 6px;border-radius:4px;border:1px solid var(--accent-indigo)}
+.log-status-pill{font-family:system-ui,"Segoe UI Emoji",sans-serif;font-size:9px;font-weight:700;padding:2px 7px;border-radius:99px;text-transform:uppercase;margin-left:auto}
+.log-status--success{background:var(--accent-green-bg);color:var(--accent-green-text);border:1px solid var(--accent-green)}
+.log-status--fail{background:var(--accent-red-bg);color:var(--accent-red-text);border:1px solid var(--accent-red)}
+.log-status--skip{background:var(--bg-tertiary);color:var(--text-tertiary);border:1px solid var(--border-color)}
+.log-status--loop{background:rgba(56,139,253,.14);color:#185FA5;border:1px solid #388bfd}
+.log-status--prune{background:var(--accent-red-bg);color:var(--accent-red-text);border:1px solid var(--accent-red)}
+.log-status--info{background:rgba(130,80,255,.14);color:#3C3489;border:1px solid #8250ff}
+.log-section{padding:7px 10px;border-bottom:1px dashed var(--border-light)}
+.log-section:last-child{border-bottom:none}
+.log-section-title{font-family:system-ui,"Segoe UI Emoji",sans-serif;font:700 8px var(--font-mono);text-transform:uppercase;letter-spacing:.06em;color:var(--text-tertiary);margin-bottom:3px;display:flex;align-items:center;gap:4px}
+.log-section-title-icon{font-family:system-ui,"Segoe UI Emoji",sans-serif;font-size:11px}
+.log-code-snippet{font:600 11px var(--font-mono);background:#0d1117;color:#e6edf3;padding:6px 9px;border-radius:4px;display:block;overflow-x:auto;white-space:pre;border:1px solid #30363d}
+.log-code-snippet .ck{color:#ff7b72}
+.log-code-snippet .cs{color:#a5d6ff}
+.log-code-snippet .cn{color:#79c0ff}
+.log-code-snippet .cf{color:#d2a8ff}
+.log-code-snippet .cc{color:#8b949e;font-style:italic}
+.log-kv-row{display:flex;flex-wrap:wrap;gap:4px}
+.log-kv{display:inline-flex;align-items:center;gap:3px;font:11px var(--font-mono);padding:2px 7px;border-radius:4px;background:var(--bg-secondary);border:1px solid var(--border-light)}
+.log-kv-key{color:var(--text-tertiary);font-weight:500}
+.log-kv-val{color:var(--text-primary);font-weight:700}
+.log-kv--in{background:rgba(56,139,253,.08);border-color:rgba(56,139,253,.3)}
+.log-kv--out{background:rgba(63,185,80,.08);border-color:rgba(63,185,80,.4)}
+.log-kv--out .log-kv-val{color:#15803D}
+.log-kv--changed{background:rgba(180,83,9,.10);border-color:rgba(180,83,9,.4)}
+.log-kv--changed .log-kv-val{color:var(--accent-amber-text)}
+.log-verdict{display:flex;align-items:center;gap:6px;font:600 11px var(--font-mono);padding:5px 8px;border-radius:5px;background:var(--bg-secondary);border:1px solid var(--border-light)}
+.log-verdict--true{background:var(--accent-green-bg);border-color:var(--accent-green);color:var(--accent-green-text)}
+.log-verdict--false{background:var(--accent-red-bg);border-color:var(--accent-red);color:var(--accent-red-text)}
+.log-analogy{font:italic 11px var(--font-sans);color:var(--text-secondary);background:#FFF8E7;border:1px solid #FBE8A6;border-left:3px solid var(--accent-amber);padding:6px 9px;border-radius:4px;line-height:1.55}
+.log-analogy strong{color:var(--accent-amber-text);font-style:normal;font-weight:700}
+.log-why{font-size:11px;line-height:1.55;color:var(--text-primary);padding:4px 0}
+.log-why strong{color:var(--accent-indigo-text)}
+.log-why code{font:600 10.5px var(--font-mono);background:var(--bg-secondary);padding:1px 4px;border-radius:3px;color:var(--accent-red-text)}
+
+.result-banner{margin-top:10px;padding:10px 14px;background:linear-gradient(135deg,#FBE8A6,#FEF3C7);border:2px solid var(--accent-amber);border-radius:var(--radius-md);font:700 13px var(--font-mono);color:var(--accent-amber-text);text-align:center;animation:win-pulse 2s infinite}
+</style>
+</head>
+<body>
+<div class="app-shell">
+
+<!-- ============ PROBLEM CARD ============ -->
+<div class="problem-card" id="problemCard">
+  <div class="pc-header">
+    <div class="pc-header-left">
+      <a href="../00_HomePage/gt_learn_homepage.html" class="gt-learn">GT LEARN</a>
+      <span class="pc-num">#3197</span>
+      <span class="pc-title">🧱 Min Area to Cover All Ones II</span>
+      <span class="pc-diff">HARD</span>
+      <span class="pc-tag">Brute Force</span>
+      <span class="pc-tag">Geometry</span>
+    </div>
+    <div class="pc-header-right">
+      <div class="input-grp">
+        grid=
+        <input type="text" id="gridInput" value="[[1,0,1],[1,1,1]]">
+      </div>
+      <span class="expected-badge" id="expectedBadge">expected: 5</span>
+      <button class="toggle-btn" id="problemToggle" onclick="toggleProblem()">▲ Hide</button>
+    </div>
+  </div>
+  <div class="pc-body" id="problemBody">
+    <div class="pc-section">
+      <h4>📝 Problem Statement</h4>
+      <p>Given a 2D binary array <code>grid</code>, find <strong>3 non-overlapping rectangles</strong> with non-zero areas (horizontal/vertical sides) such that all the <code>1</code>s in the grid lie inside these rectangles. Return the <strong>minimum possible sum of their areas</strong>. Rectangles are allowed to touch.</p>
+      <h4>🧠 Solving Approach</h4>
+      <p>Since rectangles are axis-aligned and non-overlapping, the partition into 3 regions falls into <strong>6 strategies</strong>: 2 horizontal cuts, 2 vertical cuts, or 1 horizontal + 1 vertical cut (4 corner variations). For each partition, compute min bounding rect area for each region using helper <code>minArea</code>.</p>
+      <h4>🎯 Core Concepts</h4>
+      <div class="concept-block">
+        <span class="concept-card">Helper: minArea(r1,c1,r2,c2)</span>
+        <span class="concept-card">6 Partition Strategies</span>
+        <span class="concept-card">Track Global Min</span>
+      </div>
+      <div class="complexity-chips">
+        <span class="cx-chip">⏱ Time: O(m²·n²·(m+n))</span>
+        <span class="cx-chip">💾 Space: O(1)</span>
+      </div>
+    </div>
+    <div class="pc-section">
+      <h4>🧪 Test Cases</h4>
+      <div class="test-cases">
+        <div class="tc-chip" onclick="loadTest('[[1,0,1],[1,1,1]]',5)">
+          <span class="tc-input">[[1,0,1],[1,1,1]]</span><span class="pt-tag">2×3 basic</span><span class="tc-expected">→ 5</span>
+        </div>
+        <div class="tc-chip" onclick="loadTest('[[1,0,1,0],[0,1,0,1]]',5)">
+          <span class="tc-input">[[1,0,1,0],[0,1,0,1]]</span><span class="pt-tag">scattered</span><span class="tc-expected">→ 5</span>
+        </div>
+        <div class="tc-chip" onclick="loadTest('[[1,1],[1,1]]',3)">
+          <span class="tc-input">[[1,1],[1,1]]</span><span class="pt-tag">2×2 dense</span><span class="tc-expected">→ 3</span>
+        </div>
+      </div>
+      <button class="run-btn" onclick="resetWithInput()">▶ Run</button>
+      <div class="live-out">Output: <span id="liveOutput">—</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ MAIN ROW ============ -->
+<div class="main-row">
+  <div class="col col-code" id="col1">
+    <div class="section-label">📜 PYTHON CODE</div>
+    <div class="code-panel" id="codePanel"></div>
+  </div>
+  <div class="resize-h" id="resizeH1"></div>
+  <div class="col col-viz">
+    <div class="section-label">📊 VISUALIZATION — Grid + 3 Rectangles + Strategy Tracker</div>
+    <div class="viz-panel" id="vizPanel"></div>
+  </div>
+</div>
+
+<!-- ============ FLOATING LOG POPUP ============ -->
+<div class="log-popup" id="logPopup">
+  <div class="log-popup-body" id="logPopupBody"></div>
+</div>
+
+<!-- ============ FOOTER ============ -->
+<div class="footer-bar">
+  <div class="footer-left" id="footerLeft">
+    <span class="step-info" id="stepInfo">0/0</span>
+    <span class="action-badge" id="actionBadge">—</span>
+  </div>
+    <div class="footer-right">
+    <kbd>←</kbd><kbd>→</kbd> step <kbd>R</kbd> reset
+    <button type="button" class="btn" onclick="resetStep()">↺</button>
+    <button type="button" class="btn" onclick="stepBy(-1)">◀</button>
+    <button type="button" class="btn btn-primary" onclick="stepBy(1)">▶ Next</button>
+    <span class="sep"></span>
+    <button type="button" class="btn" id="logToggleBtn" onclick="toggleLogPreview()">📋 ON</button>
+    <button type="button" class="btn" onclick="logZoom(-1)">−</button>
+    <span class="zoom-label" id="logZoomLabel">100%</span>
+    <button type="button" class="btn" onclick="logZoom(1)">+</button>
+    <button type="button" class="btn" onclick="logZoomReset()">↺</button>
+    <span class="sep"></span>
+    <button type="button" class="btn" onclick="toggleFullscreen()">⛶</button>
+  </div>
+</div>
+
+</div>
+
+<script>
+// ============ CODE LINES ============
+var codeLines = [
+  "def minimumSum(grid):",
+  "    m, n = len(grid), len(grid[0])",
+  "    def minArea(r1, c1, r2, c2):",
+  "        min_r, max_r = m, -1",
+  "        min_c, max_c = n, -1",
+  "        for i in range(r1, r2 + 1):",
+  "            for j in range(c1, c2 + 1):",
+  "                if grid[i][j] == 1:",
+  "                    min_r = min(min_r, i)",
+  "                    max_r = max(max_r, i)",
+  "                    min_c = min(min_c, j)",
+  "                    max_c = max(max_c, j)",
+  "        if max_r == -1:",
+  "            return 0",
+  "        return (max_r - min_r + 1) * (max_c - min_c + 1)",
+  "    res = float('inf')",
+  "    for i in range(m - 1):",
+  "        for j in range(n - 1):",
+  "            a1 = minArea(0, 0, i, n - 1)",
+  "            a2 = minArea(i + 1, 0, m - 1, j)",
+  "            a3 = minArea(i + 1, j + 1, m - 1, n - 1)",
+  "            res = min(res, a1 + a2 + a3)",
+  "            b1 = minArea(0, 0, i, j)",
+  "            b2 = minArea(0, j + 1, i, n - 1)",
+  "            b3 = minArea(i + 1, 0, m - 1, n - 1)",
+  "            res = min(res, b1 + b2 + b3)",
+  "    for i in range(m - 1):",
+  "        for k in range(i + 1, m - 1):",
+  "            c1 = minArea(0, 0, i, n - 1)",
+  "            c2 = minArea(i + 1, 0, k, n - 1)",
+  "            c3 = minArea(k + 1, 0, m - 1, n - 1)",
+  "            res = min(res, c1 + c2 + c3)",
+  "    for j in range(n - 1):",
+  "        for k in range(j + 1, n - 1):",
+  "            d1 = minArea(0, 0, m - 1, j)",
+  "            d2 = minArea(0, j + 1, m - 1, k)",
+  "            d3 = minArea(0, k + 1, m - 1, n - 1)",
+  "            res = min(res, d1 + d2 + d3)",
+  "    return res"
+];
+
+// ============ STATE ============
+var steps = [];
+var currentStep = 0;
+var codeWidthUserSet = false;
+var curResult = null;
+var logEnabled = true;
+var logZoomLevel = 100;
+
+// ============ BADGES ============
+var LOG_BADGE = {
+  "func-def":"📌 DEF","init":"⚙️ INIT","call":"📞 CALL","return":"🏆 RETURN",
+  "for-check":"🔁 FOR","while-check":"🔁 WHILE","if-check":"🔎 IF",
+  "mark":"✅ MARK","push":"⬆ PUSH","pop":"⬇ POP","restore":"↩ RESTORE","found":"🎉 FOUND",
+  "remove":"✏️ EDIT","prune":"✂️ PRUNE","fail":"❌ FAIL","exit":"🔚 EXIT","skip":"⏭ SKIP"
+};
+var BADGE_LABEL = {
+  "func-def":"DEF","init":"INIT","call":"CALL","return":"RETURN",
+  "for-check":"FOR","while-check":"WHILE","if-check":"IF",
+  "mark":"MARK","push":"PUSH","pop":"POP","restore":"RESTORE","found":"FOUND",
+  "remove":"EDIT","prune":"PRUNE","fail":"FAIL","exit":"EXIT","skip":"SKIP"
+};
+
+// ============ CODE RENDERING (RULE #3) ============
+function renderCode(){
+  var p = document.getElementById('codePanel');
+  p.innerHTML = codeLines.map(function(raw,i){
+    var h = raw;
+    h = h.replace(/("[^"]*"|'[^']*')/g,'\x01STR\x02$1\x03');
+    h = h.replace(/\b(def|for|in|if|return|break|continue|and|else|elif|True|False|None|not|or|while|lambda)\b/g,'\x01KW\x02$1\x03');
+    h = h.replace(/\b(len|range|int|str|list|append|pop|sorted|min|max|sum|abs|enumerate|zip|print|set|add|float)\b/g,'\x01FN\x02$1\x03');
+    h = h.replace(/(?<![\w])(\d+)(?![\w])/g,'\x01NUM\x02$1\x03');
+    h = h.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    h = h.replace(/\x01([A-Z]+)\x02/g,function(_,c){return '<span class="'+c.toLowerCase()+'">';}).replace(/\x03/g,'</span>');
+    return '<div class="code-line" data-line="'+i+'"><span class="line-num">'+(i+1)+'</span><span class="line-code">'+h+'</span></div>';
+  }).join('');
+}
+
+// ============ LOG SNIPPET HIGHLIGHTER ============
+function hlCode(raw){
+  var h = raw;
+  h = h.replace(/("[^"]*"|'[^']*')/g,'\x01s\x02$1\x03');
+  h = h.replace(/\b(def|for|in|if|return|break|continue|and|else|elif|True|False|None|not|or|while|lambda)\b/g,'\x01k\x02$1\x03');
+  h = h.replace(/\b(len|range|int|str|list|append|pop|sorted|min|max|sum|abs|enumerate|zip|print|set|add|float)\b/g,'\x01f\x02$1\x03');
+  h = h.replace(/(?<![\w])(\d+)(?![\w])/g,'\x01n\x02$1\x03');
+  h = h.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  h = h.replace(/\x01([a-z])\x02/g,function(_,c){return '<span class="c'+c+'">';}).replace(/\x03/g,'</span>');
+  return h;
+}
+
+// ============ richLog HELPER ============
+function richLog(opts){
+  var statusMap = {
+    success:"✅ Success", fail:"❌ Failed", skip:"⏭ Skipped",
+    loop:"🔁 Loop iter", prune:"✂️ Pruned", info:"ℹ️ Info"
+  };
+  var status = opts.status || "info";
+  var html = '<div class="log-card log-card--'+status+'">';
+  html += '<div class="log-card-header">';
+  html += '<span class="log-badge">'+(LOG_BADGE[opts.action]||opts.action)+'</span>';
+  html += '<span class="log-line-ref">L'+(opts.line+1)+'</span>';
+  html += '<span class="log-status-pill log-status--'+status+'">'+statusMap[status]+'</span>';
+  html += '</div>';
+  if(opts.code){
+    html += '<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">📜</span>Code Executing</div>';
+    html += '<code class="log-code-snippet">'+hlCode(opts.code)+'</code></div>';
+  }
+  if(opts.inputs && opts.inputs.length){
+    html += '<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">📥</span>Input Values (line is using these)</div>';
+    html += '<div class="log-kv-row">';
+    opts.inputs.forEach(function(kv){
+      html += '<span class="log-kv log-kv--in"><span class="log-kv-key">'+kv.k+'=</span><span class="log-kv-val">'+kv.v+'</span></span>';
+    });
+    html += '</div></div>';
+  }
+  if(opts.outputs && opts.outputs.length){
+    html += '<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">📤</span>Output / State After Line</div>';
+    html += '<div class="log-kv-row">';
+    opts.outputs.forEach(function(kv){
+      var cls = kv.changed ? 'log-kv--changed' : 'log-kv--out';
+      html += '<span class="log-kv '+cls+'"><span class="log-kv-key">'+kv.k+'=</span><span class="log-kv-val">'+kv.v+'</span></span>';
+    });
+    html += '</div></div>';
+  }
+  if(opts.verdict){
+    var vCls = opts.verdictTrue===true ? 'log-verdict--true' : (opts.verdictTrue===false ? 'log-verdict--false' : '');
+    var vIcon = opts.verdictTrue===true ? '✓' : (opts.verdictTrue===false ? '✗' : '•');
+    html += '<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">⚖️</span>Verdict / Decision</div>';
+    html += '<div class="log-verdict '+vCls+'">'+vIcon+' '+opts.verdict+'</div></div>';
+  }
+  if(opts.why){
+    html += '<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">💡</span>Why This Happens</div>';
+    html += '<div class="log-why">'+opts.why+'</div></div>';
+  }
+  if(opts.analogy){
+    html += '<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">🎭</span>Real-Life Analogy</div>';
+    html += '<div class="log-analogy">'+opts.analogy+'</div></div>';
+  }
+  html += '</div>';
+  return html;
+}
+
+// ============ INPUT PARSING ============
+function parseInputs(){
+  var raw = document.getElementById('gridInput').value.trim();
+  try{
+    var g = JSON.parse(raw);
+    if(!Array.isArray(g) || !Array.isArray(g[0])) throw new Error("bad");
+    return {grid:g};
+  }catch(e){
+    return {grid:[[1,0,1],[1,1,1]]};
+  }
+}
+
+function loadTest(input, expected){
+  document.getElementById('gridInput').value = input;
+  document.getElementById('expectedBadge').textContent = 'expected: ' + expected;
+  resetWithInput();
+}
+
+// ============ BUILD STEPS ============
+function buildSteps(params){
+  var st = [];
+  var MAX_STEPS = 4000;
+  var grid = params.grid;
+  var m = grid.length;
+  var n = grid[0].length;
+  var res = Infinity;
+  var bestRects = null;       // [{r1,c1,r2,c2}, ...] for best so far
+  var bestStrategy = "—";
+  var curRects = [];          // current 3 rectangles being evaluated
+  var curStrategy = "—";
+  var curAreas = [0,0,0];
+
+  function snap(extra){
+    return Object.assign({
+      grid: grid.map(function(r){return r.slice();}),
+      m:m, n:n,
+      res: res === Infinity ? "∞" : res,
+      bestRects: bestRects ? bestRects.map(function(r){return Object.assign({},r);}) : null,
+      bestStrategy: bestStrategy,
+      curRects: curRects.map(function(r){return Object.assign({},r);}),
+      curStrategy: curStrategy,
+      curAreas: curAreas.slice()
+    }, extra||{});
+  }
+  function pushStep(o){
+    if(st.length >= MAX_STEPS) return;
+    st.push(Object.assign({line:0, action:"init", logHTML:""}, snap(o)));
+  }
+
+  function fmtRect(r){
+    return "("+r.r1+","+r.c1+")→("+r.r2+","+r.c2+")";
+  }
+
+  // L0: function definition
+  pushStep({
+    line:0, action:"func-def",
+    logHTML: richLog({
+      line:0, action:"func-def",
+      code:"def minimumSum(grid):",
+      status:"info",
+      inputs:[{k:"grid", v:JSON.stringify(grid)}],
+      why:"<strong>Function entry:</strong> Hum minimumSum function start kar rahe hain. Goal hai grid mein saare 1s ko cover karna 3 non-overlapping rectangles se with minimum total area.",
+      analogy:"Jaise ek city map hai aur 3 alag-alag advertisement hoardings lagani hain — saare important spots cover ho aur total cost minimum ho!"
+    })
+  });
+
+  // L1: m, n = len(grid), len(grid[0])
+  pushStep({
+    line:1, action:"init",
+    logHTML: richLog({
+      line:1, action:"init",
+      code:"m, n = len(grid), len(grid[0]) = "+m+", "+n,
+      status:"success",
+      inputs:[{k:"grid.length", v:m}, {k:"grid[0].length", v:n}],
+      outputs:[{k:"m",v:m,changed:true},{k:"n",v:n,changed:true}],
+      why:"<strong>Dimensions store kar liye:</strong> Grid mein <code>"+m+"</code> rows aur <code>"+n+"</code> columns hain. Yeh values puri algorithm mein use hongi.",
+      analogy:"Jaise ek photo frame buy karne se pehle uski height aur width measure karte hain — taaki sahi size ka frame mile!"
+    })
+  });
+
+  // L2: def minArea — declare helper
+  pushStep({
+    line:2, action:"func-def",
+    logHTML: richLog({
+      line:2, action:"func-def",
+      code:"def minArea(r1, c1, r2, c2):",
+      status:"info",
+      why:"<strong>Helper function declared:</strong> <code>minArea</code> ek sub-rectangle region (r1,c1) to (r2,c2) mein bounding box ka area calculate karega jo saare 1s ko cover kare.",
+      analogy:"Jaise ek shop ka security camera lagana ho — minimum area dhundhna hai jisme saare valuable items aa jaayein!"
+    })
+  });
+
+  // ==== minArea helper (creates inline steps when called) ====
+  function callMinArea(r1, c1, r2, c2, label){
+    // L2 entry
+    pushStep({
+      line:2, action:"call",
+      logHTML: richLog({
+        line:2, action:"call",
+        code:"minArea("+r1+", "+c1+", "+r2+", "+c2+")",
+        status:"info",
+        inputs:[{k:"r1",v:r1},{k:"c1",v:c1},{k:"r2",v:r2},{k:"c2",v:c2}],
+        why:"<strong>Helper call ["+label+"]:</strong> Sub-region rows <code>"+r1+"-"+r2+"</code>, cols <code>"+c1+"-"+c2+"</code> mein bounding box dhundhne ke liye function call kar rahe hain.",
+        analogy:"Jaise treasure hunt ke liye specific area assign karte ho — \""+label+"\" zone mein chhupe diamonds ka smallest box dhundo!"
+      })
+    });
+
+    var min_r = m, max_r = -1;
+    var min_c = n, max_c = -1;
+
+    // L3
+    pushStep({
+      line:3, action:"init",
+      logHTML: richLog({
+        line:3, action:"init",
+        code:"min_r, max_r = "+m+", -1",
+        status:"success",
+        outputs:[{k:"min_r",v:m,changed:true},{k:"max_r",v:-1,changed:true}],
+        why:"<strong>Row tracker init:</strong> <code>min_r</code> ko maximum (m) rakha aur <code>max_r</code> ko -1 — sentinel values jo confirm karenge ki ek baar 1 mil jaaye toh actual row index store ho jaaye.",
+        analogy:"Jaise thermometer pe pehle reset karte ho — phir pata chalega ki actual temperature kya hai!"
+      })
+    });
+
+    // L4
+    pushStep({
+      line:4, action:"init",
+      logHTML: richLog({
+        line:4, action:"init",
+        code:"min_c, max_c = "+n+", -1",
+        status:"success",
+        outputs:[{k:"min_c",v:n,changed:true},{k:"max_c",v:-1,changed:true}],
+        why:"<strong>Column tracker init:</strong> Same logic — <code>min_c</code> aur <code>max_c</code> ko sentinel values pe set kar diya.",
+        analogy:"Compass ki suiyaan zero pe set kar di — ab measure karne ke liye ready!"
+      })
+    });
+
+    // L5: for i in range(r1, r2+1)
+    for(var i = r1; i <= r2; i++){
+      pushStep({
+        line:5, action:"for-check",
+        logHTML: richLog({
+          line:5, action:"for-check",
+          code:"for i in range("+r1+", "+(r2+1)+"): i="+i,
+          status:"loop",
+          inputs:[{k:"r1",v:r1},{k:"r2+1",v:r2+1}],
+          outputs:[{k:"i",v:i,changed:true}],
+          verdict:"i ("+i+") < "+(r2+1),
+          verdictTrue:true,
+          why:"<strong>Outer loop iteration:</strong> Row <code>"+i+"</code> pe pahunch gaye. Iss row ke saare cells check karenge.",
+          analogy:"Jaise building ki har floor pe ek-ek karke jaate ho — har floor mein kya hai dekhne ke liye!"
+        })
+      });
+
+      // L6: for j in range(c1, c2+1)
+      for(var j = c1; j <= c2; j++){
+        pushStep({
+          line:6, action:"for-check",
+          logHTML: richLog({
+            line:6, action:"for-check",
+            code:"for j in range("+c1+", "+(c2+1)+"): j="+j,
+            status:"loop",
+            inputs:[{k:"c1",v:c1},{k:"c2+1",v:c2+1}],
+            outputs:[{k:"j",v:j,changed:true},{k:"i",v:i}],
+            verdict:"j ("+j+") < "+(c2+1),
+            verdictTrue:true,
+            why:"<strong>Inner loop iteration:</strong> Cell <code>("+i+","+j+")</code> ka value check karenge.",
+            analogy:"Floor "+i+" pe ab "+j+"-th room check kar rahe ho — kya yahan kuch important hai?"
+          })
+        });
+
+        // L7: if grid[i][j] == 1
+        var cellVal = grid[i][j];
+        var isOne = cellVal === 1;
+        pushStep({
+          line:7, action:"if-check",
+          logHTML: richLog({
+            line:7, action:"if-check",
+            code:"if grid["+i+"]["+j+"] == 1: # value="+cellVal,
+            status: isOne ? "success" : "skip",
+            inputs:[{k:"grid["+i+"]["+j+"]",v:cellVal}],
+            verdict:"grid["+i+"]["+j+"] ("+cellVal+") == 1",
+            verdictTrue:isOne,
+            why: isOne
+              ? "<strong>1 mila!</strong> Cell <code>("+i+","+j+")</code> pe 1 hai — bounding box update karenge."
+              : "<strong>Yahan 0 hai:</strong> Iss cell ka bounding box pe koi effect nahi — skip karte hain.",
+            analogy: isOne
+              ? "Treasure mil gaya iss room mein! Map pe mark karna hoga."
+              : "Yeh room khaali hai — yahan kuch nahi hai, aage badho."
+          })
+        });
+
+        if(isOne){
+          var oldMinR = min_r, oldMaxR = max_r, oldMinC = min_c, oldMaxC = max_c;
+          // L8
+          min_r = Math.min(min_r, i);
+          pushStep({
+            line:8, action:"mark",
+            logHTML: richLog({
+              line:8, action:"mark",
+              code:"min_r = min("+oldMinR+", "+i+") = "+min_r,
+              status:"success",
+              inputs:[{k:"min_r(old)",v:oldMinR},{k:"i",v:i}],
+              outputs:[{k:"min_r",v:min_r,changed:min_r!==oldMinR}],
+              why:"<strong>Min row update:</strong> <code>min(min_r, i)</code> = <code>"+min_r+"</code>. "+(min_r!==oldMinR?"Naya minimum mila!":"Same hi raha."),
+              analogy:"Jaise treasure ka topmost point note kar rahe ho — ek aur point mila, dekho upar gaya ya nahi."
+            })
+          });
+          // L9
+          max_r = Math.max(max_r, i);
+          pushStep({
+            line:9, action:"mark",
+            logHTML: richLog({
+              line:9, action:"mark",
+              code:"max_r = max("+oldMaxR+", "+i+") = "+max_r,
+              status:"success",
+              inputs:[{k:"max_r(old)",v:oldMaxR},{k:"i",v:i}],
+              outputs:[{k:"max_r",v:max_r,changed:max_r!==oldMaxR}],
+              why:"<strong>Max row update:</strong> <code>max(max_r, i)</code> = <code>"+max_r+"</code>. "+(max_r!==oldMaxR?"Naya maximum mila!":"Same hi raha."),
+              analogy:"Treasure ka bottommost point bhi track kar rahe ho — neeche extend hua kya?"
+            })
+          });
+          // L10
+          min_c = Math.min(min_c, j);
+          pushStep({
+            line:10, action:"mark",
+            logHTML: richLog({
+              line:10, action:"mark",
+              code:"min_c = min("+oldMinC+", "+j+") = "+min_c,
+              status:"success",
+              inputs:[{k:"min_c(old)",v:oldMinC},{k:"j",v:j}],
+              outputs:[{k:"min_c",v:min_c,changed:min_c!==oldMinC}],
+              why:"<strong>Min column update:</strong> <code>min(min_c, j)</code> = <code>"+min_c+"</code>.",
+              analogy:"Treasure ka leftmost point — ab hum left boundary track kar rahe hain."
+            })
+          });
+          // L11
+          max_c = Math.max(max_c, j);
+          pushStep({
+            line:11, action:"mark",
+            logHTML: richLog({
+              line:11, action:"mark",
+              code:"max_c = max("+oldMaxC+", "+j+") = "+max_c,
+              status:"success",
+              inputs:[{k:"max_c(old)",v:oldMaxC},{k:"j",v:j}],
+              outputs:[{k:"max_c",v:max_c,changed:max_c!==oldMaxC}],
+              why:"<strong>Max column update:</strong> <code>max(max_c, j)</code> = <code>"+max_c+"</code>.",
+              analogy:"Treasure ka rightmost point — bounding box ki right boundary set ho rahi hai."
+            })
+          });
+        }
+      }
+    }
+
+    // L5 exit
+    pushStep({
+      line:5, action:"exit",
+      logHTML: richLog({
+        line:5, action:"exit",
+        code:"# for i loop EXIT (range "+r1+"→"+r2+" exhausted)",
+        status:"info",
+        outputs:[{k:"min_r",v:min_r},{k:"max_r",v:max_r},{k:"min_c",v:min_c},{k:"max_c",v:max_c}],
+        why:"<strong>Loops khatam:</strong> Saare cells scan ho gaye. Final bounding box: rows <code>"+min_r+"-"+max_r+"</code>, cols <code>"+min_c+"-"+max_c+"</code>.",
+        analogy:"Pura building scan ho gaya — ab final treasure map ready hai!"
+      })
+    });
+
+    // L12: if max_r == -1
+    var noOnes = (max_r === -1);
+    pushStep({
+      line:12, action:"if-check",
+      logHTML: richLog({
+        line:12, action:"if-check",
+        code:"if max_r == -1: # value="+max_r,
+        status: noOnes ? "success" : "skip",
+        inputs:[{k:"max_r",v:max_r}],
+        verdict:"max_r ("+max_r+") == -1",
+        verdictTrue:noOnes,
+        why: noOnes
+          ? "<strong>Koi 1 nahi mila:</strong> max_r abhi bhi -1 hai — matlab iss region mein zero 1s hain. Area = 0 return karenge."
+          : "<strong>1s mile the:</strong> max_r update ho gaya tha — actual area calculate karenge.",
+        analogy: noOnes
+          ? "Iss zone mein koi treasure nahi mila — area zero report kar do!"
+          : "Treasure mila tha — ab uska smallest box ka area nikaalenge."
+      })
+    });
+
+    if(noOnes){
+      pushStep({
+        line:13, action:"return",
+        logHTML: richLog({
+          line:13, action:"return",
+          code:"return 0",
+          status:"info",
+          outputs:[{k:"return",v:0}],
+          why:"<strong>Empty region:</strong> Koi 1 hi nahi hai toh area 0 — yeh region trivially valid hai.",
+          analogy:"Khaali plot pe koi hoarding lagane ki zaroorat nahi — cost zero!"
+        })
+      });
+      return 0;
+    }
+
+    var area = (max_r - min_r + 1) * (max_c - min_c + 1);
+    pushStep({
+      line:14, action:"return",
+      logHTML: richLog({
+        line:14, action:"return",
+        code:"return ("+max_r+"-"+min_r+"+1) * ("+max_c+"-"+min_c+"+1) = "+(max_r-min_r+1)+" * "+(max_c-min_c+1)+" = "+area,
+        status:"info",
+        inputs:[{k:"min_r",v:min_r},{k:"max_r",v:max_r},{k:"min_c",v:min_c},{k:"max_c",v:max_c}],
+        outputs:[{k:"area",v:area}],
+        why:"<strong>Area = height × width:</strong> Bounding box ka area <code>"+(max_r-min_r+1)+" × "+(max_c-min_c+1)+" = "+area+"</code> calculated.",
+        analogy:"Treasure box ki dimensions mil gayi — length × breadth = total area! Hoarding ki cost ready."
+      })
+    });
+    return area;
+  }
+
+  // L15: res = float('inf')
+  pushStep({
+    line:15, action:"init",
+    logHTML: richLog({
+      line:15, action:"init",
+      code:"res = float('inf')",
+      status:"success",
+      outputs:[{k:"res",v:"∞",changed:true}],
+      why:"<strong>Global minimum tracker:</strong> <code>res</code> ko infinity rakha — har valid partition se compare karke minimize karenge.",
+      analogy:"Jaise auction mein highest bid se shuru karte ho — har round mein lower bid try karenge!"
+    })
+  });
+
+  // ============ STRATEGY 1 & 2: 1 horizontal cut + 1 vertical cut (with corner variations) ============
+  // L16: for i in range(m-1)
+  for(var ii = 0; ii < m - 1; ii++){
+    pushStep({
+      line:16, action:"for-check",
+      logHTML: richLog({
+        line:16, action:"for-check",
+        code:"for i in range("+(m-1)+"): i="+ii,
+        status:"loop",
+        inputs:[{k:"m-1",v:m-1}],
+        outputs:[{k:"i",v:ii,changed:true}],
+        verdict:"i ("+ii+") < "+(m-1),
+        verdictTrue:true,
+        why:"<strong>Horizontal cut at row "+ii+":</strong> Grid ko top part (rows 0-"+ii+") aur bottom part mein cut kar rahe hain.",
+        analogy:"Jaise cake ko bich se cut kar rahe ho — upar wala piece "+ii+"th row tak."
+      })
+    });
+
+    // L17: for j in range(n-1)
+    for(var jj = 0; jj < n - 1; jj++){
+      pushStep({
+        line:17, action:"for-check",
+        logHTML: richLog({
+          line:17, action:"for-check",
+          code:"for j in range("+(n-1)+"): j="+jj,
+          status:"loop",
+          inputs:[{k:"n-1",v:n-1}],
+          outputs:[{k:"j",v:jj,changed:true},{k:"i",v:ii}],
+          verdict:"j ("+jj+") < "+(n-1),
+          verdictTrue:true,
+          why:"<strong>Vertical cut at col "+jj+":</strong> Bottom part ko further left/right mein split karenge.",
+          analogy:"Cake ka neeche wala piece — usko bhi vertical cut maar rahe ho col "+jj+" pe."
+        })
+      });
+
+      // ===== Strategy A: top-full | bottom-left | bottom-right =====
+      curStrategy = "Top-full | BotL | BotR";
+      curRects = [];
+      curAreas = [0,0,0];
+
+      // L18: a1 = minArea(0, 0, i, n-1)
+      pushStep({
+        line:18, action:"call",
+        logHTML: richLog({
+          line:18, action:"call",
+          code:"a1 = minArea(0, 0, "+ii+", "+(n-1)+")",
+          status:"info",
+          inputs:[{k:"i",v:ii},{k:"n-1",v:n-1}],
+          why:"<strong>Strategy A — Rect1 (top-full):</strong> Pura top portion (rows 0-"+ii+", saare cols) ek rectangle mein cover karenge.",
+          analogy:"Cake ka upar wala pura piece — ek hi badi rectangular hoarding."
+        })
+      });
+      var a1 = callMinArea(0, 0, ii, n-1, "Top-full");
+      curRects = [{r1:0,c1:0,r2:ii,c2:n-1, area:a1, color:"r1"}];
+      curAreas = [a1, 0, 0];
+      pushStep({
+        line:18, action:"return",
+        logHTML: richLog({
+          line:18, action:"return",
+          code:"a1 = "+a1,
+          status:"success",
+          outputs:[{k:"a1",v:a1,changed:true}],
+          why:"<strong>Rect1 area = "+a1+":</strong> Top region ka bounding box area mil gaya.",
+          analogy:"Upar wali hoarding ki cost finalize: ₹"+a1
+        })
+      });
+
+      // L19: a2 = minArea(i+1, 0, m-1, j)
+      pushStep({
+        line:19, action:"call",
+        logHTML: richLog({
+          line:19, action:"call",
+          code:"a2 = minArea("+(ii+1)+", 0, "+(m-1)+", "+jj+")",
+          status:"info",
+          why:"<strong>Strategy A — Rect2 (bottom-left):</strong> Bottom portion ka left part (rows "+(ii+1)+"-"+(m-1)+", cols 0-"+jj+").",
+          analogy:"Neeche wale piece ka left side — chhoti hoarding."
+        })
+      });
+      var a2 = callMinArea(ii+1, 0, m-1, jj, "BotL");
+      curRects.push({r1:ii+1,c1:0,r2:m-1,c2:jj, area:a2, color:"r2"});
+      curAreas[1] = a2;
+      pushStep({
+        line:19, action:"return",
+        logHTML: richLog({
+          line:19, action:"return",
+          code:"a2 = "+a2,
+          status:"success",
+          outputs:[{k:"a2",v:a2,changed:true}],
+          why:"<strong>Rect2 area = "+a2+":</strong> Bottom-left region ka area calculated.",
+          analogy:"Bottom-left hoarding ki cost: ₹"+a2
+        })
+      });
+
+      // L20: a3 = minArea(i+1, j+1, m-1, n-1)
+      pushStep({
+        line:20, action:"call",
+        logHTML: richLog({
+          line:20, action:"call",
+          code:"a3 = minArea("+(ii+1)+", "+(jj+1)+", "+(m-1)+", "+(n-1)+")",
+          status:"info",
+          why:"<strong>Strategy A — Rect3 (bottom-right):</strong> Bottom portion ka right part.",
+          analogy:"Bottom-right corner ki hoarding."
+        })
+      });
+      var a3 = callMinArea(ii+1, jj+1, m-1, n-1, "BotR");
+      curRects.push({r1:ii+1,c1:jj+1,r2:m-1,c2:n-1, area:a3, color:"r3"});
+      curAreas[2] = a3;
+      pushStep({
+        line:20, action:"return",
+        logHTML: richLog({
+          line:20, action:"return",
+          code:"a3 = "+a3,
+          status:"success",
+          outputs:[{k:"a3",v:a3,changed:true}],
+          why:"<strong>Rect3 area = "+a3+":</strong> Bottom-right region ka area calculated.",
+          analogy:"Last hoarding bhi finalize: ₹"+a3
+        })
+      });
+
+      // L21: res = min(res, a1+a2+a3)
+      var totalA = a1 + a2 + a3;
+      var oldRes = res;
+      var betterA = totalA < res;
+      if(betterA){ res = totalA; bestRects = curRects.slice(); bestStrategy = curStrategy; }
+      pushStep({
+        line:21, action: betterA ? "found" : "skip",
+        logHTML: richLog({
+          line:21, action: betterA ? "found" : "skip",
+          code:"res = min("+(oldRes===Infinity?"∞":oldRes)+", "+a1+"+"+a2+"+"+a3+") = min("+(oldRes===Infinity?"∞":oldRes)+", "+totalA+")",
+          status: betterA ? "success" : "skip",
+          inputs:[{k:"a1",v:a1},{k:"a2",v:a2},{k:"a3",v:a3},{k:"old_res",v:oldRes===Infinity?"∞":oldRes}],
+          outputs:[{k:"total",v:totalA},{k:"res",v:res, changed:betterA}],
+          verdict:"total ("+totalA+") "+(betterA?"<":">=")+" res ("+(oldRes===Infinity?"∞":oldRes)+")",
+          verdictTrue:betterA,
+          why: betterA
+            ? "<strong>🎉 New best mila!</strong> Strategy A ne <code>"+totalA+"</code> diya, jo previous <code>"+(oldRes===Infinity?"∞":oldRes)+"</code> se kam hai. <code>res</code> update!"
+            : "<strong>Improvement nahi:</strong> "+totalA+" >= "+(oldRes===Infinity?"∞":oldRes)+". res unchanged.",
+          analogy: betterA
+            ? "Naya cheap quote mila — purane se sasta! Contract finalize."
+            : "Yeh combination mehenga pad raha — purana hi best hai."
+        })
+      });
+
+      // ===== Strategy B: top-left | top-right | bottom-full =====
+      curStrategy = "TopL | TopR | Bot-full";
+      curRects = [];
+      curAreas = [0,0,0];
+
+      // L22: b1 = minArea(0, 0, i, j)
+      pushStep({
+        line:22, action:"call",
+        logHTML: richLog({
+          line:22, action:"call",
+          code:"b1 = minArea(0, 0, "+ii+", "+jj+")",
+          status:"info",
+          why:"<strong>Strategy B — Rect1 (top-left):</strong> Top portion ka left part.",
+          analogy:"Doosri strategy try kar rahe — upar bayan corner ka piece."
+        })
+      });
+      var b1 = callMinArea(0, 0, ii, jj, "TopL");
+      curRects = [{r1:0,c1:0,r2:ii,c2:jj, area:b1, color:"r1"}];
+      curAreas = [b1, 0, 0];
+      pushStep({
+        line:22, action:"return",
+        logHTML: richLog({
+          line:22, action:"return",
+          code:"b1 = "+b1,
+          status:"success",
+          outputs:[{k:"b1",v:b1,changed:true}],
+          why:"<strong>b1 = "+b1+":</strong> Top-left rectangle ka area.",
+          analogy:"Top-left hoarding ki cost: ₹"+b1
+        })
+      });
+
+      // L23
+      pushStep({
+        line:23, action:"call",
+        logHTML: richLog({
+          line:23, action:"call",
+          code:"b2 = minArea(0, "+(jj+1)+", "+ii+", "+(n-1)+")",
+          status:"info",
+          why:"<strong>Strategy B — Rect2 (top-right):</strong> Top portion ka right part.",
+          analogy:"Top-right ka piece."
+        })
+      });
+      var b2 = callMinArea(0, jj+1, ii, n-1, "TopR");
+      curRects.push({r1:0,c1:jj+1,r2:ii,c2:n-1, area:b2, color:"r2"});
+      curAreas[1] = b2;
+      pushStep({
+        line:23, action:"return",
+        logHTML: richLog({
+          line:23, action:"return",
+          code:"b2 = "+b2,
+          status:"success",
+          outputs:[{k:"b2",v:b2,changed:true}],
+          why:"<strong>b2 = "+b2+"</strong>",
+          analogy:"Top-right hoarding cost: ₹"+b2
+        })
+      });
+
+      // L24
+      pushStep({
+        line:24, action:"call",
+        logHTML: richLog({
+          line:24, action:"call",
+          code:"b3 = minArea("+(ii+1)+", 0, "+(m-1)+", "+(n-1)+")",
+          status:"info",
+          why:"<strong>Strategy B — Rect3 (bottom-full):</strong> Pura bottom part.",
+          analogy:"Neeche ka pura piece — ek hi badi hoarding."
+        })
+      });
+      var b3 = callMinArea(ii+1, 0, m-1, n-1, "Bot-full");
+      curRects.push({r1:ii+1,c1:0,r2:m-1,c2:n-1, area:b3, color:"r3"});
+      curAreas[2] = b3;
+      pushStep({
+        line:24, action:"return",
+        logHTML: richLog({
+          line:24, action:"return",
+          code:"b3 = "+b3,
+          status:"success",
+          outputs:[{k:"b3",v:b3,changed:true}],
+          why:"<strong>b3 = "+b3+"</strong>",
+          analogy:"Bottom-full hoarding cost: ₹"+b3
+        })
+      });
+
+      // L25
+      var totalB = b1 + b2 + b3;
+      var oldResB = res;
+      var betterB = totalB < res;
+      if(betterB){ res = totalB; bestRects = curRects.slice(); bestStrategy = curStrategy; }
+      pushStep({
+        line:25, action: betterB ? "found" : "skip",
+        logHTML: richLog({
+          line:25, action: betterB ? "found" : "skip",
+          code:"res = min("+(oldResB===Infinity?"∞":oldResB)+", "+b1+"+"+b2+"+"+b3+") = min("+(oldResB===Infinity?"∞":oldResB)+", "+totalB+")",
+          status: betterB ? "success" : "skip",
+          inputs:[{k:"b1",v:b1},{k:"b2",v:b2},{k:"b3",v:b3},{k:"old_res",v:oldResB===Infinity?"∞":oldResB}],
+          outputs:[{k:"total",v:totalB},{k:"res",v:res, changed:betterB}],
+          verdict:"total ("+totalB+") "+(betterB?"<":">=")+" res ("+(oldResB===Infinity?"∞":oldResB)+")",
+          verdictTrue:betterB,
+          why: betterB
+            ? "<strong>🎉 Strategy B better!</strong> Total <code>"+totalB+"</code> previous best <code>"+(oldResB===Infinity?"∞":oldResB)+"</code> se kam hai."
+            : "<strong>Strategy B improvement nahi:</strong> "+totalB+" >= "+(oldResB===Infinity?"∞":oldResB)+".",
+          analogy: betterB
+            ? "Naya supplier saste rate de raha — switch karte hain!"
+            : "Purana hi best hai — koi change nahi."
+        })
+      });
+    }
+    pushStep({
+      line:17, action:"exit",
+      logHTML: richLog({
+        line:17, action:"exit",
+        code:"# inner j loop EXIT for i="+ii,
+        status:"info",
+        why:"<strong>Inner j loop khatam:</strong> Iss i="+ii+" ke saare vertical cuts try ho gaye.",
+        analogy:"Iss horizontal cut ke saare vertical splits dekh liye!"
+      })
+    });
+  }
+  pushStep({
+    line:16, action:"exit",
+    logHTML: richLog({
+      line:16, action:"exit",
+      code:"# outer i loop EXIT (Strategy A & B done)",
+      status:"info",
+      outputs:[{k:"res",v:res===Infinity?"∞":res}],
+      why:"<strong>Mixed cuts (1H + 1V) done:</strong> Saari corner combinations dekh li.",
+      analogy:"Mixed-cut strategies finish — ab pure horizontal try karenge."
+    })
+  });
+
+  // ============ STRATEGY 3: 2 horizontal cuts ============
+  for(var ii2 = 0; ii2 < m - 1; ii2++){
+    pushStep({
+      line:26, action:"for-check",
+      logHTML: richLog({
+        line:26, action:"for-check",
+        code:"for i in range("+(m-1)+"): i="+ii2,
+        status:"loop",
+        outputs:[{k:"i",v:ii2,changed:true}],
+        verdict:"i ("+ii2+") < "+(m-1),
+        verdictTrue:true,
+        why:"<strong>2 horizontal cuts — first cut at row "+ii2+":</strong>",
+        analogy:"Cake ko 3 horizontal layers mein cut karna hai — pehla cut "+ii2+" pe."
+      })
+    });
+    for(var kk = ii2 + 1; kk < m - 1; kk++){
+      pushStep({
+        line:27, action:"for-check",
+        logHTML: richLog({
+          line:27, action:"for-check",
+          code:"for k in range("+(ii2+1)+", "+(m-1)+"): k="+kk,
+          status:"loop",
+          outputs:[{k:"k",v:kk,changed:true},{k:"i",v:ii2}],
+          verdict:"k ("+kk+") < "+(m-1),
+          verdictTrue:true,
+          why:"<strong>Second horizontal cut at row "+kk+":</strong> Grid ko 3 horizontal strips mein divide.",
+          analogy:"Doosra cut "+kk+" pe — ab 3 horizontal layers ban gayi."
+        })
+      });
+
+      curStrategy = "3 Horizontal Strips";
+      curRects = [];
+      curAreas = [0,0,0];
+
+      pushStep({
+        line:28, action:"call",
+        logHTML: richLog({
+          line:28, action:"call",
+          code:"c1 = minArea(0, 0, "+ii2+", "+(n-1)+")",
+          status:"info",
+          why:"<strong>Top strip:</strong> rows 0-"+ii2+", saare cols.",
+          analogy:"Cake ki top layer."
+        })
+      });
+      var c1v = callMinArea(0, 0, ii2, n-1, "Top-strip");
+      curRects = [{r1:0,c1:0,r2:ii2,c2:n-1, area:c1v, color:"r1"}];
+      curAreas = [c1v, 0, 0];
+      pushStep({line:28, action:"return", logHTML: richLog({line:28,action:"return",code:"c1 = "+c1v,status:"success",outputs:[{k:"c1",v:c1v,changed:true}],why:"<strong>Top strip area = "+c1v+"</strong>",analogy:"Top layer cost: ₹"+c1v})});
+
+      pushStep({
+        line:29, action:"call",
+        logHTML: richLog({
+          line:29, action:"call",
+          code:"c2 = minArea("+(ii2+1)+", 0, "+kk+", "+(n-1)+")",
+          status:"info",
+          why:"<strong>Middle strip:</strong> rows "+(ii2+1)+"-"+kk+".",
+          analogy:"Cake ki middle layer."
+        })
+      });
+      var c2v = callMinArea(ii2+1, 0, kk, n-1, "Mid-strip");
+      curRects.push({r1:ii2+1,c1:0,r2:kk,c2:n-1, area:c2v, color:"r2"});
+      curAreas[1] = c2v;
+      pushStep({line:29, action:"return", logHTML: richLog({line:29,action:"return",code:"c2 = "+c2v,status:"success",outputs:[{k:"c2",v:c2v,changed:true}],why:"<strong>Middle strip area = "+c2v+"</strong>",analogy:"Middle layer cost: ₹"+c2v})});
+
+      pushStep({
+        line:30, action:"call",
+        logHTML: richLog({
+          line:30, action:"call",
+          code:"c3 = minArea("+(kk+1)+", 0, "+(m-1)+", "+(n-1)+")",
+          status:"info",
+          why:"<strong>Bottom strip:</strong> rows "+(kk+1)+"-"+(m-1)+".",
+          analogy:"Cake ki bottom layer."
+        })
+      });
+      var c3v = callMinArea(kk+1, 0, m-1, n-1, "Bot-strip");
+      curRects.push({r1:kk+1,c1:0,r2:m-1,c2:n-1, area:c3v, color:"r3"});
+      curAreas[2] = c3v;
+      pushStep({line:30, action:"return", logHTML: richLog({line:30,action:"return",code:"c3 = "+c3v,status:"success",outputs:[{k:"c3",v:c3v,changed:true}],why:"<strong>Bottom strip area = "+c3v+"</strong>",analogy:"Bottom layer cost: ₹"+c3v})});
+
+      var totalC = c1v + c2v + c3v;
+      var oldResC = res;
+      var betterC = totalC < res;
+      if(betterC){ res = totalC; bestRects = curRects.slice(); bestStrategy = curStrategy; }
+      pushStep({
+        line:31, action: betterC ? "found" : "skip",
+        logHTML: richLog({
+          line:31, action: betterC ? "found" : "skip",
+          code:"res = min("+(oldResC===Infinity?"∞":oldResC)+", "+c1v+"+"+c2v+"+"+c3v+") = min("+(oldResC===Infinity?"∞":oldResC)+", "+totalC+")",
+          status: betterC ? "success" : "skip",
+          inputs:[{k:"c1",v:c1v},{k:"c2",v:c2v},{k:"c3",v:c3v}],
+          outputs:[{k:"total",v:totalC},{k:"res",v:res, changed:betterC}],
+          verdict:"total ("+totalC+") "+(betterC?"<":">=")+" res ("+(oldResC===Infinity?"∞":oldResC)+")",
+          verdictTrue:betterC,
+          why: betterC ? "<strong>🎉 3-horizontal strategy ne better diya!</strong>" : "<strong>3-horizontal improvement nahi laaya.</strong>",
+          analogy: betterC ? "Naya horizontal layout sasta — switch!" : "Purana strategy abhi bhi best."
+        })
+      });
+    }
+    pushStep({line:27, action:"exit", logHTML: richLog({line:27,action:"exit",code:"# k loop EXIT for i="+ii2,status:"info",why:"Iss i ke saare second cuts try ho gaye.",analogy:"Iss first cut ke combinations done."})});
+  }
+  pushStep({line:26, action:"exit", logHTML: richLog({line:26,action:"exit",code:"# 2-horizontal-cuts loop EXIT",status:"info",outputs:[{k:"res",v:res===Infinity?"∞":res}],why:"<strong>3 horizontal strips strategy done.</strong>",analogy:"Cake ke pure horizontal cuts khatam."})});
+
+  // ============ STRATEGY 4: 2 vertical cuts ============
+  for(var jj2 = 0; jj2 < n - 1; jj2++){
+    pushStep({
+      line:32, action:"for-check",
+      logHTML: richLog({
+        line:32, action:"for-check",
+        code:"for j in range("+(n-1)+"): j="+jj2,
+        status:"loop",
+        outputs:[{k:"j",v:jj2,changed:true}],
+        verdict:"j ("+jj2+") < "+(n-1),
+        verdictTrue:true,
+        why:"<strong>2 vertical cuts — first cut at col "+jj2+":</strong>",
+        analogy:"Cake ko 3 vertical slices mein cut — pehla cut col "+jj2+" pe."
+      })
+    });
+    for(var kk2 = jj2 + 1; kk2 < n - 1; kk2++){
+      pushStep({
+        line:33, action:"for-check",
+        logHTML: richLog({
+          line:33, action:"for-check",
+          code:"for k in range("+(jj2+1)+", "+(n-1)+"): k="+kk2,
+          status:"loop",
+          outputs:[{k:"k",v:kk2,changed:true},{k:"j",v:jj2}],
+          verdict:"k ("+kk2+") < "+(n-1),
+          verdictTrue:true,
+          why:"<strong>Second vertical cut at col "+kk2+":</strong>",
+          analogy:"Doosra vertical cut col "+kk2+" pe — 3 slices ban gaye."
+        })
+      });
+
+      curStrategy = "3 Vertical Slices";
+      curRects = [];
+      curAreas = [0,0,0];
+
+      pushStep({line:34, action:"call", logHTML: richLog({line:34,action:"call",code:"d1 = minArea(0, 0, "+(m-1)+", "+jj2+")",status:"info",why:"<strong>Left slice:</strong> cols 0-"+jj2+".",analogy:"Bayan slice."})});
+      var d1v = callMinArea(0, 0, m-1, jj2, "Left-slice");
+      curRects = [{r1:0,c1:0,r2:m-1,c2:jj2, area:d1v, color:"r1"}];
+      curAreas = [d1v, 0, 0];
+      pushStep({line:34, action:"return", logHTML: richLog({line:34,action:"return",code:"d1 = "+d1v,status:"success",outputs:[{k:"d1",v:d1v,changed:true}],why:"<strong>Left slice area = "+d1v+"</strong>",analogy:"Left slice cost: ₹"+d1v})});
+
+      pushStep({line:35, action:"call", logHTML: richLog({line:35,action:"call",code:"d2 = minArea(0, "+(jj2+1)+", "+(m-1)+", "+kk2+")",status:"info",why:"<strong>Middle slice:</strong> cols "+(jj2+1)+"-"+kk2+".",analogy:"Beech ka slice."})});
+      var d2v = callMinArea(0, jj2+1, m-1, kk2, "Mid-slice");
+      curRects.push({r1:0,c1:jj2+1,r2:m-1,c2:kk2, area:d2v, color:"r2"});
+      curAreas[1] = d2v;
+      pushStep({line:35, action:"return", logHTML: richLog({line:35,action:"return",code:"d2 = "+d2v,status:"success",outputs:[{k:"d2",v:d2v,changed:true}],why:"<strong>Middle slice area = "+d2v+"</strong>",analogy:"Middle slice cost: ₹"+d2v})});
+
+      pushStep({line:36, action:"call", logHTML: richLog({line:36,action:"call",code:"d3 = minArea(0, "+(kk2+1)+", "+(m-1)+", "+(n-1)+")",status:"info",why:"<strong>Right slice:</strong> cols "+(kk2+1)+"-"+(n-1)+".",analogy:"Daahina slice."})});
+      var d3v = callMinArea(0, kk2+1, m-1, n-1, "Right-slice");
+      curRects.push({r1:0,c1:kk2+1,r2:m-1,c2:n-1, area:d3v, color:"r3"});
+      curAreas[2] = d3v;
+      pushStep({line:36, action:"return", logHTML: richLog({line:36,action:"return",code:"d3 = "+d3v,status:"success",outputs:[{k:"d3",v:d3v,changed:true}],why:"<strong>Right slice area = "+d3v+"</strong>",analogy:"Right slice cost: ₹"+d3v})});
+
+      var totalD = d1v + d2v + d3v;
+      var oldResD = res;
+      var betterD = totalD < res;
+      if(betterD){ res = totalD; bestRects = curRects.slice(); bestStrategy = curStrategy; }
+      pushStep({
+        line:37, action: betterD ? "found" : "skip",
+        logHTML: richLog({
+          line:37, action: betterD ? "found" : "skip",
+          code:"res = min("+(oldResD===Infinity?"∞":oldResD)+", "+d1v+"+"+d2v+"+"+d3v+") = min("+(oldResD===Infinity?"∞":oldResD)+", "+totalD+")",
+          status: betterD ? "success" : "skip",
+          inputs:[{k:"d1",v:d1v},{k:"d2",v:d2v},{k:"d3",v:d3v}],
+          outputs:[{k:"total",v:totalD},{k:"res",v:res, changed:betterD}],
+          verdict:"total ("+totalD+") "+(betterD?"<":">=")+" res ("+(oldResD===Infinity?"∞":oldResD)+")",
+          verdictTrue:betterD,
+          why: betterD ? "<strong>🎉 3-vertical strategy ne new best diya!</strong>" : "<strong>3-vertical improvement nahi.</strong>",
+          analogy: betterD ? "Vertical slices wala layout sabse sasta!" : "Purana hi best chal raha."
+        })
+      });
+    }
+    pushStep({line:33, action:"exit", logHTML: richLog({line:33,action:"exit",code:"# k loop EXIT for j="+jj2,status:"info",why:"Iss j ke saare combinations done.",analogy:"Iss first vertical cut ke combinations finish."})});
+  }
+  pushStep({line:32, action:"exit", logHTML: richLog({line:32,action:"exit",code:"# 2-vertical-cuts loop EXIT",status:"info",outputs:[{k:"res",v:res===Infinity?"∞":res}],why:"<strong>3 vertical slices strategy done.</strong>",analogy:"Saari strategies try ho gayi!"})});
+
+  // L38: return res
+  curResult = res === Infinity ? -1 : res;
+  pushStep({
+    line:38, action:"return",
+    logHTML: richLog({
+      line:38, action:"return",
+      code:"return res = "+res,
+      status:"success",
+      outputs:[{k:"return",v:res},{k:"best_strategy",v:bestStrategy}],
+      why:"<strong>🎉 Final answer: "+res+"</strong>. Best strategy: <code>"+bestStrategy+"</code>. Saari 6 partitions explore ki — yeh sabse minimum sum mila!",
+      analogy:"Auction khatam — sabse sasta combination jeet gaya! Total cost: ₹"+res+". Yahi final answer hai!"
+    })
+  });
+
+  return st;
+}
+
+// ============ FIT CODE WIDTH ============
+function fitCodeWidth(){
+  if(codeWidthUserSet) return;
+  var col1 = document.getElementById('col1');
+  var maxLineLen = 0;
+  codeLines.forEach(function(l){ if(l.length > maxLineLen) maxLineLen = l.length; });
+  var w = Math.min(maxLineLen * 7.6 + 60, window.innerWidth * 0.45);
+  w = Math.max(280, w);
+  col1.style.width = w + 'px';
+  syncFooterWidth();
+}
+
+function syncFooterWidth(){
+  var c1 = document.getElementById('col1');
+  document.getElementById('footerLeft').style.width = c1.offsetWidth + 'px';
+}
+
+// ============ RENDER STEP ============
+function renderStep(idx){
+  if(!steps.length) return;
+  var s = steps[idx];
+  currentStep = idx;
+  document.getElementById('stepInfo').textContent = (idx+1) + '/' + steps.length;
+  var bd = document.getElementById('actionBadge');
+  bd.textContent = BADGE_LABEL[s.action] || s.action;
+  bd.className = 'action-badge action-badge--' + s.action;
+  document.querySelectorAll('.code-line').forEach(function(el){ el.classList.remove('active'); });
+  var al = document.querySelector('.code-line[data-line="'+s.line+'"]');
+  if(al){ al.classList.add('active'); al.scrollIntoView({block:'nearest'}); }
+  renderViz(s);
+  showLogPreview(s);
+}
+
+// ============ RENDER VIZ ============
+function renderViz(s){
+  var p = document.getElementById('vizPanel');
+  var html = '';
+
+  // Vars strip
+  html += '<div class="vars-strip">';
+  html += '<span class="var-chip vc-active"><span class="vk">m=</span><span class="vv">'+s.m+'</span></span>';
+  html += '<span class="var-chip vc-active"><span class="vk">n=</span><span class="vv">'+s.n+'</span></span>';
+  html += '<span class="var-chip vc-safe"><span class="vk">res=</span><span class="vv">'+s.res+'</span></span>';
+  html += '<span class="var-chip"><span class="vk">strategy=</span><span class="vv">'+s.curStrategy+'</span></span>';
+  if(s.bestRects){
+    html += '<span class="var-chip vc-safe"><span class="vk">best=</span><span class="vv">'+s.bestStrategy+'</span></span>';
+  }
+  html += '</div>';
+
+  // Build cell-to-rect mapping
+  var cellRect = [];
+  for(var r=0; r<s.m; r++){
+    cellRect.push([]);
+    for(var c=0; c<s.n; c++) cellRect[r].push(null);
+  }
+  if(s.curRects && s.curRects.length){
+    s.curRects.forEach(function(rec){
+      for(var r=rec.r1; r<=rec.r2; r++){
+        for(var c=rec.c1; c<=rec.c2; c++){
+          if(r>=0 && r<s.m && c>=0 && c<s.n) cellRect[r][c] = rec.color;
+        }
+      }
+    });
+  }
+
+  // ===== Grid Card =====
+  html += '<div class="viz-row">';
+  html += '<div class="viz-card"><h5>🧱 Grid (current partition)</h5>';
+  html += '<div class="grid-wrap">';
+  for(var r=0; r<s.m; r++){
+    html += '<div class="grid-row">';
+    for(var c=0; c<s.n; c++){
+      var cls = 'gcell';
+      if(cellRect[r][c]) cls += ' ' + cellRect[r][c];
+      if(s.grid[r][c] === 1) cls += ' one';
+      var lbl = s.grid[r][c];
+      html += '<div class="'+cls+'">'+lbl+'</div>';
+    }
+    html += '</div>';
+  }
+  html += '</div>';
+  html += '<div class="rect-legend">';
+  html += '<span class="rect-key r1">■ Rect 1</span>';
+  html += '<span class="rect-key r2">■ Rect 2</span>';
+  html += '<span class="rect-key r3">■ Rect 3</span>';
+  html += '</div>';
+  html += '</div>';
+
+  // ===== Current strategy areas =====
+  html += '<div class="viz-card"><h5>📐 Current Strategy</h5>';
+  html += '<div class="strategy-pill">'+s.curStrategy+'</div>';
+  html += '<div class="area-row">';
+  if(s.curRects && s.curRects.length){
+    s.curRects.forEach(function(rec, idx){
+      html += '<div class="area-chip '+rec.color+'">R'+(idx+1)+': ('+rec.r1+','+rec.c1+')→('+rec.r2+','+rec.c2+') = '+rec.area+'</div>';
+    });
+    var total = s.curAreas.reduce(function(a,b){return a+b;},0);
+    html += '<div class="area-chip total">Σ Total = '+total+'</div>';
+  } else {
+    html += '<div class="empty-state">No rectangles evaluated yet</div>';
+  }
+  html += '</div></div>';
+  html += '</div>';
+
+  // ===== Best so far =====
+  html += '<div class="viz-row">';
+  html += '<div class="viz-card"><h5>🏆 Best So Far</h5>';
+  if(s.bestRects){
+    html += '<div class="strategy-pill">'+s.bestStrategy+'</div>';
+    html += '<div class="area-row">';
+    s.bestRects.forEach(function(rec, idx){
+      html += '<div class="area-chip '+rec.color+'">R'+(idx+1)+': '+rec.area+'</div>';
+    });
+    html += '<div class="area-chip best">⭐ Min res = '+s.res+'</div>';
+    html += '</div>';
+  } else {
+    html += '<div class="empty-state">No best yet — res = ∞</div>';
+  }
+  html += '</div>';
+
+  // ===== Strategy summary =====
+  html += '<div class="viz-card"><h5>🎯 6 Strategy Map</h5>';
+  html += '<div class="partition-grid">';
+  var strategies = [
+    {n:"A: TopFull|BotL|BotR", desc:"1H + 1V (corner)"},
+    {n:"B: TopL|TopR|BotFull", desc:"1H + 1V (corner)"},
+    {n:"C: 3 Horizontal Strips", desc:"2 H cuts"},
+    {n:"D: 3 Vertical Slices", desc:"2 V cuts"}
+  ];
+  strategies.forEach(function(st){
+    var act = (s.curStrategy === st.n.split(":")[1].trim() || s.curStrategy.indexOf(st.n.split(":")[1].trim()) >= 0) ? ' active' : '';
+    html += '<div class="part-row'+act+'"><span class="part-label">'+st.n+'</span><span class="part-val">'+st.desc+'</span></div>';
+  });
+  html += '</div></div>';
+  html += '</div>';
+
+  // Result banner
+  if(s.line === 38){
+    html += '<div class="result-banner">🎉 Final Answer: '+s.res+' — Best Strategy: '+s.bestStrategy+'</div>';
+  }
+
+  p.innerHTML = html;
+}
+
+// ============ LOG POPUP ============
+function showLogPreview(s){
+  if(!logEnabled) return;
+  document.getElementById('logPopupBody').innerHTML = s.logHTML || '';
+  document.getElementById('logPopup').classList.remove('log-popup--hidden');
+}
+
+function hideLogPopup(){
+  document.getElementById('logPopup').classList.add('log-popup--hidden');
+}
+
+function toggleLogPreview(){
+  logEnabled = !logEnabled;
+  var btn = document.getElementById('logToggleBtn');
+  btn.textContent = logEnabled ? '📋 ON' : '📋 OFF';
+  btn.classList.toggle('log-toggle-btn--off', !logEnabled);
+  if(!logEnabled) hideLogPopup();
+  else if(steps.length) showLogPreview(steps[currentStep]);
+}
+
+function logZoom(dir){
+  logZoomLevel = Math.max(60, Math.min(180, logZoomLevel + dir*20));
+  updateLogZoom();
+}
+function logZoomReset(){ logZoomLevel = 100; updateLogZoom(); }
+function updateLogZoom(){
+  document.getElementById('logZoomLabel').textContent = logZoomLevel + '%';
+  document.getElementById('logPopup').style.setProperty('--log-scale', logZoomLevel/100);
+}
+
+function toggleFullscreen(){
+  var viz = document.querySelector('.col-viz');
+  if(!document.fullscreenElement) viz.requestFullscreen().catch(function(){});
+  else document.exitFullscreen();
+}
+
+function toggleProblem(){
+  var b = document.getElementById('problemBody');
+  var t = document.getElementById('problemToggle');
+  b.classList.toggle('hidden');
+  t.textContent = b.classList.contains('hidden') ? '▼ Show' : '▲ Hide';
+}
+
+// ============ STEP CONTROLS ============
+function stepBy(dir){
+  var n = currentStep + dir;
+  if(n < 0 || n >= steps.length) return;
+  renderStep(n);
+}
+function resetStep(){ if(steps.length) renderStep(0); }
+
+function resetWithInput(){
+  curResult = null;
+  var params = parseInputs();
+  renderCode();
+  fitCodeWidth();
+  steps = buildSteps(params);
+  currentStep = 0;
+  renderStep(0);
+  document.getElementById('liveOutput').textContent = curResult !== null ? curResult : '—';
+}
+
+// ============ KEYBOARD ============
+document.addEventListener('keydown', function(e){
+  if(e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
+  if(e.key === 'ArrowRight'){ e.preventDefault(); stepBy(1); }
+  else if(e.key === 'ArrowLeft'){ e.preventDefault(); stepBy(-1); }
+  else if(e.key === 'r' || e.key === 'R'){ e.preventDefault(); resetStep(); }
+});
+
+// ============ RESIZE HANDLE ============
+(function(){
+  var col1 = document.getElementById('col1');
+  document.getElementById('resizeH1').addEventListener('mousedown', function(e){
+    e.preventDefault();
+    codeWidthUserSet = true;
+    var startX = e.clientX, startW = col1.offsetWidth, h = this;
+    document.body.classList.add('no-select');
+    h.classList.add('active');
+    function mv(e){
+      col1.style.width = Math.max(140, startW + (e.clientX - startX)) + 'px';
+      syncFooterWidth();
+    }
+    function up(){
+      document.removeEventListener('mousemove', mv);
+      document.removeEventListener('mouseup', up);
+      document.body.classList.remove('no-select');
+      h.classList.remove('active');
+    }
+    document.addEventListener('mousemove', mv);
+    document.addEventListener('mouseup', up);
+  });
+})();
+
+window.addEventListener('resize', function(){
+  if(!codeWidthUserSet) fitCodeWidth();
+  else syncFooterWidth();
+});
+
+// ============ INIT ============
+renderCode();
+fitCodeWidth();
+steps = buildSteps(parseInputs());
+renderStep(0);
+document.getElementById('liveOutput').textContent = curResult !== null ? curResult : '—';
+
+</script>
+</body>
+</html>

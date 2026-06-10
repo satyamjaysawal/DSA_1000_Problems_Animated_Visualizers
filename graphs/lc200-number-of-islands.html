@@ -1,0 +1,918 @@
+﻿
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>200. Number of Islands — Dry Run Visualizer</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=DM+Sans:wght@400;500;600&display=swap');
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{--bg-primary:#FAFAF8;--bg-secondary:#F1EFE8;--bg-tertiary:#E2E0D8;--bg-card:#FFFFFF;--text-primary:#2C2C2A;--text-secondary:#5F5E5A;--text-tertiary:#888780;--border-color:rgba(0,0,0,.11);--border-light:rgba(0,0,0,.06);--border-focus:#534AB7;--accent-indigo:#534AB7;--accent-indigo-bg:#EEEDFE;--accent-indigo-text:#3C3489;--accent-indigo-hover:#4740A0;--accent-teal:#0F6E56;--accent-teal-bg:#E1F5EE;--accent-teal-text:#085041;--accent-red:#E24B4A;--accent-red-bg:#FCEBEB;--accent-red-text:#791F1F;--accent-amber:#B45309;--accent-amber-bg:#FEF3C7;--accent-amber-text:#78350F;--accent-green:#15803D;--accent-green-bg:#DCFCE7;--accent-green-text:#14532D;--syn-keyword:#534AB7;--syn-function:#185FA5;--syn-number:#993C1D;--syn-string:#0F6E56;--active-line-bg:#EEEDFE;--radius-sm:4px;--radius-md:6px;--radius-lg:10px;--sp-2:8px;--sp-3:12px;--sp-5:20px;--font-sans:'DM Sans',system-ui,sans-serif;--font-mono:'JetBrains Mono','Fira Code',monospace;--fs-xs:11px;--fs-sm:12px;--fs-base:14px;--fs-md:15px;--fw-medium:500;--fw-semibold:600;--fw-bold:700;--lh-normal:1.6;--lh-code:1.9;--ease:.18s ease}
+html,body{height:100%;background:var(--bg-primary);color:var(--text-primary);font:var(--fs-base) var(--font-sans)}
+.kw{color:var(--syn-keyword);font-weight:var(--fw-medium)}.fn{color:var(--syn-function)}.num{color:var(--syn-number)}.str{color:var(--syn-string)}
+.btn,.section-label,.action-badge,.log-badge,kbd{font-family:system-ui,"Segoe UI Emoji",var(--font-sans)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:4px;padding:5px var(--sp-3);font-size:var(--fs-sm);font-weight:var(--fw-medium);border:1px solid var(--border-color);border-radius:var(--radius-md);background:var(--bg-card);color:var(--text-primary);cursor:pointer;transition:all var(--ease);white-space:nowrap}.btn:hover{background:var(--bg-secondary)}.btn:active{transform:scale(.96)}.btn-primary{background:var(--accent-indigo);color:#fff;border-color:var(--accent-indigo)}.btn-primary:hover{background:var(--accent-indigo-hover)}
+.btn-zoom{display:inline-flex;align-items:center;justify-content:center;padding:2px 7px;font:700 12px var(--font-mono);border:1px solid var(--border-color);border-radius:var(--radius-sm);background:var(--bg-card);color:var(--text-secondary);cursor:pointer}.btn-zoom:hover{background:var(--accent-indigo-bg);border-color:var(--accent-indigo);color:var(--accent-indigo)}
+.input{padding:4px var(--sp-2);font:var(--fs-sm) var(--font-mono);border:1px solid var(--border-color);border-radius:var(--radius-md);background:var(--bg-card);color:var(--text-primary);outline:none}.input:focus{border-color:var(--border-focus)}
+kbd{display:inline-block;padding:1px 5px;border-radius:var(--radius-sm);font-size:10px;background:var(--bg-secondary);border:1px solid var(--border-color);color:var(--text-secondary);line-height:1.5}
+::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border-color);border-radius:3px}
+@keyframes pulse-node{0%,100%{box-shadow:0 0 4px var(--accent-indigo)}50%{box-shadow:0 0 12px var(--accent-indigo)}}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-3px)}75%{transform:translateX(3px)}}
+@keyframes win-pulse{0%,100%{box-shadow:0 0 3px rgba(234,179,8,.5)}50%{box-shadow:0 0 8px rgba(234,179,8,.9)}}
+@keyframes wave{0%,100%{transform:translateY(0)}50%{transform:translateY(-2px)}}
+.app-shell{display:flex;flex-direction:column;height:100vh;overflow:hidden;background:var(--bg-primary)}
+.prob-header{display:flex;align-items:center;gap:var(--sp-2);padding:8px var(--sp-5);border-bottom:1px solid var(--border-color);background:var(--bg-card);flex-wrap:wrap;flex-shrink:0}
+.prob-header-left{display:flex;align-items:center;gap:6px;flex-wrap:wrap;flex:1}
+.prob-header-right{display:flex;align-items:center;gap:var(--sp-2);flex-wrap:wrap}
+.gt-home-btn{padding:3px 10px;font-family:var(--font-sans);font-size:11px;font-weight:700;letter-spacing:.04em;border:1.5px solid var(--accent-indigo);border-radius:var(--radius-md);background:var(--accent-indigo);color:#fff;cursor:pointer;text-transform:uppercase}
+.gt-home-btn:hover{background:var(--accent-indigo-hover)}
+.prob-num{font-size:var(--fs-sm);font-weight:var(--fw-bold);color:var(--accent-indigo);font-family:var(--font-mono)}
+.prob-name{font-size:var(--fs-md);font-weight:var(--fw-semibold)}
+.prob-diff--medium{font-size:10px;padding:2px 8px;border-radius:99px;font-weight:var(--fw-semibold);background:var(--accent-amber-bg);color:var(--accent-amber-text)}
+.prob-tag{font-size:10px;padding:2px 8px;border-radius:99px;background:var(--bg-tertiary);color:var(--text-tertiary);border:1px solid var(--border-color);font-weight:var(--fw-medium)}
+.top-label{font:var(--fs-xs) var(--font-mono);color:var(--text-tertiary)}
+.top-expected{font:700 10px var(--font-mono);padding:2px 8px;border-radius:99px;background:var(--accent-teal-bg);color:var(--accent-teal-text);border:1px solid var(--accent-teal)}
+.prob-toggle-btn{font-family:system-ui,sans-serif;font-size:11px;padding:3px 10px;border-radius:var(--radius-md);background:var(--bg-secondary);border:1px solid var(--border-color);color:var(--text-secondary);cursor:pointer}
+.prob-body{display:flex;gap:var(--sp-5);padding:var(--sp-3) var(--sp-5);border-bottom:1px solid var(--border-color);background:var(--bg-card);flex-shrink:0}
+.problem-body--hidden{display:none!important}
+.prob-body-left{flex:1;min-width:0}.prob-body-right{width:340px;flex-shrink:0}
+.prob-body-left h3,.prob-body-right h3{font-size:var(--fs-sm);font-weight:var(--fw-semibold);color:var(--accent-indigo);margin:8px 0 3px}
+.prob-body-left h3:first-child{margin-top:0}
+.prob-desc{font-size:var(--fs-sm);color:var(--text-secondary);margin-bottom:4px}
+.prob-desc code{font-family:var(--font-mono);background:var(--bg-secondary);padding:1px 4px;border-radius:3px;font-size:var(--fs-xs)}
+.concept-block{background:var(--bg-secondary);border-radius:var(--radius-md);padding:8px 12px;margin:4px 0;font-size:var(--fs-sm);border-left:3px solid var(--accent-teal);color:var(--text-secondary)}
+.concept-block strong{color:var(--accent-teal-text);font-family:var(--font-mono);font-size:var(--fs-xs)}
+.prob-complexity{display:flex;gap:var(--sp-2);margin-top:6px}
+.prob-complexity-chip{font:10px var(--font-mono);padding:2px 8px;border-radius:var(--radius-md);background:var(--bg-secondary);border:1px solid var(--border-color)}
+.cc-label{color:var(--text-tertiary)}.cc-val{color:var(--accent-indigo-text);font-weight:var(--fw-bold)}
+.prob-tests{display:flex;flex-direction:column;gap:4px;margin-bottom:6px}
+.prob-test{display:flex;align-items:center;gap:5px;background:var(--bg-secondary);border:1px solid var(--border-color);border-radius:var(--radius-md);padding:5px 8px;font-size:var(--fs-xs);cursor:pointer;transition:all var(--ease)}
+.prob-test:hover{border-color:var(--accent-indigo)}
+.prob-test--active{border-color:var(--accent-indigo)!important;background:var(--accent-indigo-bg)!important}
+.pt-label{font-size:10px;font-weight:var(--fw-bold);color:var(--text-tertiary)}
+.pt-input{font-family:var(--font-mono);color:var(--text-primary);font-size:9px;flex:1}
+.pt-tag{font-size:7px;padding:1px 4px;border-radius:99px;background:var(--bg-tertiary);color:var(--text-tertiary);border:1px solid var(--border-color);font-weight:600;font-family:var(--font-mono)}
+.pt-arrow{color:var(--text-tertiary)}
+.pt-expected{font-family:var(--font-mono);font-weight:var(--fw-bold);color:var(--accent-teal);font-size:10px}
+.prob-live{display:flex;align-items:center;gap:6px;padding:6px var(--sp-3);border-radius:var(--radius-md);background:var(--bg-primary);border:1px solid var(--border-color);font-size:var(--fs-sm);margin-bottom:6px}
+.pl-label{font-size:var(--fs-xs);color:var(--text-tertiary)}
+.pl-output{font-family:var(--font-mono);font-weight:var(--fw-bold);color:var(--accent-indigo);font-size:var(--fs-sm)}
+.main-row{flex:1;display:flex;overflow:hidden;min-height:0}
+.col{display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.col-code{width:33%;min-width:140px;max-width:45vw}
+.col-viz{flex:1;min-width:0}
+.section-label{padding:5px var(--sp-3);font-size:var(--fs-xs);font-weight:var(--fw-semibold);color:var(--text-tertiary);text-transform:uppercase;letter-spacing:.07em;border-bottom:1px solid var(--border-color);flex-shrink:0;background:var(--bg-secondary)}
+.code-panel{flex:1;overflow-y:auto;padding:var(--sp-3) var(--sp-2);font-family:var(--font-mono);font-size:var(--fs-sm);line-height:var(--lh-code)}
+.code-line{display:flex;align-items:center;gap:var(--sp-2);padding:1px var(--sp-2);border-radius:var(--radius-sm)}
+.code-line.active{background:var(--active-line-bg)}
+.ln{min-width:18px;text-align:right;color:var(--text-tertiary);font-size:10px;user-select:none;flex-shrink:0;opacity:.6}
+.code-content{white-space:pre;flex:1}
+.resize-h{width:5px;cursor:col-resize;flex-shrink:0;background:transparent;position:relative;z-index:10;border-left:1px solid var(--border-color)}
+.resize-h:hover,.resize-h.active{background:rgba(99,102,241,.15)}
+.resize-h::after{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:3px;height:24px;border-radius:2px;background:rgba(0,0,0,.08)}
+.no-select{user-select:none!important;cursor:col-resize}
+.viz-panel{flex:1;overflow:auto;padding:var(--sp-3)}
+.vars-strip{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;padding:6px 10px;background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius-md)}
+.var-chip{display:inline-flex;align-items:center;gap:2px;padding:2px 7px;border-radius:var(--radius-md);background:var(--bg-secondary);border:1px solid var(--border-light);font-family:var(--font-mono);font-size:10px}
+.var-chip.vc-active{border-color:var(--accent-indigo);background:var(--accent-indigo-bg)}
+.var-chip.vc-safe{border-color:var(--accent-green);background:var(--accent-green-bg)}
+.var-chip.vc-flip{border-color:var(--accent-red);background:var(--accent-red-bg)}
+.vn{color:var(--text-tertiary);font-weight:500}.vv{font-weight:var(--fw-bold)}
+.viz-row{display:flex;gap:12px;align-items:flex-start;flex-wrap:wrap}
+.viz-card{background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius-md);padding:10px}
+.viz-title{font:600 9px var(--font-mono);text-transform:uppercase;letter-spacing:.04em;color:var(--text-tertiary);margin-bottom:6px}
+
+/* === GRID STYLES === */
+.grid-wrap{display:inline-block;padding:8px;background:var(--bg-secondary);border-radius:var(--radius-md);border:1px solid var(--border-color)}
+.grid-row{display:flex;gap:3px;margin-bottom:3px}
+.grid-row:last-child{margin-bottom:0}
+.cell{width:36px;height:36px;border-radius:6px;border:1.5px solid var(--border-color);display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:var(--font-mono);font-size:14px;font-weight:700;position:relative;background:#fff;transition:all .2s}
+.cell-water{background:#dbeafe;color:#1e40af;border-color:#93c5fd;animation:wave 2s ease-in-out infinite}
+.cell-land{background:#fef3c7;color:#78350f;border-color:#fbbf24}
+.cell-sunk{background:var(--accent-green-bg);color:var(--accent-green-text);border-color:var(--accent-green);opacity:.7}
+.cell-current{background:var(--accent-indigo-bg)!important;border-color:var(--accent-indigo)!important;animation:pulse-node 1.2s infinite;z-index:2;transform:scale(1.05)}
+.cell-checking{background:var(--accent-amber-bg)!important;border-color:var(--accent-amber)!important}
+.cell-oob{background:#1f2937;color:#9ca3af;border-color:#4b5563;font-style:italic;font-size:9px}
+.cell-idx{font-size:7px;color:var(--text-tertiary);font-weight:400;position:absolute;top:1px;right:2px;opacity:.6}
+.cell-island-id{position:absolute;top:-7px;left:-6px;width:14px;height:14px;border-radius:50%;background:var(--accent-indigo);color:#fff;font-size:8px;font-weight:700;display:flex;align-items:center;justify-content:center;border:1.5px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+
+.stack-col{display:flex;flex-direction:column-reverse;gap:4px;min-height:120px;padding:8px;background:var(--bg-secondary);border-radius:var(--radius-md);border:1px dashed var(--border-color);min-width:240px}
+.stack-item{font:10px var(--font-mono);padding:5px 8px;border:1px solid var(--accent-indigo);background:var(--accent-indigo-bg);border-radius:6px;color:var(--accent-indigo-text)}
+.stack-item-top{border-color:var(--accent-amber);background:var(--accent-amber-bg);color:var(--accent-amber-text);animation:pulse-node 1.2s infinite}
+.empty-state{font-size:11px;color:var(--text-tertiary);font-style:italic}
+.legend{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.legend span{display:inline-flex;align-items:center;gap:4px;font-size:10px;color:var(--text-secondary)}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:3px;border:1px solid var(--border-color)}
+.island-count{font-size:36px;font-weight:bold;color:var(--accent-teal-text);text-align:center;font-family:var(--font-mono);padding:6px}
+.result-banner{margin-top:8px;padding:8px 12px;border-radius:var(--radius-md);font-family:var(--font-mono);font-size:var(--fs-md);font-weight:bold;display:inline-flex;align-items:center;gap:8px;background:var(--accent-green-bg);border:1.5px solid var(--accent-green);color:var(--accent-green-text);animation:win-pulse 1.6s infinite}
+.action-badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:var(--radius-sm);font-size:10px;font-weight:var(--fw-bold)}
+.action-badge--func-def,.action-badge--init,.action-badge--call,.action-badge--return,.action-badge--resume{background:rgba(130,80,255,.14);color:#8250ff}
+.action-badge--for-check,.action-badge--if-check,.action-badge--while-check{background:rgba(56,139,253,.14);color:#388bfd}
+.action-badge--mark,.action-badge--push,.action-badge--pop,.action-badge--restore,.action-badge--found,.action-badge--sink{background:rgba(63,185,80,.14);color:#3fb950}
+.action-badge--remove,.action-badge--prune,.action-badge--fail{background:rgba(248,81,73,.14);color:#f85149}
+.action-badge--exit,.action-badge--skip{background:rgba(85,84,80,.14);color:#555450}
+.log-card{border-radius:var(--radius-md);overflow:hidden;border:1px solid var(--border-color);border-left-width:4px;font-size:var(--fs-xs);background:var(--bg-card)}
+.log-card--func-def,.log-card--init,.log-card--call,.log-card--return,.log-card--resume{border-left-color:#8250ff}
+.log-card--for-check,.log-card--if-check,.log-card--while-check{border-left-color:#388bfd}
+.log-card--mark,.log-card--push,.log-card--pop,.log-card--restore,.log-card--found,.log-card--sink{border-left-color:#3fb950}
+.log-card--remove,.log-card--prune,.log-card--fail{border-left-color:#f85149}
+.log-card--exit,.log-card--skip{border-left-color:#555450}
+.log-badge{display:inline-flex;flex-shrink:0;border-radius:var(--radius-sm);font-size:9px;font-weight:var(--fw-bold);padding:2px 6px;white-space:nowrap}
+.log-badge--func-def,.log-badge--init,.log-badge--call,.log-badge--return,.log-badge--resume{background:rgba(130,80,255,.22);color:#8250ff}
+.log-badge--for-check,.log-badge--if-check,.log-badge--while-check{background:rgba(56,139,253,.22);color:#388bfd}
+.log-badge--mark,.log-badge--push,.log-badge--pop,.log-badge--restore,.log-badge--found,.log-badge--sink{background:rgba(63,185,80,.22);color:#3fb950}
+.log-badge--remove,.log-badge--prune,.log-badge--fail{background:rgba(248,81,73,.22);color:#f85149}
+.log-badge--exit,.log-badge--skip{background:rgba(85,84,80,.22);color:#555450}
+.log-card-header{display:flex;align-items:center;gap:6px;padding:8px 10px 6px;background:var(--bg-secondary);border-bottom:1px solid var(--border-light)}
+.log-line-ref{font:700 10px var(--font-mono);color:var(--accent-indigo);background:var(--accent-indigo-bg);padding:1px 6px;border-radius:4px;border:1px solid var(--accent-indigo)}
+.log-status-pill{font-family:system-ui,"Segoe UI Emoji",sans-serif;font-size:9px;font-weight:700;padding:2px 7px;border-radius:99px;text-transform:uppercase;letter-spacing:.04em;margin-left:auto}
+.log-status--success{background:var(--accent-green-bg);color:var(--accent-green-text);border:1px solid var(--accent-green)}
+.log-status--fail{background:var(--accent-red-bg);color:var(--accent-red-text);border:1px solid var(--accent-red)}
+.log-status--skip{background:var(--bg-tertiary);color:var(--text-tertiary);border:1px solid var(--border-color)}
+.log-status--loop{background:rgba(56,139,253,.14);color:#185FA5;border:1px solid #388bfd}
+.log-status--prune{background:var(--accent-red-bg);color:var(--accent-red-text);border:1px solid var(--accent-red)}
+.log-status--info{background:rgba(130,80,255,.14);color:#3C3489;border:1px solid #8250ff}
+.log-section{padding:7px 10px;border-bottom:1px dashed var(--border-light)}
+.log-section:last-child{border-bottom:none}
+.log-section-title{font:700 8px var(--font-mono);text-transform:uppercase;letter-spacing:.06em;color:var(--text-tertiary);margin-bottom:3px;display:flex;align-items:center;gap:4px}
+.log-section-title-icon{font-family:system-ui,"Segoe UI Emoji",sans-serif;font-size:10px}
+.log-code-snippet{font:600 11px var(--font-mono);background:#0d1117;color:#e6edf3;padding:6px 9px;border-radius:4px;display:block;overflow-x:auto;white-space:pre;border:1px solid #30363d}
+.log-code-snippet .ck{color:#ff7b72}.log-code-snippet .cs{color:#a5d6ff}.log-code-snippet .cn{color:#79c0ff}.log-code-snippet .cf{color:#d2a8ff}.log-code-snippet .cc{color:#8b949e;font-style:italic}
+.log-kv-row{display:flex;flex-wrap:wrap;gap:4px;margin-top:2px}
+.log-kv{display:inline-flex;align-items:center;gap:3px;font:11px var(--font-mono);padding:2px 7px;border-radius:4px;background:var(--bg-secondary);border:1px solid var(--border-light)}
+.log-kv-key{color:var(--text-tertiary);font-weight:500}
+.log-kv-val{color:var(--text-primary);font-weight:700}
+.log-kv--in{background:rgba(56,139,253,.08);border-color:rgba(56,139,253,.3)}
+.log-kv--out{background:rgba(63,185,80,.08);border-color:rgba(63,185,80,.4)}
+.log-kv--out .log-kv-val{color:#15803D}
+.log-kv--changed{background:rgba(180,83,9,.10);border-color:rgba(180,83,9,.4)}
+.log-verdict{display:flex;align-items:center;gap:6px;font:600 11px var(--font-mono);padding:5px 8px;border-radius:5px;background:var(--bg-secondary);border:1px solid var(--border-light)}
+.log-verdict--true{background:var(--accent-green-bg);border-color:var(--accent-green);color:var(--accent-green-text)}
+.log-verdict--false{background:var(--accent-red-bg);border-color:var(--accent-red);color:var(--accent-red-text)}
+.log-analogy{font:italic 11px var(--font-sans);color:var(--text-secondary);background:#FFF8E7;border:1px solid #FBE8A6;border-left:3px solid var(--accent-amber);padding:6px 9px;border-radius:4px;line-height:1.55}
+.log-analogy strong{color:var(--accent-amber-text);font-style:normal;font-weight:700}
+.log-why{font-size:11px;line-height:1.55;color:var(--text-primary);padding:4px 0}
+.log-why strong{color:var(--accent-indigo-text)}
+.log-popup{--log-scale:1;position:fixed;bottom:52px;right:14px;width:calc(480px * var(--log-scale));max-width:92vw;max-height:75vh;border-radius:var(--radius-lg);box-shadow:0 10px 32px rgba(0,0,0,.14);border:1px solid var(--border-color);background:var(--bg-card);overflow:hidden;display:flex;flex-direction:column;z-index:100;transition:opacity .15s,transform .15s;transform-origin:bottom right}
+.log-popup--hidden{opacity:0;transform:scale(.92);pointer-events:none}
+.log-popup-body{flex:1;overflow:auto;padding:0}
+.log-popup-body > .log-card{border-radius:0;border:none;border-left:0}
+.footer-bar{display:flex;flex-shrink:0;border-top:1px solid var(--border-color);background:var(--bg-card)}
+.footer-left{width:33%;min-width:140px;max-width:45vw;display:flex;align-items:center;gap:8px;padding:7px 12px;border-right:1px solid var(--border-light)}
+.footer-right{flex:1;display:flex;align-items:center;gap:6px;padding:7px 14px;flex-wrap:wrap}
+.footer-sep{width:1px;height:16px;background:var(--border-color);flex-shrink:0}
+.step-info{font:10px var(--font-mono);color:var(--text-tertiary)}
+.log-toggle-btn{padding:2px 8px;font:700 9px var(--font-mono);border:1px solid var(--accent-green);border-radius:99px;background:var(--accent-green-bg);color:var(--accent-green-text);cursor:pointer}
+.log-toggle-btn--off{background:var(--bg-tertiary);color:var(--text-tertiary);border-color:var(--border-color)}
+.log-zoom-label{font:10px var(--font-mono);color:var(--text-tertiary);min-width:28px;text-align:center}
+.btn-fullscreen{font-size:14px;padding:3px 8px;background:var(--accent-indigo-bg);border-color:var(--accent-indigo);color:var(--accent-indigo)}
+.btn-fullscreen:hover{background:var(--accent-indigo);color:#fff}
+</style>
+</head>
+<body>
+<div class="app-shell">
+  <header class="prob-header">
+    <div class="prob-header-left">
+      <a href="../00_HomePage/gt_learn_homepage.html" class="gt-home-btn">GT LEARN</a>
+      <span class="prob-num">#200</span>
+      <span class="prob-name">🏝️ Number of Islands</span>
+      <span class="prob-diff--medium">MEDIUM</span>
+      <span class="prob-tag">DFS</span>
+      <span class="prob-tag">Grid</span>
+      <span class="prob-tag">Flood-fill</span>
+    </div>
+    <div class="prob-header-right">
+      <span class="top-label">grid=</span>
+      <input id="inputGrid" class="input" style="width:170px" value="110;100;001">
+      <span id="expectedBadge" class="top-expected">exp: 2</span>
+      <button id="probToggleBtn" class="prob-toggle-btn" type="button" onclick="toggleProblem()">▲ Hide</button>
+    </div>
+  </header>
+  <div id="probBody" class="prob-body">
+    <div class="prob-body-left">
+      <h3>📝 Problem Statement</h3>
+      <p class="prob-desc">Given a 2D grid <code>grid</code> of <code>'1'</code>s (land 🟨) and <code>'0'</code>s (water 🟦), return the <strong>number of islands</strong>. An island is surrounded by water and formed by connecting adjacent lands <strong>horizontally or vertically</strong> (NOT diagonally). Edges of grid count as water boundary.</p>
+      <h3>🧠 Solving Approach</h3>
+      <p class="prob-desc">Grid scan + DFS flood-fill — har cell pe jao, agar land mile aur unvisited ho, toh count++ aur DFS se uske <strong>saare connected land</strong> ko sink karo (mark as '0'). Aise har naye 'island start' pe ek baar count badhega.</p>
+      <h3>🎯 Core Concepts & Base Case</h3>
+      <div class="concept-block"><strong>Base Case:</strong> DFS mein agar <code>(r,c)</code> out-of-bounds ya cell '0' (water/visited) hai → return.</div>
+      <div class="concept-block"><strong>Transition:</strong> Land cell sink karo (<code>grid[r][c] = '0'</code>), fir 4 directions (up/down/left/right) recurse.</div>
+      <div class="concept-block"><strong>Pruning:</strong> Sink karke same island ko dobara nahi count karte — visited tracking ka sundar trick.</div>
+      <div class="prob-complexity">
+        <span class="prob-complexity-chip"><span class="cc-label">Time </span><span class="cc-val">O(R·C)</span></span>
+        <span class="prob-complexity-chip"><span class="cc-label">Space </span><span class="cc-val">O(R·C)</span></span>
+      </div>
+    </div>
+    <div class="prob-body-right">
+      <h3>🧪 Test Cases</h3>
+      <div id="testList" class="prob-tests"></div>
+      <div class="prob-live"><span class="pl-label">Result:</span><span id="liveOutput" class="pl-output">—</span></div>
+      <button class="btn btn-primary" type="button" onclick="resetWithInput()">▶ Run</button>
+      <p style="font-size:9px;color:var(--text-tertiary);margin-top:6px;font-family:var(--font-mono)">Format: rows separated by <code>;</code> — e.g. <code>110;100;001</code></p>
+    </div>
+  </div>
+  <div class="main-row">
+    <div id="col1" class="col col-code">
+      <div class="section-label">📜 Python Code</div>
+      <div id="codePanel" class="code-panel"></div>
+    </div>
+    <div id="resizeH1" class="resize-h"></div>
+    <div class="col col-viz">
+      <div class="section-label">📊 Visualization</div>
+      <div id="vizPanel" class="viz-panel"></div>
+    </div>
+  </div>
+  <div class="footer-bar">
+    <div id="footerLeft" class="footer-left">
+      <span id="stepInfo" class="step-info">0/0</span>
+      <span id="actionBadge" class="action-badge"></span>
+    </div>
+    <div class="footer-right">
+      <kbd>←</kbd><kbd>→</kbd>
+      <button class="btn" type="button" onclick="resetStep()">↺</button>
+      <button class="btn" type="button" onclick="stepBy(-1)">◀</button>
+      <button class="btn btn-primary" type="button" onclick="stepBy(1)">▶ Next</button>
+      <span class="footer-sep"></span>
+      <button id="logToggleBtn" class="log-toggle-btn" type="button" onclick="toggleLogPreview()">📋 ON</button>
+      <button class="btn-zoom" type="button" onclick="logZoom(-1)">−</button>
+      <span id="logZoomLabel" class="log-zoom-label">100%</span>
+      <button class="btn-zoom" type="button" onclick="logZoom(1)">+</button>
+      <button class="btn-zoom" type="button" onclick="logZoomReset()">↺</button>
+      <span class="footer-sep"></span>
+      <button class="btn btn-fullscreen" type="button" onclick="toggleFullscreen()">⛶</button>
+    </div>
+  </div>
+</div>
+<div id="logPopup" class="log-popup log-popup--hidden">
+  <div id="logPopupBody" class="log-popup-body"></div>
+</div>
+<script>
+var TESTS=[
+  {grid:"110;100;001",e:"2",tag:"basic"},
+  {grid:"11;11",e:"1",tag:"all land"},
+  {grid:"00;00",e:"0",tag:"all water"},
+  {grid:"101;010;101",e:"5",tag:"diagonal"},
+  {grid:"1100;1100;0010;0011",e:"3",tag:"classic 4x4"}
+];
+
+var codeLines=[
+  "def numIslands(grid):",
+  "    if not grid:",
+  "        return 0",
+  "    rows = len(grid)",
+  "    cols = len(grid[0])",
+  "    count = 0",
+  "    def dfs(r, c):",
+  "        if r < 0 or r >= rows or c < 0 or c >= cols or grid[r][c] != '1':",
+  "            return",
+  "        grid[r][c] = '0'",
+  "        dfs(r+1, c)",
+  "        dfs(r-1, c)",
+  "        dfs(r, c+1)",
+  "        dfs(r, c-1)",
+  "    for r in range(rows):",
+  "        for c in range(cols):",
+  "            if grid[r][c] == '1':",
+  "                count += 1",
+  "                dfs(r, c)",
+  "    return count"
+];
+
+var LOG_BADGE={"func-def":"📌 DEF","init":"⚙️ INIT","call":"📞 CALL","resume":"🔄 RESUME","for-check":"🔁 FOR","if-check":"🔎 IF","while-check":"🔁 WHILE","mark":"✅ MARK","sink":"🌊 SINK","push":"⬆ PUSH","pop":"⬇ POP","remove":"✏️ EDIT","restore":"↩ RESTORE","exit":"🔚 EXIT","return":"🏆 RETURN","found":"🎉 FOUND","prune":"✂️ PRUNE","skip":"⏭ SKIP","fail":"❌ FAIL"};
+var BADGE_LABEL={"func-def":"DEF","init":"INIT","call":"CALL","resume":"RESUME","for-check":"FOR","if-check":"IF","while-check":"WHILE","mark":"MARK","sink":"SINK","push":"PUSH","pop":"POP","remove":"EDIT","restore":"RESTORE","exit":"EXIT","return":"RETURN","found":"FOUND","prune":"PRUNE","skip":"SKIP","fail":"FAIL"};
+
+var DIRS=[{dr:1,dc:0,name:"DOWN",emoji:"⬇",lineDelta:0},{dr:-1,dc:0,name:"UP",emoji:"⬆",lineDelta:1},{dr:0,dc:1,name:"RIGHT",emoji:"➡",lineDelta:2},{dr:0,dc:-1,name:"LEFT",emoji:"⬅",lineDelta:3}];
+
+var steps=[],currentStep=0,codeWidthUserSet=false,curResult=null,logEnabled=true,logZoomLevel=100;
+
+function renderTests(){
+  document.getElementById("testList").innerHTML=TESTS.map(function(t,i){
+    return '<div class="prob-test'+(i===0?' prob-test--active':'')+'" onclick="loadTest('+i+',this)">'+
+      '<span class="pt-label">T'+(i+1)+'</span>'+
+      '<span class="pt-input">'+t.grid+'</span>'+
+      '<span class="pt-tag">'+t.tag+'</span>'+
+      '<span class="pt-arrow">→</span>'+
+      '<span class="pt-expected">'+t.e+'</span></div>';
+  }).join("");
+}
+
+function renderCode(){
+  var p=document.getElementById('codePanel');
+  p.innerHTML=codeLines.map(function(raw,i){
+    var h=raw;
+    h=h.replace(/("[^"]*"|'[^']*')/g,'\x01STR\x02$1\x03');
+    h=h.replace(/\b(def|for|in|if|return|break|continue|and|else|elif|True|False|None|not|or|while|lambda)\b/g,'\x01KW\x02$1\x03');
+    h=h.replace(/\b(len|range|int|str|list|append|pop|sorted|min|max|sum|abs|enumerate|zip|print|set|add)\b/g,'\x01FN\x02$1\x03');
+    h=h.replace(/(?<![.\w"\x01\x02\x03])(-?\d+)\b/g,'\x01NUM\x02$1\x03');
+    h=h.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    h=h.replace(/\x01([A-Z]+)\x02/g,function(_,c){return '<span class="'+c.toLowerCase()+'">';}).replace(/\x03/g,'</span>');
+    return '<div class="code-line" data-line="'+i+'"><span class="ln">'+(i+1)+'</span><span class="code-content">'+h+'</span></div>';
+  }).join('');
+}
+
+function toggleProblem(){
+  var body=document.getElementById('probBody'),btn=document.getElementById('probToggleBtn');
+  body.classList.toggle('problem-body--hidden');
+  btn.textContent=body.classList.contains('problem-body--hidden')?'▼ Show':'▲ Hide';
+}
+
+function syncFooterWidth(){document.getElementById('footerLeft').style.width=document.getElementById('col1').offsetWidth+'px';}
+
+function fitCodeWidth(){
+  if(codeWidthUserSet)return;
+  var c=document.getElementById('col1');
+  c.style.flex='none';c.style.width='max-content';
+  c.style.width=Math.min(c.offsetWidth,window.innerWidth*.45)+'px';
+  syncFooterWidth();
+}
+
+function hlCode(raw){
+  if(!raw)return '';
+  var h=raw;
+  h=h.replace(/("[^"]*"|'[^']*')/g,'\x01CS\x02$1\x03');
+  h=h.replace(/\b(def|for|in|if|return|break|continue|and|else|elif|True|False|None|not|or|while|lambda)\b/g,'\x01CK\x02$1\x03');
+  h=h.replace(/\b(len|range|int|str|list|append|pop|set|add|dfs|numIslands)\b/g,'\x01CF\x02$1\x03');
+  h=h.replace(/(?<![.\w"\x01\x02\x03])(-?\d+)\b/g,'\x01CN\x02$1\x03');
+  h=h.replace(/(#.*$)/g,'\x01CC\x02$1\x03');
+  h=h.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  h=h.replace(/\x01([A-Z]+)\x02/g,function(_,c){return '<span class="'+c.toLowerCase()+'">';}).replace(/\x03/g,'</span>');
+  return h;
+}
+
+function richLog(opts){
+  var statusMap={success:"✅ Success",fail:"❌ Failed",skip:"⏭ Skipped",loop:"🔁 Loop iter",prune:"✂️ Pruned",info:"ℹ️ Info"};
+  var status=opts.status||"info";
+  var html='<div class="log-card log-card--'+opts.action+'">';
+  html+='<div class="log-card-header">';
+  html+='<span class="log-badge log-badge--'+opts.action+'">'+(LOG_BADGE[opts.action]||opts.action)+'</span>';
+  html+='<span class="log-line-ref">L'+(opts.line+1)+'</span>';
+  html+='<span class="log-status-pill log-status--'+status+'">'+(statusMap[status]||status)+'</span>';
+  html+='</div>';
+  if(opts.code){
+    html+='<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">📜</span>Code Executing</div>';
+    html+='<code class="log-code-snippet">'+hlCode(opts.code)+'</code></div>';
+  }
+  if(opts.inputs&&opts.inputs.length){
+    html+='<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">📥</span>Input Values</div><div class="log-kv-row">';
+    opts.inputs.forEach(function(kv){html+='<span class="log-kv log-kv--in"><span class="log-kv-key">'+kv.k+'</span>=<span class="log-kv-val">'+kv.v+'</span></span>';});
+    html+='</div></div>';
+  }
+  if(opts.outputs&&opts.outputs.length){
+    html+='<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">📤</span>Output / State After Line</div><div class="log-kv-row">';
+    opts.outputs.forEach(function(kv){
+      var cls=kv.changed?'log-kv--changed':'log-kv--out';
+      html+='<span class="log-kv '+cls+'"><span class="log-kv-key">'+kv.k+'</span>=<span class="log-kv-val">'+kv.v+'</span></span>';
+    });
+    html+='</div></div>';
+  }
+  if(opts.verdict){
+    var vCls=opts.verdictTrue===true?'log-verdict--true':(opts.verdictTrue===false?'log-verdict--false':'');
+    var vIcon=opts.verdictTrue===true?'✓':(opts.verdictTrue===false?'✗':'•');
+    html+='<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">⚖️</span>Verdict / Decision</div>';
+    html+='<div class="log-verdict '+vCls+'">'+vIcon+' '+opts.verdict+'</div></div>';
+  }
+  if(opts.why){
+    html+='<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">💡</span>Why This Happens</div>';
+    html+='<div class="log-why">'+opts.why+'</div></div>';
+  }
+  if(opts.analogy){
+    html+='<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">🎭</span>Real-Life Analogy</div>';
+    html+='<div class="log-analogy">'+opts.analogy+'</div></div>';
+  }
+  html+='</div>';
+  return html;
+}
+
+function buildSteps(gridStr){
+  var rowsArr=gridStr.split(';').map(function(s){return s.split('');});
+  var grid=rowsArr.map(function(r){return r.slice();});
+  var rows=grid.length,cols=rows>0?grid[0].length:0;
+  var st=[],count=0,callStack=[],MAX_STEPS=10000;
+  var r_var=null,c_var=null,curR=null,curC=null,checkR=null,checkC=null;
+  var depth=0,callId=0,islandIdGrid=null;
+  if(rows>0)islandIdGrid=Array.from({length:rows},function(){return new Array(cols).fill(0);});
+  var loopR=null,loopC=null,activeIslandId=0;
+
+  function snap(x){
+    return Object.assign({
+      grid:grid.map(function(r){return r.slice();}),
+      rows:rows,cols:cols,count:count,
+      callStack:callStack.map(function(c){return Object.assign({},c);}),
+      r_var:r_var,c_var:c_var,curR:curR,curC:curC,checkR:checkR,checkC:checkC,
+      depth:depth,loopR:loopR,loopC:loopC,
+      islandIdGrid:islandIdGrid?islandIdGrid.map(function(r){return r.slice();}):null,
+      activeIslandId:activeIslandId
+    },x||{});
+  }
+  function pushStep(o){
+    if(st.length>=MAX_STEPS)return;
+    st.push(Object.assign({line:0,action:"func-def",logHTML:""},snap(o)));
+  }
+
+  function dfs(r,c){
+    callId++;
+    callStack.push({id:callId,r:r,c:c,depth:depth});
+    curR=r;curC=c;checkR=r;checkC=c;
+
+    // L7 — dfs entry
+    pushStep({line:6,action:"call",logHTML:richLog({
+      line:6,action:"call",
+      code:"def dfs(r="+r+", c="+c+"):",
+      status:"info",
+      inputs:[{k:"r",v:r},{k:"c",v:c},{k:"depth (before)",v:depth}],
+      outputs:[{k:"depth",v:depth+1,changed:true},{k:"stack frames",v:callStack.length,changed:true}],
+      why:"<strong>DFS frame open</strong> at cell ("+r+","+c+"). Pehle bounds aur land-check, fir 4 directions explore.",
+      analogy:"<strong>Helicopter</strong> ek naye spot pe land kar raha hai — pehle dekhega 'yahan zameen hai ya samandar?'"
+    })});
+
+    // L8 — boundary + water check
+    var oob_r_low=r<0,oob_r_high=r>=rows,oob_c_low=c<0,oob_c_high=c>=cols;
+    var oob=oob_r_low||oob_r_high||oob_c_low||oob_c_high;
+    var notLand=!oob&&grid[r][c]!=='1';
+    var cellVal=oob?"OOB":grid[r][c];
+    var shouldReturn=oob||notLand;
+    var verdictText="";
+    if(oob_r_low)verdictText="r<0 ("+r+"<0)";
+    else if(oob_r_high)verdictText="r>=rows ("+r+">="+rows+")";
+    else if(oob_c_low)verdictText="c<0 ("+c+"<0)";
+    else if(oob_c_high)verdictText="c>=cols ("+c+">="+cols+")";
+    else if(notLand)verdictText="grid["+r+"]["+c+"]='"+grid[r][c]+"' != '1'";
+    else verdictText="all checks pass — cell is land '1'";
+
+    pushStep({line:7,action:"if-check",logHTML:richLog({
+      line:7,action:"if-check",
+      code:"if r<0 or r>=rows or c<0 or c>=cols or grid[r][c] != '1':",
+      status:shouldReturn?"prune":"success",
+      inputs:[{k:"r",v:r},{k:"c",v:c},{k:"rows",v:rows},{k:"cols",v:cols},{k:"cell",v:'"'+cellVal+'"'}],
+      verdict:verdictText,
+      verdictTrue:shouldReturn,
+      why:shouldReturn?(oob?"<strong>Out of bounds!</strong> Cell ("+r+","+c+") grid ke bahar hai. Wapas return.":"<strong>Cell water/visited!</strong> grid["+r+"]["+c+"]='"+grid[r][c]+"' — yeh land nahi (ya already sunk). Skip."):"<strong>Valid land cell mil gaya!</strong> Ab is cell ko sink karenge aur 4 neighbors explore.",
+      analogy:shouldReturn?(oob?"<strong>Map ke bahar gir gaye</strong> 🗺️ — yahan kuch nahi, helicopter wapas.":"<strong>Paani pe land nahi karte</strong> 🌊 — helicopter wapas ud gaya."):"<strong>Naya land discover</strong> 🟨 — flag laga ke aage explore karte hain."
+    })});
+
+    if(shouldReturn){
+      // L9 — return
+      pushStep({line:8,action:"return",logHTML:richLog({
+        line:8,action:"return",
+        code:"return  # base case — back to parent",
+        status:"info",
+        inputs:[{k:"r",v:r},{k:"c",v:c}],
+        outputs:[{k:"depth (after)",v:depth-1,changed:true},{k:"stack frames",v:callStack.length-1,changed:true}],
+        why:"Base case hit — yeh DFS frame return kar raha hai parent ko.",
+        analogy:"Helicopter wapas <strong>uda</strong> — ab dusra direction try."
+      })});
+      callStack.pop();
+      curR=null;curC=null;checkR=null;checkC=null;
+      return;
+    }
+
+    // L10 — sink the cell
+    grid[r][c]='0';
+    if(islandIdGrid)islandIdGrid[r][c]=activeIslandId;
+    pushStep({line:9,action:"sink",logHTML:richLog({
+      line:9,action:"sink",
+      code:'grid['+r+']['+c+'] = "0"  # sink this land',
+      status:"success",
+      inputs:[{k:"r",v:r},{k:"c",v:c},{k:"before",v:'"1"'}],
+      outputs:[{k:"grid["+r+"]["+c+"]",v:'"0"',changed:true},{k:"island #",v:activeIslandId}],
+      why:"🌊 <strong>Land sink kar diya!</strong> Cell ko '0' mark kiya — ab yeh dobara count nahi hoga. Yeh visited-tracking ka clever trick hai (no extra space).",
+      analogy:"<strong>Flag plant kar diya</strong> 🚩 — yeh territory claimed, ab dusre ko bhi mil jaye toh skip."
+    })});
+
+    // L11–L14 — 4 direction calls
+    for(var d=0;d<4;d++){
+      var dir=DIRS[d];
+      var nr=r+dir.dr,nc=c+dir.dc;
+      checkR=nr;checkC=nc;
+      pushStep({line:10+d,action:"call",logHTML:richLog({
+        line:10+d,action:"call",
+        code:"dfs("+(dir.dr!==0?("r"+(dir.dr>0?"+":"")+dir.dr):"r")+", "+(dir.dc!==0?("c"+(dir.dc>0?"+":"")+dir.dc):"c")+")  # "+dir.emoji+" "+dir.name+"  → ("+nr+","+nc+")",
+        status:"info",
+        inputs:[{k:"current",v:"("+r+","+c+")"},{k:"direction",v:dir.emoji+" "+dir.name},{k:"target",v:"("+nr+","+nc+")"}],
+        outputs:[{k:"recursing into",v:"dfs("+nr+","+nc+")",changed:true}],
+        why:"<strong>"+dir.name+" direction</strong> mein recurse — neighbor cell ("+nr+","+nc+") explore karenge.",
+        analogy:"Helicopter <strong>"+dir.name.toLowerCase()+"</strong> ki taraf ud raha hai "+dir.emoji+" — agla cell check."
+      })});
+      depth++;
+      dfs(nr,nc);
+      depth--;
+      curR=r;curC=c;checkR=r;checkC=c;
+      pushStep({line:10+d,action:"resume",logHTML:richLog({
+        line:10+d,action:"resume",
+        code:"# resumed after "+dir.name+" dfs returned",
+        status:"info",
+        inputs:[{k:"r",v:r},{k:"c",v:c},{k:"direction done",v:dir.emoji+" "+dir.name}],
+        outputs:[{k:"local state",v:"restored",changed:true},{k:"depth",v:depth}],
+        why:"<strong>"+dir.name+"</strong> sub-DFS complete — wapas ("+r+","+c+") pe. "+(d<3?"Ab agla direction "+DIRS[d+1].name+".":"Saare 4 directions done — frame end."),
+        analogy:d<3?"<strong>"+dir.name.toLowerCase()+" coverage done</strong> — ab "+DIRS[d+1].name.toLowerCase()+" ki taraf turn.":"Charon directions explore ho gayi — <strong>helicopter wapas base</strong>."
+      })});
+    }
+
+    callStack.pop();
+    curR=null;curC=null;checkR=null;checkC=null;
+  }
+
+  // L1 — main function entry
+  pushStep({line:0,action:"func-def",logHTML:richLog({
+    line:0,action:"func-def",
+    code:"def numIslands(grid):",
+    status:"info",
+    inputs:[{k:"grid",v:rows+"×"+cols+" grid"}],
+    outputs:[{k:"function",v:"numIslands registered"}],
+    why:"<strong>Main function entry</strong>. Goal: connected '1' regions count karna.",
+    analogy:"<strong>Satellite map</strong> mil gaya — ab islands count karenge 🛰️"
+  })});
+
+  // L2 — empty check
+  var empty=(rows===0||cols===0);
+  pushStep({line:1,action:"if-check",logHTML:richLog({
+    line:1,action:"if-check",
+    code:"if not grid:  # empty? → "+empty,
+    status:empty?"success":"skip",
+    inputs:[{k:"rows",v:rows},{k:"cols",v:cols}],
+    verdict:empty?"grid is empty/None":"grid has "+rows+" rows, "+cols+" cols",
+    verdictTrue:empty,
+    why:empty?"<strong>Empty grid</strong> — straight return 0.":"Grid mein data hai, aage badho.",
+    analogy:empty?"Map blank hai — koi island possible nahi.":"Map ready hai — exploration shuru."
+  })});
+
+  if(empty){
+    pushStep({line:2,action:"return",logHTML:richLog({
+      line:2,action:"return",
+      code:"return 0",
+      status:"fail",
+      inputs:[],
+      outputs:[{k:"return value",v:0}],
+      why:"Empty grid → 0 islands.",
+      analogy:"Khaali ocean — kuch nahi mila."
+    })});
+    curResult=0;return st;
+  }
+
+  // L4 — rows
+  pushStep({line:3,action:"init",logHTML:richLog({
+    line:3,action:"init",
+    code:"rows = len(grid) = "+rows,
+    status:"success",
+    inputs:[{k:"grid",v:"2D"}],
+    outputs:[{k:"rows",v:rows,changed:true}],
+    why:"Total rows cache.",
+    analogy:"Map ki <strong>height naap li</strong>."
+  })});
+
+  // L5 — cols
+  pushStep({line:4,action:"init",logHTML:richLog({
+    line:4,action:"init",
+    code:"cols = len(grid[0]) = "+cols,
+    status:"success",
+    inputs:[{k:"grid[0]",v:"first row"}],
+    outputs:[{k:"cols",v:cols,changed:true}],
+    why:"Total cols cache.",
+    analogy:"Map ki <strong>width bhi naap li</strong>."
+  })});
+
+  // L6 — count = 0
+  pushStep({line:5,action:"init",logHTML:richLog({
+    line:5,action:"init",
+    code:"count = 0",
+    status:"success",
+    inputs:[],
+    outputs:[{k:"count",v:0,changed:true}],
+    why:"Island counter <strong>initialize</strong>.",
+    analogy:"<strong>Scoreboard zero</strong> — abhi koi island nahi mila."
+  })});
+
+  // L7 — dfs def
+  pushStep({line:6,action:"func-def",logHTML:richLog({
+    line:6,action:"func-def",
+    code:"def dfs(r, c):  # nested function defined",
+    status:"info",
+    inputs:[],
+    outputs:[{k:"dfs",v:"defined (closure over grid, rows, cols)"}],
+    why:"<strong>Inner DFS function defined</strong>. Closure hai — outer scope ke grid, rows, cols access kar sakti.",
+    analogy:"<strong>Helicopter ki recipe</strong> ready — pilot abhi nahi udaa, sirf instructions."
+  })});
+
+  // L15 — outer for loop entry
+  pushStep({line:14,action:"for-check",logHTML:richLog({
+    line:14,action:"for-check",
+    code:"for r in range(rows="+rows+"):",
+    status:"info",
+    inputs:[{k:"rows",v:rows}],
+    outputs:[{k:"loop range",v:"[0, "+rows+")"}],
+    why:"Outer for loop <strong>shuru</strong> — har row scan karenge.",
+    analogy:"<strong>Top-to-bottom map scan</strong> — har horizontal line check."
+  })});
+
+  for(var r=0;r<rows;r++){
+    r_var=r;loopR=r;
+    pushStep({line:14,action:"for-check",logHTML:richLog({
+      line:14,action:"for-check",
+      code:"# outer iter: r = "+r,
+      status:"loop",
+      inputs:[{k:"rows",v:rows}],
+      outputs:[{k:"r",v:r,changed:true}],
+      why:"Row <strong>"+r+"</strong> ka iteration — ab is row ke saare cells scan honge.",
+      analogy:"<strong>Row "+r+" ki line</strong> pe satellite ka beam focused."
+    })});
+
+    // L16 — inner for loop entry
+    pushStep({line:15,action:"for-check",logHTML:richLog({
+      line:15,action:"for-check",
+      code:"for c in range(cols="+cols+"):",
+      status:"info",
+      inputs:[{k:"cols",v:cols}],
+      outputs:[{k:"loop range",v:"[0, "+cols+")"}],
+      why:"Inner for loop — row "+r+" ke saare columns scan.",
+      analogy:"<strong>Left-to-right sweep</strong> for row "+r+"."
+    })});
+
+    for(var c=0;c<cols;c++){
+      c_var=c;loopC=c;
+      pushStep({line:15,action:"for-check",logHTML:richLog({
+        line:15,action:"for-check",
+        code:"# inner iter: c = "+c+"  → cell ("+r+","+c+")",
+        status:"loop",
+        inputs:[{k:"cols",v:cols}],
+        outputs:[{k:"c",v:c,changed:true},{k:"current cell",v:"("+r+","+c+") = '"+grid[r][c]+"'",changed:true}],
+        why:"Column <strong>"+c+"</strong> — cell ("+r+","+c+") = '"+grid[r][c]+"'",
+        analogy:"Beam ab cell <strong>("+r+","+c+")</strong> pe focused 🔦"
+      })});
+
+      // L17 — if grid[r][c] == '1'
+      var isLand=grid[r][c]==='1';
+      pushStep({line:16,action:"if-check",logHTML:richLog({
+        line:16,action:"if-check",
+        code:"if grid["+r+"]["+c+"] == '1':  # value '"+grid[r][c]+"' → "+isLand,
+        status:isLand?"success":"skip",
+        inputs:[{k:"cell",v:'"'+grid[r][c]+'"'}],
+        verdict:'grid['+r+']['+c+']="'+grid[r][c]+'" '+(isLand?"==":"!=")+' "1"',
+        verdictTrue:isLand,
+        why:isLand?"<strong>Naya land mila!</strong> Yeh kisi nayi island ka starting cell hai.":"Cell water hai ya already sunk — skip.",
+        analogy:isLand?"<strong>Naya zameen ka tukda</strong> dikha 🟨 — flag plant time!":"<strong>Paani ya already-explored</strong> 🌊 — skip."
+      })});
+
+      if(isLand){
+        // L18 — count += 1
+        count++;activeIslandId=count;
+        pushStep({line:17,action:"mark",logHTML:richLog({
+          line:17,action:"mark",
+          code:"count += 1  # "+(count-1)+" → "+count,
+          status:"success",
+          inputs:[{k:"count (before)",v:count-1}],
+          outputs:[{k:"count",v:count,changed:true},{k:"island #",v:count}],
+          why:"🎉 <strong>New island discovered!</strong> Counter "+count+" — yeh "+count+(count===1?"st":(count===2?"nd":(count===3?"rd":"th")))+" island.",
+          analogy:"<strong>Trophy cabinet</strong> mein medal #"+count+" aa gaya 🏆"
+        })});
+
+        // L19 — dfs(r,c) call
+        pushStep({line:18,action:"call",logHTML:richLog({
+          line:18,action:"call",
+          code:"dfs("+r+", "+c+")  # flood-fill the new island",
+          status:"info",
+          inputs:[{k:"r",v:r},{k:"c",v:c}],
+          outputs:[{k:"sinking island #",v:count,changed:true}],
+          why:"<strong>Flood-fill DFS</strong> shuru — is connected component ke saare cells sink kar denge.",
+          analogy:"<strong>Helicopter dispatch</strong> — pure island ko explore karke mark kar do, taaki dobara count na ho."
+        })});
+        depth++;
+        dfs(r,c);
+        depth--;
+        curR=null;curC=null;checkR=null;checkC=null;
+
+        pushStep({line:18,action:"resume",logHTML:richLog({
+          line:18,action:"resume",
+          code:"# resumed after dfs("+r+","+c+") flood-fill complete",
+          status:"info",
+          inputs:[{k:"island #"+count,v:"fully sunk"}],
+          outputs:[{k:"depth",v:depth},{k:"continue scan",v:"true",changed:true}],
+          why:"DFS complete — pura island #"+count+" submerge ho gaya. Outer loop continue.",
+          analogy:"<strong>Pura island map ho gaya</strong> 🗺️ — agla scan resume."
+        })});
+      }
+    }
+
+    // inner for-loop exit
+    pushStep({line:15,action:"exit",logHTML:richLog({
+      line:15,action:"exit",
+      code:"# inner for-loop exit (row "+r+" complete)",
+      status:"info",
+      inputs:[{k:"row",v:r}],
+      outputs:[{k:"row "+r,v:"scanned",changed:true}],
+      why:"Row "+r+" ke saare columns scan ho gaye.",
+      analogy:"Row "+r+" <strong>fully checked</strong>."
+    })});
+    loopC=null;c_var=null;
+  }
+
+  // outer for-loop exit
+  pushStep({line:14,action:"exit",logHTML:richLog({
+    line:14,action:"exit",
+    code:"# outer for-loop exit — entire grid scanned",
+    status:"info",
+    inputs:[{k:"rows",v:rows}],
+    outputs:[{k:"grid",v:"fully scanned",changed:true},{k:"count",v:count}],
+    why:"<strong>Saari rows scan ho gayi</strong>. Total islands found = "+count,
+    analogy:"<strong>Pura map cover ho gaya</strong> 🛰️"
+  })});
+  loopR=null;r_var=null;
+
+  curResult=count;
+  // L21 — return count
+  pushStep({line:19,action:"return",logHTML:richLog({
+    line:19,action:"return",
+    code:"return count  # = "+count,
+    status:count>0?"success":"fail",
+    inputs:[{k:"count",v:count}],
+    outputs:[{k:"final answer",v:count}],
+    why:count>0?"🏆 <strong>"+count+" island(s) found!</strong>":"<strong>Koi island nahi mila</strong> — pura grid water tha.",
+    analogy:count>0?"<strong>Treasure mil gaya!</strong> "+count+" islands discovered.":"Sab paani hi paani — sukha 🌊"
+  })});
+  return st;
+}
+
+function renderViz(s){
+  function chip(n,v,cls){return '<span class="var-chip '+(cls||'')+'"><span class="vn">'+n+'</span><span class="vv">'+v+'</span></span>';}
+
+  var h='<div class="vars-strip">'+
+    chip("📐 rows ",s.rows,"")+
+    chip("📐 cols ",s.cols,"")+
+    chip("🏝️ count ",s.count,s.count>0?"vc-safe":"")+
+    chip("r ",s.r_var===null?"—":s.r_var,(s.line===14)?"vc-active":"")+
+    chip("c ",s.c_var===null?"—":s.c_var,(s.line===15)?"vc-active":"")+
+    chip("📍 dfs(r,c) ",s.curR===null?"—":"("+s.curR+","+s.curC+")",(s.line>=6&&s.line<=13)?"vc-active":"")+
+    chip("📚 depth ",s.depth,"")+
+  '</div>';
+
+  // Grid visualization
+  h+='<div class="viz-row">';
+  h+='<div class="viz-card"><div class="viz-title">🗺️ Grid — '+s.rows+'×'+s.cols+'</div>';
+  h+='<div class="grid-wrap">';
+  for(var rr=0;rr<s.rows;rr++){
+    h+='<div class="grid-row">';
+    for(var cc=0;cc<s.cols;cc++){
+      var val=s.grid[rr][cc];
+      var cls='cell';
+      var isCurrent=(s.curR===rr&&s.curC===cc&&s.line>=7&&s.line<=13);
+      var isLoopFocus=(s.loopR===rr&&s.loopC===cc&&!isCurrent&&(s.line===15||s.line===16||s.line===17||s.line===18));
+      var iid=s.islandIdGrid?s.islandIdGrid[rr][cc]:0;
+      if(val==='1')cls+=' cell-land';
+      else if(iid>0)cls+=' cell-sunk';
+      else cls+=' cell-water';
+      if(isCurrent)cls+=' cell-current';
+      else if(isLoopFocus)cls+=' cell-checking';
+      var displayVal=val==='1'?'🟨':(iid>0?'✓':'🌊');
+      var idBadge=iid>0?'<div class="cell-island-id">'+iid+'</div>':'';
+      h+='<div class="'+cls+'">'+idBadge+'<span style="font-size:16px">'+displayVal+'</span><span class="cell-idx">'+rr+','+cc+'</span></div>';
+    }
+    h+='</div>';
+  }
+  // Show neighbor check (out-of-bounds visualization)
+  if(s.checkR!==null&&s.checkC!==null&&(s.line===7)){
+    var nr=s.checkR,nc=s.checkC;
+    if(nr<0||nr>=s.rows||nc<0||nc>=s.cols){
+      h+='<div style="margin-top:6px;font-size:10px;color:var(--accent-red-text);font-family:var(--font-mono)">⚠️ Checking ('+nr+','+nc+') — OUT OF BOUNDS</div>';
+    }
+  }
+  h+='</div>';
+  h+='<div class="legend">'+
+    '<span><i style="background:#dbeafe;border-color:#93c5fd"></i>🌊 Water</span>'+
+    '<span><i style="background:#fef3c7;border-color:#fbbf24"></i>🟨 Land</span>'+
+    '<span><i style="background:var(--accent-indigo-bg);border-color:var(--accent-indigo)"></i>📍 DFS current</span>'+
+    '<span><i style="background:var(--accent-amber-bg);border-color:var(--accent-amber)"></i>🔦 Loop scan</span>'+
+    '<span><i style="background:var(--accent-green-bg);border-color:var(--accent-green)"></i>✅ Sunk (visited)</span>'+
+  '</div></div>';
+
+  // Island count card
+  h+='<div class="viz-card" style="min-width:140px"><div class="viz-title">🏝️ Island Count</div>';
+  h+='<div class="island-count">'+s.count+'</div>';
+  h+='<div style="font-size:10px;color:var(--text-tertiary);text-align:center;font-family:var(--font-mono)">islands found</div></div>';
+  h+='</div>';
+
+  // Call stack
+  h+='<div class="viz-row" style="margin-top:10px">';
+  h+='<div class="viz-card"><div class="viz-title">🗂️ DFS Call Stack (depth='+s.depth+')</div><div class="stack-col">';
+  if(!s.callStack.length){
+    h+='<div class="empty-state">Call stack empty — outside DFS</div>';
+  }else{
+    for(var k=0;k<s.callStack.length;k++){
+      var cs=s.callStack[k];
+      var topCls=(k===s.callStack.length-1)?' stack-item-top':'';
+      h+='<div class="stack-item'+topCls+'">dfs(r='+cs.r+', c='+cs.c+')</div>';
+    }
+  }
+  h+='</div></div>';
+
+  // Direction explorer
+  if(s.curR!==null&&s.line>=10&&s.line<=13){
+    var dirIdx=s.line-10;
+    var dir=DIRS[dirIdx];
+    h+='<div class="viz-card" style="min-width:200px"><div class="viz-title">🧭 Direction Explorer</div>';
+    h+='<div style="text-align:center;padding:10px"><div style="font-size:32px">'+dir.emoji+'</div>';
+    h+='<div style="font-family:var(--font-mono);font-weight:bold;font-size:12px;margin-top:4px">'+dir.name+'</div>';
+    h+='<div style="font-size:10px;color:var(--text-tertiary);font-family:var(--font-mono);margin-top:4px">from ('+s.curR+','+s.curC+') → ('+(s.curR+dir.dr)+','+(s.curC+dir.dc)+')</div>';
+    h+='</div></div>';
+  }
+  h+='</div>';
+
+  if(s.line===19){
+    h+='<div class="result-banner">🏆 Total Islands: '+s.count+'</div>';
+  }
+
+  document.getElementById("vizPanel").innerHTML=h;
+}
+
+function renderStep(idx){
+  if(!steps.length)return;
+  var s=steps[idx];currentStep=idx;
+  document.getElementById('stepInfo').textContent=(idx+1)+'/'+steps.length;
+  var bd=document.getElementById('actionBadge');
+  bd.textContent=BADGE_LABEL[s.action]||s.action;
+  bd.className='action-badge action-badge--'+s.action;
+  document.querySelectorAll('.code-line').forEach(function(el){el.classList.remove('active');});
+  var al=document.querySelector('.code-line[data-line="'+s.line+'"]');
+  if(al){al.classList.add('active');al.scrollIntoView({block:'nearest'});}
+  renderViz(s);
+  showLogPreview(s);
+}
+
+function showLogPreview(s){
+  if(!logEnabled)return;
+  document.getElementById('logPopupBody').innerHTML=s.logHTML||'';
+  document.getElementById('logPopup').classList.remove('log-popup--hidden');
+}
+function hideLogPopup(){document.getElementById('logPopup').classList.add('log-popup--hidden');}
+function toggleLogPreview(){
+  logEnabled=!logEnabled;
+  var btn=document.getElementById('logToggleBtn');
+  btn.textContent=logEnabled?'📋 ON':'📋 OFF';
+  btn.classList.toggle('log-toggle-btn--off',!logEnabled);
+  if(!logEnabled)hideLogPopup();
+  else if(steps.length)showLogPreview(steps[currentStep]);
+}
+function logZoom(dir){logZoomLevel=Math.max(60,Math.min(180,logZoomLevel+dir*20));updateLogZoom();}
+function logZoomReset(){logZoomLevel=100;updateLogZoom();}
+function updateLogZoom(){
+  document.getElementById('logZoomLabel').textContent=logZoomLevel+'%';
+  document.getElementById('logPopup').style.setProperty('--log-scale',logZoomLevel/100);
+}
+function toggleFullscreen(){
+  var viz=document.querySelector('.col-viz');
+  if(!document.fullscreenElement)viz.requestFullscreen().catch(function(){});
+  else document.exitFullscreen();
+}
+
+function resetWithInput(){
+  curResult=null;
+  var raw=document.getElementById('inputGrid').value.trim();
+  // Sanitize: keep only 0,1, and ;
+  raw=raw.replace(/[^01;]/g,'');
+  if(!raw)raw="110;100;001";
+  // Normalize rows to same length
+  var rs=raw.split(';').filter(function(r){return r.length>0;});
+  var maxLen=Math.max.apply(null,rs.map(function(r){return r.length;}));
+  rs=rs.map(function(r){while(r.length<maxLen)r+="0";return r;});
+  raw=rs.join(';');
+  renderCode();fitCodeWidth();
+  steps=buildSteps(raw);
+  currentStep=0;renderStep(0);
+  document.getElementById('liveOutput').textContent=curResult!==null?curResult:'—';
+}
+
+function stepBy(d){var nx=currentStep+d;if(nx>=0&&nx<steps.length)renderStep(nx);}
+function resetStep(){renderStep(0);}
+
+function loadTest(i,el){
+  document.querySelectorAll('.prob-test').forEach(function(t){t.classList.remove('prob-test--active');});
+  if(el)el.classList.add('prob-test--active');
+  document.getElementById('inputGrid').value=TESTS[i].grid;
+  document.getElementById('expectedBadge').textContent='exp: '+TESTS[i].e;
+  resetWithInput();
+}
+
+document.addEventListener('keydown',function(e){
+  if(e.target.tagName==='INPUT'||e.target.tagName==='SELECT')return;
+  if(e.key==='ArrowRight'){e.preventDefault();stepBy(1);}
+  else if(e.key==='ArrowLeft'){e.preventDefault();stepBy(-1);}
+  else if(e.key==='r'||e.key==='R'){e.preventDefault();resetStep();}
+});
+
+(function(){
+  var col1=document.getElementById('col1');
+  document.getElementById('resizeH1').addEventListener('mousedown',function(e){
+    e.preventDefault();codeWidthUserSet=true;
+    var startX=e.clientX,startW=col1.offsetWidth,h=this;
+    document.body.classList.add('no-select');h.classList.add('active');
+    function mv(e){col1.style.width=Math.max(140,startW+(e.clientX-startX))+'px';syncFooterWidth();}
+    function up(){document.removeEventListener('mousemove',mv);document.removeEventListener('mouseup',up);document.body.classList.remove('no-select');h.classList.remove('active');}
+    document.addEventListener('mousemove',mv);document.addEventListener('mouseup',up);
+  });
+})();
+
+window.addEventListener('resize',function(){if(!codeWidthUserSet)fitCodeWidth();else syncFooterWidth();});
+
+renderTests();renderCode();fitCodeWidth();resetWithInput();
+</script>
+</body>
+</html>

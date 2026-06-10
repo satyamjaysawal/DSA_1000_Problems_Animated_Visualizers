@@ -1,0 +1,1057 @@
+﻿
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LC 238 — Product of Array Except Self</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+:root{
+  --bg-primary:#FAFAF8; --bg-secondary:#F1EFE8; --bg-tertiary:#E2E0D8; --bg-card:#FFFFFF;
+  --text-primary:#2C2C2A; --text-secondary:#5F5E5A; --text-tertiary:#888780;
+  --border-color:rgba(0,0,0,.11); --border-light:rgba(0,0,0,.06); --border-focus:#534AB7;
+  --accent-indigo:#534AB7; --accent-indigo-bg:#EEEDFE; --accent-indigo-text:#3C3489; --accent-indigo-hover:#4740A0;
+  --accent-teal:#0F6E56; --accent-teal-bg:#E1F5EE; --accent-teal-text:#085041;
+  --accent-red:#E24B4A; --accent-red-bg:#FCEBEB; --accent-red-text:#791F1F;
+  --accent-amber:#B45309; --accent-amber-bg:#FEF3C7; --accent-amber-text:#78350F;
+  --accent-green:#15803D; --accent-green-bg:#DCFCE7; --accent-green-text:#14532D;
+  --syn-keyword:#534AB7; --syn-function:#185FA5; --syn-number:#993C1D; --syn-string:#0F6E56;
+  --active-line-bg:#EEEDFE;
+  --radius-sm:4px; --radius-md:6px; --radius-lg:10px;
+  --font-sans:'DM Sans',system-ui,sans-serif;
+  --font-mono:'JetBrains Mono','Fira Code',monospace;
+  --fs-xs:11px; --fs-sm:12px; --fs-base:14px;
+  --ease:.18s ease;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:var(--bg-primary);color:var(--text-primary);font-family:var(--font-sans);font-size:var(--fs-base)}
+body.no-select{user-select:none}
+::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border-color);border-radius:3px}
+
+.app-shell{display:flex;flex-direction:column;height:100vh;overflow:hidden}
+.problem-card{flex-shrink:0;border-bottom:1px solid var(--border-color);background:var(--bg-card)}
+.pc-header{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:8px 14px;border-bottom:1px solid var(--border-light)}
+.gt-btn{font:700 11px var(--font-sans);padding:5px 10px;background:var(--accent-indigo);color:#fff;border:none;border-radius:99px;cursor:pointer;letter-spacing:.04em}
+.gt-btn:hover{background:var(--accent-indigo-hover)}
+.lc-num{font:700 12px var(--font-mono);color:var(--text-tertiary)}
+.lc-title{font:700 15px var(--font-sans)}
+.lc-diff{font:700 9px var(--font-mono);padding:2px 8px;border-radius:99px;letter-spacing:.06em;background:var(--accent-amber-bg);color:var(--accent-amber-text);border:1px solid var(--accent-amber)}
+.lc-tag{font:600 10px var(--font-mono);padding:2px 8px;border-radius:99px;background:var(--bg-secondary);color:var(--text-secondary);border:1px solid var(--border-color)}
+.pc-header-right{margin-left:auto;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.input-wrap{display:flex;align-items:center;gap:4px}
+.input-wrap label{font:600 10px var(--font-mono);color:var(--text-tertiary)}
+.input-wrap input{font:600 11px var(--font-mono);padding:3px 6px;border:1px solid var(--border-color);border-radius:4px;width:220px}
+.input-wrap input:focus{outline:none;border-color:var(--border-focus)}
+.expected-badge{font:600 10px var(--font-mono);padding:3px 8px;border-radius:4px;background:var(--accent-teal-bg);color:var(--accent-teal-text);border:1px solid var(--accent-teal)}
+.toggle-btn{font-family:system-ui,"Segoe UI Emoji",sans-serif;font:600 10px var(--font-mono);padding:3px 8px;border-radius:4px;background:var(--bg-secondary);border:1px solid var(--border-color);color:var(--text-secondary);cursor:pointer}
+
+.pc-body{display:flex;gap:16px;padding:10px 14px;max-height:34vh;overflow:auto}
+.pc-left{flex:2;min-width:0}.pc-right{flex:1;min-width:0;border-left:1px solid var(--border-light);padding-left:14px}
+.pc-section{margin-bottom:8px}
+.pc-section h4{font:700 11px var(--font-sans);text-transform:uppercase;letter-spacing:.06em;color:var(--text-tertiary);margin-bottom:4px}
+.pc-section p{font-size:12px;line-height:1.55;color:var(--text-secondary)}
+.pc-section code{font:600 11px var(--font-mono);background:var(--bg-secondary);padding:1px 5px;border-radius:3px;color:var(--accent-indigo-text)}
+.pc-section strong{color:var(--text-primary)}
+.concept-block{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
+.concept-card{flex:1;min-width:130px;padding:6px 8px;background:var(--bg-secondary);border-radius:5px;border-left:3px solid var(--accent-indigo);font-size:11px;line-height:1.5}
+.concept-card strong{display:block;color:var(--accent-indigo-text);margin-bottom:2px;font-size:10px;text-transform:uppercase}
+.complexity-row{display:flex;gap:6px;margin-top:4px}
+.cx-chip{font:600 11px var(--font-mono);padding:3px 8px;border-radius:99px;background:var(--accent-indigo-bg);color:var(--accent-indigo-text);border:1px solid var(--accent-indigo)}
+
+.test-chip{display:flex;flex-direction:column;gap:3px;padding:6px 8px;margin-bottom:5px;background:var(--bg-secondary);border-radius:5px;border:1px solid var(--border-color);cursor:pointer;transition:all var(--ease)}
+.test-chip:hover{border-color:var(--accent-indigo);background:var(--accent-indigo-bg)}
+.tc-row{display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+.tc-row code{font:600 10px var(--font-mono);color:var(--text-secondary)}
+.pt-tag{font:600 9px var(--font-mono);padding:1px 5px;border-radius:3px;background:var(--accent-indigo);color:#fff;text-transform:uppercase}
+.tc-exp{font:600 10px var(--font-mono);color:var(--accent-teal-text);margin-left:auto}
+.run-row{display:flex;align-items:center;gap:8px;margin-top:6px}
+.btn-run{font-family:system-ui,"Segoe UI Emoji",sans-serif;font:700 11px var(--font-sans);padding:5px 12px;background:var(--accent-indigo);color:#fff;border:none;border-radius:5px;cursor:pointer}
+.live-output{font:700 12px var(--font-mono);padding:4px 10px;background:var(--accent-green-bg);color:var(--accent-green-text);border-radius:4px;border:1px solid var(--accent-green)}
+
+.main-row{flex:1;display:flex;overflow:hidden;min-height:0}
+.col{display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.col-code{width:33%;min-width:140px;max-width:45vw;background:var(--bg-card);border-right:1px solid var(--border-color)}
+.col-viz{flex:1;min-width:0;background:var(--bg-primary)}
+.section-label{font-family:system-ui,"Segoe UI Emoji",sans-serif;font:700 10px var(--font-sans);text-transform:uppercase;letter-spacing:.08em;color:var(--text-tertiary);padding:8px 12px;border-bottom:1px solid var(--border-light);background:var(--bg-card)}
+
+#codePanel{flex:1;overflow-y:auto;padding:8px 0;font-family:var(--font-mono);font-size:12px;line-height:1.9}
+.code-line{display:flex;padding:0 12px;transition:background var(--ease)}
+.code-line.active{background:var(--active-line-bg);border-left:3px solid var(--accent-indigo);padding-left:9px}
+.code-line .ln{display:inline-block;width:24px;text-align:right;color:var(--text-tertiary);user-select:none;margin-right:10px;font-size:10px}
+.code-content{white-space:pre}
+.code-content .kw{color:var(--syn-keyword);font-weight:600}
+.code-content .fn{color:var(--syn-function)}
+.code-content .num{color:var(--syn-number)}
+.code-content .str{color:var(--syn-string)}
+
+#vizPanel{flex:1;overflow:auto;padding:14px}
+.vars-strip{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.var-chip{font:600 11px var(--font-mono);padding:4px 9px;border-radius:99px;background:var(--bg-card);border:1px solid var(--border-color);color:var(--text-secondary)}
+.var-chip span.k{color:var(--text-tertiary);margin-right:3px}
+.var-chip span.v{color:var(--text-primary);font-weight:700}
+.vc-active{background:var(--accent-indigo-bg);border-color:var(--accent-indigo);color:var(--accent-indigo-text)}
+.vc-active span.v{color:var(--accent-indigo-text)}
+.vc-safe{background:var(--accent-green-bg);border-color:var(--accent-green)}
+.vc-safe span.v{color:var(--accent-green-text)}
+.vc-left{background:#FFEBE0;border-color:#EA580C;color:#7C2D12}
+.vc-left span.v{color:#7C2D12}
+.vc-right{background:#E0F2FE;border-color:#0284C7;color:#075985}
+.vc-right span.v{color:#075985}
+
+.viz-row{display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap;margin-bottom:14px}
+.viz-card{background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius-md);padding:12px;min-width:240px}
+.viz-card h5{font:700 10px var(--font-sans);text-transform:uppercase;letter-spacing:.06em;color:var(--text-tertiary);margin-bottom:8px;display:flex;align-items:center;gap:5px}
+
+/* ── Array tiles ── */
+.arr-row{display:flex;gap:6px;flex-wrap:wrap;align-items:flex-end;justify-content:center;padding:6px 0}
+.arr-tile{display:flex;flex-direction:column;align-items:center;min-width:54px;padding:7px 8px;background:#fff;border:2px solid var(--border-color);border-radius:8px;font:700 14px var(--font-mono);transition:all .25s;position:relative}
+.arr-tile .at-idx{font-size:9px;color:var(--text-tertiary);font-weight:500;margin-bottom:2px}
+.arr-tile .at-val{font-size:18px;color:var(--text-primary)}
+.arr-tile.curr{background:var(--accent-amber-bg);border-color:var(--accent-amber);transform:scale(1.12);animation:pulse-amber 1.2s infinite;z-index:2}
+.arr-tile.curr .at-val{color:var(--accent-amber-text)}
+.arr-tile.processed-left{background:#FFEBE0;border-color:#EA580C;color:#7C2D12}
+.arr-tile.processed-left .at-val{color:#7C2D12}
+.arr-tile.processed-right{background:#E0F2FE;border-color:#0284C7;color:#075985}
+.arr-tile.processed-right .at-val{color:#075985}
+.arr-tile.done{background:var(--accent-green-bg);border-color:var(--accent-green);animation:done-glow 1.2s ease-out}
+.arr-tile.done .at-val{color:var(--accent-green-text)}
+.arr-tile.future{opacity:.55}
+.arr-tile.just-written{animation:write-flash .55s ease-out}
+
+@keyframes pulse-amber{0%,100%{box-shadow:0 0 4px var(--accent-amber)}50%{box-shadow:0 0 12px var(--accent-amber)}}
+@keyframes done-glow{0%{box-shadow:0 0 0 var(--accent-green)}50%{box-shadow:0 0 14px var(--accent-green)}100%{box-shadow:0 0 4px var(--accent-green)}}
+@keyframes write-flash{0%{transform:scale(1)}40%{transform:scale(1.18);box-shadow:0 0 14px var(--accent-amber)}100%{transform:scale(1)}}
+@keyframes pulse-node{0%,100%{box-shadow:0 0 4px var(--accent-indigo)}50%{box-shadow:0 0 14px var(--accent-indigo)}}
+@keyframes win-pulse{0%,100%{box-shadow:0 0 3px rgba(234,179,8,.5)}50%{box-shadow:0 0 10px rgba(234,179,8,.95)}}
+
+/* Direction arrow */
+.dir-arrow{display:flex;justify-content:center;align-items:center;gap:8px;margin:6px 0;font:700 12px var(--font-mono);color:var(--text-tertiary)}
+.dir-arrow .arrow-icon{font-size:18px}
+.dir-arrow.left-pass{color:#7C2D12}
+.dir-arrow.right-pass{color:#075985}
+.dir-arrow.done-state{color:var(--accent-green-text)}
+
+/* ── Scalars (left/right) ── */
+.scalar-card{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.scalar-box{flex:1;min-width:140px;padding:10px 12px;background:var(--bg-secondary);border:2px solid var(--border-color);border-radius:8px;display:flex;flex-direction:column;gap:4px}
+.scalar-box.left-active{background:#FFEBE0;border-color:#EA580C;animation:pulse-amber 1.2s infinite}
+.scalar-box.right-active{background:#E0F2FE;border-color:#0284C7;animation:pulse-blue 1.2s infinite}
+.scalar-box.dim{opacity:.5}
+.scalar-label{font:700 10px var(--font-mono);text-transform:uppercase;letter-spacing:.06em;color:var(--text-tertiary)}
+.scalar-value{font:700 22px var(--font-mono);color:var(--text-primary)}
+.scalar-box.left-active .scalar-label,.scalar-box.left-active .scalar-value{color:#7C2D12}
+.scalar-box.right-active .scalar-label,.scalar-box.right-active .scalar-value{color:#075985}
+.scalar-formula{font:600 10px var(--font-mono);color:var(--text-tertiary);font-style:italic}
+@keyframes pulse-blue{0%,100%{box-shadow:0 0 4px #0284C7}50%{box-shadow:0 0 14px #0284C7}}
+
+/* ── Equation strip ── */
+.eq-strip{padding:10px 12px;background:#0d1117;color:#e6edf3;border-radius:8px;font:600 13px var(--font-mono);overflow-x:auto;white-space:nowrap;border:1px solid #30363d;letter-spacing:.5px}
+.eq-strip .eq-curr{color:#fbbf24;font-weight:700}
+.eq-strip .eq-left{color:#fb923c}
+.eq-strip .eq-right{color:#38bdf8}
+.eq-strip .eq-result{color:#22c55e;font-weight:700}
+.eq-strip .eq-op{color:#94a3b8;margin:0 4px}
+
+/* ── Banner ── */
+.banner{display:flex;align-items:center;gap:8px;padding:8px 14px;border-radius:8px;font:700 13px var(--font-mono);margin-bottom:10px}
+.banner-init{background:var(--bg-secondary);color:var(--text-secondary);border:1px solid var(--border-color)}
+.banner-left{background:#FFEBE0;color:#7C2D12;border:1px solid #EA580C}
+.banner-right{background:#E0F2FE;color:#075985;border:1px solid #0284C7}
+.banner-done{background:var(--accent-green-bg);color:var(--accent-green-text);border:2px solid var(--accent-green);animation:win-pulse 1.5s infinite}
+.banner-skip{background:var(--bg-tertiary);color:var(--text-secondary);border:1px solid var(--border-color)}
+
+.footer-bar{display:flex;flex-shrink:0;border-top:1px solid var(--border-color);background:var(--bg-card)}
+.footer-left{width:33%;min-width:140px;max-width:45vw;display:flex;align-items:center;gap:8px;padding:7px 12px;border-right:1px solid var(--border-light)}
+.footer-right{flex:1;display:flex;align-items:center;gap:6px;padding:7px 14px;flex-wrap:wrap}
+.step-info{font:700 12px var(--font-mono)}
+.action-badge{font-family:system-ui,"Segoe UI Emoji",sans-serif;font:700 10px var(--font-mono);padding:3px 9px;border-radius:99px}
+.action-badge--init,.action-badge--func-def,.action-badge--call,.action-badge--return{background:rgba(130,80,255,.14);color:#3C3489;border:1px solid #8250ff}
+.action-badge--for-check,.action-badge--while-check,.action-badge--if-check{background:rgba(56,139,253,.14);color:#185FA5;border:1px solid #388bfd}
+.action-badge--mark,.action-badge--push,.action-badge--pop,.action-badge--restore,.action-badge--found{background:var(--accent-green-bg);color:var(--accent-green-text);border:1px solid var(--accent-green)}
+.action-badge--remove,.action-badge--prune,.action-badge--fail{background:var(--accent-red-bg);color:var(--accent-red-text);border:1px solid var(--accent-red)}
+.action-badge--exit,.action-badge--skip{background:var(--bg-secondary);color:var(--text-secondary);border:1px solid var(--border-color)}
+
+kbd{font-family:system-ui,"Segoe UI Emoji",sans-serif;font:600 10px var(--font-mono);padding:2px 6px;background:var(--bg-secondary);border:1px solid var(--border-color);border-radius:3px;color:var(--text-secondary)}
+.btn{font-family:system-ui,"Segoe UI Emoji",sans-serif;font:600 12px var(--font-sans);padding:5px 11px;border:1px solid var(--border-color);background:var(--bg-card);border-radius:5px;cursor:pointer;transition:all var(--ease)}
+.btn:hover{background:var(--bg-secondary);border-color:var(--accent-indigo)}
+.btn-primary{background:var(--accent-indigo);color:#fff;border-color:var(--accent-indigo)}
+.btn-primary:hover{background:var(--accent-indigo-hover);color:#fff}
+.btn-fullscreen{font-size:13px;padding:4px 10px}
+.btn-zoom{font-family:system-ui,"Segoe UI Emoji",sans-serif;font:600 11px var(--font-mono);padding:3px 8px;border:1px solid var(--border-color);background:var(--bg-card);color:var(--text-secondary);border-radius:4px;cursor:pointer}
+.btn-zoom:hover{background:var(--bg-secondary)}
+.log-zoom-label{font:600 10px var(--font-mono);color:var(--text-tertiary);min-width:38px;text-align:center}
+.log-toggle-btn{font-family:system-ui,"Segoe UI Emoji",sans-serif;font:600 11px var(--font-mono);padding:4px 9px;border:1px solid var(--accent-indigo);background:var(--accent-indigo-bg);color:var(--accent-indigo-text);border-radius:4px;cursor:pointer}
+.log-toggle-btn--off{background:var(--bg-secondary);border-color:var(--border-color);color:var(--text-tertiary)}
+.footer-sep{width:1px;height:18px;background:var(--border-color);margin:0 4px}
+
+.resize-h{width:5px;background:transparent;cursor:col-resize;position:relative;flex-shrink:0;z-index:5}
+.resize-h::before{content:'';position:absolute;top:0;bottom:0;left:2px;width:1px;background:var(--border-color)}
+.resize-h:hover::before,.resize-h.active::before{background:var(--accent-indigo);width:2px;left:1.5px}
+
+.log-popup{--log-scale:1;position:fixed;bottom:52px;right:14px;width:calc(480px*var(--log-scale));max-width:92vw;max-height:75vh;border-radius:var(--radius-lg);box-shadow:0 10px 32px rgba(0,0,0,.14);border:1px solid var(--border-color);background:var(--bg-card);overflow:hidden;display:flex;flex-direction:column;z-index:100;transition:opacity .15s,transform .15s;transform-origin:bottom right}
+.log-popup--hidden{opacity:0;transform:scale(.92);pointer-events:none}
+.log-popup-body{flex:1;overflow:auto;padding:0}
+.log-popup-body>.log-card{border-radius:0;border:none;border-left:0}
+
+.log-card{border-radius:var(--radius-md);overflow:hidden;border:1px solid var(--border-color);border-left-width:4px;font-size:var(--fs-xs);background:var(--bg-card)}
+.log-card--for-check,.log-card--while-check,.log-card--if-check{border-left-color:#388bfd}
+.log-card--func-def,.log-card--init,.log-card--call,.log-card--return{border-left-color:#8250ff}
+.log-card--mark,.log-card--push,.log-card--pop,.log-card--restore,.log-card--found{border-left-color:#3fb950}
+.log-card--remove,.log-card--prune,.log-card--fail{border-left-color:#f85149}
+.log-card--exit,.log-card--skip{border-left-color:#888780}
+
+.log-card-header{display:flex;align-items:center;gap:6px;padding:8px 10px 6px;background:var(--bg-secondary);border-bottom:1px solid var(--border-light)}
+.log-badge{font-family:system-ui,"Segoe UI Emoji",sans-serif;font:700 10px var(--font-mono);padding:2px 7px;border-radius:99px}
+.log-badge--init,.log-badge--func-def,.log-badge--call,.log-badge--return{background:rgba(130,80,255,.14);color:#3C3489}
+.log-badge--for-check,.log-badge--while-check,.log-badge--if-check{background:rgba(56,139,253,.14);color:#185FA5}
+.log-badge--mark,.log-badge--push,.log-badge--pop,.log-badge--restore,.log-badge--found{background:var(--accent-green-bg);color:var(--accent-green-text)}
+.log-badge--remove,.log-badge--prune,.log-badge--fail{background:var(--accent-red-bg);color:var(--accent-red-text)}
+.log-badge--exit,.log-badge--skip{background:var(--bg-secondary);color:var(--text-secondary)}
+.log-line-ref{font:700 10px var(--font-mono);color:var(--accent-indigo);background:var(--accent-indigo-bg);padding:1px 6px;border-radius:4px;border:1px solid var(--accent-indigo)}
+.log-status-pill{font-family:system-ui,"Segoe UI Emoji",sans-serif;font-size:9px;font-weight:700;padding:2px 7px;border-radius:99px;text-transform:uppercase;margin-left:auto}
+.log-status--success{background:var(--accent-green-bg);color:var(--accent-green-text);border:1px solid var(--accent-green)}
+.log-status--fail{background:var(--accent-red-bg);color:var(--accent-red-text);border:1px solid var(--accent-red)}
+.log-status--skip{background:var(--bg-tertiary);color:var(--text-tertiary);border:1px solid var(--border-color)}
+.log-status--loop{background:rgba(56,139,253,.14);color:#185FA5;border:1px solid #388bfd}
+.log-status--prune{background:var(--accent-red-bg);color:var(--accent-red-text);border:1px solid var(--accent-red)}
+.log-status--info{background:rgba(130,80,255,.14);color:#3C3489;border:1px solid #8250ff}
+
+.log-section{padding:7px 10px;border-bottom:1px dashed var(--border-light)}
+.log-section:last-child{border-bottom:none}
+.log-section-title{font:700 8px var(--font-mono);text-transform:uppercase;letter-spacing:.06em;color:var(--text-tertiary);margin-bottom:3px;display:flex;align-items:center;gap:4px}
+.log-section-title-icon{font-family:system-ui,"Segoe UI Emoji",sans-serif;font-size:11px}
+.log-code-snippet{font:600 11px var(--font-mono);background:#0d1117;color:#e6edf3;padding:6px 9px;border-radius:4px;display:block;overflow-x:auto;white-space:pre;border:1px solid #30363d}
+.log-code-snippet .ck{color:#ff7b72}.log-code-snippet .cs{color:#a5d6ff}
+.log-code-snippet .cn{color:#79c0ff}.log-code-snippet .cf{color:#d2a8ff}
+.log-code-snippet .cc{color:#8b949e;font-style:italic}
+.log-kv-row{display:flex;flex-wrap:wrap;gap:4px}
+.log-kv{display:inline-flex;align-items:center;gap:3px;font:11px var(--font-mono);padding:2px 7px;border-radius:4px;background:var(--bg-secondary);border:1px solid var(--border-light)}
+.log-kv-key{color:var(--text-tertiary);font-weight:500}
+.log-kv-val{color:var(--text-primary);font-weight:700}
+.log-kv--in{background:rgba(56,139,253,.08);border-color:rgba(56,139,253,.3)}
+.log-kv--out{background:rgba(63,185,80,.08);border-color:rgba(63,185,80,.4)}
+.log-kv--out .log-kv-val{color:#15803D}
+.log-kv--changed{background:rgba(180,83,9,.10);border-color:rgba(180,83,9,.4)}
+.log-kv--changed .log-kv-val{color:var(--accent-amber-text)}
+.log-verdict{display:flex;align-items:center;gap:6px;font:600 11px var(--font-mono);padding:5px 8px;border-radius:5px;background:var(--bg-secondary);border:1px solid var(--border-light)}
+.log-verdict--true{background:var(--accent-green-bg);border-color:var(--accent-green);color:var(--accent-green-text)}
+.log-verdict--false{background:var(--accent-red-bg);border-color:var(--accent-red);color:var(--accent-red-text)}
+.log-analogy{font:italic 11px var(--font-sans);color:var(--text-secondary);background:#FFF8E7;border:1px solid #FBE8A6;border-left:3px solid var(--accent-amber);padding:6px 9px;border-radius:4px;line-height:1.55}
+.log-analogy strong{color:var(--accent-amber-text);font-style:normal;font-weight:700}
+.log-why{font-size:11px;line-height:1.55;color:var(--text-primary);padding:4px 0}
+.log-why strong{color:var(--accent-indigo-text)}
+.log-why code{font:600 10px var(--font-mono);background:var(--bg-secondary);padding:1px 4px;border-radius:3px;color:var(--accent-indigo-text)}
+
+.legend{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px;padding:0 4px}
+.legend span{display:inline-flex;align-items:center;gap:5px;font-size:10px;color:var(--text-secondary)}
+.legend i{display:inline-block;width:14px;height:14px;border-radius:3px;border:1px solid var(--border-color)}
+</style>
+</head>
+<body>
+<div class="app-shell">
+
+  <!-- ─── PROBLEM CARD ─── -->
+  <div class="problem-card" id="problemCard">
+    <div class="pc-header">
+      <a href="../00_HomePage/gt_learn_homepage.html" class="gt-btn">GT LEARN</a>
+      <span class="lc-num">#238</span>
+      <span class="lc-title">✖️ Product of Array Except Self</span>
+      <span class="lc-diff">MEDIUM</span>
+      <span class="lc-tag">Array</span>
+      <span class="lc-tag">Prefix/Suffix</span>
+      <div class="pc-header-right">
+        <div class="input-wrap"><label>nums</label><input id="inNums" type="text" value="[1,2,3,4]"></div>
+        <span class="expected-badge" id="expBadge">expected: [24,12,8,6]</span>
+        <button class="toggle-btn" type="button" onclick="toggleProblem()" id="toggleBtn">▲ Hide</button>
+      </div>
+    </div>
+
+    <div class="pc-body" id="pcBody">
+      <div class="pc-left">
+        <div class="pc-section">
+          <h4>📝 Problem Statement</h4>
+          <p>Diya gaya integer array <code>nums</code>, return karo array <code>answer</code> jisme <code>answer[i]</code> = <strong>product of all elements except nums[i]</strong>. Constraint: <strong>division use mat karo</strong>, aur algorithm <code>O(n)</code> time mein chalna chahiye.</p>
+        </div>
+        <div class="pc-section">
+          <h4>🧠 Solving Approach</h4>
+          <p><strong>Two-pass prefix-suffix trick</strong>: Pehle <strong>left-to-right</strong> jaake har position pe "uske left ka product" store karo (yahi <code>answer[i]</code> ka pehla part hai). Phir <strong>right-to-left</strong> jaake "uske right ka product" running multiply karo. Final <code>answer[i] = leftProduct × rightProduct</code>. <strong>O(1) extra space</strong> (output array doesn't count).</p>
+        </div>
+        <div class="pc-section">
+          <h4>🎯 Core Concepts</h4>
+          <div class="concept-block">
+            <div class="concept-card"><strong>Prefix Pass</strong>Left-to-right scan — <code>answer[i]</code> stores product of <strong>nums[0..i-1]</strong>.</div>
+            <div class="concept-card"><strong>Suffix Pass</strong>Right-to-left scan — multiply <code>answer[i]</code> by product of <strong>nums[i+1..n-1]</strong>.</div>
+            <div class="concept-card"><strong>No Division</strong>Tricky constraint — handles zero values gracefully without divide-by-zero.</div>
+          </div>
+        </div>
+        <div class="pc-section">
+          <h4>⏱ Complexity</h4>
+          <div class="complexity-row">
+            <span class="cx-chip">Time: O(n)</span>
+            <span class="cx-chip">Space: O(1) extra</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="pc-right">
+        <h4 style="font:700 11px var(--font-sans);text-transform:uppercase;letter-spacing:.06em;color:var(--text-tertiary);margin-bottom:6px">🧪 Test Cases</h4>
+        <div class="test-chip" onclick="loadTest('[1,2,3,4]', '[24,12,8,6]', 'classic')">
+          <div class="tc-row"><span class="pt-tag">T1</span><code>[1,2,3,4]</code></div>
+          <div class="tc-row"><span style="font:11px var(--font-sans);color:var(--text-secondary)">classic example</span><span class="tc-exp">→ [24,12,8,6]</span></div>
+        </div>
+        <div class="test-chip" onclick="loadTest('[-1,1,0,-3,3]', '[0,0,9,0,0]', 'with zero')">
+          <div class="tc-row"><span class="pt-tag">T2</span><code>[-1,1,0,-3,3]</code></div>
+          <div class="tc-row"><span style="font:11px var(--font-sans);color:var(--text-secondary)">contains zero — only one non-zero pos</span><span class="tc-exp">→ [0,0,9,0,0]</span></div>
+        </div>
+        <div class="test-chip" onclick="loadTest('[2,3]', '[3,2]', 'minimal')">
+          <div class="tc-row"><span class="pt-tag">T3</span><code>[2,3]</code></div>
+          <div class="tc-row"><span style="font:11px var(--font-sans);color:var(--text-secondary)">smallest valid case</span><span class="tc-exp">→ [3,2]</span></div>
+        </div>
+        <div class="test-chip" onclick="loadTest('[1,1,1,1]', '[1,1,1,1]', 'all ones')">
+          <div class="tc-row"><span class="pt-tag">T4</span><code>[1,1,1,1]</code></div>
+          <div class="tc-row"><span style="font:11px var(--font-sans);color:var(--text-secondary)">all ones — output stays 1</span><span class="tc-exp">→ [1,1,1,1]</span></div>
+        </div>
+        <div class="test-chip" onclick="loadTest('[5]', '[1]', 'single element')">
+          <div class="tc-row"><span class="pt-tag">T5</span><code>[5]</code></div>
+          <div class="tc-row"><span style="font:11px var(--font-sans);color:var(--text-secondary)">single element edge</span><span class="tc-exp">→ [1]</span></div>
+        </div>
+        <div class="run-row">
+          <button class="btn-run" type="button" onclick="resetWithInput()">▶ Run</button>
+          <span class="live-output" id="liveOutput">—</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="main-row">
+    <div class="col col-code" id="col1">
+      <div class="section-label">📜 Python Code</div>
+      <div id="codePanel"></div>
+    </div>
+    <div class="resize-h" id="resizeH1"></div>
+    <div class="col col-viz">
+      <div class="section-label">📊 Visualization</div>
+      <div id="vizPanel"></div>
+    </div>
+  </div>
+
+  <div class="footer-bar">
+    <div class="footer-left" id="footerLeft">
+      <span id="stepInfo" class="step-info">0/0</span>
+      <span id="actionBadge" class="action-badge"></span>
+    </div>
+    <div class="footer-right">
+      <kbd>←</kbd><kbd>→</kbd><kbd>R</kbd>
+      <button class="btn" type="button" onclick="resetStep()">↺</button>
+      <button class="btn" type="button" onclick="stepBy(-1)">◀</button>
+      <button class="btn btn-primary" type="button" onclick="stepBy(1)">▶ Next</button>
+      <span class="footer-sep"></span>
+      <button id="logToggleBtn" class="log-toggle-btn" type="button" onclick="toggleLogPreview()">📋 ON</button>
+      <button class="btn-zoom" type="button" onclick="logZoom(-1)">−</button>
+      <span id="logZoomLabel" class="log-zoom-label">100%</span>
+      <button class="btn-zoom" type="button" onclick="logZoom(1)">+</button>
+      <button class="btn-zoom" type="button" onclick="logZoomReset()">↺</button>
+      <span class="footer-sep"></span>
+      <button class="btn btn-fullscreen" type="button" onclick="toggleFullscreen()">⛶</button>
+    </div>
+  </div>
+</div>
+
+<div class="log-popup" id="logPopup">
+  <div class="log-popup-body" id="logPopupBody"></div>
+</div>
+
+<script>
+/* ============ PYTHON CODE ============ */
+var codeLines = [
+  "def productExceptSelf(nums):",
+  "    n = len(nums)",
+  "    answer = [1] * n",
+  "    left = 1",
+  "    for i in range(n):",
+  "        answer[i] = left",
+  "        left = left * nums[i]",
+  "    right = 1",
+  "    for i in range(n - 1, -1, -1):",
+  "        answer[i] = answer[i] * right",
+  "        right = right * nums[i]",
+  "    return answer"
+];
+
+/* ============ STATE ============ */
+var steps=[], currentStep=0, codeWidthUserSet=false, curResult=null;
+var logEnabled=true, logZoomLevel=100;
+
+var LOG_BADGE = {
+  "func-def":"📌 DEF","init":"⚙️ INIT","call":"📞 CALL","return":"🏆 RETURN",
+  "for-check":"🔁 FOR","while-check":"🔁 WHILE","if-check":"🔎 IF",
+  "mark":"✅ MARK","push":"⬆ PUSH","pop":"⬇ POP","restore":"↩ RESTORE","found":"🎉 FOUND",
+  "remove":"✏️ EDIT","prune":"✂️ PRUNE","fail":"❌ FAIL","exit":"🔚 EXIT","skip":"⏭ SKIP"
+};
+var BADGE_LABEL = {
+  "func-def":"DEF","init":"INIT","call":"CALL","return":"RETURN",
+  "for-check":"FOR","while-check":"WHILE","if-check":"IF",
+  "mark":"MARK","push":"PUSH","pop":"POP","restore":"RESTORE","found":"FOUND",
+  "remove":"EDIT","prune":"PRUNE","fail":"FAIL","exit":"EXIT","skip":"SKIP"
+};
+
+/* ============ CODE RENDERER ============ */
+function renderCode(){
+  var p = document.getElementById('codePanel');
+  p.innerHTML = codeLines.map(function(raw,i){
+    var h = raw;
+    h = h.replace(/("[^"]*"|'[^']*')/g, '\x01STR\x02$1\x03');
+    h = h.replace(/\b(def|for|in|if|return|break|continue|and|else|elif|True|False|None|not|or|while|lambda)\b/g, '\x01KW\x02$1\x03');
+    h = h.replace(/\b(len|range|int|str|list|append|pop|sorted|min|max|sum|abs|enumerate|zip|print|set|add)\b/g, '\x01FN\x02$1\x03');
+    h = h.replace(/(?<![.\w"\x01\x02\x03])(-?\d+)\b/g, '\x01NUM\x02$1\x03');
+    h = h.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    h = h.replace(/\x01([A-Z]+)\x02/g, function(_,c){
+      return '<span class="'+(c==='KW'?'kw':c==='FN'?'fn':c==='NUM'?'num':'str')+'">';
+    }).replace(/\x03/g,'</span>');
+    return '<div class="code-line" data-line="'+i+'"><span class="ln">'+(i+1)+'</span><span class="code-content">'+h+'</span></div>';
+  }).join('');
+}
+
+/* ============ MINI HIGHLIGHTER ============ */
+function hlCode(raw){
+  var h = raw;
+  h = h.replace(/("[^"]*"|'[^']*')/g, '\x01s\x02$1\x03');
+  h = h.replace(/\b(def|for|in|if|return|break|continue|and|else|elif|True|False|None|not|or|while|lambda)\b/g, '\x01k\x02$1\x03');
+  h = h.replace(/\b(len|range|int|str|list|append|pop|sorted|min|max|sum|abs|enumerate|zip|print|set|add)\b/g, '\x01f\x02$1\x03');
+  h = h.replace(/(?<![.\w"\x01\x02\x03])(-?\d+)\b/g, '\x01n\x02$1\x03');
+  h = h.replace(/(#.*$)/gm, '\x01c\x02$1\x03');
+  h = h.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  h = h.replace(/\x01([a-z])\x02/g, function(_,c){return '<span class="c'+c+'">';}).replace(/\x03/g,'</span>');
+  return h;
+}
+
+/* ============ richLog ============ */
+function richLog(opts){
+  var statusMap = {success:"✅ Success",fail:"❌ Failed",skip:"⏭ Skipped",loop:"🔁 Loop iter",prune:"✂️ Pruned",info:"ℹ️ Info"};
+  var status = opts.status || "info";
+  var html = '<div class="log-card log-card--'+opts.action+'">';
+  html += '<div class="log-card-header">';
+  html += '<span class="log-badge log-badge--'+opts.action+'">'+(LOG_BADGE[opts.action]||opts.action)+'</span>';
+  html += '<span class="log-line-ref">L'+(opts.line+1)+'</span>';
+  html += '<span class="log-status-pill log-status--'+status+'">'+statusMap[status]+'</span></div>';
+  if(opts.code){
+    html += '<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">📜</span>Code Executing</div>';
+    html += '<code class="log-code-snippet">'+hlCode(opts.code)+'</code></div>';
+  }
+  if(opts.inputs && opts.inputs.length){
+    html += '<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">📥</span>Input Values (line is using these)</div><div class="log-kv-row">';
+    opts.inputs.forEach(function(kv){
+      html += '<span class="log-kv log-kv--in"><span class="log-kv-key">'+kv.k+'</span>=<span class="log-kv-val">'+kv.v+'</span></span>';
+    });
+    html += '</div></div>';
+  }
+  if(opts.outputs && opts.outputs.length){
+    html += '<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">📤</span>Output / State After Line</div><div class="log-kv-row">';
+    opts.outputs.forEach(function(kv){
+      var cls = kv.changed ? 'log-kv--changed':'log-kv--out';
+      html += '<span class="log-kv '+cls+'"><span class="log-kv-key">'+kv.k+'</span>=<span class="log-kv-val">'+kv.v+'</span></span>';
+    });
+    html += '</div></div>';
+  }
+  if(opts.verdict){
+    var vCls = opts.verdictTrue===true?'log-verdict--true':(opts.verdictTrue===false?'log-verdict--false':'');
+    var vIcon = opts.verdictTrue===true?'✓':(opts.verdictTrue===false?'✗':'•');
+    html += '<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">⚖️</span>Verdict / Decision</div>';
+    html += '<div class="log-verdict '+vCls+'">'+vIcon+' '+opts.verdict+'</div></div>';
+  }
+  if(opts.why){
+    html += '<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">💡</span>Why This Happens</div><div class="log-why">'+opts.why+'</div></div>';
+  }
+  if(opts.analogy){
+    html += '<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">🎭</span>Real-Life Analogy</div><div class="log-analogy">'+opts.analogy+'</div></div>';
+  }
+  html += '</div>';
+  return html;
+}
+
+/* ============ INPUT PARSING ============ */
+function parseArr(s){
+  s = s.trim();
+  if(!s) return [];
+  s = s.replace(/^\[|\]$/g,'');
+  if(!s.trim()) return [];
+  return s.split(',').map(function(x){return parseInt(x.trim(),10);}).filter(function(x){return !isNaN(x);});
+}
+
+/* ============ buildSteps ============ */
+function buildSteps(p){
+  var st=[], MAX=2000;
+  var nums = p.nums.slice();
+  var n = nums.length;
+  var answer = [];
+  var left = null, right = null;
+  var i = -1;
+  var phase = "init";          // init | left-pass | left-exit | right-pass | right-exit | done
+  var lastWriteIdx = -1;       // index just written to (for flash animation)
+
+  function snap(extra){
+    return Object.assign({
+      nums: nums.slice(), n: n,
+      answer: answer.slice(),
+      left: left, right: right,
+      i: i, phase: phase,
+      lastWriteIdx: lastWriteIdx
+    }, extra||{});
+  }
+  function push(o){ if(st.length>=MAX) return; st.push(Object.assign({line:0,action:"init",logHTML:""}, snap(o))); }
+
+  // ── L0: function def ──
+  push({
+    line:0, action:"func-def",
+    logHTML: richLog({
+      line:0, action:"func-def",
+      code:"def productExceptSelf(nums):",
+      status:"info",
+      inputs:[{k:"nums",v:JSON.stringify(nums)},{k:"len",v:n}],
+      why:"Function start — input <code>nums = "+JSON.stringify(nums)+"</code> mila. Hume har position ke liye <strong>'baki sab elements ka product'</strong> nikalna hai, <strong>division use kiye bina</strong> aur <code>O(n)</code> mein.",
+      analogy:"Tum class ke teacher ho — har bachhe ka <strong>'sabke marks ka product, sirf apne ko chhodke'</strong> nikalna hai. Bina division ke! Smart trick lagana padega."
+    })
+  });
+
+  // ── L1: n = len(nums) ──
+  push({
+    line:1, action:"init",
+    logHTML: richLog({
+      line:1, action:"init",
+      code:"n = len(nums)  # n = "+n,
+      status:"success",
+      inputs:[{k:"len(nums)",v:n}],
+      outputs:[{k:"n",v:n,changed:true}],
+      why:"Array ka <strong>length</strong> capture kar liya — <code>n = "+n+"</code>. Yeh dono passes mein loop bound ke liye chahiye.",
+      analogy:"Class mein <strong>kitne bachhe hain</strong> — register pe count kar liya: "+n+" students."
+    })
+  });
+
+  // ── L2: answer = [1] * n ──
+  answer = new Array(n).fill(1);
+  push({
+    line:2, action:"init",
+    logHTML: richLog({
+      line:2, action:"init",
+      code:"answer = [1] * "+n+"  # "+JSON.stringify(answer),
+      status:"success",
+      inputs:[{k:"n",v:n}],
+      outputs:[{k:"answer",v:JSON.stringify(answer),changed:true},{k:"answer.size",v:n,changed:true}],
+      why:"Output array <code>answer</code> ko <strong>saari positions pe 1</strong> se initialize kiya. Multiplicative identity hai — left/right products multiply karne mein 1 ka koi effect nahi padta.",
+      analogy:"Sabke result-card pe initial entry: <strong>'1'</strong> — empty slate jaise. Aage products multiply karke real value bharenge."
+    })
+  });
+
+  // ── L3: left = 1 ──
+  left = 1;
+  push({
+    line:3, action:"init",
+    logHTML: richLog({
+      line:3, action:"init",
+      code:"left = 1",
+      status:"success",
+      outputs:[{k:"left",v:1,changed:true}],
+      why:"<code>left</code> running variable — yeh <strong>'mere left side ke saare elements ka product'</strong> track karega. Initially <code>1</code> kyunki index 0 ke left mein kuch nahi hai (empty product = 1).",
+      analogy:"Pehla bachha line mein hai — uske <strong>aage koi nahi</strong>. Toh 'aage walon ka product' = 1 (empty multiplication = 1)."
+    })
+  });
+
+  // ───── PHASE 1: LEFT PASS ─────
+  phase = "left-pass";
+  if(n === 0){
+    push({
+      line:4, action:"skip",
+      logHTML: richLog({
+        line:4, action:"skip",
+        code:"for i in range(0):  # empty range",
+        status:"skip",
+        inputs:[{k:"n",v:0}],
+        verdict:"range(0) is empty → loop body skipped",
+        verdictTrue:false,
+        why:"Array khaali hai — left-pass loop run hi nahi hoga. Direct L8 par jayenge.",
+        analogy:"Class mein <strong>koi bachha hi nahi</strong> — attendance lene ki zaroorat nahi."
+      })
+    });
+  } else {
+    for(var idx=0; idx<n; idx++){
+      i = idx;
+      // ── L4: for-iter ──
+      push({
+        line:4, action:"for-check",
+        logHTML: richLog({
+          line:4, action:"for-check",
+          code:"for i in range("+n+"): i="+i,
+          status:"loop",
+          inputs:[{k:"i",v:i},{k:"n",v:n}],
+          outputs:[{k:"i",v:i,changed:true}],
+          verdict:"i ("+i+") < "+n+" → True",
+          verdictTrue:true,
+          why:"<strong>Left-pass</strong> ka iteration <strong>"+(i+1)+"/"+n+"</strong>. Index <code>i="+i+"</code> pe pahunche — abhi tak ka <code>left</code> = <strong>"+left+"</strong> (nums[0..."+(i-1)+"] ka product).",
+          analogy:"Class mein <strong>"+(i+1)+"-th bachha</strong> ki bari aayi (left side se chal rahe hain). Iske aage walon ka total product abhi tak: <strong>"+left+"</strong>."
+        })
+      });
+
+      // ── L5: answer[i] = left ──
+      var oldAns = answer[i];
+      answer[i] = left;
+      lastWriteIdx = i;
+      push({
+        line:5, action:"mark",
+        logHTML: richLog({
+          line:5, action:"mark",
+          code:"answer["+i+"] = left  # "+oldAns+" → "+left,
+          status:"success",
+          inputs:[{k:"left",v:left},{k:"answer["+i+"] (old)",v:oldAns}],
+          outputs:[
+            {k:"answer["+i+"] (new)",v:left,changed:true},
+            {k:"answer",v:JSON.stringify(answer),changed:true}
+          ],
+          why:"<code>answer["+i+"]</code> mein abhi tak ka <code>left</code> store kar diya. Yeh hai <strong>nums[0..."+(i-1)+"] ka product</strong> — exactly i ke <strong>left side</strong> ka contribution. Right-side baad mein add hoga.",
+          analogy:"Bachhe "+i+" ke result-card pe likh diya: <strong>'aage walon ka product = "+left+"'</strong>. Peeche walon ka multiply karna abhi baki."
+        })
+      });
+
+      // ── L6: left = left * nums[i] ──
+      var oldLeft = left;
+      left = left * nums[i];
+      push({
+        line:6, action:"mark",
+        logHTML: richLog({
+          line:6, action:"mark",
+          code:"left = left * nums["+i+"]  # "+oldLeft+" * "+nums[i]+" = "+left,
+          status:"success",
+          inputs:[{k:"left (old)",v:oldLeft},{k:"nums["+i+"]",v:nums[i]}],
+          outputs:[{k:"left (new)",v:left,changed:true}],
+          why:"<code>left</code> ko <strong>"+oldLeft+" × "+nums[i]+" = "+left+"</strong> update kiya. Ab <code>left</code> represents <strong>nums[0..."+i+"] ka product</strong> — agla iteration isi ka use karega.",
+          analogy:"Counter update: ab tak ke saare bachhon (0 se "+i+") ka cumulative product = <strong>"+left+"</strong>. Agle bachhe ke liye yahi base hai."
+        })
+      });
+    }
+
+    // ── L4 EXIT ──
+    push({
+      line:4, action:"exit",
+      logHTML: richLog({
+        line:4, action:"exit",
+        code:"# left-pass for-loop exit (i reached "+n+")",
+        status:"info",
+        inputs:[{k:"final i",v:n},{k:"n",v:n}],
+        verdict:"i ("+n+") < "+n+" → False",
+        verdictTrue:false,
+        outputs:[{k:"answer (after left pass)",v:JSON.stringify(answer)},{k:"left (final)",v:left}],
+        why:"<strong>Left pass complete!</strong> <code>answer</code> mein har index pe uske <strong>left side ka product</strong> store ho gaya. Final <code>left = "+left+"</code> use nahi hoga ab. Right-pass start.",
+        analogy:"<strong>Class ka left-to-right round complete</strong> — sabke card pe 'aage walon ka product' likha hua hai. Ab <strong>peeche se ulta chalna</strong> shuru."
+      })
+    });
+  }
+
+  // ── L7: right = 1 ──
+  phase = "right-pass";
+  right = 1;
+  push({
+    line:7, action:"init",
+    logHTML: richLog({
+      line:7, action:"init",
+      code:"right = 1",
+      status:"success",
+      outputs:[{k:"right",v:1,changed:true}],
+      why:"<code>right</code> running variable — <strong>'mere right side ke saare elements ka product'</strong>. Initially <code>1</code> kyunki last index ke right mein kuch nahi hai.",
+      analogy:"Aakhri bachhe ke <strong>peeche koi nahi</strong>. Toh 'peeche walon ka product' = 1 (empty multiplication)."
+    })
+  });
+
+  // ───── PHASE 2: RIGHT PASS ─────
+  if(n === 0){
+    push({
+      line:8, action:"skip",
+      logHTML: richLog({
+        line:8, action:"skip",
+        code:"for i in range(-1, -1, -1):  # empty range",
+        status:"skip",
+        inputs:[{k:"n",v:0}],
+        verdict:"range(-1,-1,-1) is empty → loop body skipped",
+        verdictTrue:false,
+        why:"Array khaali hai — right-pass loop bhi run nahi hoga. Direct L11 par.",
+        analogy:"Class khaali — peeche se bhi koi check karne ke liye nahi."
+      })
+    });
+  } else {
+    for(var idx2=n-1; idx2>=0; idx2--){
+      i = idx2;
+      // ── L8: for-iter ──
+      push({
+        line:8, action:"for-check",
+        logHTML: richLog({
+          line:8, action:"for-check",
+          code:"for i in range("+(n-1)+", -1, -1): i="+i,
+          status:"loop",
+          inputs:[{k:"i",v:i},{k:"start",v:n-1},{k:"step",v:-1}],
+          outputs:[{k:"i",v:i,changed:true}],
+          verdict:"i ("+i+") >= 0 → True",
+          verdictTrue:true,
+          why:"<strong>Right-pass</strong> iteration <strong>"+(n-i)+"/"+n+"</strong>. Index <code>i="+i+"</code> pe pahunche — peeche se chal rahe hain. Abhi tak ka <code>right</code> = <strong>"+right+"</strong> (nums["+(i+1)+"..."+(n-1)+"] ka product).",
+          analogy:"Ab <strong>ulti taraf se</strong> bachhe "+i+" ki bari (peeche se "+(n-i)+"-th). Iske <strong>peeche walon ka product</strong> abhi tak: <strong>"+right+"</strong>."
+        })
+      });
+
+      // ── L9: answer[i] = answer[i] * right ──
+      var leftPart = answer[i];
+      var oldA = answer[i];
+      answer[i] = answer[i] * right;
+      lastWriteIdx = i;
+      push({
+        line:9, action:"mark",
+        logHTML: richLog({
+          line:9, action:"mark",
+          code:"answer["+i+"] = answer["+i+"] * right  # "+leftPart+" * "+right+" = "+answer[i],
+          status:"success",
+          inputs:[
+            {k:"answer["+i+"] (left part)",v:leftPart},
+            {k:"right",v:right}
+          ],
+          outputs:[
+            {k:"answer["+i+"] (final)",v:answer[i],changed:true},
+            {k:"answer",v:JSON.stringify(answer),changed:true}
+          ],
+          why:"<strong>🎯 Final answer ready for index "+i+"!</strong> <code>"+leftPart+" (left product) × "+right+" (right product) = "+answer[i]+"</code>. Yeh <strong>'except self'</strong> ka exact product hai.",
+          analogy:"Bachhe "+i+" ka final result-card: <strong>'"+leftPart+" × "+right+" = "+answer[i]+"'</strong>. Aage walon ka × peeche walon ka = sabka product (apne ko chhodke)!"
+        })
+      });
+
+      // ── L10: right = right * nums[i] ──
+      var oldRight = right;
+      right = right * nums[i];
+      push({
+        line:10, action:"mark",
+        logHTML: richLog({
+          line:10, action:"mark",
+          code:"right = right * nums["+i+"]  # "+oldRight+" * "+nums[i]+" = "+right,
+          status:"success",
+          inputs:[{k:"right (old)",v:oldRight},{k:"nums["+i+"]",v:nums[i]}],
+          outputs:[{k:"right (new)",v:right,changed:true}],
+          why:"<code>right</code> update — <strong>"+oldRight+" × "+nums[i]+" = "+right+"</strong>. Ab <code>right</code> represents <strong>nums["+i+"..."+(n-1)+"] ka product</strong>. Agla (chhota) index isko apne 'right product' ki tarah use karega.",
+          analogy:"Right counter: ab tak peeche se <strong>"+i+" se "+(n-1)+" tak ke saare bachhon ka product = "+right+"</strong>. Agle (left-side) bachhe ke liye yahi base."
+        })
+      });
+    }
+
+    // ── L8 EXIT ──
+    push({
+      line:8, action:"exit",
+      logHTML: richLog({
+        line:8, action:"exit",
+        code:"# right-pass for-loop exit (i reached -1)",
+        status:"info",
+        inputs:[{k:"final i",v:-1},{k:"step",v:-1}],
+        verdict:"i (-1) >= 0 → False",
+        verdictTrue:false,
+        outputs:[{k:"answer (final)",v:JSON.stringify(answer)},{k:"right (final)",v:right}],
+        why:"<strong>Right pass bhi complete!</strong> Saare index pe <code>answer[i]</code> mein <strong>left × right product</strong> ready hai — ye hi 'product except self' ka final answer hai.",
+        analogy:"<strong>Reverse round bhi khatam</strong> — sabke result-cards pe final score lag gaya. Bas distribute karna baki!"
+      })
+    });
+  }
+
+  // ── L11: return answer ──
+  phase = "done";
+  curResult = answer.slice();
+  push({
+    line:11, action:"return",
+    logHTML: richLog({
+      line:11, action:"return",
+      code:"return answer  # "+JSON.stringify(answer),
+      status:"success",
+      inputs:[{k:"answer",v:JSON.stringify(answer)}],
+      outputs:[{k:"return",v:JSON.stringify(answer),changed:true}],
+      why:"<strong>🏆 Final answer:</strong> <code>"+JSON.stringify(answer)+"</code>. Har <code>answer[i]</code> = <strong>nums[0..."+(n-1)+"] ka product / nums[i]</strong> — but bina division ke, prefix-suffix trick se! Time <code>O(n)</code>, extra space <code>O(1)</code>.",
+      analogy:"<strong>Result distribute!</strong> Har bachhe ko unka 'sabka product (apne ko chhodke)' card mil gaya. Bina kisi division ke — sirf smart left + right multiplication se. <strong>Mission accomplished!</strong>"
+    })
+  });
+
+  return st;
+}
+
+/* ============ VARS STRIP ============ */
+function buildVars(s){
+  var chips=[];
+  function chip(k,v,cls){ chips.push('<span class="var-chip '+(cls||'')+'"><span class="k">'+k+':</span><span class="v">'+v+'</span></span>'); }
+
+  var phaseLabel = {
+    "init":"Setup",
+    "left-pass":"⬅ Left pass",
+    "left-exit":"Left done",
+    "right-pass":"➡ Right pass",
+    "right-exit":"Right done",
+    "done":"🏁 Done"
+  };
+  var phaseCls = "vc-active";
+  if(s.phase==="left-pass" || s.phase==="left-exit") phaseCls="vc-left";
+  else if(s.phase==="right-pass" || s.phase==="right-exit") phaseCls="vc-right";
+  else if(s.phase==="done") phaseCls="vc-safe";
+
+  chip("phase", phaseLabel[s.phase] || s.phase, phaseCls);
+  chip("n", s.n);
+  if(s.i >= 0 && s.phase !== "init" && s.phase !== "done") chip("i", s.i, "vc-active");
+  if(s.left !== null) chip("left", s.left, s.phase==="left-pass" ? "vc-left" : "");
+  if(s.right !== null) chip("right", s.right, s.phase==="right-pass" ? "vc-right" : "");
+  return '<div class="vars-strip">'+chips.join('')+'</div>';
+}
+
+/* ============ ARRAY VIZ ============ */
+function arrayCard(s, label, isInput){
+  // isInput true → show nums (immutable); false → show answer (mutable)
+  var data = isInput ? s.nums : s.answer;
+  if(s.n === 0){
+    return '<div style="padding:16px;text-align:center;font-style:italic;color:var(--text-tertiary)">📭 array empty</div>';
+  }
+  var html = '<div class="arr-row">';
+  for(var k=0; k<s.n; k++){
+    var cls = "arr-tile";
+    if(isInput){
+      // For input nums — highlight current i
+      if(s.i === k && (s.phase==="left-pass" || s.phase==="right-pass")) cls += " curr";
+    } else {
+      // For answer
+      if(s.lastWriteIdx === k && s.phase!=="done") cls += " just-written";
+      if(s.phase==="done") cls += " done";
+      else if(s.i === k && (s.phase==="left-pass" || s.phase==="right-pass")) cls += " curr";
+      else if(s.phase==="left-pass"){
+        if(k < s.i) cls += " processed-left";
+        else if(k > s.i) cls += " future";
+      } else if(s.phase==="right-pass"){
+        // Right pass goes from n-1 to 0
+        if(k > s.i) cls += " processed-right";  // already finalized in right pass
+        else if(k < s.i) cls += " processed-left"; // still has just left-product
+      } else if(s.phase==="left-exit") cls += " processed-left";
+    }
+    html += '<div class="'+cls+'"><div class="at-idx">['+k+']</div><div class="at-val">'+data[k]+'</div></div>';
+  }
+  html += '</div>';
+  return html;
+}
+
+/* ============ SCALAR CARD ============ */
+function scalarsCard(s){
+  var html = '<div class="scalar-card">';
+  // LEFT box
+  var leftCls = "scalar-box";
+  if(s.phase==="left-pass") leftCls += " left-active";
+  else if(s.phase==="right-pass" || s.phase==="done") leftCls += " dim";
+  html += '<div class="'+leftCls+'">';
+  html += '<div class="scalar-label">⬅ LEFT (running)</div>';
+  html += '<div class="scalar-value">'+(s.left===null?"—":s.left)+'</div>';
+  html += '<div class="scalar-formula">∏ nums[0..i-1]</div>';
+  html += '</div>';
+  // RIGHT box
+  var rightCls = "scalar-box";
+  if(s.phase==="right-pass") rightCls += " right-active";
+  else if(s.phase==="left-pass" || s.phase==="init") rightCls += " dim";
+  html += '<div class="'+rightCls+'">';
+  html += '<div class="scalar-label">➡ RIGHT (running)</div>';
+  html += '<div class="scalar-value">'+(s.right===null?"—":s.right)+'</div>';
+  html += '<div class="scalar-formula">∏ nums[i+1..n-1]</div>';
+  html += '</div>';
+  html += '</div>';
+  return html;
+}
+
+/* ============ EQUATION STRIP ============ */
+function equationStrip(s){
+  if(s.phase==="init" || s.i < 0) return '<div class="eq-strip" style="color:#94a3b8;font-style:italic">awaiting first iteration…</div>';
+  if(s.phase==="done"){
+    return '<div class="eq-strip"><span class="eq-result">answer = '+JSON.stringify(s.answer)+'</span></div>';
+  }
+  var html = '<div class="eq-strip">';
+  if(s.phase==="left-pass"){
+    html += 'i=<span class="eq-curr">'+s.i+'</span><span class="eq-op"> | </span>';
+    html += '<span class="eq-left">left='+s.left+'</span><span class="eq-op"> → </span>';
+    html += 'answer['+s.i+']=<span class="eq-result">'+s.answer[s.i]+'</span><span class="eq-op"> | </span>';
+    html += 'next left = '+s.left+'<span class="eq-op">×</span>nums['+s.i+']('+s.nums[s.i]+')<span class="eq-op">=</span>'+(s.left*s.nums[s.i]);
+  } else if(s.phase==="right-pass"){
+    var leftPart = s.answer[s.i]; // contains left product or final
+    html += 'i=<span class="eq-curr">'+s.i+'</span><span class="eq-op"> | </span>';
+    html += 'leftPart=<span class="eq-left">'+leftPart+'</span><span class="eq-op"> × </span>';
+    html += '<span class="eq-right">right='+s.right+'</span><span class="eq-op"> = </span>';
+    html += '<span class="eq-result">'+s.answer[s.i]+'</span><span class="eq-op"> | </span>';
+    html += 'next right = '+s.right+'<span class="eq-op">×</span>nums['+s.i+']('+s.nums[s.i]+')<span class="eq-op">=</span>'+(s.right*s.nums[s.i]);
+  }
+  html += '</div>';
+  return html;
+}
+
+/* ============ DIRECTION ARROW ============ */
+function directionArrow(s){
+  if(s.phase==="left-pass") return '<div class="dir-arrow left-pass"><span class="arrow-icon">➡️</span><span>LEFT PASS — moving right (i: 0 → n-1)</span></div>';
+  if(s.phase==="right-pass") return '<div class="dir-arrow right-pass"><span class="arrow-icon">⬅️</span><span>RIGHT PASS — moving left (i: n-1 → 0)</span></div>';
+  if(s.phase==="done") return '<div class="dir-arrow done-state"><span class="arrow-icon">✅</span><span>BOTH PASSES COMPLETE</span></div>';
+  return '<div class="dir-arrow"><span class="arrow-icon">⚙️</span><span>Setup phase</span></div>';
+}
+
+/* ============ RENDER VIZ ============ */
+function renderViz(s){
+  var v = document.getElementById('vizPanel');
+  var html = '';
+  html += buildVars(s);
+
+  // Banner
+  var bannerCls, bannerText;
+  if(s.phase==="init"){ bannerCls="banner-init"; bannerText="⚙️ Setup — n="+s.n+", answer initialized to all 1s"; }
+  else if(s.phase==="left-pass"){ bannerCls="banner-left"; bannerText="⬅ Left pass — i="+s.i+", left running product = "+s.left; }
+  else if(s.phase==="right-pass"){ bannerCls="banner-right"; bannerText="➡ Right pass — i="+s.i+", right running product = "+s.right; }
+  else if(s.phase==="done"){ bannerCls="banner-done"; bannerText="🏆 Done — answer = "+JSON.stringify(s.answer); }
+  else { bannerCls="banner-skip"; bannerText="⏭ Skipping (empty array)"; }
+  html += '<div class="banner '+bannerCls+'">'+bannerText+'</div>';
+
+  // Direction arrow
+  html += directionArrow(s);
+
+  // Equation strip
+  html += '<div style="margin:10px 0">'+equationStrip(s)+'</div>';
+
+  // Row: input nums + scalars
+  html += '<div class="viz-row">';
+  html += '<div class="viz-card" style="flex:2;min-width:340px"><h5>📥 Input — nums (immutable)</h5>'+arrayCard(s, 'nums', true)+'</div>';
+  html += '<div class="viz-card" style="flex:1;min-width:240px"><h5>🔢 Running Products</h5>'+scalarsCard(s)+'</div>';
+  html += '</div>';
+
+  // Output answer (full width)
+  html += '<div class="viz-card"><h5>📤 Output — answer (mutating)</h5>'+arrayCard(s, 'answer', false);
+  // Legend
+  var legend = '<div class="legend">';
+  legend += '<span><i style="background:#fff"></i>Initial / future</span>';
+  legend += '<span><i style="background:var(--accent-amber-bg);border-color:var(--accent-amber)"></i>Current i</span>';
+  legend += '<span><i style="background:#FFEBE0;border-color:#EA580C"></i>Has left-product</span>';
+  legend += '<span><i style="background:#E0F2FE;border-color:#0284C7"></i>Finalized (right-pass done)</span>';
+  legend += '<span><i style="background:var(--accent-green-bg);border-color:var(--accent-green)"></i>Done</span>';
+  legend += '</div>';
+  html += legend + '</div>';
+
+  v.innerHTML = html;
+}
+
+/* ============ STEP CONTROLS ============ */
+function renderStep(idx){
+  if(!steps.length) return;
+  var s = steps[idx];
+  currentStep = idx;
+  document.getElementById('stepInfo').textContent = (idx+1)+'/'+steps.length;
+  var bd = document.getElementById('actionBadge');
+  bd.textContent = BADGE_LABEL[s.action] || s.action;
+  bd.className = 'action-badge action-badge--'+s.action;
+  document.querySelectorAll('.code-line').forEach(function(el){el.classList.remove('active');});
+  var al = document.querySelector('.code-line[data-line="'+s.line+'"]');
+  if(al){ al.classList.add('active'); al.scrollIntoView({block:'nearest'}); }
+  renderViz(s);
+  showLogPreview(s);
+}
+function showLogPreview(s){
+  if(!logEnabled) return;
+  document.getElementById('logPopupBody').innerHTML = s.logHTML || '';
+  document.getElementById('logPopup').classList.remove('log-popup--hidden');
+}
+function hideLogPopup(){ document.getElementById('logPopup').classList.add('log-popup--hidden'); }
+function stepBy(d){
+  var n = currentStep + d;
+  if(n<0||n>=steps.length) return;
+  renderStep(n);
+}
+function resetStep(){ if(steps.length) renderStep(0); }
+
+/* ============ POPUP CONTROLS ============ */
+function toggleLogPreview(){
+  logEnabled = !logEnabled;
+  var btn = document.getElementById('logToggleBtn');
+  btn.textContent = logEnabled ? '📋 ON' : '📋 OFF';
+  btn.classList.toggle('log-toggle-btn--off', !logEnabled);
+  if(!logEnabled) hideLogPopup();
+  else if(steps.length) showLogPreview(steps[currentStep]);
+}
+function logZoom(dir){ logZoomLevel = Math.max(60, Math.min(180, logZoomLevel + dir*20)); updateLogZoom(); }
+function logZoomReset(){ logZoomLevel=100; updateLogZoom(); }
+function updateLogZoom(){
+  document.getElementById('logZoomLabel').textContent = logZoomLevel+'%';
+  document.getElementById('logPopup').style.setProperty('--log-scale', logZoomLevel/100);
+}
+function toggleFullscreen(){
+  var viz = document.querySelector('.col-viz');
+  if(!document.fullscreenElement) viz.requestFullscreen().catch(function(){});
+  else document.exitFullscreen();
+}
+function toggleProblem(){
+  var b = document.getElementById('pcBody');
+  var btn = document.getElementById('toggleBtn');
+  if(b.style.display==='none'){ b.style.display=''; btn.textContent='▲ Hide'; }
+  else { b.style.display='none'; btn.textContent='▼ Show'; }
+}
+
+/* ============ TEST LOADER ============ */
+function loadTest(numsStr, expStr, note){
+  document.getElementById('inNums').value = numsStr;
+  document.getElementById('expBadge').textContent = 'expected: '+expStr+' ('+note+')';
+  resetWithInput();
+}
+
+/* ============ RESET WITH INPUT ============ */
+function resetWithInput(){
+  curResult = null;
+  var nums = parseArr(document.getElementById('inNums').value);
+  renderCode();
+  fitCodeWidth();
+  steps = buildSteps({nums: nums});
+  currentStep = 0;
+  renderStep(0);
+  document.getElementById('liveOutput').textContent = curResult!==null ? JSON.stringify(curResult) : '—';
+}
+
+/* ============ CODE WIDTH ============ */
+function fitCodeWidth(){ syncFooterWidth(); }
+function syncFooterWidth(){
+  document.getElementById('footerLeft').style.width = document.getElementById('col1').offsetWidth + 'px';
+}
+
+/* ============ RESIZE HANDLE ============ */
+(function(){
+  var col1 = document.getElementById('col1');
+  document.getElementById('resizeH1').addEventListener('mousedown', function(e){
+    e.preventDefault();
+    codeWidthUserSet = true;
+    var startX = e.clientX, startW = col1.offsetWidth, h = this;
+    document.body.classList.add('no-select');
+    h.classList.add('active');
+    function mv(e){
+      col1.style.width = Math.max(140, startW + (e.clientX - startX)) + 'px';
+      syncFooterWidth();
+    }
+    function up(){
+      document.removeEventListener('mousemove', mv);
+      document.removeEventListener('mouseup', up);
+      document.body.classList.remove('no-select');
+      h.classList.remove('active');
+    }
+    document.addEventListener('mousemove', mv);
+    document.addEventListener('mouseup', up);
+  });
+})();
+window.addEventListener('resize', function(){
+  if(!codeWidthUserSet) fitCodeWidth();
+  else syncFooterWidth();
+});
+
+/* ============ KEYBOARD ============ */
+document.addEventListener('keydown', function(e){
+  if(e.target.tagName==='INPUT' || e.target.tagName==='SELECT') return;
+  if(e.key==='ArrowRight'){ e.preventDefault(); stepBy(1); }
+  else if(e.key==='ArrowLeft'){ e.preventDefault(); stepBy(-1); }
+  else if(e.key==='r' || e.key==='R'){ e.preventDefault(); resetStep(); }
+});
+
+/* ============ INIT ============ */
+renderCode();
+syncFooterWidth();
+resetWithInput();
+</script>
+</body>
+</html>

@@ -1,0 +1,1212 @@
+﻿
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LC 95 — Unique Binary Search Trees II | DSA Dry-Run Visualizer</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+:root {
+  --bg-primary:#FAFAF8; --bg-secondary:#F1EFE8; --bg-tertiary:#E2E0D8; --bg-card:#FFFFFF;
+  --text-primary:#2C2C2A; --text-secondary:#5F5E5A; --text-tertiary:#888780;
+  --border-color:rgba(0,0,0,0.11); --border-light:rgba(0,0,0,0.06); --border-focus:#534AB7;
+  --accent-indigo:#534AB7; --accent-indigo-bg:#EEEDFE; --accent-indigo-text:#3C3489; --accent-indigo-hover:#4740A0;
+  --accent-teal:#0F6E56; --accent-teal-bg:#E1F5EE; --accent-teal-text:#085041;
+  --accent-red:#E24B4A; --accent-red-bg:#FCEBEB; --accent-red-text:#791F1F;
+  --accent-amber:#B45309; --accent-amber-bg:#FEF3C7; --accent-amber-text:#78350F;
+  --accent-green:#15803D; --accent-green-bg:#DCFCE7; --accent-green-text:#14532D;
+  --syn-keyword:#534AB7; --syn-function:#185FA5; --syn-number:#993C1D; --syn-string:#0F6E56;
+  --active-line-bg:#EEEDFE;
+  --radius-sm:4px; --radius-md:6px; --radius-lg:10px; --radius-xl:14px;
+  --sp-2:8px; --sp-3:12px; --sp-5:20px;
+  --font-sans:'DM Sans', system-ui, sans-serif;
+  --font-mono:'JetBrains Mono', 'Fira Code', monospace;
+  --fs-xs:11px; --fs-sm:12px; --fs-base:14px; --fs-md:15px; --fs-lg:18px;
+  --fw-medium:500; --fw-semibold:600; --fw-bold:700;
+  --lh-normal:1.6; --lh-code:1.9;
+  --ease:.18s ease;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans);background:var(--bg-primary);color:var(--text-primary);font-size:var(--fs-base);line-height:var(--lh-normal);overflow:hidden}
+.no-select{user-select:none}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border-color);border-radius:99px}
+
+.app-shell{display:flex;flex-direction:column;height:100vh;overflow:hidden;background:var(--bg-primary)}
+
+/* Problem card */
+.problem-card{flex-shrink:0;border-bottom:1px solid var(--border-color);background:var(--bg-card)}
+.pc-header{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--border-light);flex-wrap:wrap}
+.gt-learn{background:var(--accent-indigo);color:#fff;font-weight:700;font-size:11px;padding:4px 10px;border-radius:99px;border:none;cursor:pointer;letter-spacing:.04em}
+.pc-num{font:700 12px var(--font-mono);color:var(--text-tertiary)}
+.pc-title{font-size:16px;font-weight:700}
+.pc-diff{font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;background:var(--accent-amber-bg);color:var(--accent-amber-text);border:1px solid var(--accent-amber);text-transform:uppercase}
+.pc-tag{font-size:10px;font-weight:600;padding:2px 7px;border-radius:99px;background:var(--accent-indigo-bg);color:var(--accent-indigo-text);border:1px solid var(--accent-indigo)}
+.pc-header-right{margin-left:auto;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.pc-input-label{font:600 11px var(--font-mono);color:var(--text-secondary)}
+.pc-input{font:600 12px var(--font-mono);padding:3px 8px;border-radius:5px;border:1px solid var(--border-color);background:var(--bg-secondary);width:50px;text-align:center}
+.pc-expected{font:600 11px var(--font-mono);padding:3px 9px;border-radius:5px;background:var(--accent-green-bg);color:var(--accent-green-text);border:1px solid var(--accent-green)}
+.btn-toggle{font-family:system-ui,"Segoe UI Emoji",sans-serif;background:var(--bg-secondary);border:1px solid var(--border-color);color:var(--text-primary);padding:3px 9px;border-radius:5px;font-size:11px;cursor:pointer;font-weight:600}
+
+.pc-body{display:flex;gap:14px;padding:12px 14px}
+.pc-body--hidden{display:none}
+.pc-body-left{flex:1.4;display:flex;flex-direction:column;gap:8px}
+.pc-body-right{flex:1;display:flex;flex-direction:column;gap:6px}
+.pc-section{font-size:12.5px;line-height:1.55}
+.pc-section h4{font-size:11px;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;font-weight:700}
+.pc-section code{font:600 11.5px var(--font-mono);background:var(--accent-indigo-bg);color:var(--accent-indigo-text);padding:1px 5px;border-radius:3px}
+.pc-section em{font-style:normal;background:var(--accent-amber-bg);color:var(--accent-amber-text);padding:1px 5px;border-radius:3px;font-weight:600}
+.concept-block{background:var(--bg-secondary);border-left:3px solid var(--accent-indigo);padding:6px 9px;border-radius:4px;font-size:11.5px;margin-top:4px}
+.concept-block strong{color:var(--accent-indigo-text)}
+.cplx-row{display:flex;gap:6px;margin-top:5px}
+.cplx-chip{font:600 10.5px var(--font-mono);padding:2px 8px;border-radius:99px;background:var(--accent-teal-bg);color:var(--accent-teal-text);border:1px solid var(--accent-teal)}
+
+.tc-chip{display:flex;flex-direction:column;gap:3px;background:var(--bg-secondary);border:1px solid var(--border-color);border-radius:6px;padding:6px 9px;cursor:pointer;transition:all var(--ease)}
+.tc-chip:hover{border-color:var(--accent-indigo);background:var(--accent-indigo-bg)}
+.tc-chip-top{display:flex;align-items:center;gap:6px;font-size:11px}
+.pt-tag{font:700 9px var(--font-mono);padding:1px 6px;border-radius:99px;background:var(--accent-indigo);color:#fff;text-transform:uppercase}
+.tc-label{flex:1;font-weight:600;color:var(--text-secondary)}
+.tc-expected{font:700 10.5px var(--font-mono);color:var(--accent-green-text)}
+.tc-vals{display:flex;gap:4px;flex-wrap:wrap}
+.tc-vals code{font:600 11px var(--font-mono);background:#fff;padding:2px 7px;border-radius:4px;border:1px solid var(--border-light);color:var(--text-primary)}
+.run-row{display:flex;align-items:center;gap:8px;margin-top:4px}
+.btn-run{font-family:system-ui,"Segoe UI Emoji",sans-serif;background:var(--accent-indigo);color:#fff;border:none;padding:6px 14px;border-radius:5px;font-weight:700;cursor:pointer;font-size:12px}
+.btn-run:hover{background:var(--accent-indigo-hover)}
+.live-out{font:700 12px var(--font-mono);color:var(--accent-teal-text);background:var(--accent-teal-bg);padding:4px 10px;border-radius:5px;border:1px solid var(--accent-teal)}
+
+/* Main */
+.main-row{flex:1;display:flex;overflow:hidden;min-height:0}
+.col{display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.col-code{width:33%;min-width:140px;max-width:45vw;background:var(--bg-card);border-right:1px solid var(--border-color)}
+.col-viz{flex:1;min-width:0;background:var(--bg-primary);position:relative}
+.section-label{font-family:system-ui,"Segoe UI Emoji",sans-serif;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-tertiary);padding:7px 12px;border-bottom:1px solid var(--border-light);background:var(--bg-secondary);flex-shrink:0}
+.code-panel{flex:1;overflow-y:auto;font-family:var(--font-mono);font-size:12px;line-height:var(--lh-code);padding:8px 0}
+.code-line{display:flex;padding:0 12px;white-space:pre;color:var(--text-primary)}
+.code-line.active{background:var(--active-line-bg);border-left:3px solid var(--accent-indigo);padding-left:9px}
+.code-ln{display:inline-block;width:24px;color:var(--text-tertiary);user-select:none;text-align:right;margin-right:10px;font-size:10.5px}
+.kw{color:var(--syn-keyword);font-weight:600}
+.fn{color:var(--syn-function);font-weight:600}
+.num{color:var(--syn-number);font-weight:600}
+.str{color:var(--syn-string)}
+
+.viz-panel{flex:1;overflow:auto;padding:10px 12px}
+
+.resize-h{width:5px;background:transparent;cursor:ew-resize;flex-shrink:0;transition:background var(--ease)}
+.resize-h:hover,.resize-h.active{background:var(--accent-indigo)}
+
+/* Vars strip */
+.vars-strip{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.var-chip{font:600 11px var(--font-mono);padding:3px 9px;border-radius:5px;background:var(--bg-card);border:1px solid var(--border-color);color:var(--text-primary)}
+.var-chip strong{color:var(--text-tertiary);font-weight:500;margin-right:3px}
+.vc-active{background:var(--accent-indigo-bg);border-color:var(--accent-indigo);color:var(--accent-indigo-text)}
+.vc-safe{background:var(--accent-green-bg);border-color:var(--accent-green);color:var(--accent-green-text)}
+.vc-flip{background:var(--accent-red-bg);border-color:var(--accent-red);color:var(--accent-red-text)}
+
+/* viz-row */
+.viz-row{display:flex;gap:12px;align-items:flex-start;flex-wrap:wrap}
+.viz-card{background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius-md);padding:10px;min-width:160px}
+.viz-card h5{font-size:11px;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:.06em;margin-bottom:7px;font-weight:700;display:flex;align-items:center;gap:5px}
+
+/* Stack */
+.stack-col{display:flex;flex-direction:column-reverse;gap:4px;min-height:124px;padding:8px;background:var(--bg-secondary);border-radius:var(--radius-md);border:1px dashed var(--border-color);min-width:170px}
+.stack-frame{background:var(--bg-card);border:1px solid var(--border-color);border-radius:5px;padding:5px 8px;font:600 11px var(--font-mono);display:flex;flex-direction:column;gap:2px}
+.stack-frame--active{border-color:var(--accent-indigo);background:var(--accent-indigo-bg);box-shadow:0 0 4px var(--accent-indigo);animation:pulse-node 1.4s infinite}
+.stack-frame-title{font-weight:700;color:var(--accent-indigo-text);font-size:11px}
+.stack-frame--active .stack-frame-title{color:var(--accent-indigo-text)}
+.stack-frame-meta{font-size:9.5px;color:var(--text-tertiary);font-weight:500}
+.empty-state{font-size:11px;color:var(--text-tertiary);font-style:italic;text-align:center;padding:6px}
+
+/* Range bar */
+.range-bar{display:flex;gap:3px;margin-top:4px}
+.range-tile{width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:4px;background:var(--bg-secondary);border:1px solid var(--border-color);font:700 12px var(--font-mono);color:var(--text-tertiary)}
+.range-tile--in{background:var(--accent-indigo-bg);border-color:var(--accent-indigo);color:var(--accent-indigo-text)}
+.range-tile--root{background:var(--accent-amber-bg);border-color:var(--accent-amber);color:var(--accent-amber-text);animation:pulse-node 1.4s infinite}
+
+/* Result trees */
+.trees-grid{display:flex;flex-wrap:wrap;gap:10px;margin-top:6px}
+.tree-card{background:var(--bg-card);border:1px solid var(--border-color);border-radius:6px;padding:8px;min-width:120px}
+.tree-card--new{border-color:var(--accent-green);background:var(--accent-green-bg);animation:win-pulse 1.4s infinite}
+.tree-svg{display:block}
+.tree-card-label{font:600 9.5px var(--font-mono);color:var(--text-tertiary);text-align:center;margin-top:3px}
+.tree-card--new .tree-card-label{color:var(--accent-green-text);font-weight:700}
+
+/* Result banner */
+.result-banner{margin-top:10px;padding:10px 14px;background:linear-gradient(90deg,var(--accent-amber-bg),#FEF9C3);border:2px solid var(--accent-amber);border-radius:var(--radius-md);font-weight:700;color:var(--accent-amber-text);text-align:center;animation:win-pulse 1.6s infinite}
+
+@keyframes pulse-node{0%,100%{box-shadow:0 0 4px var(--accent-indigo)}50%{box-shadow:0 0 12px var(--accent-indigo)}}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-3px)}75%{transform:translateX(3px)}}
+@keyframes win-pulse{0%,100%{box-shadow:0 0 3px rgba(234,179,8,.5)}50%{box-shadow:0 0 8px rgba(234,179,8,.9)}}
+
+/* Footer */
+.footer-bar{display:flex;flex-shrink:0;border-top:1px solid var(--border-color);background:var(--bg-card)}
+.footer-left{width:33%;min-width:140px;max-width:45vw;display:flex;align-items:center;gap:8px;padding:7px 12px;border-right:1px solid var(--border-light)}
+.footer-right{flex:1;display:flex;align-items:center;gap:8px;padding:7px 14px;flex-wrap:wrap}
+.step-info{font:700 12px var(--font-mono);color:var(--text-primary);background:var(--bg-secondary);padding:3px 10px;border-radius:5px;border:1px solid var(--border-color)}
+.action-badge{font-family:system-ui,"Segoe UI Emoji",sans-serif;font-size:10px;font-weight:700;padding:3px 8px;border-radius:99px;color:#fff;background:#888}
+.action-badge--func-def,.action-badge--init,.action-badge--call,.action-badge--return{background:#8250ff}
+.action-badge--for-check,.action-badge--while-check,.action-badge--if-check{background:#388bfd}
+.action-badge--mark,.action-badge--push,.action-badge--pop,.action-badge--restore,.action-badge--found{background:#3fb950}
+.action-badge--remove,.action-badge--prune,.action-badge--fail{background:#f85149}
+.action-badge--exit,.action-badge--skip{background:#555450}
+
+kbd{font-family:system-ui,"Segoe UI Emoji",sans-serif;font-size:10px;background:var(--bg-secondary);border:1px solid var(--border-color);border-radius:3px;padding:1px 5px;color:var(--text-secondary)}
+.btn{font-family:system-ui,"Segoe UI Emoji",sans-serif;background:var(--bg-secondary);border:1px solid var(--border-color);color:var(--text-primary);padding:4px 10px;border-radius:5px;font-size:12px;cursor:pointer;font-weight:600}
+.btn:hover{background:var(--bg-tertiary)}
+.btn-primary{background:var(--accent-indigo);color:#fff;border-color:var(--accent-indigo)}
+.btn-primary:hover{background:var(--accent-indigo-hover)}
+.btn-fullscreen{font-size:14px}
+.footer-sep{width:1px;height:20px;background:var(--border-color);margin:0 3px}
+.log-toggle-btn{font-family:system-ui,"Segoe UI Emoji",sans-serif;background:var(--accent-green-bg);color:var(--accent-green-text);border:1px solid var(--accent-green);padding:4px 10px;border-radius:5px;font-size:11px;cursor:pointer;font-weight:700}
+.log-toggle-btn--off{background:var(--bg-secondary);color:var(--text-tertiary);border-color:var(--border-color)}
+.btn-zoom{font-family:system-ui,"Segoe UI Emoji",sans-serif;background:var(--bg-secondary);border:1px solid var(--border-color);color:var(--text-primary);padding:3px 8px;border-radius:4px;font-size:13px;cursor:pointer;font-weight:700;min-width:24px}
+.log-zoom-label{font:600 10.5px var(--font-mono);color:var(--text-secondary);min-width:34px;text-align:center}
+
+/* Log popup */
+.log-popup{--log-scale:1;position:fixed;bottom:52px;right:14px;width:calc(480px * var(--log-scale));max-width:92vw;max-height:75vh;border-radius:var(--radius-lg);box-shadow:0 10px 32px rgba(0,0,0,.14);border:1px solid var(--border-color);background:var(--bg-card);overflow:hidden;display:flex;flex-direction:column;z-index:100;transition:opacity .15s, transform .15s;transform-origin:bottom right}
+.log-popup--hidden{opacity:0;transform:scale(.92);pointer-events:none}
+.log-popup-body{flex:1;overflow:auto;padding:0}
+.log-popup-body > .log-card{border-radius:0;border:none;border-left:0}
+
+.log-card{border-radius:var(--radius-md);overflow:hidden;border:1px solid var(--border-color);border-left-width:4px;font-size:var(--fs-xs);background:var(--bg-card)}
+.log-card--func-def,.log-card--init,.log-card--call,.log-card--return{border-left-color:#8250ff}
+.log-card--for-check,.log-card--while-check,.log-card--if-check{border-left-color:#388bfd}
+.log-card--mark,.log-card--push,.log-card--pop,.log-card--restore,.log-card--found{border-left-color:#3fb950}
+.log-card--remove,.log-card--prune,.log-card--fail{border-left-color:#f85149}
+.log-card--exit,.log-card--skip{border-left-color:#555450}
+
+.log-card-header{display:flex;align-items:center;gap:6px;padding:8px 10px 6px;background:var(--bg-secondary);border-bottom:1px solid var(--border-light)}
+.log-badge{font-family:system-ui,"Segoe UI Emoji",sans-serif;font-size:10px;font-weight:700;padding:2px 7px;border-radius:99px;color:#fff;background:#888}
+.log-badge--func-def,.log-badge--init,.log-badge--call,.log-badge--return{background:#8250ff}
+.log-badge--for-check,.log-badge--while-check,.log-badge--if-check{background:#388bfd}
+.log-badge--mark,.log-badge--push,.log-badge--pop,.log-badge--restore,.log-badge--found{background:#3fb950}
+.log-badge--remove,.log-badge--prune,.log-badge--fail{background:#f85149}
+.log-badge--exit,.log-badge--skip{background:#555450}
+.log-line-ref{font:700 10px var(--font-mono);color:var(--accent-indigo);background:var(--accent-indigo-bg);padding:1px 6px;border-radius:4px;border:1px solid var(--accent-indigo)}
+.log-status-pill{font-family:system-ui,"Segoe UI Emoji",sans-serif;font-size:9px;font-weight:700;padding:2px 7px;border-radius:99px;text-transform:uppercase;margin-left:auto}
+.log-status--success{background:var(--accent-green-bg);color:var(--accent-green-text);border:1px solid var(--accent-green)}
+.log-status--fail{background:var(--accent-red-bg);color:var(--accent-red-text);border:1px solid var(--accent-red)}
+.log-status--skip{background:var(--bg-tertiary);color:var(--text-tertiary);border:1px solid var(--border-color)}
+.log-status--loop{background:rgba(56,139,253,.14);color:#185FA5;border:1px solid #388bfd}
+.log-status--prune{background:var(--accent-red-bg);color:var(--accent-red-text);border:1px solid var(--accent-red)}
+.log-status--info{background:rgba(130,80,255,.14);color:#3C3489;border:1px solid #8250ff}
+
+.log-section{padding:7px 10px;border-bottom:1px dashed var(--border-light)}
+.log-section:last-child{border-bottom:none}
+.log-section-title{font:700 8px var(--font-mono);text-transform:uppercase;letter-spacing:.06em;color:var(--text-tertiary);margin-bottom:4px;display:flex;align-items:center;gap:4px}
+.log-section-title-icon{font-family:system-ui,"Segoe UI Emoji",sans-serif}
+
+.log-code-snippet{font:600 11px var(--font-mono);background:#0d1117;color:#e6edf3;padding:6px 9px;border-radius:4px;display:block;overflow-x:auto;white-space:pre;border:1px solid #30363d}
+.log-code-snippet .ck{color:#ff7b72}
+.log-code-snippet .cs{color:#a5d6ff}
+.log-code-snippet .cn{color:#79c0ff}
+.log-code-snippet .cf{color:#d2a8ff}
+.log-code-snippet .cc{color:#8b949e;font-style:italic}
+
+.log-kv-row{display:flex;flex-wrap:wrap;gap:4px}
+.log-kv{display:inline-flex;align-items:center;gap:3px;font:11px var(--font-mono);padding:2px 7px;border-radius:4px;background:var(--bg-secondary);border:1px solid var(--border-light)}
+.log-kv-key{color:var(--text-tertiary);font-weight:500}
+.log-kv-val{color:var(--text-primary);font-weight:700}
+.log-kv--in{background:rgba(56,139,253,.08);border-color:rgba(56,139,253,.3)}
+.log-kv--out{background:rgba(63,185,80,.08);border-color:rgba(63,185,80,.4)}
+.log-kv--out .log-kv-val{color:#15803D}
+.log-kv--changed{background:rgba(180,83,9,.10);border-color:rgba(180,83,9,.4)}
+.log-kv--changed .log-kv-val{color:var(--accent-amber-text)}
+
+.log-verdict{display:flex;align-items:center;gap:6px;font:600 11px var(--font-mono);padding:5px 8px;border-radius:5px;background:var(--bg-secondary);border:1px solid var(--border-light)}
+.log-verdict--true{background:var(--accent-green-bg);border-color:var(--accent-green);color:var(--accent-green-text)}
+.log-verdict--false{background:var(--accent-red-bg);border-color:var(--accent-red);color:var(--accent-red-text)}
+
+.log-analogy{font:italic 11px var(--font-sans);color:var(--text-secondary);background:#FFF8E7;border:1px solid #FBE8A6;border-left:3px solid var(--accent-amber);padding:6px 9px;border-radius:4px;line-height:1.55}
+.log-analogy strong{color:var(--accent-amber-text);font-style:normal;font-weight:700}
+
+.log-why{font-size:11px;line-height:1.55;color:var(--text-primary);padding:3px 0}
+.log-why strong{color:var(--accent-indigo-text)}
+.log-why code{font:600 10.5px var(--font-mono);background:var(--bg-secondary);padding:1px 5px;border-radius:3px;color:var(--accent-indigo-text)}
+</style>
+</head>
+<body>
+<div class="app-shell">
+
+  <!-- ============ PROBLEM CARD ============ -->
+  <div class="problem-card" id="problemCard">
+    <div class="pc-header">
+      <a href="../00_HomePage/gt_learn_homepage.html" class="gt-learn">GT LEARN</a>
+      <span class="pc-num">#95</span>
+      <span class="pc-title">🌳 Unique Binary Search Trees II</span>
+      <span class="pc-diff">MEDIUM</span>
+      <span class="pc-tag">Recursion</span>
+      <span class="pc-tag">Backtracking</span>
+      <span class="pc-tag">Trees</span>
+      <div class="pc-header-right">
+        <span class="pc-input-label">n=</span>
+        <input class="pc-input" id="inN" type="number" min="0" max="5" value="3">
+        <span class="pc-expected" id="expectedBadge">expected: 5 trees</span>
+        <button class="btn-toggle" onclick="toggleProblem()" id="toggleBtn">▲ Hide</button>
+      </div>
+    </div>
+    <div class="pc-body" id="pcBody">
+      <div class="pc-body-left">
+        <div class="pc-section">
+          <h4>📝 Problem Statement</h4>
+          Given an integer <code>n</code>, return all the structurally unique BSTs (binary search trees) which has exactly <code>n</code> nodes of unique values from <code>1</code> to <code>n</code>. Constraints: <em>1 ≤ n ≤ 8</em>.
+        </div>
+        <div class="pc-section">
+          <h4>🧠 Solving Approach</h4>
+          For each value <code>i</code> in range <code>[start, end]</code>, make <code>i</code> the root. Recursively build all possible left subtrees from <code>[start, i-1]</code> and all right subtrees from <code>[i+1, end]</code>. Combine each left × right pair under root <code>i</code>.
+        </div>
+        <div class="pc-section">
+          <h4>🎯 Core Concepts & Base Case</h4>
+          <div class="concept-block"><strong>Base Case:</strong> When <code>start &gt; end</code> → empty range → return <code>[None]</code> (one "empty tree" placeholder so combining loops still iterate).</div>
+          <div class="concept-block"><strong>Transition:</strong> For each root <code>i</code>: <code>build(start, i-1) × build(i+1, end)</code> → cartesian product of left × right subtrees.</div>
+          <div class="concept-block"><strong>BST property:</strong> All left descendants &lt; root &lt; all right descendants — guaranteed by splitting the range.</div>
+        </div>
+        <div class="cplx-row">
+          <span class="cplx-chip">Time: O(n · Catalan(n))</span>
+          <span class="cplx-chip">Space: O(n · Catalan(n))</span>
+        </div>
+      </div>
+      <div class="pc-body-right">
+        <div class="tc-chip" onclick="loadTest(1, 1)">
+          <div class="tc-chip-top"><span class="pt-tag">T1</span><span class="tc-label">smallest</span><span class="tc-expected">→ 1 tree</span></div>
+          <div class="tc-vals"><code>n=1</code></div>
+        </div>
+        <div class="tc-chip" onclick="loadTest(2, 2)">
+          <div class="tc-chip-top"><span class="pt-tag">T2</span><span class="tc-label">two nodes</span><span class="tc-expected">→ 2 trees</span></div>
+          <div class="tc-vals"><code>n=2</code></div>
+        </div>
+        <div class="tc-chip" onclick="loadTest(3, 5)">
+          <div class="tc-chip-top"><span class="pt-tag">T3</span><span class="tc-label">classic three</span><span class="tc-expected">→ 5 trees</span></div>
+          <div class="tc-vals"><code>n=3</code></div>
+        </div>
+        <div class="tc-chip" onclick="loadTest(0, 0)">
+          <div class="tc-chip-top"><span class="pt-tag">T4</span><span class="tc-label">edge: zero</span><span class="tc-expected">→ 0 trees</span></div>
+          <div class="tc-vals"><code>n=0</code></div>
+        </div>
+        <div class="run-row">
+          <button class="btn-run" onclick="resetWithInput()">▶ Run</button>
+          <span class="live-out" id="liveOutput">—</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ MAIN ============ -->
+  <div class="main-row">
+    <div class="col col-code" id="col1">
+      <div class="section-label">📜 Python Code</div>
+      <div class="code-panel" id="codePanel"></div>
+    </div>
+    <div class="resize-h" id="resizeH1"></div>
+    <div class="col col-viz">
+      <div class="section-label">📊 Visualization</div>
+      <div class="viz-panel" id="vizPanel"></div>
+      <div class="log-popup" id="logPopup">
+        <div class="log-popup-body" id="logPopupBody"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ FOOTER ============ -->
+  <div class="footer-bar">
+    <div class="footer-left" id="footerLeft">
+      <span id="stepInfo" class="step-info">0/0</span>
+      <span id="actionBadge" class="action-badge"></span>
+    </div>
+    <div class="footer-right">
+      <kbd>←</kbd><kbd>→</kbd><kbd>R</kbd>
+      <button class="btn" type="button" onclick="resetStep()">↺</button>
+      <button class="btn" type="button" onclick="stepBy(-1)">◀</button>
+      <button class="btn btn-primary" type="button" onclick="stepBy(1)">▶ Next</button>
+      <span class="footer-sep"></span>
+      <button id="logToggleBtn" class="log-toggle-btn" type="button" onclick="toggleLogPreview()">📋 ON</button>
+      <button class="btn-zoom" type="button" onclick="logZoom(-1)">−</button>
+      <span id="logZoomLabel" class="log-zoom-label">100%</span>
+      <button class="btn-zoom" type="button" onclick="logZoom(1)">+</button>
+      <button class="btn-zoom" type="button" onclick="logZoomReset()">↺</button>
+      <span class="footer-sep"></span>
+      <button class="btn btn-fullscreen" type="button" onclick="toggleFullscreen()">⛶</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+/* ============ CODE LINES ============ */
+var codeLines = [
+  "def generateTrees(n):",
+  "    if n == 0:",
+  "        return []",
+  "    def build(start, end):",
+  "        if start > end:",
+  "            return [None]",
+  "        trees = []",
+  "        for i in range(start, end + 1):",
+  "            left_trees = build(start, i - 1)",
+  "            right_trees = build(i + 1, end)",
+  "            for l in left_trees:",
+  "                for r in right_trees:",
+  "                    root = TreeNode(i)",
+  "                    root.left = l",
+  "                    root.right = r",
+  "                    trees.append(root)",
+  "        return trees",
+  "    return build(1, n)"
+];
+
+/* ============ SYNTAX HIGHLIGHTER (RULE #3) ============ */
+function renderCode() {
+  var p = document.getElementById('codePanel');
+  p.innerHTML = codeLines.map(function(raw, i) {
+    var h = raw;
+    h = h.replace(/("[^"]*"|'[^']*')/g, '\x01STR\x02$1\x03');
+    h = h.replace(/\b(def|for|in|if|return|break|continue|and|else|elif|True|False|None|not|or|while|lambda)\b/g, '\x01KW\x02$1\x03');
+    h = h.replace(/\b(len|range|int|str|list|append|pop|sorted|min|max|sum|abs|enumerate|zip|print|set|add|TreeNode)\b/g, '\x01FN\x02$1\x03');
+    h = h.replace(/(?<![.\w"\x01\x02\x03])(-?\d+)\b/g, '\x01NUM\x02$1\x03');
+    h = h.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    h = h.replace(/\x01STR\x02/g, '<span class="str">').replace(/\x01KW\x02/g, '<span class="kw">').replace(/\x01FN\x02/g, '<span class="fn">').replace(/\x01NUM\x02/g, '<span class="num">').replace(/\x03/g, '</span>');
+    return '<div class="code-line" data-line="' + i + '"><span class="code-ln">' + (i+1) + '</span>' + h + '</div>';
+  }).join('');
+}
+
+/* ============ MINI HIGHLIGHTER FOR LOG SNIPPETS ============ */
+function hlCode(raw) {
+  var h = raw;
+  h = h.replace(/("[^"]*"|'[^']*')/g, '\x01s\x02$1\x03');
+  h = h.replace(/\b(def|for|in|if|return|break|continue|and|else|elif|True|False|None|not|or|while|lambda)\b/g, '\x01k\x02$1\x03');
+  h = h.replace(/\b(len|range|int|str|list|append|pop|sorted|min|max|sum|abs|enumerate|zip|print|set|add|TreeNode|build|generateTrees)\b/g, '\x01f\x02$1\x03');
+  h = h.replace(/(?<![.\w"\x01\x02\x03])(-?\d+)\b/g, '\x01n\x02$1\x03');
+  h = h.replace(/(#.*$)/gm, '\x01c\x02$1\x03');
+  h = h.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  h = h.replace(/\x01([a-z])\x02/g, function(_, c) { return '<span class="c' + c + '">'; }).replace(/\x03/g, '</span>');
+  return h;
+}
+
+/* ============ BADGES ============ */
+var LOG_BADGE = {
+  "func-def":"📌 DEF","init":"⚙️ INIT","call":"📞 CALL","return":"🏆 RETURN",
+  "for-check":"🔁 FOR","while-check":"🔁 WHILE","if-check":"🔎 IF",
+  "mark":"✅ MARK","push":"⬆ PUSH","pop":"⬇ POP","restore":"↩ RESTORE","found":"🎉 FOUND",
+  "remove":"✏️ EDIT","prune":"✂️ PRUNE","fail":"❌ FAIL",
+  "exit":"🔚 EXIT","skip":"⏭ SKIP"
+};
+var BADGE_LABEL = {
+  "func-def":"DEF","init":"INIT","call":"CALL","return":"RETURN",
+  "for-check":"FOR","while-check":"WHILE","if-check":"IF",
+  "mark":"MARK","push":"PUSH","pop":"POP","restore":"RESTORE","found":"FOUND",
+  "remove":"EDIT","prune":"PRUNE","fail":"FAIL",
+  "exit":"EXIT","skip":"SKIP"
+};
+
+/* ============ richLog HELPER ============ */
+function richLog(opts) {
+  var statusMap = {
+    success:"✅ Success", fail:"❌ Failed", skip:"⏭ Skipped",
+    loop:"🔁 Loop iter", prune:"✂️ Pruned", info:"ℹ️ Info"
+  };
+  var status = opts.status || "info";
+  var html = '<div class="log-card log-card--' + opts.action + '">';
+  html += '<div class="log-card-header">';
+  html += '<span class="log-badge log-badge--' + opts.action + '">' + (LOG_BADGE[opts.action] || opts.action) + '</span>';
+  html += '<span class="log-line-ref">L' + (opts.line + 1) + '</span>';
+  html += '<span class="log-status-pill log-status--' + status + '">' + statusMap[status] + '</span>';
+  html += '</div>';
+  if (opts.code) {
+    html += '<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">📜</span>Code Executing</div>';
+    html += '<code class="log-code-snippet">' + hlCode(opts.code) + '</code></div>';
+  }
+  if (opts.inputs && opts.inputs.length) {
+    html += '<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">📥</span>Input Values (line is using these)</div><div class="log-kv-row">';
+    opts.inputs.forEach(function(kv){
+      html += '<span class="log-kv log-kv--in"><span class="log-kv-key">' + kv.k + '</span>=<span class="log-kv-val">' + kv.v + '</span></span>';
+    });
+    html += '</div></div>';
+  }
+  if (opts.outputs && opts.outputs.length) {
+    html += '<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">📤</span>Output / State After Line</div><div class="log-kv-row">';
+    opts.outputs.forEach(function(kv){
+      var cls = kv.changed ? 'log-kv--changed' : 'log-kv--out';
+      html += '<span class="log-kv ' + cls + '"><span class="log-kv-key">' + kv.k + '</span>=<span class="log-kv-val">' + kv.v + '</span></span>';
+    });
+    html += '</div></div>';
+  }
+  if (opts.verdict) {
+    var vCls = opts.verdictTrue === true ? 'log-verdict--true' : (opts.verdictTrue === false ? 'log-verdict--false' : '');
+    var vIcon = opts.verdictTrue === true ? '✓' : (opts.verdictTrue === false ? '✗' : '•');
+    html += '<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">⚖️</span>Verdict / Decision</div>';
+    html += '<div class="log-verdict ' + vCls + '">' + vIcon + ' ' + opts.verdict + '</div></div>';
+  }
+  if (opts.why) {
+    html += '<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">💡</span>Why This Happens</div>';
+    html += '<div class="log-why">' + opts.why + '</div></div>';
+  }
+  if (opts.analogy) {
+    html += '<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">🎭</span>Real-Life Analogy</div>';
+    html += '<div class="log-analogy">' + opts.analogy + '</div></div>';
+  }
+  html += '</div>';
+  return html;
+}
+
+/* ============ STATE ============ */
+var steps = [];
+var currentStep = 0;
+var codeWidthUserSet = false;
+var curResult = null;
+var logEnabled = true;
+var logZoomLevel = 100;
+var treeIdCounter = 0;
+
+/* ============ TREE BUILDING (for visualization) ============ */
+function makeNode(val) {
+  return { id: ++treeIdCounter, val: val, left: null, right: null };
+}
+function cloneTree(node) {
+  if (!node) return null;
+  return { id: node.id, val: node.val, left: cloneTree(node.left), right: cloneTree(node.right) };
+}
+function treeSignature(node) {
+  if (!node) return '#';
+  return node.val + '(' + treeSignature(node.left) + ',' + treeSignature(node.right) + ')';
+}
+
+/* ============ TREE LAYOUT (returns SVG string) ============ */
+function layoutTree(root, isHighlighted) {
+  if (!root) {
+    return '<div style="font:italic 10px var(--font-mono);color:var(--text-tertiary);text-align:center;padding:6px">∅ empty</div>';
+  }
+  var R = 12, gapX = 28, gapY = 36;
+  // assign x via inorder
+  var positions = {};
+  var idx = 0;
+  function inorder(node, depth) {
+    if (!node) return;
+    inorder(node.left, depth + 1);
+    positions[node.id] = { x: idx * gapX + R + 4, y: depth * gapY + R + 4, val: node.val };
+    idx++;
+    inorder(node.right, depth + 1);
+  }
+  inorder(root, 0);
+  // collect edges
+  var edges = [];
+  function collectEdges(node) {
+    if (!node) return;
+    if (node.left) {
+      edges.push({ from: positions[node.id], to: positions[node.left.id] });
+      collectEdges(node.left);
+    }
+    if (node.right) {
+      edges.push({ from: positions[node.id], to: positions[node.right.id] });
+      collectEdges(node.right);
+    }
+  }
+  collectEdges(root);
+  var maxX = 0, maxY = 0;
+  Object.keys(positions).forEach(function(k){
+    if (positions[k].x > maxX) maxX = positions[k].x;
+    if (positions[k].y > maxY) maxY = positions[k].y;
+  });
+  var W = maxX + R + 6, H = maxY + R + 6;
+  var nodeFill = isHighlighted ? '#15803D' : '#534AB7';
+  var nodeStroke = isHighlighted ? '#14532D' : '#3C3489';
+  var svg = '<svg class="tree-svg" width="' + W + '" height="' + H + '">';
+  edges.forEach(function(e){
+    svg += '<line x1="' + e.from.x + '" y1="' + e.from.y + '" x2="' + e.to.x + '" y2="' + e.to.y + '" stroke="#888780" stroke-width="1.5"/>';
+  });
+  Object.keys(positions).forEach(function(k){
+    var p = positions[k];
+    svg += '<circle cx="' + p.x + '" cy="' + p.y + '" r="' + R + '" fill="' + nodeFill + '" stroke="' + nodeStroke + '" stroke-width="1.5"/>';
+    svg += '<text x="' + p.x + '" y="' + (p.y + 4) + '" text-anchor="middle" font-family="JetBrains Mono" font-size="11" font-weight="700" fill="#fff">' + p.val + '</text>';
+  });
+  svg += '</svg>';
+  return svg;
+}
+
+/* ============ buildSteps ============ */
+function buildSteps(n) {
+  var st = [];
+  var MAX_STEPS = 4000;
+  treeIdCounter = 0;
+
+  // call stack visualization
+  var stack = []; // each frame: {start, end, i, phase, leftTrees, rightTrees}
+  // tree results accumulated so far at the OUTER level
+  var allTrees = [];
+  var newlyAdded = null; // signature of just-added tree (highlight)
+
+  function snap(extra) {
+    return Object.assign({
+      n: n,
+      stack: stack.map(function(f){ return Object.assign({}, f); }),
+      allTrees: allTrees.map(function(t){ return cloneTree(t); }),
+      newlyAdded: newlyAdded
+    }, extra || {});
+  }
+
+  function pushStep(o) {
+    if (st.length >= MAX_STEPS) return;
+    st.push(Object.assign({ line: 0, action: "init", logHTML: "" }, snap(o)));
+  }
+
+  // ===== L0: function definition =====
+  pushStep({
+    line: 0, action: "func-def",
+    logHTML: richLog({
+      line: 0, action: "func-def",
+      code: "def generateTrees(n):",
+      status: "info",
+      inputs: [{k:"n", v:n}],
+      why: "<strong>Function definition</strong> — <code>generateTrees(n)</code> ko call kiya gaya. Yeh outer wrapper hai jo inner recursive helper <code>build(start, end)</code> ko trigger karega.",
+      analogy: "Jaise ek <strong>chef</strong> ko order mila — '3 ingredients ke saath sab possible dishes banao'. Chef ne apron pehna, ab actual cooking start karega."
+    })
+  });
+
+  // ===== L1: if n == 0 =====
+  var nZero = (n === 0);
+  pushStep({
+    line: 1, action: "if-check",
+    logHTML: richLog({
+      line: 1, action: "if-check",
+      code: "if n == 0:",
+      status: nZero ? "success" : "skip",
+      inputs: [{k:"n", v:n}],
+      verdict: "n (" + n + ") == 0",
+      verdictTrue: nZero,
+      why: nZero
+        ? "n=0 hai matlab <strong>koi node nahi banana</strong>. Edge case — empty list return karenge."
+        : "n=" + n + " hai, kaam karna padega. Skip this branch and proceed to define <code>build()</code>.",
+      analogy: nZero
+        ? "Jaise customer ne bola 'kuch nahi chahiye' — chef ne empty plate wapas bhej diya."
+        : "Customer ne actual order diya hai — chef ab kitchen mein ghusta hai."
+    })
+  });
+
+  if (nZero) {
+    // L2: return []
+    pushStep({
+      line: 2, action: "return",
+      logHTML: richLog({
+        line: 2, action: "return",
+        code: "return []",
+        status: "info",
+        outputs: [{k:"return", v:"[]", changed:true}],
+        why: "Empty input → <strong>empty output</strong>. Zero nodes ka koi tree possible nahi.",
+        analogy: "Plate khali, kitchen band — bill bhi zero, dish bhi zero."
+      })
+    });
+    curResult = 0;
+    return st;
+  }
+
+  // ===== L3: def build(start, end) =====
+  pushStep({
+    line: 3, action: "func-def",
+    logHTML: richLog({
+      line: 3, action: "func-def",
+      code: "def build(start, end):",
+      status: "info",
+      why: "Inner helper <strong>defined</strong>. Yeh recursive function har sub-range <code>[start..end]</code> ke liye saare unique BSTs banayega.",
+      analogy: "Chef ne ek <strong>recipe template</strong> banaya — 'tum mujhe range do, main saare possible dishes laa dunga'. Abhi sirf template hai, call nahi hua."
+    })
+  });
+
+  // ===== L17: return build(1, n) =====
+  pushStep({
+    line: 17, action: "call",
+    logHTML: richLog({
+      line: 17, action: "call",
+      code: "return build(1, " + n + ")",
+      status: "info",
+      inputs: [{k:"start", v:1}, {k:"end", v:n}],
+      why: "Outer call — <code>build(1, " + n + ")</code> trigger ho raha. Yeh saare " + n + " values ko consider karega root banane ke liye.",
+      analogy: "Chef ne template ko first time call kiya — '<strong>1 se " + n + " tak</strong> ke ingredients use karo, sab possible recipes do!'"
+    })
+  });
+
+  // ===== Recursive build =====
+  function build(start, end, depth) {
+    var frameId = stack.length;
+    stack.push({ start: start, end: end, i: null, phase: "enter", leftTrees: 0, rightTrees: 0, depth: depth });
+
+    // L3 entry — function frame opens
+    pushStep({
+      line: 3, action: "call",
+      logHTML: richLog({
+        line: 3, action: "call",
+        code: "build(" + start + ", " + end + ")  # frame opened",
+        status: "info",
+        inputs: [{k:"start", v:start}, {k:"end", v:end}],
+        outputs: [{k:"stack.size", v:stack.length, changed:true}],
+        why: "Naya recursion frame open. Range <code>[" + start + ".." + end + "]</code> ke liye saare BSTs banane hain.",
+        analogy: "Chef ka <strong>assistant</strong> apne notebook ka naya page open karta hai — 'mere paas range " + start + "-" + end + " hai, kaam shuru.'"
+      })
+    });
+
+    // L4: if start > end
+    var emptyRange = (start > end);
+    pushStep({
+      line: 4, action: "if-check",
+      logHTML: richLog({
+        line: 4, action: "if-check",
+        code: "if start > end:",
+        status: emptyRange ? "success" : "skip",
+        inputs: [{k:"start", v:start}, {k:"end", v:end}],
+        verdict: "start (" + start + ") > end (" + end + ")",
+        verdictTrue: emptyRange,
+        why: emptyRange
+          ? "<strong>Empty range!</strong> Koi number nahi bachi. Iska matlab subtree banane ko kuch nahi — sirf <code>None</code> return karenge."
+          : "Range mein <strong>" + (end - start + 1) + " number(s)</strong> hain. Tree banana possible — aage badho.",
+        analogy: emptyRange
+          ? "Notebook ka page khali — 'mere paas koi ingredient nahi, main empty plate de raha hu' (NULL placeholder)."
+          : (end - start + 1) + " ingredients available — assistant kaam karne ko ready."
+      })
+    });
+
+    if (emptyRange) {
+      pushStep({
+        line: 5, action: "return",
+        logHTML: richLog({
+          line: 5, action: "return",
+          code: "return [None]",
+          status: "info",
+          outputs: [{k:"return", v:"[None]", changed:true}],
+          why: "<strong>Base case!</strong> Hum <code>[None]</code> return karte hain (na ki <code>[]</code>) — taaki parent ke combining loop kam se kam ek baar chale aur 'no left subtree' option include ho.",
+          analogy: "Empty plate bhi <strong>ek option</strong> hai menu mein — 'side dish nahi chahiye' bhi to ek choice hai. Isiliye empty list nahi, <code>[None]</code> bhejte hain."
+        })
+      });
+      stack.pop();
+      pushStep({
+        line: 5, action: "return",
+        logHTML: richLog({
+          line: 5, action: "return",
+          code: "# returning [None] to parent",
+          status: "info",
+          outputs: [{k:"stack.size", v:stack.length, changed:true}],
+          why: "Frame close — caller ko <code>[None]</code> wapas mil gaya.",
+          analogy: "Assistant ne notebook page band kiya, chef ko 'khali plate' ka card de diya."
+        })
+      });
+      return [null];
+    }
+
+    // L6: trees = []
+    var trees = [];
+    pushStep({
+      line: 6, action: "init",
+      logHTML: richLog({
+        line: 6, action: "init",
+        code: "trees = []",
+        status: "success",
+        outputs: [{k:"trees", v:"[]", changed:true}],
+        why: "Local <strong>collection</strong> banayi — is range ke saare unique BSTs yahan accumulate honge.",
+        analogy: "Assistant ne ek <strong>khaali tray</strong> rakhi — 'jitne dishes banenge, sab yahan rakhunga.'"
+      })
+    });
+
+    // L7: for i in range(start, end+1)
+    for (var i = start; i <= end; i++) {
+      stack[frameId].i = i;
+      stack[frameId].phase = "looping";
+
+      pushStep({
+        line: 7, action: "for-check",
+        logHTML: richLog({
+          line: 7, action: "for-check",
+          code: "for i in range(" + start + ", " + (end+1) + "): i=" + i,
+          status: "loop",
+          inputs: [{k:"start", v:start}, {k:"end", v:end}],
+          outputs: [{k:"i", v:i, changed:true}],
+          verdict: "i (" + i + ") in [" + start + ".." + end + "]",
+          verdictTrue: true,
+          why: "Loop iteration: <strong>i = " + i + "</strong> ko root banane try karenge. Left subtree <code>[" + start + ".." + (i-1) + "]</code> se, right subtree <code>[" + (i+1) + ".." + end + "]</code> se aayega.",
+          analogy: "Chef <strong>i=" + i + "</strong> ko 'main ingredient' pick karta hai — baaki sab uske around arrange honge."
+        })
+      });
+
+      // L8: left_trees = build(start, i-1)
+      pushStep({
+        line: 8, action: "call",
+        logHTML: richLog({
+          line: 8, action: "call",
+          code: "left_trees = build(" + start + ", " + (i-1) + ")",
+          status: "info",
+          inputs: [{k:"start", v:start}, {k:"i-1", v:(i-1)}],
+          why: "Recursive call — root <code>" + i + "</code> ke <strong>left side</strong> ke saare possible subtrees laao.",
+          analogy: "Chef apne assistant se: 'Bhai, " + i + " ke <strong>left mein</strong> kya kya combinations ban sakte hain — sab list karke laa.'"
+        })
+      });
+
+      var left_trees = build(start, i - 1, depth + 1);
+      stack[frameId].leftTrees = left_trees.length;
+
+      pushStep({
+        line: 8, action: "return",
+        logHTML: richLog({
+          line: 8, action: "return",
+          code: "left_trees = build(" + start + ", " + (i-1) + ")  # got " + left_trees.length + " trees",
+          status: "success",
+          outputs: [{k:"left_trees.size", v:left_trees.length, changed:true}],
+          why: "Left side se <strong>" + left_trees.length + " possible subtree(s)</strong> mile" + (left_trees.length === 1 && left_trees[0] === null ? " (empty placeholder)" : "") + ".",
+          analogy: "Assistant ne <strong>" + left_trees.length + " left-side cards</strong> chef ko handover kiye."
+        })
+      });
+
+      // L9: right_trees = build(i+1, end)
+      pushStep({
+        line: 9, action: "call",
+        logHTML: richLog({
+          line: 9, action: "call",
+          code: "right_trees = build(" + (i+1) + ", " + end + ")",
+          status: "info",
+          inputs: [{k:"i+1", v:(i+1)}, {k:"end", v:end}],
+          why: "Ab <strong>right side</strong> ke saare possible subtrees laao — root <code>" + i + "</code> ke right mein <code>[" + (i+1) + ".." + end + "]</code>.",
+          analogy: "Chef: 'Ab " + i + " ke <strong>right side</strong> ke combinations bhi laa do.'"
+        })
+      });
+
+      var right_trees = build(i + 1, end, depth + 1);
+      stack[frameId].rightTrees = right_trees.length;
+
+      pushStep({
+        line: 9, action: "return",
+        logHTML: richLog({
+          line: 9, action: "return",
+          code: "right_trees = build(" + (i+1) + ", " + end + ")  # got " + right_trees.length + " trees",
+          status: "success",
+          outputs: [{k:"right_trees.size", v:right_trees.length, changed:true}],
+          why: "Right side se <strong>" + right_trees.length + " possible subtree(s)</strong> mile.",
+          analogy: "Right-side ke <strong>" + right_trees.length + " cards</strong> bhi chef ko mil gaye."
+        })
+      });
+
+      // L10: for l in left_trees
+      for (var li = 0; li < left_trees.length; li++) {
+        var l = left_trees[li];
+        pushStep({
+          line: 10, action: "for-check",
+          logHTML: richLog({
+            line: 10, action: "for-check",
+            code: "for l in left_trees: l = " + (l ? "Tree(root=" + l.val + ")" : "None"),
+            status: "loop",
+            inputs: [{k:"left_trees.size", v:left_trees.length}, {k:"l_index", v:li}],
+            why: "Outer loop: har <strong>left subtree option</strong> ke liye, sab right options try karenge (cartesian product).",
+            analogy: "Chef ne ek left-card pick kiya — '<strong>is left ke saath</strong> har possible right try karunga.'"
+          })
+        });
+
+        // L11: for r in right_trees
+        for (var ri = 0; ri < right_trees.length; ri++) {
+          var r = right_trees[ri];
+          pushStep({
+            line: 11, action: "for-check",
+            logHTML: richLog({
+              line: 11, action: "for-check",
+              code: "for r in right_trees: r = " + (r ? "Tree(root=" + r.val + ")" : "None"),
+              status: "loop",
+              inputs: [{k:"right_trees.size", v:right_trees.length}, {k:"r_index", v:ri}],
+              why: "Inner loop: <strong>specific (left, right) pair</strong> select kiya gaya. Ab inhe combine karke ek complete tree banayenge.",
+              analogy: "Right-card bhi pick — ab <strong>left + right + root</strong> mila ke ek <strong>full dish</strong> banegi."
+            })
+          });
+
+          // L12: root = TreeNode(i)
+          var root = makeNode(i);
+          pushStep({
+            line: 12, action: "init",
+            logHTML: richLog({
+              line: 12, action: "init",
+              code: "root = TreeNode(" + i + ")",
+              status: "success",
+              inputs: [{k:"i", v:i}],
+              outputs: [{k:"root", v:"TreeNode("+i+")", changed:true}],
+              why: "<strong>New root node</strong> with value <code>" + i + "</code> create kiya.",
+              analogy: "Chef ne <strong>main ingredient " + i + "</strong> plate ke <strong>center</strong> mein rakha — root."
+            })
+          });
+
+          // L13: root.left = l
+          root.left = l ? cloneTree(l) : null;
+          pushStep({
+            line: 13, action: "mark",
+            logHTML: richLog({
+              line: 13, action: "mark",
+              code: "root.left = l",
+              status: "success",
+              outputs: [{k:"root.left", v:(l ? "Tree(root="+l.val+")" : "None"), changed:true}],
+              why: "Left subtree <strong>attached</strong> to root <code>" + i + "</code>.",
+              analogy: "Plate ke <strong>left side</strong> pe wo waali side-dish set kar di."
+            })
+          });
+
+          // L14: root.right = r
+          root.right = r ? cloneTree(r) : null;
+          pushStep({
+            line: 14, action: "mark",
+            logHTML: richLog({
+              line: 14, action: "mark",
+              code: "root.right = r",
+              status: "success",
+              outputs: [{k:"root.right", v:(r ? "Tree(root="+r.val+")" : "None"), changed:true}],
+              why: "Right subtree <strong>attached</strong> to root <code>" + i + "</code>. Ab tree complete!",
+              analogy: "Plate ke <strong>right side</strong> pe doosri side-dish — full thali ready!"
+            })
+          });
+
+          // L15: trees.append(root)
+          trees.push(root);
+          // also track at outer level if this is the top-level call
+          if (depth === 0) {
+            allTrees.push(cloneTree(root));
+            newlyAdded = treeSignature(root);
+          } else {
+            newlyAdded = null;
+          }
+          pushStep({
+            line: 15, action: "found",
+            logHTML: richLog({
+              line: 15, action: "found",
+              code: "trees.append(root)  # tree #" + trees.length,
+              status: "success",
+              outputs: [{k:"trees.size", v:trees.length, changed:true}, {k:"new_tree", v:treeSignature(root), changed:true}],
+              why: "🎉 <strong>Naya unique BST</strong> ban gaya! Local trees collection mein add kiya.",
+              analogy: "Ek <strong>complete dish</strong> ready — tray mein rakh di. <strong>Menu pe ek aur entry!</strong>"
+            })
+          });
+        }
+
+        // L11 exit
+        pushStep({
+          line: 11, action: "exit",
+          logHTML: richLog({
+            line: 11, action: "exit",
+            code: "# inner for r exit (saare " + right_trees.length + " right options try ho gaye)",
+            status: "info",
+            inputs: [{k:"right_trees.size", v:right_trees.length}],
+            why: "Inner loop khatam — <strong>is left option ke saath</strong> saare right combinations cover ho gaye.",
+            analogy: "Is left-card ke saath har right-card try ho gaya — ab <strong>agla left-card</strong> uthayenge."
+          })
+        });
+      }
+
+      // L10 exit
+      pushStep({
+        line: 10, action: "exit",
+        logHTML: richLog({
+          line: 10, action: "exit",
+          code: "# outer for l exit (saare " + left_trees.length + " left options process ho gaye)",
+          status: "info",
+          inputs: [{k:"left_trees.size", v:left_trees.length}],
+          why: "Outer loop khatam — <strong>root=" + i + "</strong> ke saare possible (left, right) pairs explore ho gaye.",
+          analogy: "Main ingredient <strong>" + i + "</strong> ke saath har combination try kar liya. Agle ingredient pe move."
+        })
+      });
+      newlyAdded = null;
+    }
+
+    // L7 exit
+    stack[frameId].phase = "loop-done";
+    pushStep({
+      line: 7, action: "exit",
+      logHTML: richLog({
+        line: 7, action: "exit",
+        code: "# for i exit — saare roots [" + start + ".." + end + "] try ho gaye",
+        status: "info",
+        inputs: [{k:"start", v:start}, {k:"end", v:end}],
+        why: "Range ke <strong>har value ko root</strong> bana ke try kar liya. Total <code>" + trees.length + " unique BSTs</code> mile.",
+        analogy: "Har ingredient ko <strong>main role</strong> mein try kar liya — kitchen ka kaam khatam."
+      })
+    });
+
+    // L16: return trees
+    pushStep({
+      line: 16, action: "return",
+      logHTML: richLog({
+        line: 16, action: "return",
+        code: "return trees  # " + trees.length + " trees for [" + start + ".." + end + "]",
+        status: "success",
+        outputs: [{k:"trees.size", v:trees.length, changed:true}],
+        why: "Frame complete — <strong>" + trees.length + " BSTs</strong> parent ko return kar rahe hain.",
+        analogy: "Assistant ne <strong>tray</strong> chef ko handover kar di — '" + trees.length + " dishes ready hain.'"
+      })
+    });
+
+    stack.pop();
+    pushStep({
+      line: 16, action: "return",
+      logHTML: richLog({
+        line: 16, action: "return",
+        code: "# frame closed — control returned to caller",
+        status: "info",
+        outputs: [{k:"stack.size", v:stack.length, changed:true}],
+        why: "Stack frame pop. Caller apna kaam continue karega.",
+        analogy: "Assistant gaya, chef wapas apne kaam pe."
+      })
+    });
+
+    return trees;
+  }
+
+  var finalTrees = build(1, n, 0);
+  curResult = finalTrees.length;
+
+  // L17 final return
+  pushStep({
+    line: 17, action: "return",
+    logHTML: richLog({
+      line: 17, action: "return",
+      code: "return build(1, " + n + ")  # " + finalTrees.length + " trees",
+      status: "success",
+      outputs: [{k:"answer", v:finalTrees.length + " trees", changed:true}],
+      why: "🎉 <strong>Final answer</strong> ready! <code>" + finalTrees.length + " unique BSTs</code> with values 1 to " + n + ".",
+      analogy: "<strong>Restaurant ka final menu</strong> chhap gaya — " + finalTrees.length + " unique dishes! Customers ko serve karne ke liye taiyaar."
+    })
+  });
+
+  return st;
+}
+
+/* ============ RENDER VIZ ============ */
+function renderViz(s) {
+  var p = document.getElementById('vizPanel');
+  var h = '';
+
+  // Vars strip
+  var topFrame = s.stack && s.stack.length ? s.stack[s.stack.length - 1] : null;
+  h += '<div class="vars-strip">';
+  h += '<span class="var-chip"><strong>n</strong>=' + s.n + '</span>';
+  h += '<span class="var-chip vc-active"><strong>stack</strong>=' + (s.stack ? s.stack.length : 0) + ' frame(s)</span>';
+  if (topFrame) {
+    h += '<span class="var-chip"><strong>start</strong>=' + topFrame.start + '</span>';
+    h += '<span class="var-chip"><strong>end</strong>=' + topFrame.end + '</span>';
+    if (topFrame.i !== null && topFrame.i !== undefined) {
+      h += '<span class="var-chip vc-active"><strong>i (root)</strong>=' + topFrame.i + '</span>';
+    }
+  }
+  h += '<span class="var-chip vc-safe"><strong>trees collected</strong>=' + (s.allTrees ? s.allTrees.length : 0) + '</span>';
+  h += '</div>';
+
+  // viz-row
+  h += '<div class="viz-row">';
+
+  // Card 1: Range bar (current frame)
+  h += '<div class="viz-card"><h5>🔢 Current Range & Root</h5>';
+  if (topFrame) {
+    h += '<div style="font:600 11px var(--font-mono);color:var(--text-secondary);margin-bottom:5px">[' + topFrame.start + ' .. ' + topFrame.end + ']</div>';
+    h += '<div class="range-bar">';
+    for (var v = 1; v <= s.n; v++) {
+      var cls = 'range-tile';
+      if (v >= topFrame.start && v <= topFrame.end) cls += ' range-tile--in';
+      if (topFrame.i === v) cls += ' range-tile--root';
+      h += '<div class="' + cls + '">' + v + '</div>';
+    }
+    h += '</div>';
+    if (topFrame.i !== null && topFrame.i !== undefined) {
+      h += '<div style="font-size:10px;color:var(--text-tertiary);margin-top:6px">↑ root=' + topFrame.i + ' splits range into [' + topFrame.start + '..' + (topFrame.i-1) + '] and [' + (topFrame.i+1) + '..' + topFrame.end + ']</div>';
+    }
+  } else {
+    h += '<div class="empty-state">no active frame</div>';
+  }
+  h += '</div>';
+
+  // Card 2: Recursion stack
+  h += '<div class="viz-card"><h5>🗂️ Recursion Stack</h5>';
+  h += '<div class="stack-col">';
+  if (!s.stack || s.stack.length === 0) {
+    h += '<div class="empty-state">stack empty</div>';
+  } else {
+    for (var si = 0; si < s.stack.length; si++) {
+      var f = s.stack[si];
+      var fcls = (si === s.stack.length - 1) ? 'stack-frame stack-frame--active' : 'stack-frame';
+      h += '<div class="' + fcls + '">';
+      h += '<div class="stack-frame-title">build(' + f.start + ', ' + f.end + ')</div>';
+      var meta = '';
+      if (f.i !== null && f.i !== undefined) meta += 'i=' + f.i + ' · ';
+      meta += 'L=' + (f.leftTrees || 0) + ' · R=' + (f.rightTrees || 0);
+      h += '<div class="stack-frame-meta">' + meta + '</div>';
+      h += '</div>';
+    }
+  }
+  h += '</div></div>';
+
+  h += '</div>'; // end viz-row
+
+  // Trees collected so far
+  h += '<div class="viz-card" style="margin-top:12px"><h5>🌳 Unique BSTs Collected (' + (s.allTrees ? s.allTrees.length : 0) + ')</h5>';
+  if (!s.allTrees || s.allTrees.length === 0) {
+    h += '<div class="empty-state">no trees yet — keep stepping!</div>';
+  } else {
+    h += '<div class="trees-grid">';
+    for (var ti = 0; ti < s.allTrees.length; ti++) {
+      var t = s.allTrees[ti];
+      var sig = treeSignature(t);
+      var isNew = (s.newlyAdded === sig && ti === s.allTrees.length - 1);
+      var tcls = isNew ? 'tree-card tree-card--new' : 'tree-card';
+      h += '<div class="' + tcls + '">' + layoutTree(t, isNew) + '<div class="tree-card-label">tree #' + (ti+1) + '</div></div>';
+    }
+    h += '</div>';
+  }
+  h += '</div>';
+
+  // Result banner
+  if (s.line === 17 && curResult !== null && (s.allTrees && s.allTrees.length === curResult)) {
+    h += '<div class="result-banner">🎉 Done! Found ' + curResult + ' unique BSTs for n=' + s.n + '</div>';
+  }
+
+  p.innerHTML = h;
+}
+
+/* ============ STEP CONTROL ============ */
+function renderStep(idx) {
+  if (!steps.length) return;
+  var s = steps[idx];
+  currentStep = idx;
+  document.getElementById('stepInfo').textContent = (idx + 1) + '/' + steps.length;
+  var bd = document.getElementById('actionBadge');
+  bd.textContent = BADGE_LABEL[s.action] || s.action;
+  bd.className = 'action-badge action-badge--' + s.action;
+  document.querySelectorAll('.code-line').forEach(function(el){ el.classList.remove('active'); });
+  var al = document.querySelector('.code-line[data-line="' + s.line + '"]');
+  if (al) { al.classList.add('active'); al.scrollIntoView({block:'nearest'}); }
+  renderViz(s);
+  showLogPreview(s);
+}
+
+function showLogPreview(s) {
+  if (!logEnabled) return;
+  document.getElementById('logPopupBody').innerHTML = s.logHTML || '';
+  document.getElementById('logPopup').classList.remove('log-popup--hidden');
+}
+
+function stepBy(d) {
+  var nx = currentStep + d;
+  if (nx < 0 || nx >= steps.length) return;
+  renderStep(nx);
+}
+
+function resetStep() {
+  if (steps.length) renderStep(0);
+}
+
+/* ============ INPUT / RUN ============ */
+function parseInputs() {
+  var n = parseInt(document.getElementById('inN').value, 10);
+  if (isNaN(n) || n < 0) n = 0;
+  if (n > 5) n = 5; // safety cap
+  return n;
+}
+
+function resetWithInput() {
+  curResult = null;
+  var n = parseInputs();
+  document.getElementById('inN').value = n;
+  renderCode();
+  fitCodeWidth();
+  steps = buildSteps(n);
+  currentStep = 0;
+  renderStep(0);
+  document.getElementById('liveOutput').textContent = curResult !== null ? (curResult + ' trees') : '—';
+}
+
+function loadTest(n, expected) {
+  document.getElementById('inN').value = n;
+  document.getElementById('expectedBadge').textContent = 'expected: ' + expected + ' tree' + (expected === 1 ? '' : 's');
+  resetWithInput();
+}
+
+/* ============ LOG CONTROLS ============ */
+function toggleLogPreview() {
+  logEnabled = !logEnabled;
+  var btn = document.getElementById('logToggleBtn');
+  btn.textContent = logEnabled ? '📋 ON' : '📋 OFF';
+  btn.classList.toggle('log-toggle-btn--off', !logEnabled);
+  if (!logEnabled) document.getElementById('logPopup').classList.add('log-popup--hidden');
+  else if (steps.length) showLogPreview(steps[currentStep]);
+}
+
+function logZoom(dir) {
+  logZoomLevel = Math.max(60, Math.min(180, logZoomLevel + dir * 20));
+  updateLogZoom();
+}
+function logZoomReset() { logZoomLevel = 100; updateLogZoom(); }
+function updateLogZoom() {
+  document.getElementById('logZoomLabel').textContent = logZoomLevel + '%';
+  document.getElementById('logPopup').style.setProperty('--log-scale', logZoomLevel / 100);
+}
+
+function toggleFullscreen() {
+  var viz = document.querySelector('.col-viz');
+  if (!document.fullscreenElement) viz.requestFullscreen().catch(function(){});
+  else document.exitFullscreen();
+}
+
+function toggleProblem() {
+  var body = document.getElementById('pcBody');
+  var btn = document.getElementById('toggleBtn');
+  body.classList.toggle('pc-body--hidden');
+  btn.textContent = body.classList.contains('pc-body--hidden') ? '▼ Show' : '▲ Hide';
+}
+
+/* ============ LAYOUT ============ */
+function fitCodeWidth() {
+  if (codeWidthUserSet) return;
+  var col = document.getElementById('col1');
+  var panel = document.getElementById('codePanel');
+  var maxLen = 0;
+  codeLines.forEach(function(l){ if (l.length > maxLen) maxLen = l.length; });
+  var px = Math.min(maxLen * 8 + 60, window.innerWidth * 0.45);
+  px = Math.max(220, px);
+  col.style.width = px + 'px';
+  syncFooterWidth();
+}
+
+function syncFooterWidth() {
+  document.getElementById('footerLeft').style.width =
+    document.getElementById('col1').offsetWidth + 'px';
+}
+
+(function() {
+  var col1 = document.getElementById('col1');
+  document.getElementById('resizeH1').addEventListener('mousedown', function(e) {
+    e.preventDefault();
+    codeWidthUserSet = true;
+    var startX = e.clientX, startW = col1.offsetWidth, h = this;
+    document.body.classList.add('no-select');
+    h.classList.add('active');
+    function mv(e) {
+      col1.style.width = Math.max(140, Math.min(window.innerWidth * 0.45, startW + (e.clientX - startX))) + 'px';
+      syncFooterWidth();
+    }
+    function up() {
+      document.removeEventListener('mousemove', mv);
+      document.removeEventListener('mouseup', up);
+      document.body.classList.remove('no-select');
+      h.classList.remove('active');
+    }
+    document.addEventListener('mousemove', mv);
+    document.addEventListener('mouseup', up);
+  });
+})();
+
+window.addEventListener('resize', function() {
+  if (!codeWidthUserSet) fitCodeWidth();
+  else syncFooterWidth();
+});
+
+document.addEventListener('keydown', function(e) {
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
+  if (e.key === 'ArrowRight') { e.preventDefault(); stepBy(1); }
+  else if (e.key === 'ArrowLeft') { e.preventDefault(); stepBy(-1); }
+  else if (e.key === 'r' || e.key === 'R') { e.preventDefault(); resetStep(); }
+});
+
+/* ============ INIT ============ */
+renderCode();
+fitCodeWidth();
+steps = buildSteps(3);
+renderStep(0);
+document.getElementById('liveOutput').textContent = curResult !== null ? (curResult + ' trees') : '—';
+</script>
+</body>
+</html>

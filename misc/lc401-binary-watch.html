@@ -1,0 +1,912 @@
+﻿
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LC 401 — Binary Watch</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+:root{
+  --bg-primary:#FAFAF8; --bg-secondary:#F1EFE8; --bg-tertiary:#E2E0D8; --bg-card:#FFFFFF;
+  --text-primary:#2C2C2A; --text-secondary:#5F5E5A; --text-tertiary:#888780;
+  --border-color:rgba(0,0,0,.11); --border-light:rgba(0,0,0,.06); --border-focus:#534AB7;
+  --accent-indigo:#534AB7; --accent-indigo-bg:#EEEDFE; --accent-indigo-text:#3C3489; --accent-indigo-hover:#4740A0;
+  --accent-teal:#0F6E56; --accent-teal-bg:#E1F5EE; --accent-teal-text:#085041;
+  --accent-red:#E24B4A; --accent-red-bg:#FCEBEB; --accent-red-text:#791F1F;
+  --accent-amber:#B45309; --accent-amber-bg:#FEF3C7; --accent-amber-text:#78350F;
+  --accent-green:#15803D; --accent-green-bg:#DCFCE7; --accent-green-text:#14532D;
+  --syn-keyword:#534AB7; --syn-function:#185FA5; --syn-number:#993C1D; --syn-string:#0F6E56;
+  --active-line-bg:#EEEDFE;
+  --radius-sm:4px; --radius-md:6px; --radius-lg:10px; --radius-xl:14px;
+  --font-sans:'DM Sans',system-ui,sans-serif;
+  --font-mono:'JetBrains Mono','Fira Code',monospace;
+  --fs-xs:11px; --fs-sm:12px; --fs-base:14px; --fs-md:15px; --fs-lg:18px;
+  --ease:.18s ease;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:var(--bg-primary);color:var(--text-primary);font-family:var(--font-sans);font-size:var(--fs-base)}
+body.no-select{user-select:none}
+::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border-color);border-radius:3px}
+
+.app-shell{display:flex;flex-direction:column;height:100vh;overflow:hidden}
+.problem-card{flex-shrink:0;border-bottom:1px solid var(--border-color);background:var(--bg-card)}
+.pc-header{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:8px 14px;border-bottom:1px solid var(--border-light)}
+.gt-btn{font:700 11px var(--font-sans);padding:5px 10px;background:var(--accent-indigo);color:#fff;border:none;border-radius:99px;cursor:pointer;letter-spacing:.04em}
+.gt-btn:hover{background:var(--accent-indigo-hover)}
+.lc-num{font:700 12px var(--font-mono);color:var(--text-tertiary)}
+.lc-title{font:700 15px var(--font-sans)}
+.lc-diff{font:700 9px var(--font-mono);padding:2px 8px;border-radius:99px;letter-spacing:.06em;background:var(--accent-amber-bg);color:var(--accent-amber-text);border:1px solid var(--accent-amber)}
+.lc-tag{font:600 10px var(--font-mono);padding:2px 8px;border-radius:99px;background:var(--bg-secondary);color:var(--text-secondary);border:1px solid var(--border-color)}
+.pc-header-right{margin-left:auto;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.input-wrap{display:flex;align-items:center;gap:4px}
+.input-wrap label{font:600 10px var(--font-mono);color:var(--text-tertiary)}
+.input-wrap input{font:600 11px var(--font-mono);padding:3px 6px;border:1px solid var(--border-color);border-radius:4px;width:60px;text-align:center}
+.input-wrap input:focus{outline:none;border-color:var(--border-focus)}
+.expected-badge{font:600 10px var(--font-mono);padding:3px 8px;border-radius:4px;background:var(--accent-teal-bg);color:var(--accent-teal-text);border:1px solid var(--accent-teal)}
+.toggle-btn{font-family:system-ui,"Segoe UI Emoji",sans-serif;font:600 10px var(--font-mono);padding:3px 8px;border-radius:4px;background:var(--bg-secondary);border:1px solid var(--border-color);color:var(--text-secondary);cursor:pointer}
+
+.pc-body{display:flex;gap:16px;padding:10px 14px;max-height:34vh;overflow:auto}
+.pc-left{flex:2;min-width:0}.pc-right{flex:1;min-width:0;border-left:1px solid var(--border-light);padding-left:14px}
+.pc-section{margin-bottom:8px}
+.pc-section h4{font:700 11px var(--font-sans);text-transform:uppercase;letter-spacing:.06em;color:var(--text-tertiary);margin-bottom:4px}
+.pc-section p{font-size:12px;line-height:1.55;color:var(--text-secondary)}
+.pc-section code{font:600 11px var(--font-mono);background:var(--bg-secondary);padding:1px 5px;border-radius:3px;color:var(--accent-indigo-text)}
+.pc-section strong{color:var(--text-primary)}
+.concept-block{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
+.concept-card{flex:1;min-width:130px;padding:6px 8px;background:var(--bg-secondary);border-radius:5px;border-left:3px solid var(--accent-indigo);font-size:11px;line-height:1.5}
+.concept-card strong{display:block;color:var(--accent-indigo-text);margin-bottom:2px;font-size:10px;text-transform:uppercase}
+.complexity-row{display:flex;gap:6px;margin-top:4px}
+.cx-chip{font:600 11px var(--font-mono);padding:3px 8px;border-radius:99px;background:var(--accent-indigo-bg);color:var(--accent-indigo-text);border:1px solid var(--accent-indigo)}
+
+.test-chip{display:flex;flex-direction:column;gap:3px;padding:6px 8px;margin-bottom:5px;background:var(--bg-secondary);border-radius:5px;border:1px solid var(--border-color);cursor:pointer;transition:all var(--ease)}
+.test-chip:hover{border-color:var(--accent-indigo);background:var(--accent-indigo-bg)}
+.tc-row{display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+.tc-row code{font:600 10px var(--font-mono);color:var(--text-secondary)}
+.pt-tag{font:600 9px var(--font-mono);padding:1px 5px;border-radius:3px;background:var(--accent-indigo);color:#fff;text-transform:uppercase}
+.tc-exp{font:600 10px var(--font-mono);color:var(--accent-teal-text);margin-left:auto}
+.run-row{display:flex;align-items:center;gap:8px;margin-top:6px}
+.btn-run{font-family:system-ui,"Segoe UI Emoji",sans-serif;font:700 11px var(--font-sans);padding:5px 12px;background:var(--accent-indigo);color:#fff;border:none;border-radius:5px;cursor:pointer}
+.live-output{font:700 12px var(--font-mono);padding:4px 10px;background:var(--accent-green-bg);color:var(--accent-green-text);border-radius:4px;border:1px solid var(--accent-green)}
+
+.main-row{flex:1;display:flex;overflow:hidden;min-height:0}
+.col{display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.col-code{width:33%;min-width:140px;max-width:45vw;background:var(--bg-card);border-right:1px solid var(--border-color)}
+.col-viz{flex:1;min-width:0;background:var(--bg-primary)}
+.section-label{font-family:system-ui,"Segoe UI Emoji",sans-serif;font:700 10px var(--font-sans);text-transform:uppercase;letter-spacing:.08em;color:var(--text-tertiary);padding:8px 12px;border-bottom:1px solid var(--border-light);background:var(--bg-card)}
+
+#codePanel{flex:1;overflow-y:auto;padding:8px 0;font-family:var(--font-mono);font-size:12px;line-height:1.9}
+.code-line{display:flex;padding:0 12px;transition:background var(--ease)}
+.code-line.active{background:var(--active-line-bg);border-left:3px solid var(--accent-indigo);padding-left:9px}
+.code-line .ln{display:inline-block;width:24px;text-align:right;color:var(--text-tertiary);user-select:none;margin-right:10px;font-size:10px}
+.code-content{white-space:pre}
+.code-content .kw{color:var(--syn-keyword);font-weight:600}
+.code-content .fn{color:var(--syn-function)}
+.code-content .num{color:var(--syn-number)}
+.code-content .str{color:var(--syn-string)}
+
+#vizPanel{flex:1;overflow:auto;padding:14px}
+.vars-strip{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.var-chip{font:600 11px var(--font-mono);padding:4px 9px;border-radius:99px;background:var(--bg-card);border:1px solid var(--border-color);color:var(--text-secondary)}
+.var-chip span.k{color:var(--text-tertiary);margin-right:3px}
+.var-chip span.v{color:var(--text-primary);font-weight:700}
+.vc-active{background:var(--accent-indigo-bg);border-color:var(--accent-indigo);color:var(--accent-indigo-text)}
+.vc-active span.v{color:var(--accent-indigo-text)}
+.vc-safe{background:var(--accent-green-bg);border-color:var(--accent-green)}
+.vc-safe span.v{color:var(--accent-green-text)}
+.vc-flip{background:var(--accent-amber-bg);border-color:var(--accent-amber)}
+.vc-flip span.v{color:var(--accent-amber-text)}
+.vc-bad{background:var(--accent-red-bg);border-color:var(--accent-red);color:var(--accent-red-text)}
+.vc-bad span.v{color:var(--accent-red-text)}
+
+.viz-row{display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap;margin-bottom:14px}
+.viz-card{background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius-md);padding:12px;min-width:220px}
+.viz-card h5{font:700 10px var(--font-sans);text-transform:uppercase;letter-spacing:.06em;color:var(--text-tertiary);margin-bottom:8px;display:flex;align-items:center;gap:5px}
+
+/* Watch face */
+.watch{background:#1e293b;border-radius:14px;padding:14px 18px;display:inline-block;border:3px solid #334155;box-shadow:0 4px 12px rgba(0,0,0,.18)}
+.watch-row{display:flex;gap:8px;align-items:center;justify-content:center;margin-bottom:10px}
+.watch-row:last-child{margin-bottom:0}
+.watch-label{font:700 9px var(--font-mono);color:#94a3b8;width:40px;text-align:right;text-transform:uppercase;letter-spacing:.06em}
+.led{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font:700 10px var(--font-mono);background:#0f172a;color:#475569;border:2px solid #1e293b;transition:all .25s;position:relative}
+.led .lv{font-size:9px;font-weight:600;opacity:.7}
+.led.on-h{background:radial-gradient(circle,#fbbf24,#d97706);color:#1e293b;border-color:#fbbf24;box-shadow:0 0 12px rgba(251,191,36,.7);animation:led-pulse 1.5s infinite}
+.led.on-m{background:radial-gradient(circle,#60a5fa,#2563eb);color:#fff;border-color:#60a5fa;box-shadow:0 0 12px rgba(96,165,250,.7);animation:led-pulse 1.5s infinite}
+.watch-time{text-align:center;font:700 22px var(--font-mono);color:#f1f5f9;margin-top:10px;padding:6px 12px;background:#0f172a;border-radius:6px;letter-spacing:.04em}
+@keyframes led-pulse{0%,100%{filter:brightness(1)}50%{filter:brightness(1.25)}}
+
+.popcount-card{display:flex;flex-direction:column;gap:6px}
+.pc-row{display:flex;align-items:center;gap:8px;font:600 12px var(--font-mono)}
+.pc-label{color:var(--text-tertiary);min-width:90px;font-size:11px}
+.pc-val{padding:3px 8px;border-radius:4px;background:var(--bg-secondary);border:1px solid var(--border-color);font-weight:700;min-width:36px;text-align:center}
+.pc-val.h{background:var(--accent-amber-bg);color:var(--accent-amber-text);border-color:var(--accent-amber)}
+.pc-val.m{background:rgba(96,165,250,.15);color:#1e3a8a;border-color:#60a5fa}
+.pc-val.sum{background:var(--accent-indigo-bg);color:var(--accent-indigo-text);border-color:var(--accent-indigo)}
+.pc-val.match-yes{background:var(--accent-green-bg);color:var(--accent-green-text);border-color:var(--accent-green);animation:win-pulse 1.6s infinite}
+.pc-val.match-no{background:var(--accent-red-bg);color:var(--accent-red-text);border-color:var(--accent-red)}
+
+.bin-display{font:700 14px var(--font-mono);letter-spacing:.18em;color:var(--text-secondary);background:#0f172a;color:#fbbf24;padding:4px 8px;border-radius:4px;display:inline-block;margin-left:6px}
+.bin-display.m{color:#60a5fa}
+
+.results-card{flex:1;min-width:280px}
+.results-grid{display:flex;flex-wrap:wrap;gap:6px;max-height:200px;overflow:auto;padding:4px;background:var(--bg-secondary);border-radius:6px;border:1px dashed var(--border-color);min-height:60px}
+.result-pill{font:700 12px var(--font-mono);padding:5px 10px;background:var(--accent-green-bg);color:var(--accent-green-text);border:1px solid var(--accent-green);border-radius:6px}
+.result-pill.latest{animation:win-pulse 1.6s infinite;background:#FFF8E7;border-color:#D4A017;color:#7A5C0E}
+.empty-state{font-size:11px;color:var(--text-tertiary);font-style:italic;padding:10px;width:100%;text-align:center}
+
+.scan-progress{margin-top:8px;background:var(--bg-secondary);border-radius:6px;padding:8px 10px;border:1px solid var(--border-color)}
+.scan-bar{height:6px;background:var(--bg-tertiary);border-radius:3px;overflow:hidden;margin-top:4px}
+.scan-fill{height:100%;background:linear-gradient(90deg,var(--accent-indigo),var(--accent-teal));transition:width .2s}
+.scan-meta{font:600 10px var(--font-mono);color:var(--text-tertiary);display:flex;justify-content:space-between}
+
+.banner{display:flex;align-items:center;gap:8px;padding:7px 14px;border-radius:8px;font:700 12px var(--font-mono);margin-bottom:10px}
+.banner-init{background:var(--bg-secondary);color:var(--text-secondary);border:1px solid var(--border-color)}
+.banner-iter{background:var(--accent-indigo-bg);color:var(--accent-indigo-text);border:1px solid var(--accent-indigo)}
+.banner-match{background:#FFF8E7;color:#7A5C0E;border:1px solid #D4A017;animation:win-pulse 1.6s infinite}
+.banner-skip{background:var(--accent-red-bg);color:var(--accent-red-text);border:1px solid var(--accent-red)}
+.banner-done{background:var(--accent-green-bg);color:var(--accent-green-text);border:1px solid var(--accent-green)}
+
+@keyframes pulse-node{0%,100%{box-shadow:0 0 4px var(--accent-indigo)}50%{box-shadow:0 0 12px var(--accent-indigo)}}
+@keyframes win-pulse{0%,100%{box-shadow:0 0 3px rgba(234,179,8,.5)}50%{box-shadow:0 0 10px rgba(234,179,8,.9)}}
+
+.footer-bar{display:flex;flex-shrink:0;border-top:1px solid var(--border-color);background:var(--bg-card)}
+.footer-left{width:33%;min-width:140px;max-width:45vw;display:flex;align-items:center;gap:8px;padding:7px 12px;border-right:1px solid var(--border-light)}
+.footer-right{flex:1;display:flex;align-items:center;gap:6px;padding:7px 14px;flex-wrap:wrap}
+.step-info{font:700 12px var(--font-mono)}
+.action-badge{font-family:system-ui,"Segoe UI Emoji",sans-serif;font:700 10px var(--font-mono);padding:3px 9px;border-radius:99px}
+.action-badge--init,.action-badge--func-def,.action-badge--call,.action-badge--return{background:rgba(130,80,255,.14);color:#3C3489;border:1px solid #8250ff}
+.action-badge--for-check,.action-badge--while-check,.action-badge--if-check{background:rgba(56,139,253,.14);color:#185FA5;border:1px solid #388bfd}
+.action-badge--mark,.action-badge--push,.action-badge--pop,.action-badge--restore,.action-badge--found{background:var(--accent-green-bg);color:var(--accent-green-text);border:1px solid var(--accent-green)}
+.action-badge--remove,.action-badge--prune,.action-badge--fail{background:var(--accent-red-bg);color:var(--accent-red-text);border:1px solid var(--accent-red)}
+.action-badge--exit,.action-badge--skip{background:var(--bg-secondary);color:var(--text-secondary);border:1px solid var(--border-color)}
+
+kbd{font-family:system-ui,"Segoe UI Emoji",sans-serif;font:600 10px var(--font-mono);padding:2px 6px;background:var(--bg-secondary);border:1px solid var(--border-color);border-radius:3px;color:var(--text-secondary)}
+.btn{font-family:system-ui,"Segoe UI Emoji",sans-serif;font:600 12px var(--font-sans);padding:5px 11px;border:1px solid var(--border-color);background:var(--bg-card);border-radius:5px;cursor:pointer;transition:all var(--ease)}
+.btn:hover{background:var(--bg-secondary);border-color:var(--accent-indigo)}
+.btn-primary{background:var(--accent-indigo);color:#fff;border-color:var(--accent-indigo)}
+.btn-primary:hover{background:var(--accent-indigo-hover);color:#fff}
+.btn-fullscreen{font-size:13px;padding:4px 10px}
+.btn-zoom{font-family:system-ui,"Segoe UI Emoji",sans-serif;font:600 11px var(--font-mono);padding:3px 8px;border:1px solid var(--border-color);background:var(--bg-card);color:var(--text-secondary);border-radius:4px;cursor:pointer}
+.btn-zoom:hover{background:var(--bg-secondary)}
+.log-zoom-label{font:600 10px var(--font-mono);color:var(--text-tertiary);min-width:38px;text-align:center}
+.log-toggle-btn{font-family:system-ui,"Segoe UI Emoji",sans-serif;font:600 11px var(--font-mono);padding:4px 9px;border:1px solid var(--accent-indigo);background:var(--accent-indigo-bg);color:var(--accent-indigo-text);border-radius:4px;cursor:pointer}
+.log-toggle-btn--off{background:var(--bg-secondary);border-color:var(--border-color);color:var(--text-tertiary)}
+.footer-sep{width:1px;height:18px;background:var(--border-color);margin:0 4px}
+
+.resize-h{width:5px;background:transparent;cursor:col-resize;position:relative;flex-shrink:0;z-index:5}
+.resize-h::before{content:'';position:absolute;top:0;bottom:0;left:2px;width:1px;background:var(--border-color)}
+.resize-h:hover::before,.resize-h.active::before{background:var(--accent-indigo);width:2px;left:1.5px}
+
+.log-popup{--log-scale:1;position:fixed;bottom:52px;right:14px;width:calc(480px*var(--log-scale));max-width:92vw;max-height:75vh;border-radius:var(--radius-lg);box-shadow:0 10px 32px rgba(0,0,0,.14);border:1px solid var(--border-color);background:var(--bg-card);overflow:hidden;display:flex;flex-direction:column;z-index:100;transition:opacity .15s,transform .15s;transform-origin:bottom right}
+.log-popup--hidden{opacity:0;transform:scale(.92);pointer-events:none}
+.log-popup-body{flex:1;overflow:auto;padding:0}
+.log-popup-body>.log-card{border-radius:0;border:none;border-left:0}
+
+.log-card{border-radius:var(--radius-md);overflow:hidden;border:1px solid var(--border-color);border-left-width:4px;font-size:var(--fs-xs);background:var(--bg-card)}
+.log-card--for-check,.log-card--while-check,.log-card--if-check{border-left-color:#388bfd}
+.log-card--func-def,.log-card--init,.log-card--call,.log-card--return{border-left-color:#8250ff}
+.log-card--mark,.log-card--push,.log-card--pop,.log-card--restore,.log-card--found{border-left-color:#3fb950}
+.log-card--remove,.log-card--prune,.log-card--fail{border-left-color:#f85149}
+.log-card--exit,.log-card--skip{border-left-color:#888780}
+
+.log-card-header{display:flex;align-items:center;gap:6px;padding:8px 10px 6px;background:var(--bg-secondary);border-bottom:1px solid var(--border-light)}
+.log-badge{font-family:system-ui,"Segoe UI Emoji",sans-serif;font:700 10px var(--font-mono);padding:2px 7px;border-radius:99px}
+.log-badge--init,.log-badge--func-def,.log-badge--call,.log-badge--return{background:rgba(130,80,255,.14);color:#3C3489}
+.log-badge--for-check,.log-badge--while-check,.log-badge--if-check{background:rgba(56,139,253,.14);color:#185FA5}
+.log-badge--mark,.log-badge--push,.log-badge--pop,.log-badge--restore,.log-badge--found{background:var(--accent-green-bg);color:var(--accent-green-text)}
+.log-badge--remove,.log-badge--prune,.log-badge--fail{background:var(--accent-red-bg);color:var(--accent-red-text)}
+.log-badge--exit,.log-badge--skip{background:var(--bg-secondary);color:var(--text-secondary)}
+.log-line-ref{font:700 10px var(--font-mono);color:var(--accent-indigo);background:var(--accent-indigo-bg);padding:1px 6px;border-radius:4px;border:1px solid var(--accent-indigo)}
+.log-status-pill{font-family:system-ui,"Segoe UI Emoji",sans-serif;font-size:9px;font-weight:700;padding:2px 7px;border-radius:99px;text-transform:uppercase;margin-left:auto}
+.log-status--success{background:var(--accent-green-bg);color:var(--accent-green-text);border:1px solid var(--accent-green)}
+.log-status--fail{background:var(--accent-red-bg);color:var(--accent-red-text);border:1px solid var(--accent-red)}
+.log-status--skip{background:var(--bg-tertiary);color:var(--text-tertiary);border:1px solid var(--border-color)}
+.log-status--loop{background:rgba(56,139,253,.14);color:#185FA5;border:1px solid #388bfd}
+.log-status--prune{background:var(--accent-red-bg);color:var(--accent-red-text);border:1px solid var(--accent-red)}
+.log-status--info{background:rgba(130,80,255,.14);color:#3C3489;border:1px solid #8250ff}
+
+.log-section{padding:7px 10px;border-bottom:1px dashed var(--border-light)}
+.log-section:last-child{border-bottom:none}
+.log-section-title{font:700 8px var(--font-mono);text-transform:uppercase;letter-spacing:.06em;color:var(--text-tertiary);margin-bottom:3px;display:flex;align-items:center;gap:4px}
+.log-section-title-icon{font-family:system-ui,"Segoe UI Emoji",sans-serif;font-size:11px}
+
+.log-code-snippet{font:600 11px var(--font-mono);background:#0d1117;color:#e6edf3;padding:6px 9px;border-radius:4px;display:block;overflow-x:auto;white-space:pre;border:1px solid #30363d}
+.log-code-snippet .ck{color:#ff7b72}.log-code-snippet .cs{color:#a5d6ff}
+.log-code-snippet .cn{color:#79c0ff}.log-code-snippet .cf{color:#d2a8ff}
+.log-code-snippet .cc{color:#8b949e;font-style:italic}
+
+.log-kv-row{display:flex;flex-wrap:wrap;gap:4px}
+.log-kv{display:inline-flex;align-items:center;gap:3px;font:11px var(--font-mono);padding:2px 7px;border-radius:4px;background:var(--bg-secondary);border:1px solid var(--border-light)}
+.log-kv-key{color:var(--text-tertiary);font-weight:500}
+.log-kv-val{color:var(--text-primary);font-weight:700}
+.log-kv--in{background:rgba(56,139,253,.08);border-color:rgba(56,139,253,.3)}
+.log-kv--out{background:rgba(63,185,80,.08);border-color:rgba(63,185,80,.4)}
+.log-kv--out .log-kv-val{color:#15803D}
+.log-kv--changed{background:rgba(180,83,9,.10);border-color:rgba(180,83,9,.4)}
+.log-kv--changed .log-kv-val{color:var(--accent-amber-text)}
+
+.log-verdict{display:flex;align-items:center;gap:6px;font:600 11px var(--font-mono);padding:5px 8px;border-radius:5px;background:var(--bg-secondary);border:1px solid var(--border-light)}
+.log-verdict--true{background:var(--accent-green-bg);border-color:var(--accent-green);color:var(--accent-green-text)}
+.log-verdict--false{background:var(--accent-red-bg);border-color:var(--accent-red);color:var(--accent-red-text)}
+
+.log-analogy{font:italic 11px var(--font-sans);color:var(--text-secondary);background:#FFF8E7;border:1px solid #FBE8A6;border-left:3px solid var(--accent-amber);padding:6px 9px;border-radius:4px;line-height:1.55}
+.log-analogy strong{color:var(--accent-amber-text);font-style:normal;font-weight:700}
+.log-why{font-size:11px;line-height:1.55;color:var(--text-primary);padding:4px 0}
+.log-why strong{color:var(--accent-indigo-text)}
+.log-why code{font:600 10px var(--font-mono);background:var(--bg-secondary);padding:1px 4px;border-radius:3px;color:var(--accent-indigo-text)}
+</style>
+</head>
+<body>
+<div class="app-shell">
+
+  <!-- ─── PROBLEM CARD ─── -->
+  <div class="problem-card" id="problemCard">
+    <div class="pc-header">
+      <a href="../00_HomePage/gt_learn_homepage.html" class="gt-btn">GT LEARN</a>
+      <span class="lc-num">#401</span>
+      <span class="lc-title">⌚ Binary Watch</span>
+      <span class="lc-diff">EASY</span>
+      <span class="lc-tag">Backtracking</span>
+      <span class="lc-tag">Bit-Manipulation</span>
+      <span class="lc-tag">Brute Force</span>
+      <div class="pc-header-right">
+        <div class="input-wrap"><label>turnedOn</label><input id="inTO" type="number" value="1" min="0" max="10"></div>
+        <span class="expected-badge" id="expBadge">expected: 10 times</span>
+        <button class="toggle-btn" type="button" onclick="toggleProblem()" id="toggleBtn">▲ Hide</button>
+      </div>
+    </div>
+
+    <div class="pc-body" id="pcBody">
+      <div class="pc-left">
+        <div class="pc-section">
+          <h4>📝 Problem Statement</h4>
+          <p>Binary watch mein <strong>4 LEDs</strong> upar (hours: <code>8, 4, 2, 1</code>) aur <strong>6 LEDs</strong> neeche (minutes: <code>32, 16, 8, 4, 2, 1</code>) hote hain. Har LED ek bit hai. Diye gaye <code>turnedOn</code> integer ke liye, <strong>saare possible times</strong> return karne hain jo watch dikha sakti hai. Hours <code>0-11</code> aur minutes <code>0-59</code> mein. Format: <code>"H:MM"</code>.</p>
+        </div>
+        <div class="pc-section">
+          <h4>🧠 Solving Approach</h4>
+          <p>Sabse simple — <strong>brute force enumeration</strong>. Har <code>(h, m)</code> pair try karo jahan <code>0 ≤ h &lt; 12</code> aur <code>0 ≤ m &lt; 60</code>. Har pair ke liye <code>popcount(h) + popcount(m)</code> nikalo. Agar yeh sum <code>turnedOn</code> ke barabar hai, toh formatted string list mein add karo. Total <strong>720 combinations</strong>, har ek O(1) check.</p>
+        </div>
+        <div class="pc-section">
+          <h4>🎯 Core Concepts</h4>
+          <div class="concept-block">
+            <div class="concept-card"><strong>Popcount</strong><code>bin(x).count('1')</code> — number ke binary representation mein 1's count.</div>
+            <div class="concept-card"><strong>Enumeration</strong>12 × 60 = 720 combinations — small enough for brute force.</div>
+            <div class="concept-card"><strong>Format</strong><code>f"{h}:{m:02d}"</code> — minutes ko 2-digit zero-padded format mein.</div>
+          </div>
+        </div>
+        <div class="pc-section">
+          <h4>⏱ Complexity</h4>
+          <div class="complexity-row">
+            <span class="cx-chip">Time: O(720) = O(1)</span>
+            <span class="cx-chip">Space: O(1) result</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="pc-right">
+        <h4 style="font:700 11px var(--font-sans);text-transform:uppercase;letter-spacing:.06em;color:var(--text-tertiary);margin-bottom:6px">🧪 Test Cases</h4>
+        <div class="test-chip" onclick="loadTest(1, 10, 'single LED')">
+          <div class="tc-row"><span class="pt-tag">T1</span><code>turnedOn = 1</code></div>
+          <div class="tc-row"><span style="font:11px var(--font-sans);color:var(--text-secondary)">single LED on</span><span class="tc-exp">→ 10 times</span></div>
+        </div>
+        <div class="test-chip" onclick="loadTest(0, 1, 'all LEDs off')">
+          <div class="tc-row"><span class="pt-tag">T2</span><code>turnedOn = 0</code></div>
+          <div class="tc-row"><span style="font:11px var(--font-sans);color:var(--text-secondary)">all off → only 0:00</span><span class="tc-exp">→ 1 time</span></div>
+        </div>
+        <div class="test-chip" onclick="loadTest(2, 44, 'two LEDs')">
+          <div class="tc-row"><span class="pt-tag">T3</span><code>turnedOn = 2</code></div>
+          <div class="tc-row"><span style="font:11px var(--font-sans);color:var(--text-secondary)">2 LEDs combinations</span><span class="tc-exp">→ 44 times</span></div>
+        </div>
+        <div class="test-chip" onclick="loadTest(9, 0, 'too many LEDs')">
+          <div class="tc-row"><span class="pt-tag">T4</span><code>turnedOn = 9</code></div>
+          <div class="tc-row"><span style="font:11px var(--font-sans);color:var(--text-secondary)">impossible — &gt; max bits</span><span class="tc-exp">→ 0 times</span></div>
+        </div>
+        <div class="run-row">
+          <button class="btn-run" type="button" onclick="resetWithInput()">▶ Run</button>
+          <span class="live-output" id="liveOutput">—</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="main-row">
+    <div class="col col-code" id="col1">
+      <div class="section-label">📜 Python Code</div>
+      <div id="codePanel"></div>
+    </div>
+    <div class="resize-h" id="resizeH1"></div>
+    <div class="col col-viz">
+      <div class="section-label">📊 Visualization</div>
+      <div id="vizPanel"></div>
+    </div>
+  </div>
+
+  <div class="footer-bar">
+    <div class="footer-left" id="footerLeft">
+      <span id="stepInfo" class="step-info">0/0</span>
+      <span id="actionBadge" class="action-badge"></span>
+    </div>
+    <div class="footer-right">
+      <kbd>←</kbd><kbd>→</kbd><kbd>R</kbd>
+      <button class="btn" type="button" onclick="resetStep()">↺</button>
+      <button class="btn" type="button" onclick="stepBy(-1)">◀</button>
+      <button class="btn btn-primary" type="button" onclick="stepBy(1)">▶ Next</button>
+      <span class="footer-sep"></span>
+      <button id="logToggleBtn" class="log-toggle-btn" type="button" onclick="toggleLogPreview()">📋 ON</button>
+      <button class="btn-zoom" type="button" onclick="logZoom(-1)">−</button>
+      <span id="logZoomLabel" class="log-zoom-label">100%</span>
+      <button class="btn-zoom" type="button" onclick="logZoom(1)">+</button>
+      <button class="btn-zoom" type="button" onclick="logZoomReset()">↺</button>
+      <span class="footer-sep"></span>
+      <button class="btn btn-fullscreen" type="button" onclick="toggleFullscreen()">⛶</button>
+    </div>
+  </div>
+
+</div>
+
+<div class="log-popup" id="logPopup">
+  <div class="log-popup-body" id="logPopupBody"></div>
+</div>
+
+<script>
+/* ============ PYTHON CODE ============ */
+var codeLines = [
+  "def readBinaryWatch(turnedOn):",
+  "    res = []",
+  "    for h in range(12):",
+  "        for m in range(60):",
+  "            if bin(h).count('1') + bin(m).count('1') == turnedOn:",
+  "                res.append(f\"{h}:{m:02d}\")",
+  "    return res"
+];
+
+/* ============ STATE ============ */
+var steps=[], currentStep=0, codeWidthUserSet=false, curResult=null;
+var logEnabled=true, logZoomLevel=100;
+
+/* ============ BADGES ============ */
+var LOG_BADGE = {
+  "func-def":"📌 DEF","init":"⚙️ INIT","call":"📞 CALL","return":"🏆 RETURN",
+  "for-check":"🔁 FOR","while-check":"🔁 WHILE","if-check":"🔎 IF",
+  "mark":"✅ MARK","push":"⬆ PUSH","pop":"⬇ POP","restore":"↩ RESTORE","found":"🎉 FOUND",
+  "remove":"✏️ EDIT","prune":"✂️ PRUNE","fail":"❌ FAIL","exit":"🔚 EXIT","skip":"⏭ SKIP"
+};
+var BADGE_LABEL = {
+  "func-def":"DEF","init":"INIT","call":"CALL","return":"RETURN",
+  "for-check":"FOR","while-check":"WHILE","if-check":"IF",
+  "mark":"MARK","push":"PUSH","pop":"POP","restore":"RESTORE","found":"FOUND",
+  "remove":"EDIT","prune":"PRUNE","fail":"FAIL","exit":"EXIT","skip":"SKIP"
+};
+
+/* ============ CODE RENDERER ============ */
+function renderCode(){
+  var p = document.getElementById('codePanel');
+  p.innerHTML = codeLines.map(function(raw,i){
+    var h = raw;
+    h = h.replace(/("[^"]*"|'[^']*')/g, '\x01STR\x02$1\x03');
+    h = h.replace(/\b(def|for|in|if|return|break|continue|and|else|elif|True|False|None|not|or|while|lambda)\b/g, '\x01KW\x02$1\x03');
+    h = h.replace(/\b(len|range|int|str|list|append|pop|sorted|min|max|sum|abs|enumerate|zip|print|set|add|bin|count)\b/g, '\x01FN\x02$1\x03');
+    h = h.replace(/\b(\d+)\b/g, '\x01NUM\x02$1\x03');
+    h = h.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    h = h.replace(/\x01([A-Z]+)\x02/g, function(_,c){
+      return '<span class="'+(c==='KW'?'kw':c==='FN'?'fn':c==='NUM'?'num':'str')+'">';
+    }).replace(/\x03/g,'</span>');
+    return '<div class="code-line" data-line="'+i+'"><span class="ln">'+(i+1)+'</span><span class="code-content">'+h+'</span></div>';
+  }).join('');
+}
+
+/* ============ MINI HIGHLIGHTER ============ */
+function hlCode(raw){
+  var h = raw;
+  h = h.replace(/("[^"]*"|'[^']*'|f"[^"]*")/g, '\x01s\x02$1\x03');
+  h = h.replace(/\b(def|for|in|if|return|break|continue|and|else|elif|True|False|None|not|or|while|lambda)\b/g, '\x01k\x02$1\x03');
+  h = h.replace(/\b(len|range|int|str|list|append|pop|sorted|min|max|sum|abs|enumerate|zip|print|set|add|bin|count)\b/g, '\x01f\x02$1\x03');
+  h = h.replace(/(?<![.\w"\x01\x02\x03])(-?\d+)\b/g, '\x01n\x02$1\x03');
+  h = h.replace(/(#.*$)/gm, '\x01c\x02$1\x03');
+  h = h.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  h = h.replace(/\x01([a-z])\x02/g, function(_,c){return '<span class="c'+c+'">';}).replace(/\x03/g,'</span>');
+  return h;
+}
+
+/* ============ richLog ============ */
+function richLog(opts){
+  var statusMap = {success:"✅ Success",fail:"❌ Failed",skip:"⏭ Skipped",loop:"🔁 Loop iter",prune:"✂️ Pruned",info:"ℹ️ Info"};
+  var status = opts.status || "info";
+  var html = '<div class="log-card log-card--'+opts.action+'">';
+  html += '<div class="log-card-header">';
+  html += '<span class="log-badge log-badge--'+opts.action+'">'+(LOG_BADGE[opts.action]||opts.action)+'</span>';
+  html += '<span class="log-line-ref">L'+(opts.line+1)+'</span>';
+  html += '<span class="log-status-pill log-status--'+status+'">'+statusMap[status]+'</span></div>';
+  if(opts.code){
+    html += '<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">📜</span>Code Executing</div>';
+    html += '<code class="log-code-snippet">'+hlCode(opts.code)+'</code></div>';
+  }
+  if(opts.inputs && opts.inputs.length){
+    html += '<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">📥</span>Input Values (line is using these)</div><div class="log-kv-row">';
+    opts.inputs.forEach(function(kv){
+      html += '<span class="log-kv log-kv--in"><span class="log-kv-key">'+kv.k+'</span>=<span class="log-kv-val">'+kv.v+'</span></span>';
+    });
+    html += '</div></div>';
+  }
+  if(opts.outputs && opts.outputs.length){
+    html += '<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">📤</span>Output / State After Line</div><div class="log-kv-row">';
+    opts.outputs.forEach(function(kv){
+      var cls = kv.changed ? 'log-kv--changed':'log-kv--out';
+      html += '<span class="log-kv '+cls+'"><span class="log-kv-key">'+kv.k+'</span>=<span class="log-kv-val">'+kv.v+'</span></span>';
+    });
+    html += '</div></div>';
+  }
+  if(opts.verdict){
+    var vCls = opts.verdictTrue===true?'log-verdict--true':(opts.verdictTrue===false?'log-verdict--false':'');
+    var vIcon = opts.verdictTrue===true?'✓':(opts.verdictTrue===false?'✗':'•');
+    html += '<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">⚖️</span>Verdict / Decision</div>';
+    html += '<div class="log-verdict '+vCls+'">'+vIcon+' '+opts.verdict+'</div></div>';
+  }
+  if(opts.why){
+    html += '<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">💡</span>Why This Happens</div><div class="log-why">'+opts.why+'</div></div>';
+  }
+  if(opts.analogy){
+    html += '<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">🎭</span>Real-Life Analogy</div><div class="log-analogy">'+opts.analogy+'</div></div>';
+  }
+  html += '</div>';
+  return html;
+}
+
+/* ============ HELPERS ============ */
+function popcount(x){ var c=0; while(x){ c += x&1; x = x>>>1; } return c; }
+function bitsOf(x, w){
+  var s = '';
+  for(var i=w-1;i>=0;i--) s += ((x>>i)&1);
+  return s;
+}
+function fmtTime(h, m){ return h + ':' + (m<10?'0':'') + m; }
+
+/* ============ buildSteps ============ */
+function buildSteps(p){
+  var st=[], MAX=4000;
+  var turnedOn = p.turnedOn;
+  var res = [];
+  var curH=null, curM=null, curHpop=null, curMpop=null, sumBits=null, isMatch=null;
+  var phase = "init";          // init | iter | match | skip | done
+  var iterCount = 0;
+  var totalIter = 12 * 60;
+  var lastFound = null;
+
+  function snap(extra){
+    return Object.assign({
+      turnedOn: turnedOn,
+      res: res.slice(),
+      curH: curH, curM: curM,
+      curHpop: curHpop, curMpop: curMpop,
+      sumBits: sumBits, isMatch: isMatch,
+      phase: phase, iterCount: iterCount, totalIter: totalIter,
+      lastFound: lastFound
+    }, extra||{});
+  }
+  function push(o){ if(st.length>=MAX) return; st.push(Object.assign({line:0,action:"init",logHTML:""}, snap(o))); }
+
+  // ── L0: function def ──
+  push({
+    line:0, action:"func-def",
+    logHTML: richLog({
+      line:0, action:"func-def",
+      code:"def readBinaryWatch(turnedOn):",
+      status:"info",
+      inputs:[{k:"turnedOn",v:turnedOn}],
+      why:"Function start ho gayi. <code>turnedOn</code> = <strong>"+turnedOn+"</strong> matlab itni LEDs jal rahi hain. Hume <strong>saare valid times</strong> nikalne hain jab is count ke saath hours+minutes mein total <code>"+turnedOn+"</code> bits set ho.",
+      analogy:"Jaise tumhe <strong>watch ki sirf "+turnedOn+" lights</strong> jali dikh rahi hain — andhere kamre mein. Ab guess karo <strong>kya-kya time ho sakta hai</strong>?"
+    })
+  });
+
+  // ── L1: res = [] ──
+  push({
+    line:1, action:"init",
+    logHTML: richLog({
+      line:1, action:"init",
+      code:"res = []",
+      status:"success",
+      outputs:[{k:"res",v:"[]",changed:true}],
+      why:"Empty list <code>res</code> banayi. Yahan saare matching times collect karenge.",
+      analogy:"Ek <strong>khaali notebook</strong> nikali — jaise-jaise valid times milengi, isme likhte jayenge."
+    })
+  });
+
+  // ── L2 outer for loop ──
+  for(var h=0; h<12; h++){
+    curH = h;
+    curHpop = popcount(h);
+
+    push({
+      line:2, action:"for-check",
+      logHTML: richLog({
+        line:2, action:"for-check",
+        code:"for h in range(12): h="+h,
+        status:"loop",
+        inputs:[{k:"h",v:h},{k:"range",v:"12"}],
+        outputs:[{k:"h",v:h,changed:true}],
+        verdict:"h ("+h+") < 12 → True",
+        verdictTrue:true,
+        why:"Outer loop ka <strong>"+(h+1)+"-th iteration</strong>. Hour <code>h="+h+"</code> try kar rahe hain. Binary mein yeh hai: <code>"+bitsOf(h,4)+"</code> ("+curHpop+" bits set).",
+        analogy:"Ghadi ke <strong>hour dial ko "+h+" pe set</strong> kiya. Ab is hour ke saath saare 60 minutes try karenge."
+      })
+    });
+
+    // ── L3 inner for loop ──
+    for(var m=0; m<60; m++){
+      curM = m;
+      curMpop = popcount(m);
+      sumBits = curHpop + curMpop;
+      iterCount++;
+      phase = "iter";
+
+      push({
+        line:3, action:"for-check",
+        logHTML: richLog({
+          line:3, action:"for-check",
+          code:"for m in range(60): m="+m,
+          status:"loop",
+          inputs:[{k:"m",v:m},{k:"range",v:"60"}],
+          outputs:[{k:"m",v:m,changed:true}],
+          verdict:"m ("+m+") < 60 → True",
+          verdictTrue:true,
+          why:"Inner loop ka <code>m="+m+"</code>. Binary mein <code>"+bitsOf(m,6)+"</code> ("+curMpop+" bits set). Combined try kar rahe hain <strong>h="+h+", m="+m+"</strong>.",
+          analogy:"Minute dial ko <strong>"+m+" pe ghuma diya</strong>. Ab dekhte hain — kya yeh time match karta hai?"
+        })
+      });
+
+      // ── L4: if condition ──
+      isMatch = (sumBits === turnedOn);
+      phase = isMatch ? "match" : "skip";
+
+      push({
+        line:4, action:"if-check",
+        logHTML: richLog({
+          line:4, action:"if-check",
+          code:"if bin("+h+").count('1') + bin("+m+").count('1') == "+turnedOn+":  # "+curHpop+" + "+curMpop+" = "+sumBits,
+          status: isMatch ? "success" : "skip",
+          inputs:[
+            {k:"bin(h)",v:"'0b"+bitsOf(h,4).replace(/^0+(?=\d)/,'')+"'"},
+            {k:"popcount(h)",v:curHpop},
+            {k:"bin(m)",v:"'0b"+bitsOf(m,6).replace(/^0+(?=\d)/,'')+"'"},
+            {k:"popcount(m)",v:curMpop},
+            {k:"sum",v:sumBits},
+            {k:"turnedOn",v:turnedOn}
+          ],
+          verdict: curHpop+" + "+curMpop+" = "+sumBits+" "+(isMatch?"==":"!=")+" "+turnedOn+(isMatch?" → True":" → False"),
+          verdictTrue: isMatch,
+          why: isMatch
+            ? "<strong>Match mil gaya!</strong> Hour <code>"+h+"</code> mein "+curHpop+" bits set hain aur minute <code>"+m+"</code> mein "+curMpop+" bits — total <strong>"+sumBits+" = turnedOn ("+turnedOn+")</strong>. Yeh time valid hai!"
+            : "Mismatch — total <strong>"+sumBits+"</strong> bits set hain par humein <strong>"+turnedOn+"</strong> chahiye. Yeh time skip karenge.",
+          analogy: isMatch
+            ? "Jaise <strong>combination lock</strong> ka sahi number lag gaya — click! Time accept ho gaya."
+            : "Lights ki ginti match nahi hui — <strong>yeh time count nahi karega</strong>. Aage badho."
+        })
+      });
+
+      // ── L5: res.append (only if match) ──
+      if(isMatch){
+        var formatted = fmtTime(h, m);
+        res.push(formatted);
+        lastFound = formatted;
+        push({
+          line:5, action:"found",
+          logHTML: richLog({
+            line:5, action:"found",
+            code:"res.append(f\"{"+h+"}:{"+m+":02d}\")  # \""+formatted+"\"",
+            status:"success",
+            inputs:[{k:"h",v:h},{k:"m",v:m}],
+            outputs:[
+              {k:"appended",v:'"'+formatted+'"',changed:true},
+              {k:"res.size",v:res.length,changed:true}
+            ],
+            why:"<strong>🎉 Valid time found!</strong> Format <code>f\"{h}:{m:02d}\"</code> use kiya — minutes ko <strong>2-digit zero-padded</strong> banaya. Result list mein <code>\""+formatted+"\"</code> add ho gaya. Total ab <strong>"+res.length+"</strong> times.",
+            analogy:"<strong>Notebook mein entry add ki!</strong> Jaise diary mein nayi yaad likhi — \""+formatted+"\". Ab yeh permanent hai."
+          })
+        });
+      }
+    }
+    // ── L3 inner loop EXIT ──
+    push({
+      line:3, action:"exit",
+      logHTML: richLog({
+        line:3, action:"exit",
+        code:"# inner for-loop exit (m reached 60), h="+h,
+        status:"info",
+        inputs:[{k:"final m",v:60},{k:"range",v:"60"}],
+        verdict:"m (60) < 60 → False",
+        verdictTrue:false,
+        outputs:[{k:"res.size",v:res.length}],
+        why:"Saare 60 minutes <code>h="+h+"</code> ke saath check ho gaye. Inner loop natural exit. Ab next hour pe jayenge.",
+        analogy:"Hour <strong>"+h+"</strong> ke saare minute slots try ho gaye — <strong>aage badho</strong> next hour pe."
+      })
+    });
+  }
+
+  // ── L2 outer loop EXIT ──
+  push({
+    line:2, action:"exit",
+    logHTML: richLog({
+      line:2, action:"exit",
+      code:"# outer for-loop exit (h reached 12)",
+      status:"info",
+      inputs:[{k:"final h",v:12},{k:"range",v:"12"}],
+      verdict:"h (12) < 12 → False",
+      verdictTrue:false,
+      outputs:[{k:"res.size (final)",v:res.length}],
+      why:"Saare 12 hours × 60 minutes = <strong>720 combinations</strong> check ho gaye. Outer loop bhi exit. Total matches: <strong>"+res.length+"</strong>.",
+      analogy:"<strong>Saari ghadi scan ho gayi</strong> — har possible time check kar liya. Ab final list dene ka time hai."
+    })
+  });
+
+  // ── L6: return res ──
+  phase = "done";
+  curResult = res.length;
+  push({
+    line:6, action:"return",
+    logHTML: richLog({
+      line:6, action:"return",
+      code:"return res  # "+res.length+" valid times",
+      status:"success",
+      outputs:[{k:"return",v:JSON.stringify(res),changed:true},{k:"count",v:res.length,changed:true}],
+      why:"<strong>🏆 Final answer!</strong> Total <strong>"+res.length+" valid times</strong> mile jab "+turnedOn+" LEDs jali ho. Function khatam.",
+      analogy:"Notebook complete — <strong>"+res.length+" entries</strong>. Ab caller ko de do, kaam khatam!"
+    })
+  });
+
+  return st;
+}
+
+/* ============ VARS STRIP ============ */
+function buildVars(s){
+  var chips=[];
+  function chip(k,v,cls){ chips.push('<span class="var-chip '+(cls||'')+'"><span class="k">'+k+':</span><span class="v">'+v+'</span></span>'); }
+
+  var phaseLabel = {
+    "init":"Setup",
+    "iter":"Trying (h, m)",
+    "match":"✓ Match",
+    "skip":"✗ Skip",
+    "done":"🏁 Done"
+  };
+  chip("phase", phaseLabel[s.phase] || s.phase, "vc-active");
+  chip("turnedOn", s.turnedOn, "vc-active");
+  if(s.curH !== null) chip("h", s.curH, s.phase==="match"?"vc-safe":"vc-active");
+  if(s.curM !== null) chip("m", s.curM, s.phase==="match"?"vc-safe":"vc-active");
+  if(s.curHpop !== null) chip("popcount(h)", s.curHpop, "vc-flip");
+  if(s.curMpop !== null) chip("popcount(m)", s.curMpop, "vc-flip");
+  if(s.sumBits !== null) chip("sum", s.sumBits, s.phase==="match"?"vc-safe":(s.phase==="skip"?"vc-bad":""));
+  chip("res.size", s.res.length, s.res.length>0?"vc-safe":"");
+  chip("iter", s.iterCount+"/"+s.totalIter);
+  return '<div class="vars-strip">'+chips.join('')+'</div>';
+}
+
+/* ============ WATCH FACE ============ */
+function watchFace(s){
+  var H_BITS = [8, 4, 2, 1];
+  var M_BITS = [32, 16, 8, 4, 2, 1];
+  var h = s.curH===null ? 0 : s.curH;
+  var m = s.curM===null ? 0 : s.curM;
+
+  var html = '<div class="watch">';
+  // Hour row
+  html += '<div class="watch-row"><span class="watch-label">HOUR</span>';
+  for(var i=0;i<H_BITS.length;i++){
+    var bit = H_BITS[i];
+    var on = (h & bit) !== 0;
+    html += '<div class="led '+(on?'on-h':'')+'"><span class="lv">'+bit+'</span></div>';
+  }
+  html += '</div>';
+  // Minute row
+  html += '<div class="watch-row"><span class="watch-label">MIN</span>';
+  for(var j=0;j<M_BITS.length;j++){
+    var b2 = M_BITS[j];
+    var on2 = (m & b2) !== 0;
+    html += '<div class="led '+(on2?'on-m':'')+'"><span class="lv">'+b2+'</span></div>';
+  }
+  html += '</div>';
+  // Time display
+  if(s.curH !== null){
+    html += '<div class="watch-time">'+fmtTime(h, m)+'</div>';
+  } else {
+    html += '<div class="watch-time" style="opacity:.5">--:--</div>';
+  }
+  html += '</div>';
+  return html;
+}
+
+/* ============ POPCOUNT CARD ============ */
+function popcountCard(s){
+  if(s.curH === null){
+    return '<div class="empty-state">Iteration shuru hote hi popcount calc dikhega</div>';
+  }
+  var html = '<div class="popcount-card">';
+  html += '<div class="pc-row"><span class="pc-label">bin(h='+s.curH+')</span><span class="pc-val h">'+s.curHpop+' bits</span><span class="bin-display">'+bitsOf(s.curH,4)+'</span></div>';
+  html += '<div class="pc-row"><span class="pc-label">bin(m='+s.curM+')</span><span class="pc-val m">'+s.curMpop+' bits</span><span class="bin-display m">'+bitsOf(s.curM,6)+'</span></div>';
+  html += '<div class="pc-row"><span class="pc-label">sum</span><span class="pc-val sum">'+s.sumBits+'</span><span style="font:600 11px var(--font-mono);color:var(--text-tertiary)">vs turnedOn = '+s.turnedOn+'</span></div>';
+  if(s.isMatch !== null){
+    var matchCls = s.isMatch ? 'match-yes' : 'match-no';
+    var matchLbl = s.isMatch ? '✓ MATCH' : '✗ SKIP';
+    html += '<div class="pc-row"><span class="pc-label">verdict</span><span class="pc-val '+matchCls+'">'+matchLbl+'</span></div>';
+  }
+  html += '</div>';
+  return html;
+}
+
+/* ============ RESULTS GRID ============ */
+function resultsGrid(s){
+  if(!s.res.length){
+    return '<div class="results-grid"><div class="empty-state">Abhi koi match nahi mila…</div></div>';
+  }
+  var html = '<div class="results-grid">';
+  for(var i=0;i<s.res.length;i++){
+    var isLatest = (s.res[i] === s.lastFound && s.phase === "match" && i === s.res.length-1);
+    html += '<div class="result-pill '+(isLatest?'latest':'')+'">'+s.res[i]+'</div>';
+  }
+  html += '</div>';
+  return html;
+}
+
+/* ============ SCAN PROGRESS ============ */
+function scanProgress(s){
+  var pct = s.totalIter ? Math.round((s.iterCount / s.totalIter) * 100) : 0;
+  var html = '<div class="scan-progress">';
+  html += '<div class="scan-meta"><span>🔎 Scan progress</span><span>'+s.iterCount+' / '+s.totalIter+' ('+pct+'%)</span></div>';
+  html += '<div class="scan-bar"><div class="scan-fill" style="width:'+pct+'%"></div></div>';
+  html += '</div>';
+  return html;
+}
+
+/* ============ RENDER VIZ ============ */
+function renderViz(s){
+  var v = document.getElementById('vizPanel');
+  var html = '';
+  html += buildVars(s);
+
+  // Phase banner
+  var bannerCls, bannerText;
+  if(s.phase==="init"){ bannerCls="banner-init"; bannerText="⚙️ Setup — empty result list initialized"; }
+  else if(s.phase==="iter"){ bannerCls="banner-iter"; bannerText="🔎 Trying h="+s.curH+", m="+s.curM+" (iteration "+s.iterCount+"/"+s.totalIter+")"; }
+  else if(s.phase==="match"){ bannerCls="banner-match"; bannerText="🎉 Match found! "+fmtTime(s.curH,s.curM)+" added to result"; }
+  else if(s.phase==="skip"){ bannerCls="banner-skip"; bannerText="⏭ Skip — "+s.sumBits+" bits ≠ "+s.turnedOn; }
+  else if(s.phase==="done"){ bannerCls="banner-done"; bannerText="🏁 Done — "+s.res.length+" valid times found for turnedOn="+s.turnedOn; }
+  html += '<div class="banner '+bannerCls+'">'+bannerText+'</div>';
+
+  // Watch + popcount row
+  html += '<div class="viz-row">';
+  html += '<div class="viz-card"><h5>⌚ Binary Watch (current h, m)</h5>'+watchFace(s)+'</div>';
+  html += '<div class="viz-card" style="flex:1;min-width:280px"><h5>🔢 Popcount Math</h5>'+popcountCard(s)+scanProgress(s)+'</div>';
+  html += '</div>';
+
+  // Results card (full width)
+  html += '<div class="viz-card results-card" style="display:block"><h5>📋 Result List ('+s.res.length+' times)</h5>'+resultsGrid(s)+'</div>';
+
+  v.innerHTML = html;
+}
+
+/* ============ STEP CONTROLS ============ */
+function renderStep(idx){
+  if(!steps.length) return;
+  var s = steps[idx];
+  currentStep = idx;
+  document.getElementById('stepInfo').textContent = (idx+1)+'/'+steps.length;
+  var bd = document.getElementById('actionBadge');
+  bd.textContent = BADGE_LABEL[s.action] || s.action;
+  bd.className = 'action-badge action-badge--'+s.action;
+  document.querySelectorAll('.code-line').forEach(function(el){el.classList.remove('active');});
+  var al = document.querySelector('.code-line[data-line="'+s.line+'"]');
+  if(al){ al.classList.add('active'); al.scrollIntoView({block:'nearest'}); }
+  renderViz(s);
+  showLogPreview(s);
+}
+function showLogPreview(s){
+  if(!logEnabled) return;
+  document.getElementById('logPopupBody').innerHTML = s.logHTML || '';
+  document.getElementById('logPopup').classList.remove('log-popup--hidden');
+}
+function hideLogPopup(){ document.getElementById('logPopup').classList.add('log-popup--hidden'); }
+function stepBy(d){
+  var n = currentStep + d;
+  if(n<0||n>=steps.length) return;
+  renderStep(n);
+}
+function resetStep(){ if(steps.length) renderStep(0); }
+
+/* ============ LOG POPUP CONTROLS ============ */
+function toggleLogPreview(){
+  logEnabled = !logEnabled;
+  var btn = document.getElementById('logToggleBtn');
+  btn.textContent = logEnabled ? '📋 ON' : '📋 OFF';
+  btn.classList.toggle('log-toggle-btn--off', !logEnabled);
+  if(!logEnabled) hideLogPopup();
+  else if(steps.length) showLogPreview(steps[currentStep]);
+}
+function logZoom(dir){ logZoomLevel = Math.max(60, Math.min(180, logZoomLevel + dir*20)); updateLogZoom(); }
+function logZoomReset(){ logZoomLevel=100; updateLogZoom(); }
+function updateLogZoom(){
+  document.getElementById('logZoomLabel').textContent = logZoomLevel+'%';
+  document.getElementById('logPopup').style.setProperty('--log-scale', logZoomLevel/100);
+}
+function toggleFullscreen(){
+  var viz = document.querySelector('.col-viz');
+  if(!document.fullscreenElement) viz.requestFullscreen().catch(function(){});
+  else document.exitFullscreen();
+}
+function toggleProblem(){
+  var b = document.getElementById('pcBody');
+  var btn = document.getElementById('toggleBtn');
+  if(b.style.display==='none'){ b.style.display=''; btn.textContent='▲ Hide'; }
+  else { b.style.display='none'; btn.textContent='▼ Show'; }
+}
+
+/* ============ TEST LOADER ============ */
+function loadTest(to, exp, note){
+  document.getElementById('inTO').value = to;
+  document.getElementById('expBadge').textContent = 'expected: '+exp+' times ('+note+')';
+  resetWithInput();
+}
+
+/* ============ RESET WITH INPUT ============ */
+function resetWithInput(){
+  curResult = null;
+  var to = parseInt(document.getElementById('inTO').value, 10);
+  if(isNaN(to) || to<0) to = 0;
+  if(to>10) to = 10;
+  renderCode();
+  fitCodeWidth();
+  steps = buildSteps({turnedOn: to});
+  currentStep = 0;
+  renderStep(0);
+  document.getElementById('liveOutput').textContent = curResult!==null ? (curResult+' valid times') : '—';
+}
+
+/* ============ CODE WIDTH ============ */
+function fitCodeWidth(){ syncFooterWidth(); }
+function syncFooterWidth(){
+  document.getElementById('footerLeft').style.width = document.getElementById('col1').offsetWidth + 'px';
+}
+
+/* ============ RESIZE HANDLE ============ */
+(function(){
+  var col1 = document.getElementById('col1');
+  document.getElementById('resizeH1').addEventListener('mousedown', function(e){
+    e.preventDefault();
+    codeWidthUserSet = true;
+    var startX = e.clientX, startW = col1.offsetWidth, h = this;
+    document.body.classList.add('no-select');
+    h.classList.add('active');
+    function mv(e){
+      col1.style.width = Math.max(140, startW + (e.clientX - startX)) + 'px';
+      syncFooterWidth();
+    }
+    function up(){
+      document.removeEventListener('mousemove', mv);
+      document.removeEventListener('mouseup', up);
+      document.body.classList.remove('no-select');
+      h.classList.remove('active');
+    }
+    document.addEventListener('mousemove', mv);
+    document.addEventListener('mouseup', up);
+  });
+})();
+window.addEventListener('resize', function(){
+  if(!codeWidthUserSet) fitCodeWidth();
+  else syncFooterWidth();
+});
+
+/* ============ KEYBOARD ============ */
+document.addEventListener('keydown', function(e){
+  if(e.target.tagName==='INPUT' || e.target.tagName==='SELECT') return;
+  if(e.key==='ArrowRight'){ e.preventDefault(); stepBy(1); }
+  else if(e.key==='ArrowLeft'){ e.preventDefault(); stepBy(-1); }
+  else if(e.key==='r' || e.key==='R'){ e.preventDefault(); resetStep(); }
+});
+
+/* ============ INIT ============ */
+renderCode();
+syncFooterWidth();
+resetWithInput();
+</script>
+</body>
+</html>

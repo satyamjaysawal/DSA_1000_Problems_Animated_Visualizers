@@ -1,0 +1,1224 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LC 3161 — Block Placement Queries | DSA Dry-Run</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+:root{
+  --bg-primary:#FAFAF8; --bg-secondary:#F1EFE8; --bg-tertiary:#E2E0D8; --bg-card:#FFFFFF;
+  --text-primary:#2C2C2A; --text-secondary:#5F5E5A; --text-tertiary:#888780;
+  --border-color:rgba(0,0,0,0.11); --border-light:rgba(0,0,0,0.06); --border-focus:#534AB7;
+  --accent-indigo:#534AB7; --accent-indigo-bg:#EEEDFE; --accent-indigo-text:#3C3489; --accent-indigo-hover:#4740A0;
+  --accent-teal:#0F6E56; --accent-teal-bg:#E1F5EE; --accent-teal-text:#085041;
+  --accent-red:#E24B4A; --accent-red-bg:#FCEBEB; --accent-red-text:#791F1F;
+  --accent-amber:#B45309; --accent-amber-bg:#FEF3C7; --accent-amber-text:#78350F;
+  --accent-green:#15803D; --accent-green-bg:#DCFCE7; --accent-green-text:#14532D;
+  --syn-keyword:#534AB7; --syn-function:#185FA5; --syn-number:#993C1D; --syn-string:#0F6E56;
+  --active-line-bg:#EEEDFE;
+  --radius-sm:4px; --radius-md:6px; --radius-lg:10px; --radius-xl:14px;
+  --font-sans:'DM Sans',system-ui,sans-serif; --font-mono:'JetBrains Mono','Fira Code',monospace;
+  --fs-xs:11px; --fs-sm:12px; --fs-base:14px;
+  --ease:.18s ease;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:var(--font-sans);color:var(--text-primary);background:var(--bg-primary);font-size:var(--fs-base)}
+body.no-select{user-select:none}
+::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border-color);border-radius:3px}
+
+.app-shell{display:flex;flex-direction:column;height:100vh;overflow:hidden;background:var(--bg-primary)}
+
+.problem-card{flex-shrink:0;border-bottom:1px solid var(--border-color);background:var(--bg-card)}
+.prob-header{display:flex;align-items:center;justify-content:space-between;padding:8px 14px;gap:12px;border-bottom:1px solid var(--border-light);flex-wrap:wrap}
+.prob-header-left{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.prob-header-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.gt-home-btn{font-family:var(--font-sans);font-weight:700;font-size:11px;letter-spacing:.08em;background:var(--accent-indigo);color:#fff;border:none;padding:5px 10px;border-radius:99px;cursor:pointer}
+.gt-home-btn:hover{background:var(--accent-indigo-hover)}
+.prob-num{font:700 13px var(--font-mono);color:var(--text-tertiary)}
+.prob-name{font-weight:700;font-size:15px;color:var(--text-primary)}
+.prob-diff--hard{font-size:9px;font-weight:700;background:var(--accent-red-bg);color:var(--accent-red-text);padding:2px 7px;border-radius:99px;border:1px solid var(--accent-red);text-transform:uppercase;letter-spacing:.06em}
+.prob-tag{font-size:9px;font-weight:600;background:var(--accent-indigo-bg);color:var(--accent-indigo-text);padding:2px 7px;border-radius:99px;border:1px solid var(--accent-indigo);text-transform:uppercase;letter-spacing:.05em}
+.top-label{font-size:11px;color:var(--text-tertiary);font-weight:600}
+.input{font-family:var(--font-mono);font-size:11px;padding:4px 8px;border:1px solid var(--border-color);border-radius:var(--radius-sm);width:340px;background:var(--bg-card);color:var(--text-primary)}
+.input:focus{outline:none;border-color:var(--border-focus)}
+.top-expected{font:11px var(--font-mono);background:var(--accent-amber-bg);color:var(--accent-amber-text);padding:3px 8px;border-radius:4px;border:1px solid var(--accent-amber)}
+.prob-toggle-btn{font-family:system-ui,"Segoe UI Emoji",sans-serif;font-size:11px;font-weight:600;background:var(--bg-secondary);color:var(--text-secondary);border:1px solid var(--border-color);padding:4px 9px;border-radius:var(--radius-sm);cursor:pointer}
+.prob-body{display:flex;gap:16px;padding:12px 14px;flex-wrap:wrap;max-height:300px;overflow-y:auto}
+.prob-body--hidden{display:none}
+.prob-col{flex:1;min-width:280px}
+.prob-section-title{font-size:12px;font-weight:700;color:var(--text-secondary);margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em}
+.prob-text{font-size:12px;line-height:1.6;color:var(--text-primary);margin-bottom:8px}
+.prob-text code{font-family:var(--font-mono);background:var(--bg-secondary);padding:1px 5px;border-radius:3px;font-size:11px;color:var(--accent-indigo-text)}
+.concept-block{background:var(--bg-secondary);border-left:3px solid var(--accent-indigo);padding:6px 10px;border-radius:var(--radius-sm);margin-bottom:6px;font-size:11.5px}
+.concept-block strong{color:var(--accent-indigo-text)}
+.complexity-row{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap}
+.cx-chip{font:11px var(--font-mono);background:var(--bg-secondary);padding:3px 8px;border-radius:4px;border:1px solid var(--border-color)}
+.tc-chip{background:var(--bg-secondary);border:1px solid var(--border-color);border-radius:var(--radius-md);padding:6px 9px;margin-bottom:6px;cursor:pointer;font-size:11px;transition:all var(--ease)}
+.tc-chip:hover{background:var(--accent-indigo-bg);border-color:var(--accent-indigo)}
+.tc-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.pt-tag{font-size:9px;background:var(--accent-indigo);color:#fff;padding:1px 6px;border-radius:99px;font-weight:700;letter-spacing:.04em}
+.tc-label{font-weight:600;color:var(--text-primary)}
+.tc-expected{font-family:var(--font-mono);color:var(--accent-amber-text);font-weight:600;margin-left:auto;font-size:10.5px}
+.tc-vals{display:flex;gap:4px;flex-wrap:wrap;margin-top:5px}
+.tc-vals code{font-family:var(--font-mono);font-size:10px;background:var(--bg-card);border:1px solid var(--border-color);padding:1px 5px;border-radius:3px;color:var(--text-primary)}
+.run-btn{font-family:system-ui,"Segoe UI Emoji",sans-serif;background:var(--accent-indigo);color:#fff;border:none;padding:6px 14px;border-radius:var(--radius-sm);cursor:pointer;font-weight:600;font-size:12px;margin-top:6px}
+.run-btn:hover{background:var(--accent-indigo-hover)}
+.live-out{margin-top:6px;font:12px var(--font-mono);background:var(--accent-green-bg);color:var(--accent-green-text);padding:5px 9px;border-radius:4px;border:1px solid var(--accent-green)}
+
+.main-row{flex:1;display:flex;overflow:hidden;min-height:0}
+.col{display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.col-code{width:33%;min-width:140px;max-width:45vw;border-right:1px solid var(--border-color);background:var(--bg-card)}
+.col-viz{flex:1;min-width:0;background:var(--bg-primary);position:relative;overflow:auto}
+.section-label{font-family:system-ui,"Segoe UI Emoji",sans-serif;font-size:11px;font-weight:700;color:var(--text-tertiary);padding:6px 12px;background:var(--bg-secondary);border-bottom:1px solid var(--border-light);text-transform:uppercase;letter-spacing:.06em}
+.code-panel{flex:1;overflow-y:auto;padding:8px 0;font-family:var(--font-mono);font-size:11.5px;line-height:1.85}
+.code-line{display:flex;padding:0 12px}
+.code-line.active{background:var(--active-line-bg);box-shadow:inset 3px 0 0 var(--accent-indigo)}
+.ln{color:var(--text-tertiary);width:24px;text-align:right;margin-right:10px;user-select:none;flex-shrink:0}
+.code-content{white-space:pre;color:var(--text-primary)}
+.kw{color:var(--syn-keyword);font-weight:600}
+.fn{color:var(--syn-function);font-weight:500}
+.num{color:var(--syn-number)}
+.str{color:var(--syn-string)}
+
+.resize-h{flex-shrink:0;width:5px;cursor:col-resize;background:transparent}
+.resize-h:hover,.resize-h.active{background:var(--accent-indigo)}
+
+.viz-content{padding:12px;display:flex;flex-direction:column;gap:10px}
+.vars-strip{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:4px}
+.var-chip{font:11px var(--font-mono);background:var(--bg-card);border:1px solid var(--border-color);padding:4px 8px;border-radius:99px;display:inline-flex;align-items:center;gap:4px}
+.var-chip-key{color:var(--text-tertiary);font-weight:500}
+.var-chip-val{color:var(--text-primary);font-weight:700}
+.vc-active{background:var(--accent-indigo-bg);border-color:var(--accent-indigo);color:var(--accent-indigo-text)}
+.vc-active .var-chip-val{color:var(--accent-indigo-text)}
+.vc-safe{background:var(--accent-green-bg);border-color:var(--accent-green);color:var(--accent-green-text)}
+.vc-safe .var-chip-val{color:var(--accent-green-text)}
+.vc-flip{background:var(--accent-red-bg);border-color:var(--accent-red);color:var(--accent-red-text)}
+.vc-flip .var-chip-val{color:var(--accent-red-text)}
+.vc-amber{background:var(--accent-amber-bg);border-color:var(--accent-amber);color:var(--accent-amber-text)}
+.vc-amber .var-chip-val{color:var(--accent-amber-text)}
+
+.viz-row{display:flex;gap:12px;align-items:flex-start;flex-wrap:wrap}
+.viz-card{background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius-md);padding:10px}
+.viz-title{font-size:11px;font-weight:700;color:var(--text-secondary);margin-bottom:8px;text-transform:uppercase;letter-spacing:.05em}
+
+/* Number line */
+.numline-wrap{position:relative;padding:30px 30px 50px;background:#0f172a;border-radius:8px;border:2px solid #334155;overflow-x:auto}
+.numline{position:relative;height:90px;min-width:600px}
+.numline-axis{position:absolute;left:0;right:0;top:50%;height:3px;background:#64748b;border-radius:2px}
+.numline-tick{position:absolute;top:50%;width:1px;height:8px;background:#94a3b8;transform:translate(-50%,-50%)}
+.numline-tick-label{position:absolute;top:calc(50% + 10px);font:9px var(--font-mono);color:#94a3b8;transform:translateX(-50%)}
+.obs-mark{position:absolute;top:50%;width:14px;height:14px;background:#dc2626;border:2px solid #fee2e2;border-radius:50%;transform:translate(-50%,-50%);z-index:3;box-shadow:0 0 6px rgba(220,38,38,.6);transition:all .25s}
+.obs-mark--new{background:#f59e0b;border-color:#fef3c7;animation:pulse-node 1s infinite;width:18px;height:18px}
+.obs-mark--curr{box-shadow:0 0 0 5px rgba(245,158,11,.35), 0 0 6px rgba(220,38,38,.6)}
+.obs-label{position:absolute;top:calc(50% - 28px);font:600 10px var(--font-mono);color:#fecaca;transform:translateX(-50%);background:#7f1d1d;padding:1px 5px;border-radius:3px;white-space:nowrap}
+.obs-label--new{color:#fef3c7;background:#78350f}
+.x-marker{position:absolute;top:0;bottom:0;width:0;border-left:2px dashed #22c55e;z-index:2}
+.x-marker-label{position:absolute;top:-22px;font:700 10px var(--font-mono);color:#bbf7d0;background:#14532d;padding:1px 6px;border-radius:3px;transform:translateX(-50%);white-space:nowrap}
+.x-marker-zone{position:absolute;top:50%;height:36px;background:rgba(34,197,94,.08);border:1px dashed rgba(34,197,94,.3);transform:translateY(-50%);z-index:1}
+.gap-bar{position:absolute;top:calc(50% + 4px);height:7px;background:#475569;border-radius:2px;transform:translateY(-50%)}
+.gap-bar--curr{background:#fbbf24;animation:pulse-node 1s infinite;height:10px;z-index:2}
+.gap-bar--max{background:#22c55e;height:10px;box-shadow:0 0 6px rgba(34,197,94,.6)}
+.gap-bar--tail{background:#a78bfa;height:9px}
+.gap-bar-label{position:absolute;top:calc(50% + 16px);font:600 9px var(--font-mono);color:#e2e8f0;transform:translateX(-50%);white-space:nowrap;background:#1e293b;padding:0 4px;border-radius:3px}
+.gap-bar-label--curr{color:#fef3c7;background:#78350f}
+.gap-bar-label--max{color:#bbf7d0;background:#14532d}
+.gap-bar-label--tail{color:#ddd6fe;background:#4c1d95}
+
+/* Block size indicator */
+.block-indicator{position:absolute;top:calc(50% - 50px);height:20px;background:repeating-linear-gradient(45deg,#fbbf24,#fbbf24 5px,#f59e0b 5px,#f59e0b 10px);border:2px solid #fef3c7;border-radius:3px;display:flex;align-items:center;justify-content:center;font:700 9px var(--font-mono);color:#451a03;z-index:4}
+
+/* Queries panel */
+.queries-list{display:flex;flex-direction:column;gap:4px;max-height:240px;overflow-y:auto}
+.query-row{display:flex;align-items:center;gap:6px;padding:5px 8px;border-radius:4px;font:11px var(--font-mono);background:var(--bg-secondary);border:1px solid var(--border-light)}
+.query-row--curr{background:var(--accent-indigo-bg);border-color:var(--accent-indigo);box-shadow:0 0 0 2px rgba(83,74,183,.2)}
+.query-row--done{opacity:.5}
+.query-idx{font-size:9px;color:var(--text-tertiary);min-width:22px}
+.query-type{font-size:9px;font-weight:700;padding:1px 5px;border-radius:99px}
+.query-type--add{background:#fee2e2;color:#7f1d1d;border:1px solid #fca5a5}
+.query-type--check{background:#dbeafe;color:#1e3a8a;border:1px solid #93c5fd}
+.query-content{flex:1;color:var(--text-primary)}
+.query-result{font-weight:700;font-size:11px;padding:1px 6px;border-radius:3px}
+.query-result--true{background:var(--accent-green-bg);color:var(--accent-green-text)}
+.query-result--false{background:var(--accent-red-bg);color:var(--accent-red-text)}
+
+/* Result chips */
+.result-row{display:flex;gap:5px;flex-wrap:wrap;align-items:center}
+.result-chip{font:600 11px var(--font-mono);padding:3px 8px;border-radius:4px;border:1px solid;display:inline-flex;align-items:center;gap:4px}
+.result-chip--true{background:var(--accent-green-bg);color:var(--accent-green-text);border-color:var(--accent-green)}
+.result-chip--false{background:var(--accent-red-bg);color:var(--accent-red-text);border-color:var(--accent-red)}
+.result-chip-idx{font-size:9px;color:var(--text-tertiary)}
+
+/* Obstacles list */
+.obs-list{display:flex;gap:4px;flex-wrap:wrap}
+.obs-item{font:600 11px var(--font-mono);padding:3px 8px;border-radius:4px;background:var(--accent-red-bg);color:var(--accent-red-text);border:1px solid var(--accent-red);display:inline-flex;align-items:center;gap:3px}
+.obs-item--curr{background:var(--accent-amber-bg);color:var(--accent-amber-text);border-color:var(--accent-amber);animation:pulse-node 1s infinite}
+.obs-item--insert{background:var(--accent-indigo-bg);color:var(--accent-indigo-text);border-color:var(--accent-indigo);border-style:dashed}
+.obs-item-idx{font-size:8px;opacity:.6}
+
+@keyframes pulse-node{0%,100%{box-shadow:0 0 4px var(--accent-indigo)}50%{box-shadow:0 0 12px var(--accent-indigo)}}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-3px)}75%{transform:translateX(3px)}}
+@keyframes win-pulse{0%,100%{box-shadow:0 0 3px rgba(234,179,8,.5)}50%{box-shadow:0 0 8px rgba(234,179,8,.9)}}
+
+.result-banner{background:linear-gradient(135deg,#FEF3C7,#FDE68A);border:2px solid var(--accent-amber);padding:10px 14px;border-radius:var(--radius-md);font-weight:700;font-size:14px;color:var(--accent-amber-text);text-align:center;animation:win-pulse 1.6s infinite}
+
+.legend{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px;padding:6px 8px;background:var(--bg-secondary);border-radius:4px}
+.legend span{display:inline-flex;align-items:center;gap:5px;font-size:10px;color:var(--text-secondary)}
+.legend i{display:inline-block;width:14px;height:6px;border-radius:2px}
+
+/* Footer */
+.footer-bar{display:flex;flex-shrink:0;border-top:1px solid var(--border-color);background:var(--bg-card)}
+.footer-left{width:33%;min-width:140px;max-width:45vw;display:flex;align-items:center;gap:8px;padding:7px 12px;border-right:1px solid var(--border-light)}
+.footer-right{flex:1;display:flex;align-items:center;gap:8px;padding:7px 20px;flex-wrap:wrap}
+.step-info{font:600 12px var(--font-mono);color:var(--text-secondary)}
+.action-badge{font-family:system-ui,"Segoe UI Emoji",sans-serif;font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;text-transform:uppercase;letter-spacing:.05em;background:var(--bg-secondary);color:var(--text-secondary);border:1px solid var(--border-color)}
+.action-badge--init,.action-badge--func-def,.action-badge--call,.action-badge--return{background:rgba(130,80,255,.14);color:#3C3489;border-color:#8250ff}
+.action-badge--for-check,.action-badge--while-check,.action-badge--if-check{background:rgba(56,139,253,.14);color:#185FA5;border-color:#388bfd}
+.action-badge--mark,.action-badge--push,.action-badge--pop,.action-badge--restore,.action-badge--found{background:var(--accent-green-bg);color:var(--accent-green-text);border-color:var(--accent-green)}
+.action-badge--remove,.action-badge--prune,.action-badge--fail{background:var(--accent-red-bg);color:var(--accent-red-text);border-color:var(--accent-red)}
+.action-badge--exit,.action-badge--skip{background:var(--bg-tertiary);color:var(--text-tertiary);border-color:var(--border-color)}
+
+kbd{font-family:system-ui,"Segoe UI Emoji",sans-serif;font-size:10px;background:var(--bg-secondary);border:1px solid var(--border-color);border-bottom-width:2px;padding:1px 6px;border-radius:3px;color:var(--text-secondary)}
+.btn{font-family:system-ui,"Segoe UI Emoji",sans-serif;font-size:13px;padding:5px 10px;border:1px solid var(--border-color);background:var(--bg-card);color:var(--text-primary);border-radius:var(--radius-sm);cursor:pointer}
+.btn:hover{background:var(--bg-secondary)}
+.btn-primary{background:var(--accent-indigo);color:#fff;border-color:var(--accent-indigo);font-weight:600}
+.btn-primary:hover{background:var(--accent-indigo-hover)}
+.btn-fullscreen{font-size:14px}
+.footer-sep{width:1px;height:18px;background:var(--border-color)}
+.log-toggle-btn{font-family:system-ui,"Segoe UI Emoji",sans-serif;font-size:11px;padding:4px 10px;border:1px solid var(--accent-indigo);background:var(--accent-indigo-bg);color:var(--accent-indigo-text);border-radius:var(--radius-sm);cursor:pointer;font-weight:600}
+.log-toggle-btn--off{background:var(--bg-secondary);color:var(--text-tertiary);border-color:var(--border-color)}
+.btn-zoom{font-family:system-ui,"Segoe UI Emoji",sans-serif;font-size:13px;padding:3px 8px;border:1px solid var(--border-color);background:var(--bg-card);border-radius:var(--radius-sm);cursor:pointer;min-width:24px}
+.log-zoom-label{font:600 10px var(--font-mono);color:var(--text-secondary);min-width:36px;text-align:center}
+
+.log-popup{--log-scale:1;position:fixed;bottom:52px;right:14px;width:calc(480px * var(--log-scale));max-width:92vw;max-height:75vh;border-radius:var(--radius-lg);box-shadow:0 10px 32px rgba(0,0,0,.14);border:1px solid var(--border-color);background:var(--bg-card);overflow:hidden;display:flex;flex-direction:column;z-index:100;transition:opacity .15s,transform .15s;transform-origin:bottom right}
+.log-popup--hidden{opacity:0;transform:scale(.92);pointer-events:none}
+.log-popup-body{flex:1;overflow:auto;padding:0}
+.log-popup-body > .log-card{border-radius:0;border:none;border-left:0}
+
+.log-card{border-radius:var(--radius-md);overflow:hidden;border:1px solid var(--border-color);border-left-width:4px;font-size:var(--fs-xs);background:var(--bg-card)}
+.log-card--init,.log-card--func-def,.log-card--call,.log-card--return{border-left-color:#8250ff}
+.log-card--for-check,.log-card--while-check,.log-card--if-check{border-left-color:#388bfd}
+.log-card--mark,.log-card--push,.log-card--pop,.log-card--restore,.log-card--found{border-left-color:#3fb950}
+.log-card--remove,.log-card--prune,.log-card--fail{border-left-color:#f85149}
+.log-card--exit,.log-card--skip{border-left-color:#555450}
+.log-card-header{display:flex;align-items:center;gap:6px;padding:8px 10px 6px;background:var(--bg-secondary);border-bottom:1px solid var(--border-light)}
+.log-badge{font-family:system-ui,"Segoe UI Emoji",sans-serif;font-size:10px;font-weight:700;padding:2px 7px;border-radius:99px;background:var(--bg-card);border:1px solid var(--border-color)}
+.log-line-ref{font:700 10px var(--font-mono);color:var(--accent-indigo);background:var(--accent-indigo-bg);padding:1px 6px;border-radius:4px;border:1px solid var(--accent-indigo)}
+.log-status-pill{font-family:system-ui,"Segoe UI Emoji",sans-serif;font-size:9px;font-weight:700;padding:2px 7px;border-radius:99px;text-transform:uppercase;margin-left:auto}
+.log-status--success{background:var(--accent-green-bg);color:var(--accent-green-text);border:1px solid var(--accent-green)}
+.log-status--fail{background:var(--accent-red-bg);color:var(--accent-red-text);border:1px solid var(--accent-red)}
+.log-status--skip{background:var(--bg-tertiary);color:var(--text-tertiary);border:1px solid var(--border-color)}
+.log-status--loop{background:rgba(56,139,253,.14);color:#185FA5;border:1px solid #388bfd}
+.log-status--prune{background:var(--accent-red-bg);color:var(--accent-red-text);border:1px solid var(--accent-red)}
+.log-status--info{background:rgba(130,80,255,.14);color:#3C3489;border:1px solid #8250ff}
+.log-section{padding:7px 10px;border-bottom:1px dashed var(--border-light)}
+.log-section:last-child{border-bottom:none}
+.log-section-title{font:700 8px var(--font-mono);text-transform:uppercase;letter-spacing:.06em;color:var(--text-tertiary);margin-bottom:4px;display:flex;align-items:center;gap:4px}
+.log-section-title-icon{font-family:system-ui,"Segoe UI Emoji",sans-serif;font-size:11px}
+.log-code-snippet{font:600 11px var(--font-mono);background:#0d1117;color:#e6edf3;padding:6px 9px;border-radius:4px;display:block;overflow-x:auto;white-space:pre;border:1px solid #30363d}
+.log-code-snippet .ck{color:#ff7b72}
+.log-code-snippet .cs{color:#a5d6ff}
+.log-code-snippet .cn{color:#79c0ff}
+.log-code-snippet .cf{color:#d2a8ff}
+.log-code-snippet .cc{color:#8b949e;font-style:italic}
+.log-kv-row{display:flex;gap:4px;flex-wrap:wrap}
+.log-kv{display:inline-flex;align-items:center;gap:3px;font:11px var(--font-mono);padding:2px 7px;border-radius:4px;background:var(--bg-secondary);border:1px solid var(--border-light)}
+.log-kv-key{color:var(--text-tertiary);font-weight:500}
+.log-kv-val{color:var(--text-primary);font-weight:700}
+.log-kv--in{background:rgba(56,139,253,.08);border-color:rgba(56,139,253,.3)}
+.log-kv--out{background:rgba(63,185,80,.08);border-color:rgba(63,185,80,.4)}
+.log-kv--out .log-kv-val{color:#15803D}
+.log-kv--changed{background:rgba(180,83,9,.10);border-color:rgba(180,83,9,.4)}
+.log-kv--changed .log-kv-val{color:var(--accent-amber-text)}
+.log-verdict{display:flex;align-items:center;gap:6px;font:600 11px var(--font-mono);padding:5px 8px;border-radius:5px;background:var(--bg-secondary);border:1px solid var(--border-light)}
+.log-verdict--true{background:var(--accent-green-bg);border-color:var(--accent-green);color:var(--accent-green-text)}
+.log-verdict--false{background:var(--accent-red-bg);border-color:var(--accent-red);color:var(--accent-red-text)}
+.log-why{font-size:11px;line-height:1.55;color:var(--text-primary);padding:2px 0}
+.log-why strong{color:var(--accent-indigo-text)}
+.log-why code{font-family:var(--font-mono);background:var(--bg-secondary);padding:1px 4px;border-radius:3px;font-size:10px}
+.log-analogy{font:italic 11px var(--font-sans);color:var(--text-secondary);background:#FFF8E7;border:1px solid #FBE8A6;border-left:3px solid var(--accent-amber);padding:6px 9px;border-radius:4px;line-height:1.55}
+.log-analogy strong{color:var(--accent-amber-text);font-style:normal;font-weight:700}
+</style>
+</head>
+<body>
+<div class="app-shell">
+
+  <div class="problem-card">
+    <header class="prob-header">
+      <div class="prob-header-left">
+        <a href="../00_HomePage/gt_learn_homepage.html" class="gt-home-btn">GT LEARN</a>
+        <span class="prob-num">#3161</span>
+        <span class="prob-name">🧱 Block Placement Queries</span>
+        <span class="prob-diff--hard">HARD</span>
+        <span class="prob-tag">Sorted Set</span>
+        <span class="prob-tag">Segment Tree</span>
+      </div>
+      <div class="prob-header-right">
+        <span class="top-label">queries=</span>
+        <input id="inputQueries" class="input" value="[[1,2],[1,5],[2,5,2],[2,1,1],[2,3,2]]">
+        <span id="expectedBadge" class="top-expected">exp: [true,true,true]</span>
+        <button id="probToggleBtn" class="prob-toggle-btn" type="button" onclick="toggleProblem()">▲ Hide</button>
+      </div>
+    </header>
+    <div class="prob-body" id="probBody">
+      <div class="prob-col">
+        <div class="prob-section-title">📝 Problem Statement</div>
+        <div class="prob-text">
+          Infinite number line. Two query types:
+          <code>[1, x]</code> = place an <strong>obstacle at position x</strong> (positions are unique).
+          <code>[2, x, sz]</code> = ask: can we place a <strong>block of size <code>sz</code></strong>
+          fully inside <code>[0, x]</code> such that no obstacle lies <em>strictly inside</em> the block?
+          The block's right edge must touch <strong>x</strong> or end before — and the block must fit in some <strong>obstacle-free gap</strong> ending at-or-before <code>x</code>.
+        </div>
+        <div class="prob-section-title">🧠 Solving Approach</div>
+        <div class="prob-text">
+          Maintain a <strong>sorted set of obstacle positions</strong> (always includes <code>0</code>). Track the <strong>maximum gap</strong> ending at each obstacle — the gap from <em>previous obstacle</em> to <em>this obstacle</em>. For a query <code>(x, sz)</code>: find the largest obstacle <code>≤ x</code>, check if max-gap up to that point ≥ <code>sz</code>, OR if the partial gap (from previous obstacle to <code>x</code>) ≥ <code>sz</code>.
+        </div>
+        <div class="prob-section-title">🎯 Core Concepts</div>
+        <div class="concept-block"><strong>Obstacles set:</strong> sorted, starts as <code>{0}</code>. Insertion = O(log n) (uses bisect).</div>
+        <div class="concept-block"><strong>maxGap[i]:</strong> largest gap ending ≤ obstacle i (segment-tree max).</div>
+        <div class="concept-block"><strong>Query answer:</strong> True iff <code>maxGap[predecessor of x] ≥ sz</code> OR <code>(x − predecessor) ≥ sz</code>.</div>
+        <div class="complexity-row">
+          <span class="cx-chip">⏱ Time: O(q · log q)</span>
+          <span class="cx-chip">💾 Space: O(q)</span>
+        </div>
+      </div>
+      <div class="prob-col">
+        <div class="prob-section-title">🧪 Test Cases (click to load)</div>
+        <div class="tc-chip" onclick="loadTest('[[1,2],[1,5],[2,5,2],[2,1,1],[2,3,2]]','[true,true,true]','classic')">
+          <div class="tc-row"><span class="pt-tag">CLASSIC</span><span class="tc-label">5 queries, mixed</span><span class="tc-expected">→ [T,T,T]</span></div>
+          <div class="tc-vals"><code>[1,2]</code><code>[1,5]</code><code>[2,5,2]</code><code>[2,1,1]</code><code>[2,3,2]</code></div>
+        </div>
+        <div class="tc-chip" onclick="loadTest('[[1,7],[2,7,6],[1,2],[2,7,5],[2,7,6]]','[true,true,false]','tight')">
+          <div class="tc-row"><span class="pt-tag">TIGHT</span><span class="tc-label">size matters</span><span class="tc-expected">→ [T,T,F]</span></div>
+          <div class="tc-vals"><code>[1,7]</code><code>[2,7,6]</code><code>[1,2]</code><code>[2,7,5]</code><code>[2,7,6]</code></div>
+        </div>
+        <div class="tc-chip" onclick="loadTest('[[2,5,3],[1,4],[2,5,1],[2,5,3]]','[true,true,true]','empty-start')">
+          <div class="tc-row"><span class="pt-tag">EMPTY</span><span class="tc-label">start no obstacles</span><span class="tc-expected">→ [T,T,T]</span></div>
+          <div class="tc-vals"><code>[2,5,3]</code><code>[1,4]</code><code>[2,5,1]</code><code>[2,5,3]</code></div>
+        </div>
+        <div class="tc-chip" onclick="loadTest('[[1,3],[1,8],[1,15],[2,15,7],[2,8,5],[2,15,8]]','[true,true,false]','three-obs')">
+          <div class="tc-row"><span class="pt-tag">3-OBS</span><span class="tc-label">multi-gap check</span><span class="tc-expected">→ [T,T,F]</span></div>
+          <div class="tc-vals"><code>[1,3]</code><code>[1,8]</code><code>[1,15]</code><code>[2,15,7]</code><code>[2,8,5]</code><code>[2,15,8]</code></div>
+        </div>
+        <button class="run-btn" type="button" onclick="resetWithInput()">▶ Run</button>
+        <div class="live-out">Result: <span id="liveOutput">—</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="main-row">
+    <div class="col col-code" id="col1">
+      <div class="section-label">📜 Python Code</div>
+      <div class="code-panel" id="codePanel"></div>
+    </div>
+    <div class="resize-h" id="resizeH1"></div>
+    <div class="col col-viz">
+      <div class="section-label">📊 Visualization — Number Line + Obstacles + Gaps</div>
+      <div class="viz-content" id="vizContent"></div>
+    </div>
+  </div>
+
+  <div class="log-popup" id="logPopup">
+    <div class="log-popup-body" id="logPopupBody"></div>
+  </div>
+
+  <div class="footer-bar">
+    <div class="footer-left" id="footerLeft">
+      <span id="stepInfo" class="step-info">0/0</span>
+      <span id="actionBadge" class="action-badge"></span>
+    </div>
+    <div class="footer-right">
+      <kbd>←</kbd><kbd>→</kbd><kbd>R</kbd>
+      <button class="btn" type="button" onclick="resetStep()">↺</button>
+      <button class="btn" type="button" onclick="stepBy(-1)">◀</button>
+      <button class="btn btn-primary" type="button" onclick="stepBy(1)">▶ Next</button>
+      <span class="footer-sep"></span>
+      <button id="logToggleBtn" class="log-toggle-btn" type="button" onclick="toggleLogPreview()">📋 ON</button>
+      <button class="btn-zoom" type="button" onclick="logZoom(-1)">−</button>
+      <span id="logZoomLabel" class="log-zoom-label">100%</span>
+      <button class="btn-zoom" type="button" onclick="logZoom(1)">+</button>
+      <button class="btn-zoom" type="button" onclick="logZoomReset()">↺</button>
+      <span class="footer-sep"></span>
+      <button class="btn btn-fullscreen" type="button" onclick="toggleFullscreen()">⛶</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   LC 3161 — Block Placement Queries
+   Simplified sorted-list approach (educational dry-run)
+   ============================================================ */
+
+var codeLines = [
+  "def getResults(queries):",
+  "    obstacles = [0]",
+  "    maxGap = {0: 0}",
+  "    res = []",
+  "    for q in queries:",
+  "        if q[0] == 1:",
+  "            x = q[1]",
+  "            i = bisect.insort(obstacles, x)",
+  "            idx = obstacles.index(x)",
+  "            prev = obstacles[idx - 1]",
+  "            maxGap[x] = max(maxGap[prev], x - prev)",
+  "            for j in range(idx + 1, len(obstacles)):",
+  "                y = obstacles[j]",
+  "                py = obstacles[j - 1]",
+  "                maxGap[y] = max(maxGap[py], y - py)",
+  "        else:",
+  "            x, sz = q[1], q[2]",
+  "            idx = bisect.bisect_right(obstacles, x) - 1",
+  "            p = obstacles[idx]",
+  "            ok = maxGap[p] >= sz or (x - p) >= sz",
+  "            res.append(ok)",
+  "    return res"
+];
+
+var steps = [];
+var currentStep = 0;
+var codeWidthUserSet = false;
+var curResult = null;
+var logEnabled = true;
+var logZoomLevel = 100;
+
+var LOG_BADGE = {
+  "func-def":"📌 DEF","init":"⚙️ INIT","call":"📞 CALL","return":"🏆 RETURN",
+  "for-check":"🔁 FOR","while-check":"🔁 WHILE","if-check":"🔎 IF",
+  "mark":"✅ MARK","push":"⬆ PUSH","pop":"⬇ POP","restore":"↩ RESTORE","found":"🎉 FOUND",
+  "remove":"✏️ EDIT","prune":"✂️ PRUNE","fail":"❌ FAIL",
+  "exit":"🔚 EXIT","skip":"⏭ SKIP"
+};
+var BADGE_LABEL = {
+  "func-def":"DEF","init":"INIT","call":"CALL","return":"RETURN",
+  "for-check":"FOR","while-check":"WHILE","if-check":"IF",
+  "mark":"MARK","push":"PUSH","pop":"POP","restore":"RESTORE","found":"FOUND",
+  "remove":"EDIT","prune":"PRUNE","fail":"FAIL",
+  "exit":"EXIT","skip":"SKIP"
+};
+
+function renderCode(){
+  var p = document.getElementById('codePanel');
+  p.innerHTML = codeLines.map(function(raw,i){
+    var h = raw;
+    h = h.replace(/("[^"]*"|'[^']*')/g,'\x01STR\x02$1\x03');
+    h = h.replace(/\b(def|for|in|if|return|break|continue|and|else|elif|True|False|None|not|or|while|lambda)\b/g,'\x01KW\x02$1\x03');
+    h = h.replace(/\b(len|range|int|str|list|append|pop|sorted|min|max|sum|abs|enumerate|zip|print|set|add|index|insort|bisect_right)\b/g,'\x01FN\x02$1\x03');
+    h = h.replace(/(?<![.\w"\x01\x02\x03])(-?\d+)\b/g,'\x01NUM\x02$1\x03');
+    h = h.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    h = h.replace(/\x01([A-Z]+)\x02/g,function(_,c){return '<span class="'+c.toLowerCase()+'">';}).replace(/\x03/g,'</span>');
+    return '<div class="code-line" data-line="'+i+'"><span class="ln">'+(i+1)+'</span><span class="code-content">'+h+'</span></div>';
+  }).join('');
+}
+
+function hlCode(raw){
+  var h = raw;
+  h = h.replace(/("[^"]*"|'[^']*')/g,'\x01s\x02$1\x03');
+  h = h.replace(/\b(def|for|in|if|return|break|continue|and|else|elif|True|False|None|not|or|while|lambda)\b/g,'\x01k\x02$1\x03');
+  h = h.replace(/\b(len|range|int|str|list|append|pop|sorted|min|max|sum|abs|enumerate|zip|print|set|add|index|insort|bisect_right)\b/g,'\x01f\x02$1\x03');
+  h = h.replace(/(?<![.\w"\x01\x02\x03])(-?\d+)\b/g,'\x01n\x02$1\x03');
+  h = h.replace(/(#.*$)/gm,'\x01c\x02$1\x03');
+  h = h.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  h = h.replace(/\x01([a-z])\x02/g,function(_,c){return '<span class="c'+c+'">';}).replace(/\x03/g,'</span>');
+  return h;
+}
+
+function fitCodeWidth(){
+  if(codeWidthUserSet) return;
+  var col = document.getElementById('col1');
+  var maxLine = 0;
+  document.querySelectorAll('.code-line').forEach(function(el){ if(el.scrollWidth > maxLine) maxLine = el.scrollWidth; });
+  var w = Math.min(maxLine + 26, window.innerWidth * 0.45);
+  col.style.width = Math.max(140, w) + 'px';
+  syncFooterWidth();
+}
+
+function richLog(opts){
+  var statusMap = {success:"✅ Success",fail:"❌ Failed",skip:"⏭ Skipped",loop:"🔁 Loop iter",prune:"✂️ Pruned",info:"ℹ️ Info"};
+  var status = opts.status || "info";
+  var html = '<div class="log-card log-card--'+opts.action+'">';
+  html += '<div class="log-card-header">';
+  html += '<span class="log-badge log-badge--'+opts.action+'">'+(LOG_BADGE[opts.action]||opts.action)+'</span>';
+  html += '<span class="log-line-ref">L'+(opts.line+1)+'</span>';
+  html += '<span class="log-status-pill log-status--'+status+'">'+statusMap[status]+'</span>';
+  html += '</div>';
+  if(opts.code){
+    html += '<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">📜</span>Code Executing</div>';
+    html += '<code class="log-code-snippet">'+hlCode(opts.code)+'</code></div>';
+  }
+  if(opts.inputs && opts.inputs.length){
+    html += '<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">📥</span>Input Values</div><div class="log-kv-row">';
+    opts.inputs.forEach(function(kv){ html += '<span class="log-kv log-kv--in"><span class="log-kv-key">'+kv.k+'</span>=<span class="log-kv-val">'+kv.v+'</span></span>'; });
+    html += '</div></div>';
+  }
+  if(opts.outputs && opts.outputs.length){
+    html += '<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">📤</span>Output / State After Line</div><div class="log-kv-row">';
+    opts.outputs.forEach(function(kv){
+      var cls = kv.changed?'log-kv--changed':'log-kv--out';
+      html += '<span class="log-kv '+cls+'"><span class="log-kv-key">'+kv.k+'</span>=<span class="log-kv-val">'+kv.v+'</span></span>';
+    });
+    html += '</div></div>';
+  }
+  if(opts.verdict){
+    var vCls = opts.verdictTrue===true?'log-verdict--true':(opts.verdictTrue===false?'log-verdict--false':'');
+    var vIcon = opts.verdictTrue===true?'✓':(opts.verdictTrue===false?'✗':'•');
+    html += '<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">⚖️</span>Verdict / Decision</div>';
+    html += '<div class="log-verdict '+vCls+'">'+vIcon+' '+opts.verdict+'</div></div>';
+  }
+  if(opts.why){
+    html += '<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">💡</span>Why This Happens</div><div class="log-why">'+opts.why+'</div></div>';
+  }
+  if(opts.analogy){
+    html += '<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">🎭</span>Real-Life Analogy</div><div class="log-analogy">'+opts.analogy+'</div></div>';
+  }
+  html += '</div>';
+  return html;
+}
+
+/* ---------- buildSteps ---------- */
+function buildSteps(queries){
+  var st = [];
+  var MAX_STEPS = 6000;
+  var obstacles = [0];
+  var maxGap = {0:0};
+  var res = [];
+  var qIdx = -1, q = null;
+  var hl = {x:null, sz:null, currObs:null, prevObs:null, mode:null, insertIdx:null, recomputeJ:null, currGap:null, qResult:null};
+
+  function snap(extra){
+    return Object.assign({
+      queries: queries.map(function(qq){return qq.slice();}),
+      obstacles: obstacles.slice(),
+      maxGap: Object.assign({}, maxGap),
+      res: res.slice(),
+      qIdx: qIdx,
+      q: q ? q.slice() : null,
+      hl: Object.assign({}, hl)
+    }, extra||{});
+  }
+  function pushStep(o){
+    if(st.length >= MAX_STEPS) return;
+    st.push(Object.assign({line:0, action:"init", logHTML:""}, snap(o)));
+  }
+  function resetHL(){ hl = {x:null,sz:null,currObs:null,prevObs:null,mode:null,insertIdx:null,recomputeJ:null,currGap:null,qResult:null}; }
+
+  // L0 — function def
+  pushStep({
+    line:0, action:"func-def",
+    logHTML: richLog({
+      line:0, action:"func-def", code:"def getResults(queries):", status:"info",
+      inputs:[{k:"queries.length",v:queries.length}],
+      why:"Function entry. <strong>queries</strong> ki list aayi hai. Type 1 = obstacle add karna, Type 2 = block fit hoga ya nahi pucha jaa raha hai.",
+      analogy:"Jaise <strong>parking lot manager</strong> ko ek list mile — kabhi 'naya pillar yahan lagao', kabhi 'is car ke liye spot hai?'. Sab queries order se handle karna hai."
+    })
+  });
+
+  // L1 — obstacles = [0]
+  pushStep({
+    line:1, action:"init",
+    logHTML: richLog({
+      line:1, action:"init", code:"obstacles = [0]", status:"success",
+      outputs:[{k:"obstacles",v:"[0]",changed:true}],
+      why:"Sorted obstacle list. Hum hamesha <code>0</code> ko ek <strong>sentinel obstacle</strong> rakhte hain — taaki 'predecessor of x' query hamesha well-defined ho.",
+      analogy:"Parking lot ke <strong>main gate</strong> ko 0 position pe pillar maan lo — anchor point hai jisse measurements start hoti hain."
+    })
+  });
+
+  // L2 — maxGap = {0:0}
+  pushStep({
+    line:2, action:"init",
+    logHTML: richLog({
+      line:2, action:"init", code:"maxGap = {0: 0}", status:"success",
+      outputs:[{k:"maxGap",v:"{0: 0}",changed:true}],
+      why:"<code>maxGap[i]</code> = sabse bada gap jo obstacle <code>i</code> tak (inclusive) end hota hai. Position 0 ke liye gap = 0 (kuch hai hi nahi peeche).",
+      analogy:"Pehle pillar ke peeche kuch nahi — toh 'sabse lambi khali jagah' = 0. Logical baseline."
+    })
+  });
+
+  // L3 — res = []
+  pushStep({
+    line:3, action:"init",
+    logHTML: richLog({
+      line:3, action:"init", code:"res = []", status:"success",
+      outputs:[{k:"res",v:"[]",changed:true}],
+      why:"Result list initialize. Type 2 query ka answer (True/False) yahan append karenge.",
+      analogy:"Manager ki <strong>answer sheet</strong> khali — har 'spot hai?' question ka jawab yahan likhenge."
+    })
+  });
+
+  // L4 — for q in queries (loop)
+  for(var qi=0; qi<queries.length; qi++){
+    qIdx = qi;
+    q = queries[qi];
+    resetHL();
+
+    pushStep({
+      line:4, action:"for-check",
+      logHTML: richLog({
+        line:4, action:"for-check", code:"for q in queries:  # q = queries["+qi+"] = ["+q.join(",")+"]", status:"loop",
+        inputs:[{k:"qi",v:qi},{k:"q",v:"["+q.join(",")+"]"}],
+        outputs:[{k:"q",v:"["+q.join(",")+"]",changed:true}],
+        why:"Query #"+(qi+1)+"/"+queries.length+" ko process kar rahe hain. Type "+q[0]+(q[0]===1?" = obstacle add":" = block fit check")+".",
+        analogy:"Manager ki list ka next instruction uthaya — '"+(q[0]===1?"naya pillar at "+q[1]:"check kar at "+q[1]+" size "+q[2])+"'."
+      })
+    });
+
+    // L5 — if q[0] == 1
+    var isType1 = (q[0] === 1);
+    pushStep({
+      line:5, action:"if-check",
+      logHTML: richLog({
+        line:5, action:"if-check", code:"if q[0] == 1:  # "+q[0]+" == 1 -> "+isType1, status: isType1?"success":"skip",
+        inputs:[{k:"q[0]",v:q[0]}],
+        verdict:"q[0] ("+q[0]+") "+(isType1?"==":"!=")+" 1",
+        verdictTrue: isType1,
+        why: isType1
+          ? "Type 1 query — <strong>obstacle insert</strong> karna hai."
+          : "Type 1 nahi — toh else branch lenge (<strong>fit-check query</strong>).",
+        analogy: isType1?"'Pillar lagao' instruction — civil work mode!":"'Spot check kar' query — measurement mode!"
+      })
+    });
+
+    if(isType1){
+      // L6 — x = q[1]
+      var x = q[1];
+      hl.x = x; hl.mode = "insert";
+      pushStep({
+        line:6, action:"init",
+        logHTML: richLog({
+          line:6, action:"init", code:"x = q[1]  # x = "+x, status:"success",
+          inputs:[{k:"q[1]",v:q[1]}],
+          outputs:[{k:"x",v:x,changed:true}],
+          why:"Naya obstacle position extract kiya — yahan pillar lagana hai.",
+          analogy:"Manager ne batayi co-ordinate — pillar position "+x+"."
+        })
+      });
+
+      // L7 — bisect.insort(obstacles, x)
+      var insertIdx = 0;
+      while(insertIdx < obstacles.length && obstacles[insertIdx] < x) insertIdx++;
+      obstacles.splice(insertIdx, 0, x);
+      hl.insertIdx = insertIdx;
+      pushStep({
+        line:7, action:"push",
+        logHTML: richLog({
+          line:7, action:"push", code:"bisect.insort(obstacles, "+x+")", status:"success",
+          inputs:[{k:"x",v:x},{k:"obstacles(before)",v:"["+(function(){var a=obstacles.slice();a.splice(insertIdx,1);return a.join(",");})()+"]"}],
+          outputs:[{k:"obstacles",v:"["+obstacles.join(",")+"]",changed:true},{k:"insertedAt",v:insertIdx}],
+          why:"<code>bisect.insort</code> ne sorted order maintain karke <code>"+x+"</code> ko index <code>"+insertIdx+"</code> pe daal diya. <strong>O(log n)</strong> search + O(n) shift.",
+          analogy:"Pillar ko sorted lineup mein <strong>sahi jagah</strong> ghusa diya — order kabhi tooti nahi."
+        })
+      });
+
+      // L8 — idx = obstacles.index(x)
+      var idx = obstacles.indexOf(x);
+      pushStep({
+        line:8, action:"init",
+        logHTML: richLog({
+          line:8, action:"init", code:"idx = obstacles.index("+x+")  # idx = "+idx, status:"success",
+          inputs:[{k:"x",v:x},{k:"obstacles",v:"["+obstacles.join(",")+"]"}],
+          outputs:[{k:"idx",v:idx,changed:true}],
+          why:"Naye obstacle ka <strong>final index</strong> nikala (bisect.insort ke baad).",
+          analogy:"Pillar ka lineup mein <strong>seat number</strong> confirm — pos "+idx+"."
+        })
+      });
+
+      // L9 — prev = obstacles[idx-1]
+      var prev = obstacles[idx-1];
+      hl.prevObs = prev; hl.currObs = x;
+      pushStep({
+        line:9, action:"init",
+        logHTML: richLog({
+          line:9, action:"init", code:"prev = obstacles[idx-1]  # prev = obstacles["+(idx-1)+"] = "+prev, status:"success",
+          inputs:[{k:"idx",v:idx},{k:"obstacles["+(idx-1)+"]",v:prev}],
+          outputs:[{k:"prev",v:prev,changed:true}],
+          why:"<strong>Predecessor</strong> obstacle nikala — yahi se naya gap measure hoga.",
+          analogy:"Naye pillar ke <strong>baayein wala pillar</strong> dhundha — gap calculation ke liye reference point."
+        })
+      });
+
+      // L10 — maxGap[x] = max(maxGap[prev], x - prev)
+      var newGap = x - prev;
+      var newMaxGap = Math.max(maxGap[prev], newGap);
+      var prevMaxGap = maxGap[prev];
+      maxGap[x] = newMaxGap;
+      hl.currGap = newGap;
+      pushStep({
+        line:10, action:"push",
+        logHTML: richLog({
+          line:10, action:"push", code:"maxGap["+x+"] = max(maxGap["+prev+"], "+x+" - "+prev+") = max("+prevMaxGap+", "+newGap+") = "+newMaxGap, status:"success",
+          inputs:[{k:"maxGap["+prev+"]",v:prevMaxGap},{k:"x-prev",v:newGap}],
+          outputs:[{k:"maxGap["+x+"]",v:newMaxGap,changed:true}],
+          why:"Naye obstacle <code>"+x+"</code> tak ka maxGap = max of (predecessor ka maxGap, new gap created from insertion). New gap = <code>"+newGap+"</code>.",
+          analogy:"Naye pillar tak ki <strong>sabse lambi free space</strong> = max(pichhle pillar tak ki sabse lambi, naya banaya hua gap)."
+        })
+      });
+
+      // L11 — for j in range(idx+1, len(obstacles))
+      var jStart = idx + 1;
+      var jEnd = obstacles.length;
+      var loopRan = false;
+      for(var j=jStart; j<jEnd; j++){
+        loopRan = true;
+        hl.recomputeJ = j;
+        pushStep({
+          line:11, action:"for-check",
+          logHTML: richLog({
+            line:11, action:"for-check", code:"for j in range("+jStart+", "+jEnd+"):  # j = "+j, status:"loop",
+            inputs:[{k:"j",v:j},{k:"range",v:jStart+"-"+(jEnd-1)}],
+            outputs:[{k:"j",v:j,changed:true}],
+            why:"Insertion ke baad <strong>aage waale obstacles</strong> ka maxGap recompute karna padega — kyunki ek pichla gap toot ke do mein split ho gaya.",
+            analogy:"Beech mein naya pillar ghusne se <strong>aage ke saare pillars</strong> ke 'longest gap' recalculate karne padenge."
+          })
+        });
+
+        // L12 — y = obstacles[j]
+        var y = obstacles[j];
+        pushStep({
+          line:12, action:"init",
+          logHTML: richLog({
+            line:12, action:"init", code:"y = obstacles["+j+"]  # y = "+y, status:"success",
+            outputs:[{k:"y",v:y,changed:true}],
+            why:"Aage ka obstacle position read kiya.",
+            analogy:"Agla pillar ka position dekha — "+y+"."
+          })
+        });
+
+        // L13 — py = obstacles[j-1]
+        var py = obstacles[j-1];
+        pushStep({
+          line:13, action:"init",
+          logHTML: richLog({
+            line:13, action:"init", code:"py = obstacles["+(j-1)+"]  # py = "+py, status:"success",
+            outputs:[{k:"py",v:py,changed:true}],
+            why:"Uska predecessor (jiska maxGap abhi update ho chuka).",
+            analogy:"Iske <strong>pichla pillar</strong> kaunsa — woh dekha."
+          })
+        });
+
+        // L14 — maxGap[y] = max(maxGap[py], y - py)
+        var gapY = y - py;
+        var newMy = Math.max(maxGap[py], gapY);
+        var oldMy = maxGap[y];
+        maxGap[y] = newMy;
+        pushStep({
+          line:14, action:"push",
+          logHTML: richLog({
+            line:14, action:"push", code:"maxGap["+y+"] = max(maxGap["+py+"], "+y+" - "+py+") = max("+maxGap[py]+", "+gapY+") = "+newMy, status:"success",
+            inputs:[{k:"maxGap["+py+"]",v:maxGap[py]},{k:"y-py",v:gapY},{k:"oldMaxGap["+y+"]",v:oldMy}],
+            outputs:[{k:"maxGap["+y+"]",v:newMy,changed:true}],
+            why:"<code>"+y+"</code> ka maxGap update — old="+oldMy+" new="+newMy+(oldMy===newMy?". Same hi raha — koi change nahi.":". Update lag gaya!"),
+            analogy:"Pillar "+y+" tak ka 'longest free space' "+(oldMy===newMy?"same hi nikla — koi badlav nahi":"recompute ke baad change ho gaya")+"."
+          })
+        });
+      }
+
+      // L11 — exit
+      hl.recomputeJ = null;
+      pushStep({
+        line:11, action:"exit",
+        logHTML: richLog({
+          line:11, action:"exit", code:"# for j loop exit: range("+jStart+","+jEnd+") "+(loopRan?"finished":"was empty"), status:"info",
+          inputs:[{k:"jStart",v:jStart},{k:"jEnd",v:jEnd}],
+          why: loopRan
+            ? "Saare aage waale obstacles ka maxGap update ho gaya. Insert query complete."
+            : "Range empty thi — naya obstacle <strong>list ke end</strong> mein gaya, koi suffix update nahi chahiye.",
+          analogy: loopRan
+            ? "Saare aage ke pillars ki recalculation done — clipboard update."
+            : "Naya pillar sabse aakhir mein laga — peeche kuch update karne ko nahi."
+        })
+      });
+
+    } else {
+      // L15 — else
+      pushStep({
+        line:15, action:"skip",
+        logHTML: richLog({
+          line:15, action:"skip", code:"else:", status:"skip",
+          why:"Type 1 nahi tha — fit-check query handle karenge.",
+          analogy:"Pillar lagana nahi hai — 'spot check' branch mein chalo."
+        })
+      });
+
+      // L16 — x, sz = q[1], q[2]
+      var qx = q[1], qsz = q[2];
+      hl.x = qx; hl.sz = qsz; hl.mode = "query";
+      pushStep({
+        line:16, action:"init",
+        logHTML: richLog({
+          line:16, action:"init", code:"x, sz = q[1], q[2]  # x="+qx+", sz="+qsz, status:"success",
+          inputs:[{k:"q[1]",v:qx},{k:"q[2]",v:qsz}],
+          outputs:[{k:"x",v:qx,changed:true},{k:"sz",v:qsz,changed:true}],
+          why:"Query ka <strong>upper bound x</strong> aur <strong>block size sz</strong> extract kiye.",
+          analogy:"Manager bola: '"+qx+" tak ke andar, "+qsz+" length ka block fit ho sakta hai?' — measurements note kar liye."
+        })
+      });
+
+      // L17 — idx = bisect.bisect_right(obstacles, x) - 1
+      var qIdxBs = 0;
+      while(qIdxBs < obstacles.length && obstacles[qIdxBs] <= qx) qIdxBs++;
+      qIdxBs -= 1;
+      pushStep({
+        line:17, action:"init",
+        logHTML: richLog({
+          line:17, action:"init", code:"idx = bisect.bisect_right(obstacles, "+qx+") - 1  # idx = "+qIdxBs, status:"success",
+          inputs:[{k:"x",v:qx},{k:"obstacles",v:"["+obstacles.join(",")+"]"}],
+          outputs:[{k:"idx",v:qIdxBs,changed:true}],
+          why:"<code>bisect_right</code> ka use karke <strong>largest obstacle ≤ x</strong> ka index nikala. Kyunki <code>0</code> hamesha obstacles mein hai, idx ≥ 0 guaranteed.",
+          analogy:"Position "+qx+" ke <strong>baayein side</strong> ka closest pillar dhundha — woh hai humara reference."
+        })
+      });
+
+      // L18 — p = obstacles[idx]
+      var p = obstacles[qIdxBs];
+      hl.prevObs = p; hl.currObs = qx;
+      pushStep({
+        line:18, action:"init",
+        logHTML: richLog({
+          line:18, action:"init", code:"p = obstacles["+qIdxBs+"]  # p = "+p, status:"success",
+          inputs:[{k:"idx",v:qIdxBs}],
+          outputs:[{k:"p",v:p,changed:true}],
+          why:"Predecessor obstacle ki <strong>actual value</strong> read ki — yahan se gap-from-p-to-x measure hoga.",
+          analogy:"Reference pillar ka exact position confirm — "+p+"."
+        })
+      });
+
+      // L19 — ok = maxGap[p] >= sz or (x - p) >= sz
+      var mgp = maxGap[p];
+      var tail = qx - p;
+      var c1 = mgp >= qsz;
+      var c2 = tail >= qsz;
+      var ok = c1 || c2;
+      hl.qResult = ok; hl.currGap = tail;
+      pushStep({
+        line:19, action:"if-check",
+        logHTML: richLog({
+          line:19, action:"if-check", code:"ok = maxGap["+p+"] >= "+qsz+" or ("+qx+" - "+p+") >= "+qsz+"  # "+mgp+">="+qsz+"->"+c1+", "+tail+">="+qsz+"->"+c2+" => "+ok, status: ok?"success":"fail",
+          inputs:[{k:"maxGap[p]",v:mgp},{k:"sz",v:qsz},{k:"x-p (tail gap)",v:tail}],
+          outputs:[{k:"ok",v:ok?"True":"False",changed:true}],
+          verdict:"maxGap["+p+"] ("+mgp+") "+(c1?"≥":"<")+" sz ("+qsz+")  OR  (x-p="+tail+") "+(c2?"≥":"<")+" sz ("+qsz+")",
+          verdictTrue: ok,
+          why: ok
+            ? (c1
+              ? "<strong>Mil gaya!</strong> <code>p</code> tak hi koi gap ≥ sz mil chuka hai — usi gap ke andar block fit kar do (right edge p ke pehle hi end ho jayega, x tak pahunchne ki zaroorat nahi)."
+              : "<strong>Mil gaya!</strong> <code>p</code> aur <code>x</code> ke beech ka khali zone (size = "+tail+") block ke liye kaafi hai — block ka right edge x pe touch karega, no obstacle inside.")
+            : "<strong>Nahi mila!</strong> Na toh p tak koi gap ≥ sz hai, na hi p-to-x ka tail gap kaafi hai. Block fit nahi hoga.",
+          analogy: ok
+            ? (c1
+              ? "Pichhli khali jagah mein hi pehle se itni room thi — gaadi park kar do, x tak jaane ki zaroorat hi nahi."
+              : "Last pillar se x tak ka stretch perfect fit hai — bilkul x ke saath block ka edge.")
+            : "Na peeche koi spot bada hai, na last pillar se x tak — block kahin fit hi nahi ho raha. <strong>NO!</strong>"
+        })
+      });
+
+      // L20 — res.append(ok)
+      res.push(ok);
+      pushStep({
+        line:20, action:"found",
+        logHTML: richLog({
+          line:20, action:"found", code:"res.append("+ok+")", status:"success",
+          inputs:[{k:"ok",v:ok?"True":"False"}],
+          outputs:[{k:"res",v:"["+res.map(function(b){return b?"T":"F";}).join(",")+"]",changed:true},{k:"res.length",v:res.length}],
+          why:"Answer answer-sheet pe likh diya — query #"+(qi+1)+" ka result = <strong>"+ok+"</strong>.",
+          analogy:"Manager ne answer-sheet pe tick/cross laga diya — entry #"+res.length+"."
+        })
+      });
+    }
+  }
+
+  // L4 exit
+  q = null;
+  pushStep({
+    line:4, action:"exit",
+    logHTML: richLog({
+      line:4, action:"exit", code:"# for q loop exit: all "+queries.length+" queries processed", status:"info",
+      inputs:[{k:"final res",v:"["+res.map(function(b){return b?"T":"F";}).join(",")+"]"},{k:"final obstacles",v:"["+obstacles.join(",")+"]"}],
+      why:"Saari queries ho gayi process. Result list ready hai.",
+      analogy:"Manager ki saari instructions complete — answer-sheet final ho gayi."
+    })
+  });
+
+  // L21 — return res
+  curResult = res.slice();
+  pushStep({
+    line:21, action:"return",
+    logHTML: richLog({
+      line:21, action:"return", code:"return res  # = ["+res.map(function(b){return b?"true":"false";}).join(",")+"]", status:"success",
+      inputs:[{k:"res",v:"["+res.map(function(b){return b?"T":"F";}).join(",")+"]"}],
+      outputs:[{k:"answer",v:"["+res.map(function(b){return b?"T":"F";}).join(",")+"]",changed:true}],
+      why:"<strong>🎉 Final answer return!</strong> Saare type-2 queries ka result ek list mein.",
+      analogy:"Answer-sheet manager ko hand over — kaam khatam!"
+    })
+  });
+
+  return st;
+}
+
+/* ---------- renderViz ---------- */
+function renderViz(s){
+  var c = document.getElementById('vizContent');
+  var h = '';
+
+  // ===== Vars strip =====
+  h += '<div class="vars-strip">';
+  h += '<span class="var-chip"><span class="var-chip-key">qIdx</span>=<span class="var-chip-val">'+(s.qIdx<0?"−":(s.qIdx+1)+"/"+s.queries.length)+'</span></span>';
+  if(s.q) h += '<span class="var-chip vc-active"><span class="var-chip-key">q</span>=<span class="var-chip-val">['+s.q.join(",")+']</span></span>';
+  h += '<span class="var-chip"><span class="var-chip-key">obstacles.size</span>=<span class="var-chip-val">'+s.obstacles.length+'</span></span>';
+  if(s.hl.x !== null){
+    h += '<span class="var-chip vc-amber"><span class="var-chip-key">x</span>=<span class="var-chip-val">'+s.hl.x+'</span></span>';
+  }
+  if(s.hl.sz !== null){
+    h += '<span class="var-chip vc-amber"><span class="var-chip-key">sz</span>=<span class="var-chip-val">'+s.hl.sz+'</span></span>';
+  }
+  if(s.hl.prevObs !== null){
+    h += '<span class="var-chip vc-safe"><span class="var-chip-key">p (predecessor)</span>=<span class="var-chip-val">'+s.hl.prevObs+'</span></span>';
+  }
+  if(s.hl.prevObs !== null && s.maxGap[s.hl.prevObs] !== undefined){
+    h += '<span class="var-chip"><span class="var-chip-key">maxGap[p]</span>=<span class="var-chip-val">'+s.maxGap[s.hl.prevObs]+'</span></span>';
+  }
+  if(s.hl.currGap !== null){
+    h += '<span class="var-chip vc-amber"><span class="var-chip-key">tail gap</span>=<span class="var-chip-val">'+s.hl.currGap+'</span></span>';
+  }
+  if(s.hl.qResult !== null){
+    var rcls = s.hl.qResult ? 'vc-safe' : 'vc-flip';
+    h += '<span class="var-chip '+rcls+'"><span class="var-chip-key">result</span>=<span class="var-chip-val">'+(s.hl.qResult?"TRUE":"FALSE")+'</span></span>';
+  }
+  h += '</div>';
+
+  // ===== Final result banner =====
+  if(s.qIdx === s.queries.length - 1 && s.q === null){
+    var typ2Count = s.res.length;
+    h += '<div class="result-banner">🎉 All Queries Done — Type-2 results: ['+s.res.map(function(b){return b?"true":"false";}).join(", ")+']</div>';
+  }
+
+  // ===== Number line viz =====
+  h += '<div class="viz-card"><div class="viz-title">📍 Number Line — Obstacles & Gaps</div>';
+  // Compute scale
+  var allPos = s.obstacles.slice();
+  if(s.hl.x !== null) allPos.push(s.hl.x);
+  // include sz extent
+  if(s.hl.x !== null && s.hl.sz !== null) allPos.push(s.hl.x - s.hl.sz);
+  var maxPos = Math.max.apply(null, allPos);
+  if(maxPos < 10) maxPos = 10;
+  // padding for visual
+  var displayMax = Math.ceil((maxPos + 2) * 1.05);
+  var nlWidth = Math.max(700, displayMax * 25);
+
+  h += '<div class="numline-wrap"><div class="numline" style="width:'+nlWidth+'px">';
+  h += '<div class="numline-axis"></div>';
+
+  function pos2px(p){ return (p / displayMax) * nlWidth; }
+
+  // ticks every integer (sparse if too many)
+  var tickStep = displayMax > 20 ? Math.ceil(displayMax / 20) : 1;
+  for(var t=0; t<=displayMax; t+=tickStep){
+    h += '<div class="numline-tick" style="left:'+pos2px(t)+'px"></div>';
+    h += '<div class="numline-tick-label" style="left:'+pos2px(t)+'px">'+t+'</div>';
+  }
+
+  // Gap bars between consecutive obstacles
+  for(var oi=1; oi<s.obstacles.length; oi++){
+    var oa = s.obstacles[oi-1], ob = s.obstacles[oi];
+    var gap = ob - oa;
+    var leftPx = pos2px(oa), widthPx = pos2px(ob) - pos2px(oa);
+    var barCls = "gap-bar";
+    var lblCls = "gap-bar-label";
+    // Highlight current gap during recompute or insert
+    if(s.hl.recomputeJ !== null && oi === s.hl.recomputeJ){
+      barCls += " gap-bar--curr"; lblCls += " gap-bar-label--curr";
+    }
+    h += '<div class="'+barCls+'" style="left:'+leftPx+'px;width:'+widthPx+'px"></div>';
+    if(widthPx > 24){
+      h += '<div class="'+lblCls+'" style="left:'+(leftPx + widthPx/2)+'px">gap='+gap+'</div>';
+    }
+  }
+
+  // Tail gap from p to x (during query)
+  if(s.hl.mode === "query" && s.hl.prevObs !== null && s.hl.x !== null && s.hl.x > s.hl.prevObs){
+    var tlx = pos2px(s.hl.prevObs);
+    var tww = pos2px(s.hl.x) - tlx;
+    h += '<div class="gap-bar gap-bar--tail" style="left:'+tlx+'px;width:'+tww+'px"></div>';
+    if(tww > 24){
+      h += '<div class="gap-bar-label gap-bar-label--tail" style="left:'+(tlx + tww/2)+'px">tail='+(s.hl.x - s.hl.prevObs)+'</div>';
+    }
+  }
+
+  // Highlight max-gap-up-to-p (informational, only during query)
+  if(s.hl.mode === "query" && s.hl.prevObs !== null){
+    // mark the gap matching maxGap[p] if findable
+    var targetGap = s.maxGap[s.hl.prevObs];
+    if(targetGap > 0){
+      for(var oi2=1; oi2<s.obstacles.length; oi2++){
+        var pa = s.obstacles[oi2-1], pb = s.obstacles[oi2];
+        if(pb > s.hl.prevObs) break;
+        if(pb - pa === targetGap){
+          var lpx = pos2px(pa), wpx = pos2px(pb) - pos2px(pa);
+          h += '<div class="gap-bar gap-bar--max" style="left:'+lpx+'px;width:'+wpx+'px"></div>';
+          if(wpx > 24){
+            h += '<div class="gap-bar-label gap-bar-label--max" style="left:'+(lpx + wpx/2)+'px">maxGap='+targetGap+'</div>';
+          }
+          break;
+        }
+      }
+    }
+  }
+
+  // X marker (query upper bound) with shaded zone
+  if(s.hl.mode === "query" && s.hl.x !== null){
+    h += '<div class="x-marker-zone" style="left:0;width:'+pos2px(s.hl.x)+'px"></div>';
+    h += '<div class="x-marker" style="left:'+pos2px(s.hl.x)+'px"></div>';
+    h += '<div class="x-marker-label" style="left:'+pos2px(s.hl.x)+'px">x='+s.hl.x+'</div>';
+  }
+
+  // Block-size indicator (during query) — show how big the block is, hovering above
+  if(s.hl.mode === "query" && s.hl.sz !== null && s.hl.x !== null){
+    var bw = pos2px(s.hl.sz) - pos2px(0);
+    var bx = pos2px(Math.max(0, s.hl.x - s.hl.sz));
+    h += '<div class="block-indicator" style="left:'+bx+'px;width:'+bw+'px">size='+s.hl.sz+'</div>';
+  }
+
+  // Obstacle dots
+  for(var oi3=0; oi3<s.obstacles.length; oi3++){
+    var ov = s.obstacles[oi3];
+    var dotCls = "obs-mark";
+    var lblCls2 = "obs-label";
+    var isCurr = false;
+    // Insert mode: just inserted x is "new"
+    if(s.hl.mode === "insert" && ov === s.hl.x){ dotCls += " obs-mark--new"; lblCls2 += " obs-label--new"; }
+    // Query mode: predecessor is highlighted
+    if(s.hl.mode === "query" && ov === s.hl.prevObs){ dotCls += " obs-mark--curr"; }
+    // Recompute focus
+    if(s.hl.recomputeJ !== null && oi3 === s.hl.recomputeJ){ dotCls += " obs-mark--curr"; }
+    h += '<div class="'+dotCls+'" style="left:'+pos2px(ov)+'px"></div>';
+    if(ov !== 0 || s.obstacles.length === 1){
+      h += '<div class="'+lblCls2+'" style="left:'+pos2px(ov)+'px">'+ov+(s.maxGap[ov]!==undefined?' (mg='+s.maxGap[ov]+')':'')+'</div>';
+    } else {
+      h += '<div class="'+lblCls2+'" style="left:'+pos2px(ov)+'px">0</div>';
+    }
+  }
+
+  h += '</div></div>';
+
+  // Legend
+  h += '<div class="legend">';
+  h += '<span><i style="background:#dc2626;width:10px;height:10px;border-radius:50%"></i>Obstacle</span>';
+  h += '<span><i style="background:#f59e0b;width:10px;height:10px;border-radius:50%"></i>New / current</span>';
+  h += '<span><i style="background:#475569"></i>Gap</span>';
+  h += '<span><i style="background:#22c55e"></i>maxGap[p]</span>';
+  h += '<span><i style="background:#a78bfa"></i>Tail (p→x)</span>';
+  h += '<span><i style="border-left:2px dashed #22c55e;width:0;height:14px"></i>x boundary</span>';
+  h += '<span><i style="background:repeating-linear-gradient(45deg,#fbbf24,#fbbf24 3px,#f59e0b 3px,#f59e0b 6px)"></i>Block size</span>';
+  h += '</div>';
+  h += '</div>';
+
+  // ===== Two-column: queries list + obstacles set =====
+  h += '<div class="viz-row">';
+
+  // Queries list
+  h += '<div class="viz-card" style="flex:1;min-width:300px"><div class="viz-title">📋 Query Stream</div>';
+  h += '<div class="queries-list">';
+  s.queries.forEach(function(qq, qqi){
+    var rowCls = "query-row";
+    if(qqi === s.qIdx && s.q !== null) rowCls += " query-row--curr";
+    else if(qqi < s.qIdx || (qqi === s.qIdx && s.q === null)) rowCls += " query-row--done";
+    var typCls = qq[0] === 1 ? "query-type--add" : "query-type--check";
+    var typTxt = qq[0] === 1 ? "ADD" : "CHK";
+    var content = qq[0] === 1 ? "place obstacle at "+qq[1] : "fit size "+qq[2]+" in [0,"+qq[1]+"]?";
+    h += '<div class="'+rowCls+'">';
+    h += '<span class="query-idx">#'+(qqi+1)+'</span>';
+    h += '<span class="query-type '+typCls+'">'+typTxt+'</span>';
+    h += '<span class="query-content">'+content+'</span>';
+    // Show result for completed type-2 queries
+    if(qq[0] === 2){
+      var resIdx = 0;
+      for(var qq3=0; qq3<qqi; qq3++) if(s.queries[qq3][0]===2) resIdx++;
+      if(resIdx < s.res.length){
+        var rb = s.res[resIdx];
+        h += '<span class="query-result query-result--'+(rb?'true':'false')+'">'+(rb?'T':'F')+'</span>';
+      }
+    }
+    h += '</div>';
+  });
+  h += '</div></div>';
+
+  // Obstacles set + maxGap dict
+  h += '<div class="viz-card" style="flex:1;min-width:280px"><div class="viz-title">🗂️ Sorted Obstacles + maxGap</div>';
+  h += '<div style="font-size:10px;color:var(--text-tertiary);margin-bottom:5px">obstacles (sorted):</div>';
+  h += '<div class="obs-list">';
+  s.obstacles.forEach(function(ov, oi4){
+    var cls = "obs-item";
+    if(s.hl.mode === "insert" && ov === s.hl.x) cls += " obs-item--insert";
+    else if(s.hl.mode === "query" && ov === s.hl.prevObs) cls += " obs-item--curr";
+    else if(s.hl.recomputeJ !== null && oi4 === s.hl.recomputeJ) cls += " obs-item--curr";
+    h += '<span class="'+cls+'"><span class="obs-item-idx">['+oi4+']</span>'+ov+'</span>';
+  });
+  h += '</div>';
+
+  h += '<div style="font-size:10px;color:var(--text-tertiary);margin:8px 0 5px">maxGap dictionary:</div>';
+  h += '<div class="obs-list">';
+  s.obstacles.forEach(function(ov){
+    var mg = s.maxGap[ov];
+    if(mg !== undefined){
+      var mgCls = "obs-item";
+      mgCls = "obs-item"; // base
+      var bg = mg === 0 ? "var(--bg-tertiary)" : "var(--accent-green-bg)";
+      var bd = mg === 0 ? "var(--border-color)" : "var(--accent-green)";
+      var col = mg === 0 ? "var(--text-tertiary)" : "var(--accent-green-text)";
+      h += '<span class="'+mgCls+'" style="background:'+bg+';border-color:'+bd+';color:'+col+'">'+ov+' → '+mg+'</span>';
+    }
+  });
+  h += '</div>';
+
+  // Results so far
+  if(s.res.length){
+    h += '<div style="font-size:10px;color:var(--text-tertiary);margin:8px 0 5px">res (type-2 answers so far):</div>';
+    h += '<div class="result-row">';
+    s.res.forEach(function(r, ri){
+      var rcls = r ? "result-chip--true" : "result-chip--false";
+      h += '<span class="result-chip '+rcls+'"><span class="result-chip-idx">#'+(ri+1)+'</span>'+(r?'TRUE':'FALSE')+'</span>';
+    });
+    h += '</div>';
+  }
+  h += '</div>';
+  h += '</div>'; // viz-row
+
+  c.innerHTML = h;
+}
+
+/* ---------- renderStep ---------- */
+function renderStep(idx){
+  if(!steps.length) return;
+  var s = steps[idx];
+  currentStep = idx;
+  document.getElementById('stepInfo').textContent = (idx+1)+'/'+steps.length;
+  var bd = document.getElementById('actionBadge');
+  bd.textContent = BADGE_LABEL[s.action] || s.action;
+  bd.className = 'action-badge action-badge--'+s.action;
+  document.querySelectorAll('.code-line').forEach(function(el){ el.classList.remove('active'); });
+  var al = document.querySelector('.code-line[data-line="'+s.line+'"]');
+  if(al){ al.classList.add('active'); al.scrollIntoView({block:'nearest'}); }
+  renderViz(s);
+  showLogPreview(s);
+  // live output update at final return
+  if(s.line === 21){
+    document.getElementById('liveOutput').textContent = '['+s.res.map(function(b){return b?"true":"false";}).join(", ")+']';
+  } else if(idx === 0){
+    document.getElementById('liveOutput').textContent = '—';
+  }
+}
+
+function showLogPreview(s){
+  if(!logEnabled) return;
+  document.getElementById('logPopupBody').innerHTML = s.logHTML || '';
+  document.getElementById('logPopup').classList.remove('log-popup--hidden');
+}
+function hideLogPopup(){ document.getElementById('logPopup').classList.add('log-popup--hidden'); }
+
+function stepBy(d){ var ni = currentStep + d; if(ni >= 0 && ni < steps.length) renderStep(ni); }
+function resetStep(){ if(steps.length) renderStep(0); }
+
+function parseInputs(){
+  var raw = document.getElementById('inputQueries').value.trim();
+  var queries = [];
+  try{
+    queries = JSON.parse(raw);
+  }catch(e){
+    queries = [[1,2],[1,5],[2,5,2],[2,1,1],[2,3,2]];
+  }
+  if(!Array.isArray(queries) || !queries.length) queries = [[1,2]];
+  return {queries:queries};
+}
+
+function resetWithInput(){
+  curResult = null;
+  var p = parseInputs();
+  renderCode();
+  fitCodeWidth();
+  steps = buildSteps(p.queries);
+  currentStep = 0;
+  renderStep(0);
+  document.getElementById('liveOutput').textContent = '—';
+}
+
+function loadTest(qStr, expStr, label){
+  document.getElementById('inputQueries').value = qStr;
+  document.getElementById('expectedBadge').textContent = 'exp: '+expStr;
+  resetWithInput();
+}
+
+function toggleProblem(){
+  var b = document.getElementById('probBody');
+  var btn = document.getElementById('probToggleBtn');
+  b.classList.toggle('prob-body--hidden');
+  btn.textContent = b.classList.contains('prob-body--hidden') ? '▼ Show' : '▲ Hide';
+}
+
+function toggleLogPreview(){
+  logEnabled = !logEnabled;
+  var btn = document.getElementById('logToggleBtn');
+  btn.textContent = logEnabled ? '📋 ON' : '📋 OFF';
+  btn.classList.toggle('log-toggle-btn--off', !logEnabled);
+  if(!logEnabled) hideLogPopup();
+  else if(steps.length) showLogPreview(steps[currentStep]);
+}
+function logZoom(dir){ logZoomLevel = Math.max(60, Math.min(180, logZoomLevel + dir*20)); updateLogZoom(); }
+function logZoomReset(){ logZoomLevel = 100; updateLogZoom(); }
+function updateLogZoom(){
+  document.getElementById('logZoomLabel').textContent = logZoomLevel + '%';
+  document.getElementById('logPopup').style.setProperty('--log-scale', logZoomLevel/100);
+}
+function toggleFullscreen(){
+  var viz = document.querySelector('.col-viz');
+  if(!document.fullscreenElement) viz.requestFullscreen().catch(function(){});
+  else document.exitFullscreen();
+}
+
+(function(){
+  var col1 = document.getElementById('col1');
+  document.getElementById('resizeH1').addEventListener('mousedown', function(e){
+    e.preventDefault();
+    codeWidthUserSet = true;
+    var startX = e.clientX, startW = col1.offsetWidth, h = this;
+    document.body.classList.add('no-select');
+    h.classList.add('active');
+    function mv(e){
+      col1.style.width = Math.max(140, startW + (e.clientX - startX)) + 'px';
+      syncFooterWidth();
+    }
+    function up(){
+      document.removeEventListener('mousemove', mv);
+      document.removeEventListener('mouseup', up);
+      document.body.classList.remove('no-select');
+      h.classList.remove('active');
+    }
+    document.addEventListener('mousemove', mv);
+    document.addEventListener('mouseup', up);
+  });
+})();
+
+function syncFooterWidth(){
+  document.getElementById('footerLeft').style.width =
+    document.getElementById('col1').offsetWidth + 'px';
+}
+
+window.addEventListener('resize', function(){
+  if(!codeWidthUserSet) fitCodeWidth();
+  else syncFooterWidth();
+});
+
+document.addEventListener('keydown', function(e){
+  if(e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
+  if(e.key === 'ArrowRight'){ e.preventDefault(); stepBy(1); }
+  else if(e.key === 'ArrowLeft'){ e.preventDefault(); stepBy(-1); }
+  else if(e.key === 'r' || e.key === 'R'){ e.preventDefault(); resetStep(); }
+});
+
+renderCode();
+fitCodeWidth();
+syncFooterWidth();
+resetWithInput();
+</script>
+</body>
+</html>

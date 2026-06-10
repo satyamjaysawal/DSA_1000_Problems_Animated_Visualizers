@@ -1,0 +1,939 @@
+﻿
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>3195. Minimum Area to Cover All Ones I — Dry Run Visualizer</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=DM+Sans:wght@400;500;600&display=swap');
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{--bg-primary:#FAFAF8;--bg-secondary:#F1EFE8;--bg-tertiary:#E2E0D8;--bg-card:#FFFFFF;--text-primary:#2C2C2A;--text-secondary:#5F5E5A;--text-tertiary:#888780;--border-color:rgba(0,0,0,.11);--border-light:rgba(0,0,0,.06);--border-focus:#534AB7;--accent-indigo:#534AB7;--accent-indigo-bg:#EEEDFE;--accent-indigo-text:#3C3489;--accent-indigo-hover:#4740A0;--accent-teal:#0F6E56;--accent-teal-bg:#E1F5EE;--accent-teal-text:#085041;--accent-red:#E24B4A;--accent-red-bg:#FCEBEB;--accent-red-text:#791F1F;--accent-amber:#B45309;--accent-amber-bg:#FEF3C7;--accent-amber-text:#78350F;--accent-green:#15803D;--accent-green-bg:#DCFCE7;--accent-green-text:#14532D;--syn-keyword:#534AB7;--syn-function:#185FA5;--syn-number:#993C1D;--syn-string:#0F6E56;--active-line-bg:#EEEDFE;--radius-sm:4px;--radius-md:6px;--radius-lg:10px;--sp-2:8px;--sp-3:12px;--sp-5:20px;--font-sans:'DM Sans',system-ui,sans-serif;--font-mono:'JetBrains Mono','Fira Code',monospace;--fs-xs:11px;--fs-sm:12px;--fs-base:14px;--fs-md:15px;--fw-medium:500;--fw-semibold:600;--fw-bold:700;--lh-normal:1.6;--lh-code:1.9;--ease:.18s ease}
+html,body{height:100%;background:var(--bg-primary);color:var(--text-primary);font:var(--fs-base) var(--font-sans)}
+.kw{color:var(--syn-keyword);font-weight:var(--fw-medium)}.fn{color:var(--syn-function)}.num{color:var(--syn-number)}.str{color:var(--syn-string)}
+.btn,.section-label,.action-badge,.log-badge,kbd{font-family:system-ui,"Segoe UI Emoji",var(--font-sans)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:4px;padding:5px var(--sp-3);font-size:var(--fs-sm);font-weight:var(--fw-medium);border:1px solid var(--border-color);border-radius:var(--radius-md);background:var(--bg-card);color:var(--text-primary);cursor:pointer;transition:all var(--ease);white-space:nowrap}.btn:hover{background:var(--bg-secondary)}.btn:active{transform:scale(.96)}.btn-primary{background:var(--accent-indigo);color:#fff;border-color:var(--accent-indigo)}.btn-primary:hover{background:var(--accent-indigo-hover)}
+.btn-zoom{display:inline-flex;align-items:center;justify-content:center;padding:2px 7px;font:700 12px var(--font-mono);border:1px solid var(--border-color);border-radius:var(--radius-sm);background:var(--bg-card);color:var(--text-secondary);cursor:pointer}.btn-zoom:hover{background:var(--accent-indigo-bg);border-color:var(--accent-indigo);color:var(--accent-indigo)}
+.input{padding:4px var(--sp-2);font:var(--fs-sm) var(--font-mono);border:1px solid var(--border-color);border-radius:var(--radius-md);background:var(--bg-card);color:var(--text-primary);outline:none}.input:focus{border-color:var(--border-focus)}
+kbd{display:inline-block;padding:1px 5px;border-radius:var(--radius-sm);font-size:10px;background:var(--bg-secondary);border:1px solid var(--border-color);color:var(--text-secondary);line-height:1.5}
+::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border-color);border-radius:3px}
+@keyframes pulse-node{0%,100%{box-shadow:0 0 5px var(--accent-indigo)}50%{box-shadow:0 0 14px var(--accent-indigo)}}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-3px)}75%{transform:translateX(3px)}}
+@keyframes win-pulse{0%,100%{box-shadow:0 0 5px rgba(234,179,8,.6)}50%{box-shadow:0 0 16px rgba(234,179,8,.95)}}
+@keyframes cell-found{0%{transform:scale(0.5);background:#FEF3C7}100%{transform:scale(1);background:#DCFCE7}}
+@keyframes bound-update{0%,100%{box-shadow:0 0 0 2px var(--accent-amber)}50%{box-shadow:0 0 0 5px var(--accent-amber)}}
+.app-shell{display:flex;flex-direction:column;height:100vh;overflow:hidden;background:var(--bg-primary)}
+.prob-header{display:flex;align-items:center;gap:var(--sp-2);padding:8px var(--sp-5);border-bottom:1px solid var(--border-color);background:var(--bg-card);flex-wrap:wrap;flex-shrink:0}
+.prob-header-left{display:flex;align-items:center;gap:6px;flex-wrap:wrap;flex:1}
+.prob-header-right{display:flex;align-items:center;gap:var(--sp-2);flex-wrap:wrap}
+.gt-home-btn{padding:3px 10px;font-family:var(--font-sans);font-size:11px;font-weight:700;letter-spacing:.04em;border:1.5px solid var(--accent-indigo);border-radius:var(--radius-md);background:var(--accent-indigo);color:#fff;cursor:pointer;text-transform:uppercase}
+.gt-home-btn:hover{background:var(--accent-indigo-hover)}
+.prob-num{font-size:var(--fs-sm);font-weight:var(--fw-bold);color:var(--accent-indigo);font-family:var(--font-mono)}
+.prob-name{font-size:var(--fs-md);font-weight:var(--fw-semibold)}
+.prob-diff--easy{font-size:10px;padding:2px 8px;border-radius:99px;font-weight:var(--fw-semibold);background:var(--accent-green-bg);color:var(--accent-green-text)}
+.prob-tag{font-size:10px;padding:2px 8px;border-radius:99px;background:var(--bg-tertiary);color:var(--text-tertiary);border:1px solid var(--border-color);font-weight:var(--fw-medium)}
+.top-label{font:var(--fs-xs) var(--font-mono);color:var(--text-tertiary)}
+.top-expected{font:700 10px var(--font-mono);padding:2px 8px;border-radius:99px;background:var(--accent-teal-bg);color:var(--accent-teal-text);border:1px solid var(--accent-teal)}
+.prob-toggle-btn{font-family:system-ui,sans-serif;font-size:11px;padding:3px 10px;border-radius:var(--radius-md);background:var(--bg-secondary);border:1px solid var(--border-color);color:var(--text-secondary);cursor:pointer}
+.prob-body{display:flex;gap:var(--sp-5);padding:var(--sp-3) var(--sp-5);border-bottom:1px solid var(--border-color);background:var(--bg-card);flex-shrink:0}
+.problem-body--hidden{display:none!important}
+.prob-body-left{flex:1;min-width:0}.prob-body-right{width:340px;flex-shrink:0}
+.prob-body-left h3,.prob-body-right h3{font-size:var(--fs-sm);font-weight:var(--fw-semibold);color:var(--accent-indigo);margin:8px 0 3px}
+.prob-body-left h3:first-child{margin-top:0}
+.prob-desc{font-size:var(--fs-sm);color:var(--text-secondary);margin-bottom:4px}
+.prob-desc code{font-family:var(--font-mono);background:var(--bg-secondary);padding:1px 4px;border-radius:3px;font-size:var(--fs-xs)}
+.concept-block{background:var(--bg-secondary);border-radius:var(--radius-md);padding:8px 12px;margin:4px 0;font-size:var(--fs-sm);border-left:3px solid var(--accent-teal);color:var(--text-secondary)}
+.concept-block strong{color:var(--accent-teal-text);font-family:var(--font-mono);font-size:var(--fs-xs)}
+.prob-complexity{display:flex;gap:var(--sp-2);margin-top:6px}
+.prob-complexity-chip{font:10px var(--font-mono);padding:2px 8px;border-radius:var(--radius-md);background:var(--bg-secondary);border:1px solid var(--border-color)}
+.cc-label{color:var(--text-tertiary)}.cc-val{color:var(--accent-indigo-text);font-weight:var(--fw-bold)}
+.prob-tests{display:flex;flex-direction:column;gap:4px;margin-bottom:6px}
+.prob-test{display:flex;align-items:center;gap:5px;background:var(--bg-secondary);border:1px solid var(--border-color);border-radius:var(--radius-md);padding:5px 8px;font-size:var(--fs-xs);cursor:pointer;transition:all var(--ease)}
+.prob-test:hover{border-color:var(--accent-indigo)}
+.prob-test--active{border-color:var(--accent-indigo)!important;background:var(--accent-indigo-bg)!important}
+.pt-label{font-size:10px;font-weight:var(--fw-bold);color:var(--text-tertiary)}
+.pt-input{font-family:var(--font-mono);color:var(--text-primary);font-size:9px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pt-tag{font-size:8px;padding:1px 5px;border-radius:99px;background:var(--bg-tertiary);color:var(--text-tertiary);border:1px solid var(--border-color);font-weight:600;font-family:var(--font-mono)}
+.pt-arrow{color:var(--text-tertiary)}
+.pt-expected{font-family:var(--font-mono);font-weight:var(--fw-bold);color:var(--accent-teal);font-size:10px}
+.prob-live{display:flex;align-items:center;gap:6px;padding:6px var(--sp-3);border-radius:var(--radius-md);background:var(--bg-primary);border:1px solid var(--border-color);font-size:var(--fs-sm);margin-bottom:6px}
+.pl-label{font-size:var(--fs-xs);color:var(--text-tertiary)}
+.pl-output{font-family:var(--font-mono);font-weight:var(--fw-bold);color:var(--accent-indigo);font-size:var(--fs-sm)}
+.main-row{flex:1;display:flex;overflow:hidden;min-height:0}
+.col{display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.col-code{width:33%;min-width:140px;max-width:45vw}
+.col-viz{flex:1;min-width:0}
+.section-label{padding:5px var(--sp-3);font-size:var(--fs-xs);font-weight:var(--fw-semibold);color:var(--text-tertiary);text-transform:uppercase;letter-spacing:.07em;border-bottom:1px solid var(--border-color);flex-shrink:0;background:var(--bg-secondary)}
+.code-panel{flex:1;overflow-y:auto;padding:var(--sp-3) var(--sp-2);font-family:var(--font-mono);font-size:var(--fs-sm);line-height:var(--lh-code)}
+.code-line{display:flex;align-items:center;gap:var(--sp-2);padding:1px var(--sp-2);border-radius:var(--radius-sm)}
+.code-line.active{background:var(--active-line-bg)}
+.ln{min-width:18px;text-align:right;color:var(--text-tertiary);font-size:10px;user-select:none;flex-shrink:0;opacity:.6}
+.code-content{white-space:pre;flex:1}
+.resize-h{width:5px;cursor:col-resize;flex-shrink:0;background:transparent;position:relative;z-index:10;border-left:1px solid var(--border-color)}
+.resize-h:hover,.resize-h.active{background:rgba(99,102,241,.15)}
+.resize-h::after{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:3px;height:24px;border-radius:2px;background:rgba(0,0,0,.08)}
+.no-select{user-select:none!important;cursor:col-resize}
+.viz-panel{flex:1;overflow:auto;padding:var(--sp-3)}
+.vars-strip{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;padding:6px 10px;background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius-md)}
+.var-chip{display:inline-flex;align-items:center;gap:2px;padding:2px 7px;border-radius:var(--radius-md);background:var(--bg-secondary);border:1px solid var(--border-light);font-family:var(--font-mono);font-size:10px}
+.var-chip.vc-active{border-color:var(--accent-indigo);background:var(--accent-indigo-bg)}
+.var-chip.vc-safe{border-color:var(--accent-green);background:var(--accent-green-bg)}
+.var-chip.vc-warn{border-color:var(--accent-amber);background:var(--accent-amber-bg)}
+.var-chip.vc-init{border-color:var(--text-tertiary);color:var(--text-tertiary);font-style:italic}
+.vn{color:var(--text-tertiary);font-weight:500}.vv{font-weight:var(--fw-bold)}
+.viz-row{display:flex;gap:12px;align-items:flex-start;flex-wrap:wrap}
+.viz-card{background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius-md);padding:10px}
+.viz-title{font:600 9px var(--font-mono);text-transform:uppercase;letter-spacing:.04em;color:var(--text-tertiary);margin-bottom:6px;display:flex;justify-content:space-between;align-items:center}
+
+/* === GRID === */
+.grid-wrap{display:inline-block;padding:18px;background:#1e293b;border-radius:8px;border:2px solid #334155;position:relative}
+.grid-board{display:grid;gap:3px;position:relative}
+.gc-cell{width:48px;height:48px;display:flex;flex-direction:column;align-items:center;justify-content:center;font:700 18px var(--font-mono);border-radius:6px;border:2px solid transparent;position:relative;transition:all .25s;background:#fff;color:#1e293b}
+.gc-coord{font-size:7px;color:var(--text-tertiary);font-weight:400;position:absolute;top:2px;left:3px;opacity:.55}
+.gc-zero{background:#f1f5f9;color:#94a3b8}
+.gc-one{background:#fde68a;color:#78350f;border-color:#fbbf24}
+.gc-curr{outline:3px solid #534AB7;outline-offset:-3px;animation:pulse-node 1s infinite;z-index:3}
+.gc-found{background:#DCFCE7!important;color:#14532D!important;border-color:#15803D!important;animation:cell-found .4s ease}
+.gc-in-bound{background:#EEEDFE!important;border-color:#534AB7!important}
+.gc-in-bound.gc-one{background:#fef3c7!important;border-color:#B45309!important}
+.gc-in-bound.gc-found{background:#bbf7d0!important;border-color:#15803D!important}
+
+/* Bounding rectangle overlay */
+.bbox-overlay{position:absolute;border:3px solid #ef4444;border-radius:4px;pointer-events:none;animation:bound-update 1.4s infinite;background:rgba(239,68,68,.08);transition:all .3s ease;z-index:2}
+.bbox-label{position:absolute;top:-22px;left:0;background:#ef4444;color:#fff;font:700 10px var(--font-mono);padding:2px 7px;border-radius:4px;white-space:nowrap}
+
+/* === BOUNDS TRACKER === */
+.bounds-table{display:grid;grid-template-columns:auto auto auto auto;gap:4px;font-family:var(--font-mono);font-size:11px}
+.bounds-cell{padding:5px 9px;border-radius:5px;background:var(--bg-secondary);border:1px solid var(--border-light);text-align:center}
+.bounds-label{font:700 9px var(--font-mono);color:var(--text-tertiary);text-transform:uppercase;display:flex;align-items:center;justify-content:center;padding:5px 9px}
+.bounds-cell--init{color:var(--text-tertiary);font-style:italic;background:var(--bg-tertiary)}
+.bounds-cell--set{background:var(--accent-amber-bg);border-color:var(--accent-amber);color:var(--accent-amber-text);font-weight:700}
+.bounds-cell--changed{animation:cell-found .4s ease;background:var(--accent-green-bg)!important;border-color:var(--accent-green)!important;color:var(--accent-green-text)!important;font-weight:700}
+
+/* === FORMULA CARD === */
+.formula-box{padding:10px 14px;background:linear-gradient(135deg,#fef3c7,#fde68a);border:2px solid #B45309;border-radius:var(--radius-md);font-family:var(--font-mono);font-size:13px;color:#78350f;text-align:center;line-height:1.7}
+.formula-box strong{font-size:16px;color:#7c2d12}
+.formula-step{display:inline-block;padding:2px 7px;background:#fff;border:1px solid #B45309;border-radius:4px;margin:2px;font-weight:700}
+
+.legend{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px}
+.legend span{display:inline-flex;align-items:center;gap:5px;font-size:10px;color:var(--text-secondary)}
+.legend i{display:inline-block;width:14px;height:14px;border-radius:3px;border:1px solid var(--border-color)}
+
+.empty-state{font-size:11px;color:var(--text-tertiary);font-style:italic;padding:8px}
+
+.step-calc{margin-top:8px;padding:8px 12px;background:#FFF8E7;border:1px solid #FBE8A6;border-left:3px solid var(--accent-amber);border-radius:var(--radius-md);font:11px var(--font-mono);color:var(--accent-amber-text);line-height:1.5}
+.step-calc strong{font-size:12px;font-weight:700}
+
+.result-banner{margin-top:12px;padding:10px 14px;border-radius:var(--radius-md);font-family:var(--font-mono);font-size:var(--fs-md);font-weight:bold;background:var(--accent-green-bg);border:2px solid var(--accent-green);color:var(--accent-green-text);animation:win-pulse 1.6s infinite;text-align:center}
+
+.action-badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:var(--radius-sm);font-size:10px;font-weight:var(--fw-bold)}
+.action-badge--func-def,.action-badge--init,.action-badge--call,.action-badge--return{background:rgba(130,80,255,.14);color:#8250ff}
+.action-badge--for-check,.action-badge--if-check,.action-badge--while-check{background:rgba(56,139,253,.14);color:#388bfd}
+.action-badge--mark,.action-badge--push,.action-badge--pop,.action-badge--restore,.action-badge--found,.action-badge--update{background:rgba(63,185,80,.14);color:#3fb950}
+.action-badge--remove,.action-badge--prune,.action-badge--fail{background:rgba(248,81,73,.14);color:#f85149}
+.action-badge--exit,.action-badge--skip{background:rgba(85,84,80,.14);color:#555450}
+
+.log-card{border-radius:var(--radius-md);overflow:hidden;border:1px solid var(--border-color);border-left-width:4px;font-size:var(--fs-xs);background:var(--bg-card)}
+.log-card--func-def,.log-card--init,.log-card--call,.log-card--return{border-left-color:#8250ff}
+.log-card--for-check,.log-card--if-check,.log-card--while-check{border-left-color:#388bfd}
+.log-card--mark,.log-card--push,.log-card--pop,.log-card--restore,.log-card--found,.log-card--update{border-left-color:#3fb950}
+.log-card--remove,.log-card--prune,.log-card--fail{border-left-color:#f85149}
+.log-card--exit,.log-card--skip{border-left-color:#555450}
+.log-badge{display:inline-flex;flex-shrink:0;border-radius:var(--radius-sm);font-size:9px;font-weight:var(--fw-bold);padding:2px 6px;white-space:nowrap}
+.log-badge--func-def,.log-badge--init,.log-badge--call,.log-badge--return{background:rgba(130,80,255,.22);color:#8250ff}
+.log-badge--for-check,.log-badge--if-check,.log-badge--while-check{background:rgba(56,139,253,.22);color:#388bfd}
+.log-badge--mark,.log-badge--push,.log-badge--pop,.log-badge--restore,.log-badge--found,.log-badge--update{background:rgba(63,185,80,.22);color:#3fb950}
+.log-badge--remove,.log-badge--prune,.log-badge--fail{background:rgba(248,81,73,.22);color:#f85149}
+.log-badge--exit,.log-badge--skip{background:rgba(85,84,80,.22);color:#555450}
+.log-card-header{display:flex;align-items:center;gap:6px;padding:8px 10px 6px;background:var(--bg-secondary);border-bottom:1px solid var(--border-light)}
+.log-line-ref{font:700 10px var(--font-mono);color:var(--accent-indigo);background:var(--accent-indigo-bg);padding:1px 6px;border-radius:4px;border:1px solid var(--accent-indigo)}
+.log-status-pill{font-family:system-ui,"Segoe UI Emoji",sans-serif;font-size:9px;font-weight:700;padding:2px 7px;border-radius:99px;text-transform:uppercase;letter-spacing:.04em;margin-left:auto}
+.log-status--success{background:var(--accent-green-bg);color:var(--accent-green-text);border:1px solid var(--accent-green)}
+.log-status--fail{background:var(--accent-red-bg);color:var(--accent-red-text);border:1px solid var(--accent-red)}
+.log-status--skip{background:var(--bg-tertiary);color:var(--text-tertiary);border:1px solid var(--border-color)}
+.log-status--loop{background:rgba(56,139,253,.14);color:#185FA5;border:1px solid #388bfd}
+.log-status--prune{background:var(--accent-red-bg);color:var(--accent-red-text);border:1px solid var(--accent-red)}
+.log-status--info{background:rgba(130,80,255,.14);color:#3C3489;border:1px solid #8250ff}
+.log-section{padding:7px 10px;border-bottom:1px dashed var(--border-light)}
+.log-section:last-child{border-bottom:none}
+.log-section-title{font:700 8px var(--font-mono);text-transform:uppercase;letter-spacing:.06em;color:var(--text-tertiary);margin-bottom:3px;display:flex;align-items:center;gap:4px}
+.log-section-title-icon{font-family:system-ui,"Segoe UI Emoji",sans-serif;font-size:10px}
+.log-code-snippet{font:600 11px var(--font-mono);background:#0d1117;color:#e6edf3;padding:6px 9px;border-radius:4px;display:block;overflow-x:auto;white-space:pre;border:1px solid #30363d}
+.log-code-snippet .ck{color:#ff7b72}.log-code-snippet .cs{color:#a5d6ff}.log-code-snippet .cn{color:#79c0ff}.log-code-snippet .cf{color:#d2a8ff}.log-code-snippet .cc{color:#8b949e;font-style:italic}
+.log-kv-row{display:flex;flex-wrap:wrap;gap:4px;margin-top:2px}
+.log-kv{display:inline-flex;align-items:center;gap:3px;font:11px var(--font-mono);padding:2px 7px;border-radius:4px;background:var(--bg-secondary);border:1px solid var(--border-light)}
+.log-kv-key{color:var(--text-tertiary);font-weight:500}
+.log-kv-val{color:var(--text-primary);font-weight:700}
+.log-kv--in{background:rgba(56,139,253,.08);border-color:rgba(56,139,253,.3)}
+.log-kv--out{background:rgba(63,185,80,.08);border-color:rgba(63,185,80,.4)}
+.log-kv--out .log-kv-val{color:#15803D}
+.log-kv--changed{background:rgba(180,83,9,.10);border-color:rgba(180,83,9,.4)}
+.log-verdict{display:flex;align-items:center;gap:6px;font:600 11px var(--font-mono);padding:5px 8px;border-radius:5px;background:var(--bg-secondary);border:1px solid var(--border-light)}
+.log-verdict--true{background:var(--accent-green-bg);border-color:var(--accent-green);color:var(--accent-green-text)}
+.log-verdict--false{background:var(--accent-red-bg);border-color:var(--accent-red);color:var(--accent-red-text)}
+.log-analogy{font:italic 11px var(--font-sans);color:var(--text-secondary);background:#FFF8E7;border:1px solid #FBE8A6;border-left:3px solid var(--accent-amber);padding:6px 9px;border-radius:4px;line-height:1.55}
+.log-analogy strong{color:var(--accent-amber-text);font-style:normal;font-weight:700}
+.log-why{font-size:11px;line-height:1.55;color:var(--text-primary);padding:4px 0}
+.log-why strong{color:var(--accent-indigo-text)}
+.log-popup{--log-scale:1;position:fixed;bottom:52px;right:14px;width:calc(480px * var(--log-scale));max-width:92vw;max-height:75vh;border-radius:var(--radius-lg);box-shadow:0 10px 32px rgba(0,0,0,.14);border:1px solid var(--border-color);background:var(--bg-card);overflow:hidden;display:flex;flex-direction:column;z-index:100;transition:opacity .15s,transform .15s;transform-origin:bottom right}
+.log-popup--hidden{opacity:0;transform:scale(.92);pointer-events:none}
+.log-popup-body{flex:1;overflow:auto;padding:0}
+.log-popup-body > .log-card{border-radius:0;border:none;border-left:0}
+.footer-bar{display:flex;flex-shrink:0;border-top:1px solid var(--border-color);background:var(--bg-card)}
+.footer-left{width:33%;min-width:140px;max-width:45vw;display:flex;align-items:center;gap:8px;padding:7px 12px;border-right:1px solid var(--border-light)}
+.footer-right{flex:1;display:flex;align-items:center;gap:6px;padding:7px 14px;flex-wrap:wrap}
+.footer-sep{width:1px;height:16px;background:var(--border-color);flex-shrink:0}
+.step-info{font:10px var(--font-mono);color:var(--text-tertiary)}
+.log-toggle-btn{padding:2px 8px;font:700 9px var(--font-mono);border:1px solid var(--accent-green);border-radius:99px;background:var(--accent-green-bg);color:var(--accent-green-text);cursor:pointer}
+.log-toggle-btn--off{background:var(--bg-tertiary);color:var(--text-tertiary);border-color:var(--border-color)}
+.log-zoom-label{font:10px var(--font-mono);color:var(--text-tertiary);min-width:28px;text-align:center}
+.btn-fullscreen{font-size:14px;padding:3px 8px;background:var(--accent-indigo-bg);border-color:var(--accent-indigo);color:var(--accent-indigo)}
+.btn-fullscreen:hover{background:var(--accent-indigo);color:#fff}
+</style>
+</head>
+<body>
+<div class="app-shell">
+  <header class="prob-header">
+    <div class="prob-header-left">
+      <a href="../00_HomePage/gt_learn_homepage.html" class="gt-home-btn">GT LEARN</a>
+      <span class="prob-num">#3195</span>
+      <span class="prob-name">🧱 Min Area to Cover All Ones I</span>
+      <span class="prob-diff--easy">EASY</span>
+      <span class="prob-tag">Matrix</span>
+      <span class="prob-tag">Bounding Box</span>
+    </div>
+    <div class="prob-header-right">
+      <span class="top-label">grid=</span>
+      <input id="inputGrid" class="input" style="width:240px" value="[[0,1,0],[1,0,1]]">
+      <span id="expectedBadge" class="top-expected">exp: 6</span>
+      <button id="probToggleBtn" class="prob-toggle-btn" type="button" onclick="toggleProblem()">▲ Hide</button>
+    </div>
+  </header>
+  <div id="probBody" class="prob-body">
+    <div class="prob-body-left">
+      <h3>📝 Problem Statement</h3>
+      <p class="prob-desc">Given a 2D binary array <code>grid</code>, return the <strong>minimum area</strong> of an axis-aligned rectangle that contains <strong>all the 1's</strong> in the grid. The rectangle's sides must be parallel to the grid axes.</p>
+      <h3>🧠 Solving Approach</h3>
+      <p class="prob-desc"><strong>Bounding box</strong> technique — track <code>min_r</code>, <code>max_r</code>, <code>min_c</code>, <code>max_c</code> across all 1-cells. Final area = <code>(max_r - min_r + 1) × (max_c - min_c + 1)</code>. Single O(m·n) pass.</p>
+      <h3>🎯 Core Concepts</h3>
+      <div class="concept-block"><strong>Init Trick:</strong> Start <code>min_r = m, max_r = -1</code> (impossible values) so first 1 will always update both.</div>
+      <div class="concept-block"><strong>Bounding Box:</strong> Smallest rectangle covering all 1s = top-left at <code>(min_r, min_c)</code>, bottom-right at <code>(max_r, max_c)</code>.</div>
+      <div class="concept-block"><strong>Area Formula:</strong> Width = <code>max_c - min_c + 1</code>, Height = <code>max_r - min_r + 1</code>. The +1 because both endpoints inclusive.</div>
+      <div class="prob-complexity">
+        <span class="prob-complexity-chip"><span class="cc-label">Time </span><span class="cc-val">O(m·n)</span></span>
+        <span class="prob-complexity-chip"><span class="cc-label">Space </span><span class="cc-val">O(1)</span></span>
+      </div>
+    </div>
+    <div class="prob-body-right">
+      <h3>🧪 Test Cases</h3>
+      <div id="testList" class="prob-tests"></div>
+      <div class="prob-live"><span class="pl-label">Min Area:</span><span id="liveOutput" class="pl-output">—</span></div>
+      <button class="btn btn-primary" type="button" onclick="resetWithInput()">▶ Run</button>
+    </div>
+  </div>
+  <div class="main-row">
+    <div id="col1" class="col col-code">
+      <div class="section-label">📜 Python Code</div>
+      <div id="codePanel" class="code-panel"></div>
+    </div>
+    <div id="resizeH1" class="resize-h"></div>
+    <div class="col col-viz">
+      <div class="section-label">📊 Visualization</div>
+      <div id="vizPanel" class="viz-panel"></div>
+    </div>
+  </div>
+  <div class="footer-bar">
+    <div id="footerLeft" class="footer-left">
+      <span id="stepInfo" class="step-info">0/0</span>
+      <span id="actionBadge" class="action-badge"></span>
+    </div>
+    <div class="footer-right">
+      <kbd>←</kbd><kbd>→</kbd>
+      <button class="btn" type="button" onclick="resetStep()">↺</button>
+      <button class="btn" type="button" onclick="stepBy(-1)">◀</button>
+      <button class="btn btn-primary" type="button" onclick="stepBy(1)">▶ Next</button>
+      <span class="footer-sep"></span>
+      <button id="logToggleBtn" class="log-toggle-btn" type="button" onclick="toggleLogPreview()">📋 ON</button>
+      <button class="btn-zoom" type="button" onclick="logZoom(-1)">−</button>
+      <span id="logZoomLabel" class="log-zoom-label">100%</span>
+      <button class="btn-zoom" type="button" onclick="logZoom(1)">+</button>
+      <button class="btn-zoom" type="button" onclick="logZoomReset()">↺</button>
+      <span class="footer-sep"></span>
+      <button class="btn btn-fullscreen" type="button" onclick="toggleFullscreen()">⛶</button>
+    </div>
+  </div>
+</div>
+<div id="logPopup" class="log-popup log-popup--hidden">
+  <div id="logPopupBody" class="log-popup-body"></div>
+</div>
+<script>
+var TESTS=[
+  {grid:"[[0,1,0],[1,0,1]]",e:"6",tag:"basic 2x3"},
+  {grid:"[[1,0],[0,0]]",e:"1",tag:"single 1"},
+  {grid:"[[1,1,1],[1,1,1]]",e:"6",tag:"full grid"},
+  {grid:"[[0,0,0],[0,1,0],[0,0,0]]",e:"1",tag:"center 1"},
+  {grid:"[[1,0,0,0],[0,0,0,0],[0,0,0,1]]",e:"16",tag:"diagonal corners"},
+  {grid:"[[0,1,1,0],[1,1,0,0],[0,0,0,0]]",e:"6",tag:"L-shape"}
+];
+
+var codeLines=[
+  "def minimumArea(grid):",
+  "    m = len(grid)",
+  "    n = len(grid[0])",
+  "    min_r = m",
+  "    max_r = -1",
+  "    min_c = n",
+  "    max_c = -1",
+  "    for r in range(m):",
+  "        for c in range(n):",
+  "            if grid[r][c] == 1:",
+  "                min_r = min(min_r, r)",
+  "                max_r = max(max_r, r)",
+  "                min_c = min(min_c, c)",
+  "                max_c = max(max_c, c)",
+  "    return (max_r - min_r + 1) * (max_c - min_c + 1)"
+];
+
+var LOG_BADGE={"func-def":"📌 DEF","init":"⚙️ INIT","call":"📞 CALL","return":"🏆 RETURN","for-check":"🔁 FOR","while-check":"🔁 WHILE","if-check":"🔎 IF","mark":"✅ MARK","push":"⬆ PUSH","pop":"⬇ POP","update":"✏️ UPDATE","restore":"↩ RESTORE","exit":"🔚 EXIT","found":"🎉 FOUND","prune":"✂️ PRUNE","skip":"⏭ SKIP","fail":"❌ FAIL"};
+var BADGE_LABEL={"func-def":"DEF","init":"INIT","call":"CALL","return":"RETURN","for-check":"FOR","while-check":"WHILE","if-check":"IF","mark":"MARK","push":"PUSH","pop":"POP","update":"UPDATE","restore":"RESTORE","exit":"EXIT","found":"FOUND","prune":"PRUNE","skip":"SKIP","fail":"FAIL"};
+
+var steps=[],currentStep=0,codeWidthUserSet=false,curResult=null,logEnabled=true,logZoomLevel=100;
+
+function renderTests(){
+  document.getElementById("testList").innerHTML=TESTS.map(function(t,i){
+    return '<div class="prob-test'+(i===0?' prob-test--active':'')+'" onclick="loadTest('+i+',this)">'+
+      '<span class="pt-label">T'+(i+1)+'</span>'+
+      '<span class="pt-input" title=\''+t.grid+'\'>'+t.grid+'</span>'+
+      '<span class="pt-tag">'+t.tag+'</span>'+
+      '<span class="pt-arrow">→</span>'+
+      '<span class="pt-expected">'+t.e+'</span></div>';
+  }).join("");
+}
+
+function renderCode(){
+  var p=document.getElementById('codePanel');
+  p.innerHTML=codeLines.map(function(raw,i){
+    var h=raw;
+    h=h.replace(/("[^"]*"|'[^']*')/g,'\x01STR\x02$1\x03');
+    h=h.replace(/\b(def|for|in|if|return|break|continue|and|else|elif|True|False|None|not|or|while|lambda)\b/g,'\x01KW\x02$1\x03');
+    h=h.replace(/\b(len|range|int|str|list|append|pop|sorted|min|max|sum|abs|enumerate|zip|print|set|add)\b/g,'\x01FN\x02$1\x03');
+    h=h.replace(/(?<![.\w"\x01\x02\x03])(-?\d+)\b/g,'\x01NUM\x02$1\x03');
+    h=h.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    h=h.replace(/\x01([A-Z]+)\x02/g,function(_,c){return '<span class="'+c.toLowerCase()+'">';}).replace(/\x03/g,'</span>');
+    return '<div class="code-line" data-line="'+i+'"><span class="ln">'+(i+1)+'</span><span class="code-content">'+h+'</span></div>';
+  }).join('');
+}
+
+function toggleProblem(){
+  var body=document.getElementById('probBody'),btn=document.getElementById('probToggleBtn');
+  body.classList.toggle('problem-body--hidden');
+  btn.textContent=body.classList.contains('problem-body--hidden')?'▼ Show':'▲ Hide';
+}
+
+function syncFooterWidth(){document.getElementById('footerLeft').style.width=document.getElementById('col1').offsetWidth+'px';}
+
+function fitCodeWidth(){
+  if(codeWidthUserSet)return;
+  var c=document.getElementById('col1');
+  c.style.flex='none';c.style.width='max-content';
+  c.style.width=Math.min(c.offsetWidth,window.innerWidth*.45)+'px';
+  syncFooterWidth();
+}
+
+function hlCode(raw){
+  if(!raw)return '';
+  var h=raw;
+  h=h.replace(/("[^"]*"|'[^']*')/g,'\x01CS\x02$1\x03');
+  h=h.replace(/\b(def|for|in|if|return|break|continue|and|else|elif|True|False|None|not|or|while|lambda)\b/g,'\x01CK\x02$1\x03');
+  h=h.replace(/\b(len|range|int|str|list|append|pop|sorted|min|max|sum|abs|set|add|minimumArea)\b/g,'\x01CF\x02$1\x03');
+  h=h.replace(/(?<![.\w"\x01\x02\x03])(-?\d+)\b/g,'\x01CN\x02$1\x03');
+  h=h.replace(/(#.*$)/g,'\x01CC\x02$1\x03');
+  h=h.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  h=h.replace(/\x01([A-Z]+)\x02/g,function(_,c){return '<span class="'+c.toLowerCase()+'">';}).replace(/\x03/g,'</span>');
+  return h;
+}
+
+function richLog(opts){
+  var statusMap={success:"✅ Success",fail:"❌ Failed",skip:"⏭ Skipped",loop:"🔁 Loop iter",prune:"✂️ Pruned",info:"ℹ️ Info"};
+  var status=opts.status||"info";
+  var html='<div class="log-card log-card--'+opts.action+'">';
+  html+='<div class="log-card-header">';
+  html+='<span class="log-badge log-badge--'+opts.action+'">'+(LOG_BADGE[opts.action]||opts.action)+'</span>';
+  html+='<span class="log-line-ref">L'+(opts.line+1)+'</span>';
+  html+='<span class="log-status-pill log-status--'+status+'">'+(statusMap[status]||status)+'</span>';
+  html+='</div>';
+  if(opts.code){
+    html+='<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">📜</span>Code Executing</div>';
+    html+='<code class="log-code-snippet">'+hlCode(opts.code)+'</code></div>';
+  }
+  if(opts.inputs&&opts.inputs.length){
+    html+='<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">📥</span>Input Values</div><div class="log-kv-row">';
+    opts.inputs.forEach(function(kv){html+='<span class="log-kv log-kv--in"><span class="log-kv-key">'+kv.k+'</span>=<span class="log-kv-val">'+kv.v+'</span></span>';});
+    html+='</div></div>';
+  }
+  if(opts.outputs&&opts.outputs.length){
+    html+='<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">📤</span>Output / State After Line</div><div class="log-kv-row">';
+    opts.outputs.forEach(function(kv){
+      var cls=kv.changed?'log-kv--changed':'log-kv--out';
+      html+='<span class="log-kv '+cls+'"><span class="log-kv-key">'+kv.k+'</span>=<span class="log-kv-val">'+kv.v+'</span></span>';
+    });
+    html+='</div></div>';
+  }
+  if(opts.verdict){
+    var vCls=opts.verdictTrue===true?'log-verdict--true':(opts.verdictTrue===false?'log-verdict--false':'');
+    var vIcon=opts.verdictTrue===true?'✓':(opts.verdictTrue===false?'✗':'•');
+    html+='<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">⚖️</span>Verdict / Decision</div>';
+    html+='<div class="log-verdict '+vCls+'">'+vIcon+' '+opts.verdict+'</div></div>';
+  }
+  if(opts.why){
+    html+='<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">💡</span>Why This Happens</div>';
+    html+='<div class="log-why">'+opts.why+'</div></div>';
+  }
+  if(opts.analogy){
+    html+='<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">🎭</span>Real-Life Analogy</div>';
+    html+='<div class="log-analogy">'+opts.analogy+'</div></div>';
+  }
+  html+='</div>';
+  return html;
+}
+
+function buildSteps(grid){
+  var st=[],MAX_STEPS=4000;
+  var m=null,n=null;
+  var min_r=null,max_r=null,min_c=null,max_c=null;
+  var r=null,c=null;
+  var hl={currCell:null,foundCells:[],changedBound:null,boundsInit:{minR:false,maxR:false,minC:false,maxC:false}};
+  var finalArea=null,heightVal=null,widthVal=null;
+
+  function snap(x){
+    return Object.assign({
+      grid:grid.map(function(row){return row.slice();}),
+      m:m,n:n,
+      min_r:min_r,max_r:max_r,min_c:min_c,max_c:max_c,
+      r:r,c:c,
+      finalArea:finalArea,heightVal:heightVal,widthVal:widthVal,
+      hl:Object.assign({currCell:null,foundCells:[],changedBound:null,boundsInit:{minR:false,maxR:false,minC:false,maxC:false}},x&&x.hl||{})
+    },x||{});
+  }
+  var foundCellsList=[];
+  var boundsInitFlags={minR:false,maxR:false,minC:false,maxC:false};
+  function pushStep(o){
+    if(st.length>=MAX_STEPS)return;
+    if(!o.hl)o.hl={};
+    if(!o.hl.foundCells)o.hl.foundCells=foundCellsList.slice();
+    if(!o.hl.boundsInit)o.hl.boundsInit=Object.assign({},boundsInitFlags);
+    st.push(Object.assign({line:0,action:"func-def",logHTML:""},snap(o)));
+  }
+
+  // ── L1: function entry ──
+  pushStep({line:0,action:"func-def",logHTML:richLog({
+    line:0,action:"func-def",
+    code:"def minimumArea(grid):  # grid = "+JSON.stringify(grid),
+    status:"info",
+    inputs:[{k:"grid",v:JSON.stringify(grid)}],
+    outputs:[{k:"function",v:"entered"}],
+    why:"<strong>Function entry</strong> — grid mil gaya. Goal: smallest rectangle dhundhna jo saare 1s ko cover kare.",
+    analogy:"<strong>Property surveyor</strong> 📐 — saari buildings (1s) ke around chhota se chhota fence dalna hai."
+  })});
+
+  // ── L2: m = len(grid) ──
+  m=grid.length;
+  pushStep({line:1,action:"init",logHTML:richLog({
+    line:1,action:"init",
+    code:"m = len(grid)  # m = "+m,
+    status:"success",
+    inputs:[{k:"grid",v:JSON.stringify(grid)}],
+    outputs:[{k:"m",v:m,changed:true}],
+    why:"<strong>Total rows</strong> = <strong>"+m+"</strong>. Outer loop boundary ke liye chahiye.",
+    analogy:"<strong>Plot mein kitni rows hain</strong> 🏘️ — total horizontal lines count kar lo."
+  })});
+
+  // ── L3: n = len(grid[0]) ──
+  n=grid[0].length;
+  pushStep({line:2,action:"init",logHTML:richLog({
+    line:2,action:"init",
+    code:"n = len(grid[0])  # n = "+n,
+    status:"success",
+    inputs:[{k:"grid[0]",v:JSON.stringify(grid[0])}],
+    outputs:[{k:"n",v:n,changed:true}],
+    why:"<strong>Total columns</strong> = <strong>"+n+"</strong>. Inner loop boundary.",
+    analogy:"<strong>Har row mein kitne plots</strong> 🏠 — vertical lines count."
+  })});
+
+  // ── L4: min_r = m ──
+  min_r=m;
+  pushStep({line:3,action:"init",logHTML:richLog({
+    line:3,action:"init",
+    code:"min_r = m  # min_r = "+m+" (impossibly large)",
+    status:"success",
+    inputs:[{k:"m",v:m}],
+    outputs:[{k:"min_r",v:min_r,changed:true}],
+    why:"<strong>Trick init!</strong> min_r ko <strong>m="+m+"</strong> set kiya — yeh impossibly large value hai (valid rows 0 to m-1). Pehla 1 milte hi <code>min(min_r, r)</code> guaranteed update karega.",
+    analogy:"<strong>Speedometer reset</strong> 🏁 — initially 'infinity' set kar do, taaki har real reading kam ho."
+  },{hl:{boundsInit:{minR:true,maxR:false,minC:false,maxC:false}}})});
+  boundsInitFlags.minR=true;
+
+  // ── L5: max_r = -1 ──
+  max_r=-1;
+  pushStep({line:4,action:"init",logHTML:richLog({
+    line:4,action:"init",
+    code:"max_r = -1  # impossibly small",
+    status:"success",
+    outputs:[{k:"max_r",v:max_r,changed:true}],
+    why:"<strong>Trick init!</strong> max_r ko <strong>-1</strong> set kiya — impossibly small (valid rows 0 to m-1). Pehla 1 milte hi <code>max(max_r, r)</code> update karega.",
+    analogy:"<strong>High-score reset</strong> 🎮 — initially '-infinity', taaki har real score zyada ho."
+  },{hl:{boundsInit:{minR:true,maxR:true,minC:false,maxC:false}}})});
+  boundsInitFlags.maxR=true;
+
+  // ── L6: min_c = n ──
+  min_c=n;
+  pushStep({line:5,action:"init",logHTML:richLog({
+    line:5,action:"init",
+    code:"min_c = n  # min_c = "+n,
+    status:"success",
+    outputs:[{k:"min_c",v:min_c,changed:true}],
+    why:"<strong>min_c = n="+n+"</strong> — impossibly large for column index. Same trick.",
+    analogy:"<strong>Western-most column tracker</strong> 🧭 — start with rightmost-of-rightmost."
+  },{hl:{boundsInit:{minR:true,maxR:true,minC:true,maxC:false}}})});
+  boundsInitFlags.minC=true;
+
+  // ── L7: max_c = -1 ──
+  max_c=-1;
+  pushStep({line:6,action:"init",logHTML:richLog({
+    line:6,action:"init",
+    code:"max_c = -1  # impossibly small",
+    status:"success",
+    outputs:[{k:"max_c",v:max_c,changed:true}],
+    why:"<strong>max_c = -1</strong> — impossibly small. Saare 4 boundary trackers ready.",
+    analogy:"<strong>Eastern-most column tracker</strong> 🧭 — start with leftmost-of-leftmost."
+  },{hl:{boundsInit:{minR:true,maxR:true,minC:true,maxC:true}}})});
+  boundsInitFlags.maxC=true;
+
+  // ── L8: outer for loop entry ──
+  pushStep({line:7,action:"for-check",logHTML:richLog({
+    line:7,action:"for-check",
+    code:"for r in range("+m+"):",
+    status:"info",
+    inputs:[{k:"m",v:m}],
+    outputs:[{k:"loop range",v:"[0,"+m+")"}],
+    why:"<strong>Outer loop</strong> setup — har row 0 to "+(m-1)+" pe iterate karenge.",
+    analogy:"<strong>Building ke har floor pe jaana</strong> 🏢 — top to bottom scan."
+  })});
+
+  // Main double loop
+  for(r=0;r<m;r++){
+    pushStep({line:7,action:"for-check",logHTML:richLog({
+      line:7,action:"for-check",
+      code:"# r = "+r+" of "+(m-1),
+      status:"loop",
+      inputs:[{k:"r",v:r},{k:"m",v:m}],
+      outputs:[{k:"r",v:r,changed:true}],
+      why:"<strong>Row "+r+"</strong> shuru — iss row ki saari cells check karenge.",
+      analogy:"<strong>Floor "+r+" pe pahunche</strong> 🏢 — ab har room visit karenge."
+    },{hl:{currCell:null}})});
+
+    pushStep({line:8,action:"for-check",logHTML:richLog({
+      line:8,action:"for-check",
+      code:"for c in range("+n+"):",
+      status:"info",
+      inputs:[{k:"n",v:n}],
+      outputs:[{k:"inner loop range",v:"[0,"+n+")"}],
+      why:"<strong>Inner loop</strong> setup — row "+r+" ke saare "+n+" columns scan.",
+      analogy:"<strong>Iss floor ke har room mein peek</strong> 🚪 — left to right scan."
+    })});
+
+    for(c=0;c<n;c++){
+      pushStep({line:8,action:"for-check",logHTML:richLog({
+        line:8,action:"for-check",
+        code:"# c = "+c+" of "+(n-1)+" — visiting cell ("+r+","+c+")",
+        status:"loop",
+        inputs:[{k:"r",v:r},{k:"c",v:c}],
+        outputs:[{k:"c",v:c,changed:true}],
+        why:"Cell <strong>("+r+","+c+")</strong> ka turn — value check karenge.",
+        analogy:"<strong>Room ("+r+","+c+") ka darwaza khol rahe</strong> 🚪 — andar 1 hai ya 0?"
+      },{hl:{currCell:[r,c]}})});
+
+      // ── L10: if grid[r][c] == 1 ──
+      var cellVal=grid[r][c];
+      var is1=cellVal===1;
+      pushStep({line:9,action:"if-check",logHTML:richLog({
+        line:9,action:"if-check",
+        code:"if grid["+r+"]["+c+"] == 1:  # grid["+r+"]["+c+"] = "+cellVal,
+        status:is1?"success":"skip",
+        inputs:[{k:"grid["+r+"]["+c+"]",v:cellVal}],
+        verdict:"grid["+r+"]["+c+"] ("+cellVal+") "+(is1?"==":"!=")+" 1",
+        verdictTrue:is1,
+        why:is1?"🎉 <strong>1 mil gaya!</strong> Iss cell ko bounding box mein include karna padega — saari 4 boundaries update karenge.":"<strong>0 hai</strong> — yeh cell skip. Bounding box pe koi effect nahi.",
+        analogy:is1?"<strong>Building mil gayi!</strong> 🏠 — fence mein iska area cover karna hai.":"<strong>Khaali plot</strong> 🏞️ — fence mein lene ki zaroorat nahi, aage badho."
+      },{hl:{currCell:[r,c]}})});
+
+      if(is1){
+        foundCellsList.push([r,c]);
+        // ── L11: min_r = min(min_r, r) ──
+        var oldMinR=min_r;
+        var newMinR=Math.min(min_r,r);
+        var minRChanged=newMinR!==oldMinR;
+        min_r=newMinR;
+        pushStep({line:10,action:"update",logHTML:richLog({
+          line:10,action:"update",
+          code:"min_r = min("+oldMinR+", "+r+") = "+min_r,
+          status:"success",
+          inputs:[{k:"min_r (before)",v:oldMinR},{k:"r",v:r}],
+          outputs:[{k:"min_r",v:min_r,changed:minRChanged}],
+          why:minRChanged?"<strong>min_r updated!</strong> "+oldMinR+" → "+min_r+". Naya topmost row mil gaya jisme 1 hai.":"<strong>min_r same</strong> ("+min_r+") — current r="+r+" pehle se zyada ya barabar tha. No change.",
+          analogy:minRChanged?"<strong>Sabse upar wali building</strong> 🏔️ — north boundary upar shift hui.":"<strong>Pehle se zyada upar koi building nahi</strong> — north fence wahi rahega."
+        },{hl:{currCell:[r,c],changedBound:minRChanged?"minR":null}})});
+
+        // ── L12: max_r = max(max_r, r) ──
+        var oldMaxR=max_r;
+        var newMaxR=Math.max(max_r,r);
+        var maxRChanged=newMaxR!==oldMaxR;
+        max_r=newMaxR;
+        pushStep({line:11,action:"update",logHTML:richLog({
+          line:11,action:"update",
+          code:"max_r = max("+oldMaxR+", "+r+") = "+max_r,
+          status:"success",
+          inputs:[{k:"max_r (before)",v:oldMaxR},{k:"r",v:r}],
+          outputs:[{k:"max_r",v:max_r,changed:maxRChanged}],
+          why:maxRChanged?"<strong>max_r updated!</strong> "+oldMaxR+" → "+max_r+". Naya bottommost row jisme 1 hai.":"<strong>max_r same</strong> ("+max_r+") — current r="+r+" pehle se chhota ya barabar tha.",
+          analogy:maxRChanged?"<strong>Sabse neeche wali building</strong> 🏜️ — south boundary neeche shift hui.":"<strong>Pehle se neeche koi building nahi</strong> — south fence wahi."
+        },{hl:{currCell:[r,c],changedBound:maxRChanged?"maxR":null}})});
+
+        // ── L13: min_c = min(min_c, c) ──
+        var oldMinC=min_c;
+        var newMinC=Math.min(min_c,c);
+        var minCChanged=newMinC!==oldMinC;
+        min_c=newMinC;
+        pushStep({line:12,action:"update",logHTML:richLog({
+          line:12,action:"update",
+          code:"min_c = min("+oldMinC+", "+c+") = "+min_c,
+          status:"success",
+          inputs:[{k:"min_c (before)",v:oldMinC},{k:"c",v:c}],
+          outputs:[{k:"min_c",v:min_c,changed:minCChanged}],
+          why:minCChanged?"<strong>min_c updated!</strong> "+oldMinC+" → "+min_c+". Naya leftmost column jisme 1 hai.":"<strong>min_c same</strong> ("+min_c+") — current c="+c+" pehle se zyada tha.",
+          analogy:minCChanged?"<strong>Sabse left wali building</strong> 🌅 — west boundary left shift hui.":"<strong>Pehle se left mein koi building nahi</strong> — west fence wahi."
+        },{hl:{currCell:[r,c],changedBound:minCChanged?"minC":null}})});
+
+        // ── L14: max_c = max(max_c, c) ──
+        var oldMaxC=max_c;
+        var newMaxC=Math.max(max_c,c);
+        var maxCChanged=newMaxC!==oldMaxC;
+        max_c=newMaxC;
+        pushStep({line:13,action:"update",logHTML:richLog({
+          line:13,action:"update",
+          code:"max_c = max("+oldMaxC+", "+c+") = "+max_c,
+          status:"success",
+          inputs:[{k:"max_c (before)",v:oldMaxC},{k:"c",v:c}],
+          outputs:[{k:"max_c",v:max_c,changed:maxCChanged}],
+          why:maxCChanged?"<strong>max_c updated!</strong> "+oldMaxC+" → "+max_c+". Naya rightmost column jisme 1 hai.":"<strong>max_c same</strong> ("+max_c+") — current c="+c+" pehle se chhota tha.",
+          analogy:maxCChanged?"<strong>Sabse right wali building</strong> 🌇 — east boundary right shift hui.":"<strong>Pehle se right mein koi building nahi</strong> — east fence wahi."
+        },{hl:{currCell:[r,c],changedBound:maxCChanged?"maxC":null}})});
+      }
+    }
+
+    // Inner for-loop natural exit
+    pushStep({line:8,action:"exit",logHTML:richLog({
+      line:8,action:"exit",
+      code:"# inner for-loop exit at r="+r+" — saari "+n+" columns scanned",
+      status:"info",
+      inputs:[{k:"r",v:r},{k:"c (final)",v:n-1}],
+      outputs:[{k:"row "+r,v:"complete"}],
+      why:"<strong>Row "+r+" scan complete</strong> — saare "+n+" cells check ho gaye. Outer loop ka next iteration.",
+      analogy:"<strong>Floor "+r+" ke saare rooms check kar liye</strong> ✅ — agle floor pe jaao."
+    },{hl:{currCell:null}})});
+  }
+
+  // Outer for-loop natural exit
+  pushStep({line:7,action:"exit",logHTML:richLog({
+    line:7,action:"exit",
+    code:"# outer for-loop exit — saari "+m+" rows scanned",
+    status:"info",
+    inputs:[{k:"r (final)",v:m-1},{k:"m",v:m}],
+    outputs:[{k:"min_r",v:min_r},{k:"max_r",v:max_r},{k:"min_c",v:min_c},{k:"max_c",v:max_c},{k:"total 1s found",v:foundCellsList.length}],
+    why:"<strong>Pura grid scan ho gaya!</strong> Bounding box ki saari 4 boundaries final: min_r="+min_r+", max_r="+max_r+", min_c="+min_c+", max_c="+max_c+". Total "+foundCellsList.length+" ones mile.",
+    analogy:"<strong>Saari building survey complete</strong> 🏢✓ — ab fence ka size calculate karo."
+  },{hl:{currCell:null}})});
+
+  // ── L15: return (max_r - min_r + 1) * (max_c - min_c + 1) ──
+  heightVal=max_r-min_r+1;
+  widthVal=max_c-min_c+1;
+  finalArea=heightVal*widthVal;
+  curResult=finalArea;
+  pushStep({line:14,action:"return",logHTML:richLog({
+    line:14,action:"return",
+    code:"return ("+max_r+" - "+min_r+" + 1) * ("+max_c+" - "+min_c+" + 1) = "+heightVal+" * "+widthVal+" = "+finalArea,
+    status:"success",
+    inputs:[{k:"min_r",v:min_r},{k:"max_r",v:max_r},{k:"min_c",v:min_c},{k:"max_c",v:max_c}],
+    outputs:[{k:"height",v:heightVal,changed:true},{k:"width",v:widthVal,changed:true},{k:"area",v:finalArea,changed:true}],
+    why:"🏆 <strong>Final area = "+finalArea+"</strong>. Height = max_r - min_r + 1 = "+max_r+" - "+min_r+" + 1 = <strong>"+heightVal+"</strong>. Width = max_c - min_c + 1 = "+max_c+" - "+min_c+" + 1 = <strong>"+widthVal+"</strong>. <strong>+1 isliye</strong> kyunki dono endpoints inclusive hain (e.g. rows 0 to 2 means 3 rows, not 2).",
+    analogy:"<strong>Fence ka final measurement</strong> 📐 — length × breadth = area. Kaam khatam, contractor ko de do!"
+  },{hl:{currCell:null}})});
+
+  return st;
+}
+
+// ── VIZ ──
+function renderViz(s){
+  function chip(n,v,cls){return '<span class="var-chip '+(cls||'')+'"><span class="vn">'+n+'</span><span class="vv">'+v+'</span></span>';}
+
+  // Vars strip
+  var minRDisplay=s.min_r===null?"—":(s.hl.boundsInit&&s.hl.boundsInit.minR&&s.min_r===s.m?s.min_r+" (init=m)":s.min_r);
+  var maxRDisplay=s.max_r===null?"—":s.max_r;
+  var minCDisplay=s.min_c===null?"—":(s.hl.boundsInit&&s.hl.boundsInit.minC&&s.min_c===s.n?s.min_c+" (init=n)":s.min_c);
+  var maxCDisplay=s.max_c===null?"—":s.max_c;
+
+  var h='<div class="vars-strip">'+
+    chip("📐 m ",s.m===null?"—":s.m,"")+
+    chip("📐 n ",s.n===null?"—":s.n,"")+
+    chip("↕ r ",s.r===null?"—":s.r,(s.line===7||s.line===10||s.line===11)?"vc-active":"")+
+    chip("↔ c ",s.c===null?"—":s.c,(s.line===8||s.line===12||s.line===13)?"vc-active":"")+
+    chip("⬆ min_r ",minRDisplay,s.hl.changedBound==="minR"?"vc-warn":(s.min_r!==null&&s.min_r<s.m?"vc-safe":"vc-init"))+
+    chip("⬇ max_r ",maxRDisplay,s.hl.changedBound==="maxR"?"vc-warn":(s.max_r!==null&&s.max_r>=0?"vc-safe":"vc-init"))+
+    chip("⬅ min_c ",minCDisplay,s.hl.changedBound==="minC"?"vc-warn":(s.min_c!==null&&s.min_c<s.n?"vc-safe":"vc-init"))+
+    chip("➡ max_c ",maxCDisplay,s.hl.changedBound==="maxC"?"vc-warn":(s.max_c!==null&&s.max_c>=0?"vc-safe":"vc-init"))+
+    chip("📦 area ",s.finalArea===null?"—":s.finalArea,s.finalArea!==null?"vc-safe":"")+
+  '</div>';
+
+  // ── ROW 1: Grid + Bounds tracker ──
+  h+='<div class="viz-row">';
+
+  // Grid
+  if(s.m!==null&&s.n!==null){
+    h+='<div class="viz-card"><div class="viz-title">🧱 Grid ('+s.m+'×'+s.n+')</div>';
+    h+='<div class="grid-wrap"><div class="grid-board" style="grid-template-columns:repeat('+s.n+',48px)">';
+
+    // Build found-cells lookup
+    var foundMap={};
+    for(var fi=0;fi<s.hl.foundCells.length;fi++){
+      foundMap[s.hl.foundCells[fi][0]+','+s.hl.foundCells[fi][1]]=true;
+    }
+
+    // Determine if bbox is valid (any 1 found yet)
+    var bboxValid=s.min_r!==null&&s.max_r!==null&&s.min_c!==null&&s.max_c!==null&&
+                  s.min_r<s.m&&s.max_r>=0&&s.min_c<s.n&&s.max_c>=0&&
+                  s.hl.foundCells.length>0;
+
+    for(var rr=0;rr<s.m;rr++){
+      for(var cc=0;cc<s.n;cc++){
+        var classes=['gc-cell'];
+        var key=rr+','+cc;
+        var cellV=s.grid[rr][cc];
+        var isCurr=s.hl.currCell&&s.hl.currCell[0]===rr&&s.hl.currCell[1]===cc;
+        var isFound=foundMap[key];
+        var inBound=bboxValid&&rr>=s.min_r&&rr<=s.max_r&&cc>=s.min_c&&cc<=s.max_c;
+
+        if(cellV===1)classes.push('gc-one');else classes.push('gc-zero');
+        if(isFound)classes.push('gc-found');
+        if(inBound)classes.push('gc-in-bound');
+        if(isCurr)classes.push('gc-curr');
+
+        h+='<div class="'+classes.join(' ')+'">';
+        h+='<span class="gc-coord">'+rr+','+cc+'</span>';
+        h+=cellV;
+        h+='</div>';
+      }
+    }
+    h+='</div>';
+
+    // Bounding box overlay
+    if(bboxValid){
+      var cellSize=48,gap=3,padding=18;
+      var left=padding+s.min_c*(cellSize+gap)-2;
+      var top=padding+s.min_r*(cellSize+gap)-2;
+      var widthPx=(s.max_c-s.min_c+1)*cellSize+(s.max_c-s.min_c)*gap+4;
+      var heightPx=(s.max_r-s.min_r+1)*cellSize+(s.max_r-s.min_r)*gap+4;
+      h+='<div class="bbox-overlay" style="left:'+left+'px;top:'+top+'px;width:'+widthPx+'px;height:'+heightPx+'px;">';
+      h+='<div class="bbox-label">📦 BBox '+(s.max_r-s.min_r+1)+'×'+(s.max_c-s.min_c+1)+'='+((s.max_r-s.min_r+1)*(s.max_c-s.min_c+1))+'</div>';
+      h+='</div>';
+    }
+    h+='</div>';
+
+    h+='<div class="legend">'+
+      '<span><i style="background:#f1f5f9"></i>Zero (skip)</span>'+
+      '<span><i style="background:#fde68a;border-color:#fbbf24"></i>One (target)</span>'+
+      '<span><i style="background:#DCFCE7;border-color:#15803D"></i>Found 1</span>'+
+      '<span><i style="border:2px solid #534AB7"></i>Current cell</span>'+
+      '<span><i style="border:2px solid #ef4444"></i>Bounding box</span>'+
+    '</div>';
+    h+='</div>';
+  }
+
+  // Bounds tracker card
+  h+='<div class="viz-card" style="min-width:240px"><div class="viz-title">🎯 Bounding Trackers</div>';
+  h+='<div class="bounds-table">';
+  h+='<div class="bounds-label">↕ ROWS</div>';
+  h+='<div class="bounds-label">min</div>';
+  h+='<div class="bounds-label">max</div>';
+  h+='<div class="bounds-label">↔ COLS</div>';
+
+  // min_r row
+  var minRCls='bounds-cell';
+  if(s.hl.changedBound==='minR')minRCls+=' bounds-cell--changed';
+  else if(s.min_r!==null&&s.min_r<s.m)minRCls+=' bounds-cell--set';
+  else if(s.hl.boundsInit&&s.hl.boundsInit.minR)minRCls+=' bounds-cell--init';
+  var maxRCls='bounds-cell';
+  if(s.hl.changedBound==='maxR')maxRCls+=' bounds-cell--changed';
+  else if(s.max_r!==null&&s.max_r>=0)maxRCls+=' bounds-cell--set';
+  else if(s.hl.boundsInit&&s.hl.boundsInit.maxR)maxRCls+=' bounds-cell--init';
+
+  h+='<div class="bounds-label">r</div>';
+  h+='<div class="'+minRCls+'">'+(s.min_r===null?'—':s.min_r)+'</div>';
+  h+='<div class="'+maxRCls+'">'+(s.max_r===null?'—':s.max_r)+'</div>';
+  h+='<div class="bounds-label">'+(s.min_r!==null&&s.max_r!==null&&s.max_r>=0?'h='+(s.max_r-s.min_r+1):'—')+'</div>';
+
+  // min_c row
+  var minCCls='bounds-cell';
+  if(s.hl.changedBound==='minC')minCCls+=' bounds-cell--changed';
+  else if(s.min_c!==null&&s.min_c<s.n)minCCls+=' bounds-cell--set';
+  else if(s.hl.boundsInit&&s.hl.boundsInit.minC)minCCls+=' bounds-cell--init';
+  var maxCCls='bounds-cell';
+  if(s.hl.changedBound==='maxC')maxCCls+=' bounds-cell--changed';
+  else if(s.max_c!==null&&s.max_c>=0)maxCCls+=' bounds-cell--set';
+  else if(s.hl.boundsInit&&s.hl.boundsInit.maxC)maxCCls+=' bounds-cell--init';
+
+  h+='<div class="bounds-label">c</div>';
+  h+='<div class="'+minCCls+'">'+(s.min_c===null?'—':s.min_c)+'</div>';
+  h+='<div class="'+maxCCls+'">'+(s.max_c===null?'—':s.max_c)+'</div>';
+  h+='<div class="bounds-label">'+(s.min_c!==null&&s.max_c!==null&&s.max_c>=0?'w='+(s.max_c-s.min_c+1):'—')+'</div>';
+
+  h+='</div>';
+
+  // Formula card
+  if(s.line===14&&s.finalArea!==null){
+    h+='<div style="margin-top:10px"><div class="formula-box">';
+    h+='area = <span class="formula-step">h='+s.heightVal+'</span> × <span class="formula-step">w='+s.widthVal+'</span> = <strong>'+s.finalArea+'</strong>';
+    h+='</div></div>';
+  }
+  h+='</div>';
+
+  h+='</div>';
+
+  // ── Step calc banner ──
+  if(s.hl.currCell){
+    var rr=s.hl.currCell[0],cc=s.hl.currCell[1];
+    var v=s.grid[rr][cc];
+    h+='<div class="step-calc">📍 Visiting <strong>('+rr+','+cc+')</strong> &nbsp;|&nbsp; grid['+rr+']['+cc+'] = <strong>'+v+'</strong> &nbsp;|&nbsp; '+(v===1?'<strong>UPDATE bounds</strong> 🎯':'<strong>SKIP — zero cell</strong> ⏭')+(s.hl.changedBound?' &nbsp;|&nbsp; just updated: <strong>'+s.hl.changedBound+'</strong>':'')+'</div>';
+  }
+
+  // ── Result banner ──
+  if(s.line===14&&s.finalArea!==null){
+    h+='<div class="result-banner">🏆 Minimum Area = '+s.finalArea+' &nbsp;(height '+s.heightVal+' × width '+s.widthVal+') &nbsp;|&nbsp; covering '+s.hl.foundCells.length+' ones</div>';
+  }
+
+  document.getElementById("vizPanel").innerHTML=h;
+}
+
+function renderStep(idx){
+  if(!steps.length)return;
+  var s=steps[idx];currentStep=idx;
+  document.getElementById('stepInfo').textContent=(idx+1)+'/'+steps.length;
+  var bd=document.getElementById('actionBadge');
+  bd.textContent=BADGE_LABEL[s.action]||s.action;
+  bd.className='action-badge action-badge--'+s.action;
+  document.querySelectorAll('.code-line').forEach(function(el){el.classList.remove('active');});
+  var al=document.querySelector('.code-line[data-line="'+s.line+'"]');
+  if(al){al.classList.add('active');al.scrollIntoView({block:'nearest'});}
+  renderViz(s);
+  showLogPreview(s);
+}
+
+function showLogPreview(s){
+  if(!logEnabled)return;
+  document.getElementById('logPopupBody').innerHTML=s.logHTML||'';
+  document.getElementById('logPopup').classList.remove('log-popup--hidden');
+}
+function hideLogPopup(){document.getElementById('logPopup').classList.add('log-popup--hidden');}
+function toggleLogPreview(){
+  logEnabled=!logEnabled;
+  var btn=document.getElementById('logToggleBtn');
+  btn.textContent=logEnabled?'📋 ON':'📋 OFF';
+  btn.classList.toggle('log-toggle-btn--off',!logEnabled);
+  if(!logEnabled)hideLogPopup();
+  else if(steps.length)showLogPreview(steps[currentStep]);
+}
+function logZoom(dir){logZoomLevel=Math.max(60,Math.min(180,logZoomLevel+dir*20));updateLogZoom();}
+function logZoomReset(){logZoomLevel=100;updateLogZoom();}
+function updateLogZoom(){
+  document.getElementById('logZoomLabel').textContent=logZoomLevel+'%';
+  document.getElementById('logPopup').style.setProperty('--log-scale',logZoomLevel/100);
+}
+function toggleFullscreen(){
+  var viz=document.querySelector('.col-viz');
+  if(!document.fullscreenElement)viz.requestFullscreen().catch(function(){});
+  else document.exitFullscreen();
+}
+
+function parseGrid(str){
+  try{
+    var g=JSON.parse(str);
+    if(!Array.isArray(g)||!g.length||!Array.isArray(g[0]))return null;
+    var nn=g[0].length;
+    var hasOne=false;
+    for(var i=0;i<g.length;i++){
+      if(!Array.isArray(g[i])||g[i].length!==nn)return null;
+      for(var j=0;j<g[i].length;j++){
+        if(g[i][j]!==0&&g[i][j]!==1)return null;
+        if(g[i][j]===1)hasOne=true;
+      }
+    }
+    if(!hasOne)return null;
+    return g;
+  }catch(e){return null;}
+}
+
+function resetWithInput(){
+  curResult=null;
+  var gridStr=document.getElementById('inputGrid').value.trim();
+  var grid=parseGrid(gridStr);
+  if(!grid){
+    alert("Invalid grid! Must be 2D array of 0s and 1s with at least one 1. Using default.");
+    grid=[[0,1,0],[1,0,1]];
+    document.getElementById('inputGrid').value=JSON.stringify(grid);
+  }
+  if(grid.length*grid[0].length>30){
+    alert("Grid too large! Max 30 cells.");
+    grid=[[0,1,0],[1,0,1]];
+    document.getElementById('inputGrid').value=JSON.stringify(grid);
+  }
+  renderCode();fitCodeWidth();
+  steps=buildSteps(grid);
+  currentStep=0;renderStep(0);
+  document.getElementById('liveOutput').textContent=curResult!==null?curResult:'—';
+}
+
+function stepBy(d){var nx=currentStep+d;if(nx>=0&&nx<steps.length)renderStep(nx);}
+function resetStep(){renderStep(0);}
+
+function loadTest(i,el){
+  document.querySelectorAll('.prob-test').forEach(function(t){t.classList.remove('prob-test--active');});
+  if(el)el.classList.add('prob-test--active');
+  document.getElementById('inputGrid').value=TESTS[i].grid;
+  document.getElementById('expectedBadge').textContent='exp: '+TESTS[i].e;
+  resetWithInput();
+}
+
+document.addEventListener('keydown',function(e){
+  if(e.target.tagName==='INPUT'||e.target.tagName==='SELECT')return;
+  if(e.key==='ArrowRight'){e.preventDefault();stepBy(1);}
+  else if(e.key==='ArrowLeft'){e.preventDefault();stepBy(-1);}
+  else if(e.key==='r'||e.key==='R'){e.preventDefault();resetStep();}
+});
+
+(function(){
+  var col1=document.getElementById('col1');
+  document.getElementById('resizeH1').addEventListener('mousedown',function(e){
+    e.preventDefault();codeWidthUserSet=true;
+    var startX=e.clientX,startW=col1.offsetWidth,h=this;
+    document.body.classList.add('no-select');h.classList.add('active');
+    function mv(e){col1.style.width=Math.max(140,startW+(e.clientX-startX))+'px';syncFooterWidth();}
+    function up(){document.removeEventListener('mousemove',mv);document.removeEventListener('mouseup',up);document.body.classList.remove('no-select');h.classList.remove('active');}
+    document.addEventListener('mousemove',mv);document.addEventListener('mouseup',up);
+  });
+})();
+
+window.addEventListener('resize',function(){if(!codeWidthUserSet)fitCodeWidth();else syncFooterWidth();});
+
+renderTests();renderCode();fitCodeWidth();resetWithInput();
+</script>
+</body>
+</html>

@@ -1,0 +1,912 @@
+﻿
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LC 217 — Contains Duplicate</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+:root{
+  --bg-primary:#FAFAF8; --bg-secondary:#F1EFE8; --bg-tertiary:#E2E0D8; --bg-card:#FFFFFF;
+  --text-primary:#2C2C2A; --text-secondary:#5F5E5A; --text-tertiary:#888780;
+  --border-color:rgba(0,0,0,.11); --border-light:rgba(0,0,0,.06); --border-focus:#534AB7;
+  --accent-indigo:#534AB7; --accent-indigo-bg:#EEEDFE; --accent-indigo-text:#3C3489; --accent-indigo-hover:#4740A0;
+  --accent-teal:#0F6E56; --accent-teal-bg:#E1F5EE; --accent-teal-text:#085041;
+  --accent-red:#E24B4A; --accent-red-bg:#FCEBEB; --accent-red-text:#791F1F;
+  --accent-amber:#B45309; --accent-amber-bg:#FEF3C7; --accent-amber-text:#78350F;
+  --accent-green:#15803D; --accent-green-bg:#DCFCE7; --accent-green-text:#14532D;
+  --syn-keyword:#534AB7; --syn-function:#185FA5; --syn-number:#993C1D; --syn-string:#0F6E56;
+  --active-line-bg:#EEEDFE;
+  --radius-sm:4px; --radius-md:6px; --radius-lg:10px;
+  --font-sans:'DM Sans',system-ui,sans-serif;
+  --font-mono:'JetBrains Mono','Fira Code',monospace;
+  --fs-xs:11px; --fs-sm:12px; --fs-base:14px;
+  --ease:.18s ease;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:var(--bg-primary);color:var(--text-primary);font-family:var(--font-sans);font-size:var(--fs-base)}
+body.no-select{user-select:none}
+::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border-color);border-radius:3px}
+
+.app-shell{display:flex;flex-direction:column;height:100vh;overflow:hidden}
+.problem-card{flex-shrink:0;border-bottom:1px solid var(--border-color);background:var(--bg-card)}
+.pc-header{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:8px 14px;border-bottom:1px solid var(--border-light)}
+.gt-btn{font:700 11px var(--font-sans);padding:5px 10px;background:var(--accent-indigo);color:#fff;border:none;border-radius:99px;cursor:pointer;letter-spacing:.04em}
+.gt-btn:hover{background:var(--accent-indigo-hover)}
+.lc-num{font:700 12px var(--font-mono);color:var(--text-tertiary)}
+.lc-title{font:700 15px var(--font-sans)}
+.lc-diff{font:700 9px var(--font-mono);padding:2px 8px;border-radius:99px;letter-spacing:.06em;background:var(--accent-green-bg);color:var(--accent-green-text);border:1px solid var(--accent-green)}
+.lc-tag{font:600 10px var(--font-mono);padding:2px 8px;border-radius:99px;background:var(--bg-secondary);color:var(--text-secondary);border:1px solid var(--border-color)}
+.pc-header-right{margin-left:auto;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.input-wrap{display:flex;align-items:center;gap:4px}
+.input-wrap label{font:600 10px var(--font-mono);color:var(--text-tertiary)}
+.input-wrap input{font:600 11px var(--font-mono);padding:3px 6px;border:1px solid var(--border-color);border-radius:4px;width:180px}
+.input-wrap input:focus{outline:none;border-color:var(--border-focus)}
+.expected-badge{font:600 10px var(--font-mono);padding:3px 8px;border-radius:4px;background:var(--accent-teal-bg);color:var(--accent-teal-text);border:1px solid var(--accent-teal)}
+.toggle-btn{font-family:system-ui,"Segoe UI Emoji",sans-serif;font:600 10px var(--font-mono);padding:3px 8px;border-radius:4px;background:var(--bg-secondary);border:1px solid var(--border-color);color:var(--text-secondary);cursor:pointer}
+
+.pc-body{display:flex;gap:16px;padding:10px 14px;max-height:34vh;overflow:auto}
+.pc-left{flex:2;min-width:0}.pc-right{flex:1;min-width:0;border-left:1px solid var(--border-light);padding-left:14px}
+.pc-section{margin-bottom:8px}
+.pc-section h4{font:700 11px var(--font-sans);text-transform:uppercase;letter-spacing:.06em;color:var(--text-tertiary);margin-bottom:4px}
+.pc-section p{font-size:12px;line-height:1.55;color:var(--text-secondary)}
+.pc-section code{font:600 11px var(--font-mono);background:var(--bg-secondary);padding:1px 5px;border-radius:3px;color:var(--accent-indigo-text)}
+.pc-section strong{color:var(--text-primary)}
+.concept-block{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
+.concept-card{flex:1;min-width:130px;padding:6px 8px;background:var(--bg-secondary);border-radius:5px;border-left:3px solid var(--accent-indigo);font-size:11px;line-height:1.5}
+.concept-card strong{display:block;color:var(--accent-indigo-text);margin-bottom:2px;font-size:10px;text-transform:uppercase}
+.complexity-row{display:flex;gap:6px;margin-top:4px}
+.cx-chip{font:600 11px var(--font-mono);padding:3px 8px;border-radius:99px;background:var(--accent-indigo-bg);color:var(--accent-indigo-text);border:1px solid var(--accent-indigo)}
+
+.test-chip{display:flex;flex-direction:column;gap:3px;padding:6px 8px;margin-bottom:5px;background:var(--bg-secondary);border-radius:5px;border:1px solid var(--border-color);cursor:pointer;transition:all var(--ease)}
+.test-chip:hover{border-color:var(--accent-indigo);background:var(--accent-indigo-bg)}
+.tc-row{display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+.tc-row code{font:600 10px var(--font-mono);color:var(--text-secondary)}
+.pt-tag{font:600 9px var(--font-mono);padding:1px 5px;border-radius:3px;background:var(--accent-indigo);color:#fff;text-transform:uppercase}
+.tc-exp{font:600 10px var(--font-mono);color:var(--accent-teal-text);margin-left:auto}
+.run-row{display:flex;align-items:center;gap:8px;margin-top:6px}
+.btn-run{font-family:system-ui,"Segoe UI Emoji",sans-serif;font:700 11px var(--font-sans);padding:5px 12px;background:var(--accent-indigo);color:#fff;border:none;border-radius:5px;cursor:pointer}
+.live-output{font:700 12px var(--font-mono);padding:4px 10px;background:var(--accent-green-bg);color:var(--accent-green-text);border-radius:4px;border:1px solid var(--accent-green)}
+
+.main-row{flex:1;display:flex;overflow:hidden;min-height:0}
+.col{display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.col-code{width:33%;min-width:140px;max-width:45vw;background:var(--bg-card);border-right:1px solid var(--border-color)}
+.col-viz{flex:1;min-width:0;background:var(--bg-primary)}
+.section-label{font-family:system-ui,"Segoe UI Emoji",sans-serif;font:700 10px var(--font-sans);text-transform:uppercase;letter-spacing:.08em;color:var(--text-tertiary);padding:8px 12px;border-bottom:1px solid var(--border-light);background:var(--bg-card)}
+
+#codePanel{flex:1;overflow-y:auto;padding:8px 0;font-family:var(--font-mono);font-size:12px;line-height:1.9}
+.code-line{display:flex;padding:0 12px;transition:background var(--ease)}
+.code-line.active{background:var(--active-line-bg);border-left:3px solid var(--accent-indigo);padding-left:9px}
+.code-line .ln{display:inline-block;width:24px;text-align:right;color:var(--text-tertiary);user-select:none;margin-right:10px;font-size:10px}
+.code-content{white-space:pre}
+.code-content .kw{color:var(--syn-keyword);font-weight:600}
+.code-content .fn{color:var(--syn-function)}
+.code-content .num{color:var(--syn-number)}
+.code-content .str{color:var(--syn-string)}
+
+#vizPanel{flex:1;overflow:auto;padding:14px}
+.vars-strip{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.var-chip{font:600 11px var(--font-mono);padding:4px 9px;border-radius:99px;background:var(--bg-card);border:1px solid var(--border-color);color:var(--text-secondary)}
+.var-chip span.k{color:var(--text-tertiary);margin-right:3px}
+.var-chip span.v{color:var(--text-primary);font-weight:700}
+.vc-active{background:var(--accent-indigo-bg);border-color:var(--accent-indigo);color:var(--accent-indigo-text)}
+.vc-active span.v{color:var(--accent-indigo-text)}
+.vc-safe{background:var(--accent-green-bg);border-color:var(--accent-green)}
+.vc-safe span.v{color:var(--accent-green-text)}
+.vc-bad{background:var(--accent-red-bg);border-color:var(--accent-red);color:var(--accent-red-text)}
+.vc-bad span.v{color:var(--accent-red-text)}
+
+.viz-row{display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap;margin-bottom:14px}
+.viz-card{background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius-md);padding:12px;min-width:240px}
+.viz-card h5{font:700 10px var(--font-sans);text-transform:uppercase;letter-spacing:.06em;color:var(--text-tertiary);margin-bottom:8px;display:flex;align-items:center;gap:5px}
+
+/* Array tiles */
+.arr-row{display:flex;gap:6px;flex-wrap:wrap;align-items:flex-end}
+.arr-tile{display:flex;flex-direction:column;align-items:center;min-width:48px;padding:6px 8px;background:#fff;border:2px solid var(--border-color);border-radius:8px;font:700 14px var(--font-mono);transition:all .25s;position:relative}
+.arr-tile .at-idx{font-size:9px;color:var(--text-tertiary);font-weight:500;margin-bottom:2px}
+.arr-tile .at-val{font-size:16px;color:var(--text-primary)}
+.arr-tile.future{opacity:.5}
+.arr-tile.visited{background:var(--accent-green-bg);border-color:var(--accent-green);color:var(--accent-green-text)}
+.arr-tile.visited .at-val{color:var(--accent-green-text)}
+.arr-tile.curr{background:var(--accent-indigo-bg);border-color:var(--accent-indigo);transform:scale(1.1);animation:pulse-node 1.2s infinite;z-index:2}
+.arr-tile.curr .at-val{color:var(--accent-indigo-text)}
+.arr-tile.dup{background:var(--accent-red-bg);border-color:var(--accent-red);animation:shake .5s 2;transform:scale(1.1)}
+.arr-tile.dup .at-val{color:var(--accent-red-text)}
+.arr-tile.match-orig{background:var(--accent-amber-bg);border-color:var(--accent-amber);animation:win-pulse 1.5s infinite}
+.arr-tile.match-orig .at-val{color:var(--accent-amber-text)}
+
+/* Set chips */
+.set-box{min-height:80px;padding:10px;background:var(--bg-secondary);border:2px dashed var(--border-color);border-radius:8px;display:flex;flex-wrap:wrap;gap:6px;align-content:flex-start}
+.set-chip{font:700 13px var(--font-mono);padding:5px 10px;background:#fff;border:2px solid var(--accent-teal);color:var(--accent-teal-text);border-radius:99px;transition:all .25s}
+.set-chip.just-added{animation:pop-in .35s ease-out;background:var(--accent-green-bg);border-color:var(--accent-green)}
+.set-chip.match{background:var(--accent-red-bg);border-color:var(--accent-red);color:var(--accent-red-text);animation:shake .5s 2}
+.empty-state{font-size:11px;color:var(--text-tertiary);font-style:italic;width:100%;text-align:center;padding:14px 0}
+
+/* Decision card */
+.decision-card{display:flex;flex-direction:column;gap:8px}
+.dc-row{display:flex;align-items:center;gap:8px;font:600 12px var(--font-mono);flex-wrap:wrap}
+.dc-label{color:var(--text-tertiary);min-width:90px;font-size:11px}
+.dc-val{padding:4px 10px;border-radius:5px;background:var(--bg-secondary);border:1px solid var(--border-color);font-weight:700}
+.dc-val.curr{background:var(--accent-indigo-bg);color:var(--accent-indigo-text);border-color:var(--accent-indigo)}
+.dc-val.found{background:var(--accent-red-bg);color:var(--accent-red-text);border-color:var(--accent-red)}
+.dc-val.notfound{background:var(--accent-green-bg);color:var(--accent-green-text);border-color:var(--accent-green)}
+
+/* Banner */
+.banner{display:flex;align-items:center;gap:8px;padding:8px 14px;border-radius:8px;font:700 13px var(--font-mono);margin-bottom:10px}
+.banner-init{background:var(--bg-secondary);color:var(--text-secondary);border:1px solid var(--border-color)}
+.banner-iter{background:var(--accent-indigo-bg);color:var(--accent-indigo-text);border:1px solid var(--accent-indigo)}
+.banner-add{background:var(--accent-green-bg);color:var(--accent-green-text);border:1px solid var(--accent-green)}
+.banner-found{background:var(--accent-red-bg);color:var(--accent-red-text);border:2px solid var(--accent-red);animation:win-pulse 1.5s infinite}
+.banner-done{background:var(--accent-teal-bg);color:var(--accent-teal-text);border:1px solid var(--accent-teal)}
+
+@keyframes pulse-node{0%,100%{box-shadow:0 0 4px var(--accent-indigo)}50%{box-shadow:0 0 14px var(--accent-indigo)}}
+@keyframes shake{0%,100%{transform:translateX(0) scale(1.1)}25%{transform:translateX(-4px) scale(1.1)}75%{transform:translateX(4px) scale(1.1)}}
+@keyframes win-pulse{0%,100%{box-shadow:0 0 4px rgba(234,179,8,.5)}50%{box-shadow:0 0 12px rgba(234,179,8,.95)}}
+@keyframes pop-in{0%{transform:scale(.5);opacity:0}70%{transform:scale(1.15)}100%{transform:scale(1);opacity:1}}
+
+.footer-bar{display:flex;flex-shrink:0;border-top:1px solid var(--border-color);background:var(--bg-card)}
+.footer-left{width:33%;min-width:140px;max-width:45vw;display:flex;align-items:center;gap:8px;padding:7px 12px;border-right:1px solid var(--border-light)}
+.footer-right{flex:1;display:flex;align-items:center;gap:6px;padding:7px 14px;flex-wrap:wrap}
+.step-info{font:700 12px var(--font-mono)}
+.action-badge{font-family:system-ui,"Segoe UI Emoji",sans-serif;font:700 10px var(--font-mono);padding:3px 9px;border-radius:99px}
+.action-badge--init,.action-badge--func-def,.action-badge--call,.action-badge--return{background:rgba(130,80,255,.14);color:#3C3489;border:1px solid #8250ff}
+.action-badge--for-check,.action-badge--while-check,.action-badge--if-check{background:rgba(56,139,253,.14);color:#185FA5;border:1px solid #388bfd}
+.action-badge--mark,.action-badge--push,.action-badge--pop,.action-badge--restore,.action-badge--found{background:var(--accent-green-bg);color:var(--accent-green-text);border:1px solid var(--accent-green)}
+.action-badge--remove,.action-badge--prune,.action-badge--fail{background:var(--accent-red-bg);color:var(--accent-red-text);border:1px solid var(--accent-red)}
+.action-badge--exit,.action-badge--skip{background:var(--bg-secondary);color:var(--text-secondary);border:1px solid var(--border-color)}
+
+kbd{font-family:system-ui,"Segoe UI Emoji",sans-serif;font:600 10px var(--font-mono);padding:2px 6px;background:var(--bg-secondary);border:1px solid var(--border-color);border-radius:3px;color:var(--text-secondary)}
+.btn{font-family:system-ui,"Segoe UI Emoji",sans-serif;font:600 12px var(--font-sans);padding:5px 11px;border:1px solid var(--border-color);background:var(--bg-card);border-radius:5px;cursor:pointer;transition:all var(--ease)}
+.btn:hover{background:var(--bg-secondary);border-color:var(--accent-indigo)}
+.btn-primary{background:var(--accent-indigo);color:#fff;border-color:var(--accent-indigo)}
+.btn-primary:hover{background:var(--accent-indigo-hover);color:#fff}
+.btn-fullscreen{font-size:13px;padding:4px 10px}
+.btn-zoom{font-family:system-ui,"Segoe UI Emoji",sans-serif;font:600 11px var(--font-mono);padding:3px 8px;border:1px solid var(--border-color);background:var(--bg-card);color:var(--text-secondary);border-radius:4px;cursor:pointer}
+.btn-zoom:hover{background:var(--bg-secondary)}
+.log-zoom-label{font:600 10px var(--font-mono);color:var(--text-tertiary);min-width:38px;text-align:center}
+.log-toggle-btn{font-family:system-ui,"Segoe UI Emoji",sans-serif;font:600 11px var(--font-mono);padding:4px 9px;border:1px solid var(--accent-indigo);background:var(--accent-indigo-bg);color:var(--accent-indigo-text);border-radius:4px;cursor:pointer}
+.log-toggle-btn--off{background:var(--bg-secondary);border-color:var(--border-color);color:var(--text-tertiary)}
+.footer-sep{width:1px;height:18px;background:var(--border-color);margin:0 4px}
+
+.resize-h{width:5px;background:transparent;cursor:col-resize;position:relative;flex-shrink:0;z-index:5}
+.resize-h::before{content:'';position:absolute;top:0;bottom:0;left:2px;width:1px;background:var(--border-color)}
+.resize-h:hover::before,.resize-h.active::before{background:var(--accent-indigo);width:2px;left:1.5px}
+
+.log-popup{--log-scale:1;position:fixed;bottom:52px;right:14px;width:calc(480px*var(--log-scale));max-width:92vw;max-height:75vh;border-radius:var(--radius-lg);box-shadow:0 10px 32px rgba(0,0,0,.14);border:1px solid var(--border-color);background:var(--bg-card);overflow:hidden;display:flex;flex-direction:column;z-index:100;transition:opacity .15s,transform .15s;transform-origin:bottom right}
+.log-popup--hidden{opacity:0;transform:scale(.92);pointer-events:none}
+.log-popup-body{flex:1;overflow:auto;padding:0}
+.log-popup-body>.log-card{border-radius:0;border:none;border-left:0}
+
+.log-card{border-radius:var(--radius-md);overflow:hidden;border:1px solid var(--border-color);border-left-width:4px;font-size:var(--fs-xs);background:var(--bg-card)}
+.log-card--for-check,.log-card--while-check,.log-card--if-check{border-left-color:#388bfd}
+.log-card--func-def,.log-card--init,.log-card--call,.log-card--return{border-left-color:#8250ff}
+.log-card--mark,.log-card--push,.log-card--pop,.log-card--restore,.log-card--found{border-left-color:#3fb950}
+.log-card--remove,.log-card--prune,.log-card--fail{border-left-color:#f85149}
+.log-card--exit,.log-card--skip{border-left-color:#888780}
+
+.log-card-header{display:flex;align-items:center;gap:6px;padding:8px 10px 6px;background:var(--bg-secondary);border-bottom:1px solid var(--border-light)}
+.log-badge{font-family:system-ui,"Segoe UI Emoji",sans-serif;font:700 10px var(--font-mono);padding:2px 7px;border-radius:99px}
+.log-badge--init,.log-badge--func-def,.log-badge--call,.log-badge--return{background:rgba(130,80,255,.14);color:#3C3489}
+.log-badge--for-check,.log-badge--while-check,.log-badge--if-check{background:rgba(56,139,253,.14);color:#185FA5}
+.log-badge--mark,.log-badge--push,.log-badge--pop,.log-badge--restore,.log-badge--found{background:var(--accent-green-bg);color:var(--accent-green-text)}
+.log-badge--remove,.log-badge--prune,.log-badge--fail{background:var(--accent-red-bg);color:var(--accent-red-text)}
+.log-badge--exit,.log-badge--skip{background:var(--bg-secondary);color:var(--text-secondary)}
+.log-line-ref{font:700 10px var(--font-mono);color:var(--accent-indigo);background:var(--accent-indigo-bg);padding:1px 6px;border-radius:4px;border:1px solid var(--accent-indigo)}
+.log-status-pill{font-family:system-ui,"Segoe UI Emoji",sans-serif;font-size:9px;font-weight:700;padding:2px 7px;border-radius:99px;text-transform:uppercase;margin-left:auto}
+.log-status--success{background:var(--accent-green-bg);color:var(--accent-green-text);border:1px solid var(--accent-green)}
+.log-status--fail{background:var(--accent-red-bg);color:var(--accent-red-text);border:1px solid var(--accent-red)}
+.log-status--skip{background:var(--bg-tertiary);color:var(--text-tertiary);border:1px solid var(--border-color)}
+.log-status--loop{background:rgba(56,139,253,.14);color:#185FA5;border:1px solid #388bfd}
+.log-status--prune{background:var(--accent-red-bg);color:var(--accent-red-text);border:1px solid var(--accent-red)}
+.log-status--info{background:rgba(130,80,255,.14);color:#3C3489;border:1px solid #8250ff}
+
+.log-section{padding:7px 10px;border-bottom:1px dashed var(--border-light)}
+.log-section:last-child{border-bottom:none}
+.log-section-title{font:700 8px var(--font-mono);text-transform:uppercase;letter-spacing:.06em;color:var(--text-tertiary);margin-bottom:3px;display:flex;align-items:center;gap:4px}
+.log-section-title-icon{font-family:system-ui,"Segoe UI Emoji",sans-serif;font-size:11px}
+
+.log-code-snippet{font:600 11px var(--font-mono);background:#0d1117;color:#e6edf3;padding:6px 9px;border-radius:4px;display:block;overflow-x:auto;white-space:pre;border:1px solid #30363d}
+.log-code-snippet .ck{color:#ff7b72}.log-code-snippet .cs{color:#a5d6ff}
+.log-code-snippet .cn{color:#79c0ff}.log-code-snippet .cf{color:#d2a8ff}
+.log-code-snippet .cc{color:#8b949e;font-style:italic}
+
+.log-kv-row{display:flex;flex-wrap:wrap;gap:4px}
+.log-kv{display:inline-flex;align-items:center;gap:3px;font:11px var(--font-mono);padding:2px 7px;border-radius:4px;background:var(--bg-secondary);border:1px solid var(--border-light)}
+.log-kv-key{color:var(--text-tertiary);font-weight:500}
+.log-kv-val{color:var(--text-primary);font-weight:700}
+.log-kv--in{background:rgba(56,139,253,.08);border-color:rgba(56,139,253,.3)}
+.log-kv--out{background:rgba(63,185,80,.08);border-color:rgba(63,185,80,.4)}
+.log-kv--out .log-kv-val{color:#15803D}
+.log-kv--changed{background:rgba(180,83,9,.10);border-color:rgba(180,83,9,.4)}
+.log-kv--changed .log-kv-val{color:var(--accent-amber-text)}
+
+.log-verdict{display:flex;align-items:center;gap:6px;font:600 11px var(--font-mono);padding:5px 8px;border-radius:5px;background:var(--bg-secondary);border:1px solid var(--border-light)}
+.log-verdict--true{background:var(--accent-green-bg);border-color:var(--accent-green);color:var(--accent-green-text)}
+.log-verdict--false{background:var(--accent-red-bg);border-color:var(--accent-red);color:var(--accent-red-text)}
+
+.log-analogy{font:italic 11px var(--font-sans);color:var(--text-secondary);background:#FFF8E7;border:1px solid #FBE8A6;border-left:3px solid var(--accent-amber);padding:6px 9px;border-radius:4px;line-height:1.55}
+.log-analogy strong{color:var(--accent-amber-text);font-style:normal;font-weight:700}
+.log-why{font-size:11px;line-height:1.55;color:var(--text-primary);padding:4px 0}
+.log-why strong{color:var(--accent-indigo-text)}
+.log-why code{font:600 10px var(--font-mono);background:var(--bg-secondary);padding:1px 4px;border-radius:3px;color:var(--accent-indigo-text)}
+</style>
+</head>
+<body>
+<div class="app-shell">
+
+  <!-- ─── PROBLEM CARD ─── -->
+  <div class="problem-card" id="problemCard">
+    <div class="pc-header">
+      <a href="../00_HomePage/gt_learn_homepage.html" class="gt-btn">GT LEARN</a>
+      <span class="lc-num">#217</span>
+      <span class="lc-title">🔍 Contains Duplicate</span>
+      <span class="lc-diff">EASY</span>
+      <span class="lc-tag">Hash Set</span>
+      <span class="lc-tag">Array</span>
+      <div class="pc-header-right">
+        <div class="input-wrap"><label>nums</label><input id="inNums" type="text" value="[1,2,3,1]"></div>
+        <span class="expected-badge" id="expBadge">expected: True</span>
+        <button class="toggle-btn" type="button" onclick="toggleProblem()" id="toggleBtn">▲ Hide</button>
+      </div>
+    </div>
+
+    <div class="pc-body" id="pcBody">
+      <div class="pc-left">
+        <div class="pc-section">
+          <h4>📝 Problem Statement</h4>
+          <p>Diya gaya integer array <code>nums</code> mein <strong>kya koi value 2 ya zyada baar repeat hoti hai</strong>? Agar haan, return <code>True</code>. Agar saari values <strong>distinct (unique)</strong> hain, return <code>False</code>. Bilkul simple — duplicate detection.</p>
+        </div>
+        <div class="pc-section">
+          <h4>🧠 Solving Approach</h4>
+          <p>Hash <strong>set</strong> use karenge — jisme O(1) lookup hota hai. Array ko ek baar traverse karenge. Har element ke liye check: kya yeh element <code>seen</code> set mein already hai? Agar haan → <strong>duplicate mil gaya</strong>, return True. Agar nahi → set mein add karke aage badho. Loop khatam hua matlab koi duplicate nahi.</p>
+        </div>
+        <div class="pc-section">
+          <h4>🎯 Core Concepts</h4>
+          <div class="concept-block">
+            <div class="concept-card"><strong>Hash Set</strong>O(1) average lookup + insert. Memory mein elements ka quick directory.</div>
+            <div class="concept-card"><strong>Early Exit</strong>Pehla duplicate milte hi <code>return True</code> — pura array scan zaroori nahi.</div>
+            <div class="concept-card"><strong>Single Pass</strong>Ek hi traversal kaafi — har element ek baar dekha jaata hai.</div>
+          </div>
+        </div>
+        <div class="pc-section">
+          <h4>⏱ Complexity</h4>
+          <div class="complexity-row">
+            <span class="cx-chip">Time: O(n)</span>
+            <span class="cx-chip">Space: O(n)</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="pc-right">
+        <h4 style="font:700 11px var(--font-sans);text-transform:uppercase;letter-spacing:.06em;color:var(--text-tertiary);margin-bottom:6px">🧪 Test Cases</h4>
+        <div class="test-chip" onclick="loadTest('[1,2,3,1]', 'True', 'duplicate at end')">
+          <div class="tc-row"><span class="pt-tag">T1</span><code>[1,2,3,1]</code></div>
+          <div class="tc-row"><span style="font:11px var(--font-sans);color:var(--text-secondary)">duplicate '1' at end</span><span class="tc-exp">→ True</span></div>
+        </div>
+        <div class="test-chip" onclick="loadTest('[1,2,3,4]', 'False', 'all unique')">
+          <div class="tc-row"><span class="pt-tag">T2</span><code>[1,2,3,4]</code></div>
+          <div class="tc-row"><span style="font:11px var(--font-sans);color:var(--text-secondary)">all unique values</span><span class="tc-exp">→ False</span></div>
+        </div>
+        <div class="test-chip" onclick="loadTest('[1,1,1,3,3,4,3,2,4,2]', 'True', 'early duplicate')">
+          <div class="tc-row"><span class="pt-tag">T3</span><code>[1,1,1,3,3,4,3,2,4,2]</code></div>
+          <div class="tc-row"><span style="font:11px var(--font-sans);color:var(--text-secondary)">early duplicate exit</span><span class="tc-exp">→ True</span></div>
+        </div>
+        <div class="test-chip" onclick="loadTest('[5]', 'False', 'single element')">
+          <div class="tc-row"><span class="pt-tag">T4</span><code>[5]</code></div>
+          <div class="tc-row"><span style="font:11px var(--font-sans);color:var(--text-secondary)">single element edge</span><span class="tc-exp">→ False</span></div>
+        </div>
+        <div class="test-chip" onclick="loadTest('[]', 'False', 'empty array')">
+          <div class="tc-row"><span class="pt-tag">T5</span><code>[]</code></div>
+          <div class="tc-row"><span style="font:11px var(--font-sans);color:var(--text-secondary)">empty array edge</span><span class="tc-exp">→ False</span></div>
+        </div>
+        <div class="run-row">
+          <button class="btn-run" type="button" onclick="resetWithInput()">▶ Run</button>
+          <span class="live-output" id="liveOutput">—</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="main-row">
+    <div class="col col-code" id="col1">
+      <div class="section-label">📜 Python Code</div>
+      <div id="codePanel"></div>
+    </div>
+    <div class="resize-h" id="resizeH1"></div>
+    <div class="col col-viz">
+      <div class="section-label">📊 Visualization</div>
+      <div id="vizPanel"></div>
+    </div>
+  </div>
+
+  <div class="footer-bar">
+    <div class="footer-left" id="footerLeft">
+      <span id="stepInfo" class="step-info">0/0</span>
+      <span id="actionBadge" class="action-badge"></span>
+    </div>
+    <div class="footer-right">
+      <kbd>←</kbd><kbd>→</kbd><kbd>R</kbd>
+      <button class="btn" type="button" onclick="resetStep()">↺</button>
+      <button class="btn" type="button" onclick="stepBy(-1)">◀</button>
+      <button class="btn btn-primary" type="button" onclick="stepBy(1)">▶ Next</button>
+      <span class="footer-sep"></span>
+      <button id="logToggleBtn" class="log-toggle-btn" type="button" onclick="toggleLogPreview()">📋 ON</button>
+      <button class="btn-zoom" type="button" onclick="logZoom(-1)">−</button>
+      <span id="logZoomLabel" class="log-zoom-label">100%</span>
+      <button class="btn-zoom" type="button" onclick="logZoom(1)">+</button>
+      <button class="btn-zoom" type="button" onclick="logZoomReset()">↺</button>
+      <span class="footer-sep"></span>
+      <button class="btn btn-fullscreen" type="button" onclick="toggleFullscreen()">⛶</button>
+    </div>
+  </div>
+</div>
+
+<div class="log-popup" id="logPopup">
+  <div class="log-popup-body" id="logPopupBody"></div>
+</div>
+
+<script>
+/* ============ PYTHON CODE ============ */
+var codeLines = [
+  "def containsDuplicate(nums):",
+  "    seen = set()",
+  "    for i in range(len(nums)):",
+  "        if nums[i] in seen:",
+  "            return True",
+  "        seen.add(nums[i])",
+  "    return False"
+];
+
+/* ============ STATE ============ */
+var steps=[], currentStep=0, codeWidthUserSet=false, curResult=null;
+var logEnabled=true, logZoomLevel=100;
+
+var LOG_BADGE = {
+  "func-def":"📌 DEF","init":"⚙️ INIT","call":"📞 CALL","return":"🏆 RETURN",
+  "for-check":"🔁 FOR","while-check":"🔁 WHILE","if-check":"🔎 IF",
+  "mark":"✅ MARK","push":"⬆ PUSH","pop":"⬇ POP","restore":"↩ RESTORE","found":"🎉 FOUND",
+  "remove":"✏️ EDIT","prune":"✂️ PRUNE","fail":"❌ FAIL","exit":"🔚 EXIT","skip":"⏭ SKIP"
+};
+var BADGE_LABEL = {
+  "func-def":"DEF","init":"INIT","call":"CALL","return":"RETURN",
+  "for-check":"FOR","while-check":"WHILE","if-check":"IF",
+  "mark":"MARK","push":"PUSH","pop":"POP","restore":"RESTORE","found":"FOUND",
+  "remove":"EDIT","prune":"PRUNE","fail":"FAIL","exit":"EXIT","skip":"SKIP"
+};
+
+/* ============ CODE RENDERER ============ */
+function renderCode(){
+  var p = document.getElementById('codePanel');
+  p.innerHTML = codeLines.map(function(raw,i){
+    var h = raw;
+    h = h.replace(/("[^"]*"|'[^']*')/g, '\x01STR\x02$1\x03');
+    h = h.replace(/\b(def|for|in|if|return|break|continue|and|else|elif|True|False|None|not|or|while|lambda)\b/g, '\x01KW\x02$1\x03');
+    h = h.replace(/\b(len|range|int|str|list|append|pop|sorted|min|max|sum|abs|enumerate|zip|print|set|add)\b/g, '\x01FN\x02$1\x03');
+    h = h.replace(/\b(\d+)\b/g, '\x01NUM\x02$1\x03');
+    h = h.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    h = h.replace(/\x01([A-Z]+)\x02/g, function(_,c){
+      return '<span class="'+(c==='KW'?'kw':c==='FN'?'fn':c==='NUM'?'num':'str')+'">';
+    }).replace(/\x03/g,'</span>');
+    return '<div class="code-line" data-line="'+i+'"><span class="ln">'+(i+1)+'</span><span class="code-content">'+h+'</span></div>';
+  }).join('');
+}
+
+/* ============ MINI HIGHLIGHTER ============ */
+function hlCode(raw){
+  var h = raw;
+  h = h.replace(/("[^"]*"|'[^']*')/g, '\x01s\x02$1\x03');
+  h = h.replace(/\b(def|for|in|if|return|break|continue|and|else|elif|True|False|None|not|or|while|lambda)\b/g, '\x01k\x02$1\x03');
+  h = h.replace(/\b(len|range|int|str|list|append|pop|sorted|min|max|sum|abs|enumerate|zip|print|set|add)\b/g, '\x01f\x02$1\x03');
+  h = h.replace(/(?<![.\w"\x01\x02\x03])(-?\d+)\b/g, '\x01n\x02$1\x03');
+  h = h.replace(/(#.*$)/gm, '\x01c\x02$1\x03');
+  h = h.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  h = h.replace(/\x01([a-z])\x02/g, function(_,c){return '<span class="c'+c+'">';}).replace(/\x03/g,'</span>');
+  return h;
+}
+
+/* ============ richLog ============ */
+function richLog(opts){
+  var statusMap = {success:"✅ Success",fail:"❌ Failed",skip:"⏭ Skipped",loop:"🔁 Loop iter",prune:"✂️ Pruned",info:"ℹ️ Info"};
+  var status = opts.status || "info";
+  var html = '<div class="log-card log-card--'+opts.action+'">';
+  html += '<div class="log-card-header">';
+  html += '<span class="log-badge log-badge--'+opts.action+'">'+(LOG_BADGE[opts.action]||opts.action)+'</span>';
+  html += '<span class="log-line-ref">L'+(opts.line+1)+'</span>';
+  html += '<span class="log-status-pill log-status--'+status+'">'+statusMap[status]+'</span></div>';
+  if(opts.code){
+    html += '<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">📜</span>Code Executing</div>';
+    html += '<code class="log-code-snippet">'+hlCode(opts.code)+'</code></div>';
+  }
+  if(opts.inputs && opts.inputs.length){
+    html += '<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">📥</span>Input Values (line is using these)</div><div class="log-kv-row">';
+    opts.inputs.forEach(function(kv){
+      html += '<span class="log-kv log-kv--in"><span class="log-kv-key">'+kv.k+'</span>=<span class="log-kv-val">'+kv.v+'</span></span>';
+    });
+    html += '</div></div>';
+  }
+  if(opts.outputs && opts.outputs.length){
+    html += '<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">📤</span>Output / State After Line</div><div class="log-kv-row">';
+    opts.outputs.forEach(function(kv){
+      var cls = kv.changed ? 'log-kv--changed':'log-kv--out';
+      html += '<span class="log-kv '+cls+'"><span class="log-kv-key">'+kv.k+'</span>=<span class="log-kv-val">'+kv.v+'</span></span>';
+    });
+    html += '</div></div>';
+  }
+  if(opts.verdict){
+    var vCls = opts.verdictTrue===true?'log-verdict--true':(opts.verdictTrue===false?'log-verdict--false':'');
+    var vIcon = opts.verdictTrue===true?'✓':(opts.verdictTrue===false?'✗':'•');
+    html += '<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">⚖️</span>Verdict / Decision</div>';
+    html += '<div class="log-verdict '+vCls+'">'+vIcon+' '+opts.verdict+'</div></div>';
+  }
+  if(opts.why){
+    html += '<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">💡</span>Why This Happens</div><div class="log-why">'+opts.why+'</div></div>';
+  }
+  if(opts.analogy){
+    html += '<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">🎭</span>Real-Life Analogy</div><div class="log-analogy">'+opts.analogy+'</div></div>';
+  }
+  html += '</div>';
+  return html;
+}
+
+/* ============ INPUT PARSING ============ */
+function parseArr(s){
+  s = s.trim();
+  if(!s) return [];
+  s = s.replace(/^\[|\]$/g,'');
+  if(!s.trim()) return [];
+  return s.split(',').map(function(x){return parseInt(x.trim(),10);}).filter(function(x){return !isNaN(x);});
+}
+
+/* ============ buildSteps ============ */
+function buildSteps(p){
+  var st=[], MAX=2000;
+  var nums = p.nums.slice();
+  var n = nums.length;
+  var seen = [];          // ordered list (for visualization) — acts as set
+  var seenAdded = null;   // last-added value (for "just-added" animation)
+  var i = -1, curVal = null, inSeen = null;
+  var phase = "init";     // init | iter | check | dup | add | done
+  var origIndex = -1;     // index where duplicate was originally seen
+  var earlyExit = false;
+
+  function snap(extra){
+    return Object.assign({
+      nums: nums.slice(), n: n,
+      seen: seen.slice(), seenAdded: seenAdded,
+      i: i, curVal: curVal, inSeen: inSeen,
+      phase: phase, origIndex: origIndex, earlyExit: earlyExit
+    }, extra||{});
+  }
+  function push(o){ if(st.length>=MAX) return; st.push(Object.assign({line:0,action:"init",logHTML:""}, snap(o))); }
+
+  // ── L0: function def ──
+  push({
+    line:0, action:"func-def",
+    logHTML: richLog({
+      line:0, action:"func-def",
+      code:"def containsDuplicate(nums):",
+      status:"info",
+      inputs:[{k:"nums",v:JSON.stringify(nums)},{k:"len(nums)",v:n}],
+      why:"Function start ho gayi. <code>nums</code> = <strong>"+JSON.stringify(nums)+"</strong> (length <code>"+n+"</code>). Hume check karna hai ki <strong>koi value repeat hoti hai ya nahi</strong>.",
+      analogy:"Jaise tum ek <strong>guest list</strong> mein dekh rahe ho — kya koi naam <strong>2 baar</strong> aaya hai? Wahi check kar rahe hain."
+    })
+  });
+
+  // ── L1: seen = set() ──
+  seenAdded = null;
+  push({
+    line:1, action:"init",
+    logHTML: richLog({
+      line:1, action:"init",
+      code:"seen = set()",
+      status:"success",
+      outputs:[{k:"seen",v:"set()",changed:true},{k:"seen.size",v:0,changed:true}],
+      why:"Empty hash <code>set</code> banayi. Yahan har visited element store karenge. Set mein <strong>O(1) lookup</strong> hota hai — bahut fast.",
+      analogy:"Ek <strong>khaali register</strong> uthaya — jaise-jaise log andar aate hain, naam likhte jayenge. Aage aane wala check karega: pehle aaya tha ya nahi."
+    })
+  });
+
+  // ── L2: for i in range(len(nums)) ──
+  if(n === 0){
+    // Empty array — loop skipped entirely
+    phase = "done";
+    push({
+      line:2, action:"skip",
+      logHTML: richLog({
+        line:2, action:"skip",
+        code:"for i in range(len(nums)):  # range(0) — empty",
+        status:"skip",
+        inputs:[{k:"len(nums)",v:0}],
+        verdict:"range(0) is empty → loop body skipped",
+        verdictTrue:false,
+        why:"Array <strong>khaali</strong> hai — <code>range(0)</code> = empty. Loop body ek baar bhi execute nahi hogi. Direct <code>L7</code> par jayenge.",
+        analogy:"Guest list pe <strong>koi naam hi nahi</strong> — checking ki zaroorat hi nahi. Seedha jaayenge final answer pe."
+      })
+    });
+  } else {
+    for(var idx=0; idx<n; idx++){
+      i = idx;
+      curVal = nums[i];
+      phase = "iter";
+
+      push({
+        line:2, action:"for-check",
+        logHTML: richLog({
+          line:2, action:"for-check",
+          code:"for i in range(len(nums)): i="+i+"  # nums["+i+"]="+curVal,
+          status:"loop",
+          inputs:[{k:"i",v:i},{k:"len(nums)",v:n},{k:"nums["+i+"]",v:curVal}],
+          outputs:[{k:"i",v:i,changed:true}],
+          verdict:"i ("+i+") < "+n+" → True",
+          verdictTrue:true,
+          why:"Loop ka <strong>"+(i+1)+"-th iteration</strong>. Index <code>i="+i+"</code> pe element <code>"+curVal+"</code> dekh rahe hain.",
+          analogy:"Guest list ke <strong>"+(i+1)+"-th naam</strong> ki bari aayi — naam hai <strong>'"+curVal+"'</strong>. Ab register check karte hain."
+        })
+      });
+
+      // ── L3: if nums[i] in seen ──
+      inSeen = (seen.indexOf(curVal) !== -1);
+      phase = inSeen ? "dup" : "check";
+      if(inSeen){
+        // Find the original index where it appeared
+        origIndex = nums.indexOf(curVal);
+      } else {
+        origIndex = -1;
+      }
+
+      push({
+        line:3, action:"if-check",
+        logHTML: richLog({
+          line:3, action:"if-check",
+          code:"if nums["+i+"] in seen:  # "+curVal+" in "+JSON.stringify(seen),
+          status: inSeen ? "success" : "skip",
+          inputs:[{k:"nums["+i+"]",v:curVal},{k:"seen",v:JSON.stringify(seen)}],
+          verdict: curVal+" "+(inSeen?"∈":"∉")+" "+JSON.stringify(seen)+" → "+(inSeen?"True":"False"),
+          verdictTrue: inSeen,
+          why: inSeen
+            ? "<strong>🎯 Duplicate mil gaya!</strong> Value <code>"+curVal+"</code> pehle se <code>seen</code> set mein hai (originally index <code>"+origIndex+"</code> par dikhi thi). Ab <code>True</code> return karenge."
+            : "<code>"+curVal+"</code> set mein nahi hai — yeh <strong>pehli baar</strong> dikh raha hai. Toh <code>if</code> body skip, aage <code>L6</code> par add karenge.",
+          analogy: inSeen
+            ? "<strong>Ek hi naam phir se!</strong> Jaise party mein '"+curVal+"' naam ka bandaa <strong>2-baar entry</strong> kar gaya — gate-keeper rok dega."
+            : "Yeh '"+curVal+"' naam <strong>register mein nahi hai</strong> — naya guest hai. Ab register mein likhna padega."
+        })
+      });
+
+      if(inSeen){
+        // ── L4: return True ──
+        phase = "done";
+        earlyExit = true;
+        curResult = true;
+        push({
+          line:4, action:"found",
+          logHTML: richLog({
+            line:4, action:"found",
+            code:"return True",
+            status:"success",
+            inputs:[{k:"duplicate",v:curVal},{k:"first seen at",v:"index "+origIndex},{k:"now at",v:"index "+i}],
+            outputs:[{k:"return",v:"True",changed:true}],
+            why:"<strong>🏆 Done!</strong> Duplicate confirmed — <code>nums["+origIndex+"]</code> aur <code>nums["+i+"]</code> dono <code>"+curVal+"</code> hain. Function abhi exit — baaki array dekhne ki zaroorat nahi.",
+            analogy:"Bouncer ne dekha — yeh banda <strong>repeat customer</strong> hai. <strong>Game over</strong>, aur scan band, answer announce: <strong>True</strong>!"
+          })
+        });
+        break;
+      }
+
+      // ── L5: seen.add(nums[i]) ──
+      seen.push(curVal);
+      seenAdded = curVal;
+      phase = "add";
+      push({
+        line:5, action:"push",
+        logHTML: richLog({
+          line:5, action:"push",
+          code:"seen.add(nums["+i+"])  # add "+curVal,
+          status:"success",
+          inputs:[{k:"nums["+i+"]",v:curVal},{k:"seen(prev)",v:JSON.stringify(seen.slice(0,seen.length-1))}],
+          outputs:[
+            {k:"seen(new)",v:JSON.stringify(seen),changed:true},
+            {k:"seen.size",v:seen.length,changed:true}
+          ],
+          why:"<code>"+curVal+"</code> set mein <strong>add ho gaya</strong>. Ab agar yeh value future mein phir aayegi, toh <code>L3</code> ka check usse turant catch kar lega.",
+          analogy:"Naya guest aaya — register mein <strong>'"+curVal+"' likh diya</strong>. Agle log isko check kar payenge — 'kya yeh pehle aaya tha?'"
+        })
+      });
+      seenAdded = null;
+    }
+
+    // ── L2: for-loop EXIT (only if no early break) ──
+    if(!earlyExit){
+      push({
+        line:2, action:"exit",
+        logHTML: richLog({
+          line:2, action:"exit",
+          code:"# for-loop exit (i reached "+n+")",
+          status:"info",
+          inputs:[{k:"final i",v:n},{k:"len(nums)",v:n}],
+          verdict:"i ("+n+") < "+n+" → False",
+          verdictTrue:false,
+          outputs:[{k:"seen.size",v:seen.length}],
+          why:"Saare <strong>"+n+" elements</strong> scan ho gaye. Loop natural exit — koi duplicate nahi mila. Final answer <code>False</code> hoga.",
+          analogy:"Saari guest list check ho gayi — har naam <strong>unique</strong> tha. Koi double-entry nahi. Sab clean!"
+        })
+      });
+    }
+  }
+
+  // ── L6: return False (only if no early break) ──
+  if(!earlyExit){
+    phase = "done";
+    curResult = false;
+    push({
+      line:6, action:"return",
+      logHTML: richLog({
+        line:6, action:"return",
+        code:"return False",
+        status:"success",
+        inputs:[{k:"seen",v:JSON.stringify(seen)},{k:"seen.size",v:seen.length}],
+        outputs:[{k:"return",v:"False",changed:true}],
+        why:"<strong>🏁 Done!</strong> Pura array scan ho gaya, koi value repeat nahi hui. Saari "+n+" values <strong>distinct</strong> thi. Return <code>False</code>.",
+        analogy:"Final report: <strong>"+n+" mein se "+n+" log unique</strong> the — koi gadbad nahi. <strong>All clear, no duplicates!</strong>"
+      })
+    });
+  }
+
+  return st;
+}
+
+/* ============ VARS STRIP ============ */
+function buildVars(s){
+  var chips=[];
+  function chip(k,v,cls){ chips.push('<span class="var-chip '+(cls||'')+'"><span class="k">'+k+':</span><span class="v">'+v+'</span></span>'); }
+
+  var phaseLabel = {
+    "init":"Setup",
+    "iter":"Iterating",
+    "check":"Checking 'in seen'",
+    "dup":"⚠️ Duplicate!",
+    "add":"Added to set",
+    "done":"🏁 Done"
+  };
+  chip("phase", phaseLabel[s.phase] || s.phase, s.phase==="dup"?"vc-bad":(s.phase==="done"?"vc-safe":"vc-active"));
+  chip("n", s.n);
+  if(s.i >= 0) chip("i", s.i, "vc-active");
+  if(s.curVal !== null) chip("nums[i]", s.curVal, s.phase==="dup"?"vc-bad":"vc-active");
+  chip("seen.size", s.seen.length, s.seen.length>0?"vc-safe":"");
+  if(s.inSeen !== null && s.phase!=="iter") chip("in seen?", s.inSeen?"YES":"no", s.inSeen?"vc-bad":"vc-safe");
+  return '<div class="vars-strip">'+chips.join('')+'</div>';
+}
+
+/* ============ ARRAY VIZ ============ */
+function arrayCard(s){
+  if(s.n === 0){
+    return '<div class="empty-state">📦 Array is empty — no elements to scan</div>';
+  }
+  var html = '<div class="arr-row">';
+  for(var k=0; k<s.n; k++){
+    var cls = "arr-tile";
+    if(s.phase==="done" && !s.earlyExit){
+      cls += " visited";
+    } else if(s.earlyExit && s.phase==="done"){
+      // Highlight duplicate match
+      if(k === s.i) cls += " dup";
+      else if(k === s.origIndex) cls += " match-orig";
+      else if(k < s.i) cls += " visited";
+      else cls += " future";
+    } else {
+      if(k < s.i) cls += " visited";
+      else if(k === s.i){
+        if(s.phase==="dup") cls += " dup";
+        else cls += " curr";
+      } else cls += " future";
+    }
+    // Highlight orig index when duplicate detected
+    if((s.phase==="dup" || (s.phase==="done" && s.earlyExit)) && k === s.origIndex && k !== s.i){
+      cls = cls.replace(/\bvisited\b/, '').trim() + " match-orig";
+    }
+    html += '<div class="'+cls+'"><div class="at-idx">['+k+']</div><div class="at-val">'+s.nums[k]+'</div></div>';
+  }
+  html += '</div>';
+  return html;
+}
+
+/* ============ SET VIZ ============ */
+function setCard(s){
+  if(!s.seen.length){
+    return '<div class="set-box"><div class="empty-state">Set is empty — items aate hi yahan dikhenge</div></div>';
+  }
+  var html = '<div class="set-box">';
+  for(var k=0; k<s.seen.length; k++){
+    var cls = "set-chip";
+    if(s.phase==="add" && k === s.seen.length-1) cls += " just-added";
+    if(s.phase==="dup" && s.seen[k] === s.curVal) cls += " match";
+    html += '<div class="'+cls+'">'+s.seen[k]+'</div>';
+  }
+  html += '</div>';
+  return html;
+}
+
+/* ============ DECISION CARD ============ */
+function decisionCard(s){
+  var html = '<div class="decision-card">';
+  if(s.curVal === null){
+    html += '<div class="empty-state" style="text-align:left;padding:6px 0">Iteration shuru hone ka intezaar…</div>';
+  } else {
+    html += '<div class="dc-row"><span class="dc-label">current</span><span class="dc-val curr">nums['+s.i+'] = '+s.curVal+'</span></div>';
+    html += '<div class="dc-row"><span class="dc-label">seen has?</span>';
+    if(s.inSeen === true){
+      html += '<span class="dc-val found">✗ YES — duplicate at index '+s.origIndex+'</span>';
+    } else if(s.inSeen === false){
+      html += '<span class="dc-val notfound">✓ no — first time</span>';
+    } else {
+      html += '<span class="dc-val">checking…</span>';
+    }
+    html += '</div>';
+    if(s.phase==="add"){
+      html += '<div class="dc-row"><span class="dc-label">action</span><span class="dc-val notfound">added to seen</span></div>';
+    } else if(s.phase==="dup" || (s.phase==="done" && s.earlyExit)){
+      html += '<div class="dc-row"><span class="dc-label">action</span><span class="dc-val found">return True (early exit)</span></div>';
+    } else if(s.phase==="done" && !s.earlyExit){
+      html += '<div class="dc-row"><span class="dc-label">action</span><span class="dc-val notfound">return False (no dup)</span></div>';
+    }
+  }
+  html += '</div>';
+  return html;
+}
+
+/* ============ RENDER VIZ ============ */
+function renderViz(s){
+  var v = document.getElementById('vizPanel');
+  var html = '';
+  html += buildVars(s);
+
+  // Phase banner
+  var bannerCls, bannerText;
+  if(s.phase==="init"){ bannerCls="banner-init"; bannerText="⚙️ Setup — empty hash set initialized"; }
+  else if(s.phase==="iter"){ bannerCls="banner-iter"; bannerText="🔁 Iterating — i="+s.i+", inspecting nums["+s.i+"]="+s.curVal; }
+  else if(s.phase==="check"){ bannerCls="banner-iter"; bannerText="🔎 Checking — is "+s.curVal+" in seen? → No (first time)"; }
+  else if(s.phase==="add"){ bannerCls="banner-add"; bannerText="⬆ Added — "+s.curVal+" inserted into seen"; }
+  else if(s.phase==="dup"){ bannerCls="banner-found"; bannerText="🚨 DUPLICATE! "+s.curVal+" found at index "+s.i+" (also at index "+s.origIndex+")"; }
+  else if(s.phase==="done"){
+    if(s.earlyExit){ bannerCls="banner-found"; bannerText="🏆 Returned True — duplicate "+s.curVal+" detected"; }
+    else { bannerCls="banner-done"; bannerText="🏁 Returned False — all "+s.n+" elements unique"; }
+  }
+  html += '<div class="banner '+bannerCls+'">'+bannerText+'</div>';
+
+  // Row 1: Array + Decision
+  html += '<div class="viz-row">';
+  html += '<div class="viz-card" style="flex:2;min-width:340px"><h5>📦 Input Array (nums)</h5>'+arrayCard(s)+'</div>';
+  html += '<div class="viz-card" style="flex:1;min-width:240px"><h5>🎯 Current Decision</h5>'+decisionCard(s)+'</div>';
+  html += '</div>';
+
+  // Row 2: Set
+  html += '<div class="viz-card" style="display:block"><h5>🗂️ seen (Hash Set) · size = '+s.seen.length+'</h5>'+setCard(s)+'</div>';
+
+  v.innerHTML = html;
+}
+
+/* ============ STEP CONTROLS ============ */
+function renderStep(idx){
+  if(!steps.length) return;
+  var s = steps[idx];
+  currentStep = idx;
+  document.getElementById('stepInfo').textContent = (idx+1)+'/'+steps.length;
+  var bd = document.getElementById('actionBadge');
+  bd.textContent = BADGE_LABEL[s.action] || s.action;
+  bd.className = 'action-badge action-badge--'+s.action;
+  document.querySelectorAll('.code-line').forEach(function(el){el.classList.remove('active');});
+  var al = document.querySelector('.code-line[data-line="'+s.line+'"]');
+  if(al){ al.classList.add('active'); al.scrollIntoView({block:'nearest'}); }
+  renderViz(s);
+  showLogPreview(s);
+}
+function showLogPreview(s){
+  if(!logEnabled) return;
+  document.getElementById('logPopupBody').innerHTML = s.logHTML || '';
+  document.getElementById('logPopup').classList.remove('log-popup--hidden');
+}
+function hideLogPopup(){ document.getElementById('logPopup').classList.add('log-popup--hidden'); }
+function stepBy(d){
+  var n = currentStep + d;
+  if(n<0||n>=steps.length) return;
+  renderStep(n);
+}
+function resetStep(){ if(steps.length) renderStep(0); }
+
+/* ============ POPUP CONTROLS ============ */
+function toggleLogPreview(){
+  logEnabled = !logEnabled;
+  var btn = document.getElementById('logToggleBtn');
+  btn.textContent = logEnabled ? '📋 ON' : '📋 OFF';
+  btn.classList.toggle('log-toggle-btn--off', !logEnabled);
+  if(!logEnabled) hideLogPopup();
+  else if(steps.length) showLogPreview(steps[currentStep]);
+}
+function logZoom(dir){ logZoomLevel = Math.max(60, Math.min(180, logZoomLevel + dir*20)); updateLogZoom(); }
+function logZoomReset(){ logZoomLevel=100; updateLogZoom(); }
+function updateLogZoom(){
+  document.getElementById('logZoomLabel').textContent = logZoomLevel+'%';
+  document.getElementById('logPopup').style.setProperty('--log-scale', logZoomLevel/100);
+}
+function toggleFullscreen(){
+  var viz = document.querySelector('.col-viz');
+  if(!document.fullscreenElement) viz.requestFullscreen().catch(function(){});
+  else document.exitFullscreen();
+}
+function toggleProblem(){
+  var b = document.getElementById('pcBody');
+  var btn = document.getElementById('toggleBtn');
+  if(b.style.display==='none'){ b.style.display=''; btn.textContent='▲ Hide'; }
+  else { b.style.display='none'; btn.textContent='▼ Show'; }
+}
+
+/* ============ TEST LOADER ============ */
+function loadTest(numsStr, exp, note){
+  document.getElementById('inNums').value = numsStr;
+  document.getElementById('expBadge').textContent = 'expected: '+exp+' ('+note+')';
+  resetWithInput();
+}
+
+/* ============ RESET WITH INPUT ============ */
+function resetWithInput(){
+  curResult = null;
+  var nums = parseArr(document.getElementById('inNums').value);
+  renderCode();
+  fitCodeWidth();
+  steps = buildSteps({nums: nums});
+  currentStep = 0;
+  renderStep(0);
+  document.getElementById('liveOutput').textContent = curResult!==null ? String(curResult) : '—';
+}
+
+/* ============ CODE WIDTH ============ */
+function fitCodeWidth(){ syncFooterWidth(); }
+function syncFooterWidth(){
+  document.getElementById('footerLeft').style.width = document.getElementById('col1').offsetWidth + 'px';
+}
+
+/* ============ RESIZE HANDLE ============ */
+(function(){
+  var col1 = document.getElementById('col1');
+  document.getElementById('resizeH1').addEventListener('mousedown', function(e){
+    e.preventDefault();
+    codeWidthUserSet = true;
+    var startX = e.clientX, startW = col1.offsetWidth, h = this;
+    document.body.classList.add('no-select');
+    h.classList.add('active');
+    function mv(e){
+      col1.style.width = Math.max(140, startW + (e.clientX - startX)) + 'px';
+      syncFooterWidth();
+    }
+    function up(){
+      document.removeEventListener('mousemove', mv);
+      document.removeEventListener('mouseup', up);
+      document.body.classList.remove('no-select');
+      h.classList.remove('active');
+    }
+    document.addEventListener('mousemove', mv);
+    document.addEventListener('mouseup', up);
+  });
+})();
+window.addEventListener('resize', function(){
+  if(!codeWidthUserSet) fitCodeWidth();
+  else syncFooterWidth();
+});
+
+/* ============ KEYBOARD ============ */
+document.addEventListener('keydown', function(e){
+  if(e.target.tagName==='INPUT' || e.target.tagName==='SELECT') return;
+  if(e.key==='ArrowRight'){ e.preventDefault(); stepBy(1); }
+  else if(e.key==='ArrowLeft'){ e.preventDefault(); stepBy(-1); }
+  else if(e.key==='r' || e.key==='R'){ e.preventDefault(); resetStep(); }
+});
+
+/* ============ INIT ============ */
+renderCode();
+syncFooterWidth();
+resetWithInput();
+</script>
+</body>
+</html>

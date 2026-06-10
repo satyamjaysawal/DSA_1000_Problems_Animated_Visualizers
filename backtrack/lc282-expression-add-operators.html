@@ -1,0 +1,968 @@
+﻿
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>282. Expression Add Operators — Dry Run Visualizer</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=DM+Sans:wght@400;500;600&display=swap');
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{--bg-primary:#FAFAF8;--bg-secondary:#F1EFE8;--bg-tertiary:#E2E0D8;--bg-card:#FFFFFF;--text-primary:#2C2C2A;--text-secondary:#5F5E5A;--text-tertiary:#888780;--border-color:rgba(0,0,0,.11);--border-light:rgba(0,0,0,.06);--border-focus:#534AB7;--accent-indigo:#534AB7;--accent-indigo-bg:#EEEDFE;--accent-indigo-text:#3C3489;--accent-indigo-hover:#4740A0;--accent-teal:#0F6E56;--accent-teal-bg:#E1F5EE;--accent-teal-text:#085041;--accent-red:#E24B4A;--accent-red-bg:#FCEBEB;--accent-red-text:#791F1F;--accent-amber:#B45309;--accent-amber-bg:#FEF3C7;--accent-amber-text:#78350F;--accent-green:#15803D;--accent-green-bg:#DCFCE7;--accent-green-text:#14532D;--syn-keyword:#534AB7;--syn-function:#185FA5;--syn-number:#993C1D;--syn-string:#0F6E56;--active-line-bg:#EEEDFE;--radius-sm:4px;--radius-md:6px;--radius-lg:10px;--sp-2:8px;--sp-3:12px;--sp-5:20px;--font-sans:'DM Sans',system-ui,sans-serif;--font-mono:'JetBrains Mono','Fira Code',monospace;--fs-xs:11px;--fs-sm:12px;--fs-base:14px;--fs-md:15px;--fw-medium:500;--fw-semibold:600;--fw-bold:700;--lh-normal:1.6;--lh-code:1.9;--ease:.18s ease}
+html,body{height:100%;background:var(--bg-primary);color:var(--text-primary);font:var(--fs-base) var(--font-sans)}
+.kw{color:var(--syn-keyword);font-weight:var(--fw-medium)}.fn{color:var(--syn-function)}.num{color:var(--syn-number)}.str{color:var(--syn-string)}
+.btn,.section-label,.action-badge,.log-badge,kbd{font-family:system-ui,"Segoe UI Emoji",var(--font-sans)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:4px;padding:5px var(--sp-3);font-size:var(--fs-sm);font-weight:var(--fw-medium);border:1px solid var(--border-color);border-radius:var(--radius-md);background:var(--bg-card);color:var(--text-primary);cursor:pointer;transition:all var(--ease);white-space:nowrap}.btn:hover{background:var(--bg-secondary)}.btn:active{transform:scale(.96)}.btn-primary{background:var(--accent-indigo);color:#fff;border-color:var(--accent-indigo)}.btn-primary:hover{background:var(--accent-indigo-hover)}
+.btn-zoom{display:inline-flex;align-items:center;justify-content:center;padding:2px 7px;font:700 12px var(--font-mono);border:1px solid var(--border-color);border-radius:var(--radius-sm);background:var(--bg-card);color:var(--text-secondary);cursor:pointer}.btn-zoom:hover{background:var(--accent-indigo-bg);border-color:var(--accent-indigo);color:var(--accent-indigo)}
+.input{padding:4px var(--sp-2);font:var(--fs-sm) var(--font-mono);border:1px solid var(--border-color);border-radius:var(--radius-md);background:var(--bg-card);color:var(--text-primary);outline:none}.input:focus{border-color:var(--border-focus)}
+kbd{display:inline-block;padding:1px 5px;border-radius:var(--radius-sm);font-size:10px;background:var(--bg-secondary);border:1px solid var(--border-color);color:var(--text-secondary);line-height:1.5}
+::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border-color);border-radius:3px}
+@keyframes pulse-node{0%,100%{box-shadow:0 0 4px var(--accent-indigo)}50%{box-shadow:0 0 12px var(--accent-indigo)}}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-3px)}75%{transform:translateX(3px)}}
+@keyframes win-pulse{0%,100%{box-shadow:0 0 3px rgba(234,179,8,.5)}50%{box-shadow:0 0 8px rgba(234,179,8,.9)}}
+.app-shell{display:flex;flex-direction:column;height:100vh;overflow:hidden;background:var(--bg-primary)}
+.prob-header{display:flex;align-items:center;gap:var(--sp-2);padding:8px var(--sp-5);border-bottom:1px solid var(--border-color);background:var(--bg-card);flex-wrap:wrap;flex-shrink:0}
+.prob-header-left{display:flex;align-items:center;gap:6px;flex-wrap:wrap;flex:1}
+.prob-header-right{display:flex;align-items:center;gap:var(--sp-2);flex-wrap:wrap}
+.gt-home-btn{padding:3px 10px;font-family:var(--font-sans);font-size:11px;font-weight:700;letter-spacing:.04em;border:1.5px solid var(--accent-indigo);border-radius:var(--radius-md);background:var(--accent-indigo);color:#fff;cursor:pointer;text-transform:uppercase}
+.gt-home-btn:hover{background:var(--accent-indigo-hover)}
+.prob-num{font-size:var(--fs-sm);font-weight:var(--fw-bold);color:var(--accent-indigo);font-family:var(--font-mono)}
+.prob-name{font-size:var(--fs-md);font-weight:var(--fw-semibold)}
+.prob-diff--hard{font-size:10px;padding:2px 8px;border-radius:99px;font-weight:var(--fw-semibold);background:var(--accent-red-bg);color:var(--accent-red-text)}
+.prob-tag{font-size:10px;padding:2px 8px;border-radius:99px;background:var(--bg-tertiary);color:var(--text-tertiary);border:1px solid var(--border-color);font-weight:var(--fw-medium)}
+.top-label{font:var(--fs-xs) var(--font-mono);color:var(--text-tertiary)}
+.top-expected{font:700 10px var(--font-mono);padding:2px 8px;border-radius:99px;background:var(--accent-teal-bg);color:var(--accent-teal-text);border:1px solid var(--accent-teal);max-width:240px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.prob-toggle-btn{font-family:system-ui,sans-serif;font-size:11px;padding:3px 10px;border-radius:var(--radius-md);background:var(--bg-secondary);border:1px solid var(--border-color);color:var(--text-secondary);cursor:pointer}
+.prob-body{display:flex;gap:var(--sp-5);padding:var(--sp-3) var(--sp-5);border-bottom:1px solid var(--border-color);background:var(--bg-card);flex-shrink:0}
+.problem-body--hidden{display:none!important}
+.prob-body-left{flex:1;min-width:0}.prob-body-right{width:340px;flex-shrink:0}
+.prob-body-left h3,.prob-body-right h3{font-size:var(--fs-sm);font-weight:var(--fw-semibold);color:var(--accent-indigo);margin:8px 0 3px}
+.prob-body-left h3:first-child{margin-top:0}
+.prob-desc{font-size:var(--fs-sm);color:var(--text-secondary);margin-bottom:4px}
+.prob-desc code{font-family:var(--font-mono);background:var(--bg-secondary);padding:1px 4px;border-radius:3px;font-size:var(--fs-xs)}
+.concept-block{background:var(--bg-secondary);border-radius:var(--radius-md);padding:8px 12px;margin:4px 0;font-size:var(--fs-sm);border-left:3px solid var(--accent-teal);color:var(--text-secondary)}
+.concept-block strong{color:var(--accent-teal-text);font-family:var(--font-mono);font-size:var(--fs-xs)}
+.prob-complexity{display:flex;gap:var(--sp-2);margin-top:6px}
+.prob-complexity-chip{font:10px var(--font-mono);padding:2px 8px;border-radius:var(--radius-md);background:var(--bg-secondary);border:1px solid var(--border-color)}
+.cc-label{color:var(--text-tertiary)}.cc-val{color:var(--accent-indigo-text);font-weight:var(--fw-bold)}
+.prob-tests{display:flex;flex-direction:column;gap:4px;margin-bottom:6px}
+.prob-test{display:flex;align-items:center;gap:5px;background:var(--bg-secondary);border:1px solid var(--border-color);border-radius:var(--radius-md);padding:5px 8px;font-size:var(--fs-xs);cursor:pointer;transition:all var(--ease)}
+.prob-test:hover{border-color:var(--accent-indigo)}
+.prob-test--active{border-color:var(--accent-indigo)!important;background:var(--accent-indigo-bg)!important}
+.pt-label{font-size:10px;font-weight:var(--fw-bold);color:var(--text-tertiary)}
+.pt-input{font-family:var(--font-mono);color:var(--text-primary);font-size:9px;flex:1}
+.pt-tag{font-size:7px;padding:1px 4px;border-radius:99px;background:var(--bg-tertiary);color:var(--text-tertiary);border:1px solid var(--border-color);font-weight:600;font-family:var(--font-mono)}
+.pt-arrow{color:var(--text-tertiary)}
+.pt-expected{font-family:var(--font-mono);font-weight:var(--fw-bold);color:var(--accent-teal);font-size:9px;max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.prob-live{display:flex;align-items:center;gap:6px;padding:6px var(--sp-3);border-radius:var(--radius-md);background:var(--bg-primary);border:1px solid var(--border-color);font-size:var(--fs-sm);margin-bottom:6px}
+.pl-label{font-size:var(--fs-xs);color:var(--text-tertiary)}
+.pl-output{font-family:var(--font-mono);font-weight:var(--fw-bold);color:var(--accent-indigo);font-size:var(--fs-sm);word-break:break-all}
+.main-row{flex:1;display:flex;overflow:hidden;min-height:0}
+.col{display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.col-code{width:33%;min-width:140px;max-width:45vw}
+.col-viz{flex:1;min-width:0}
+.section-label{padding:5px var(--sp-3);font-size:var(--fs-xs);font-weight:var(--fw-semibold);color:var(--text-tertiary);text-transform:uppercase;letter-spacing:.07em;border-bottom:1px solid var(--border-color);flex-shrink:0;background:var(--bg-secondary)}
+.code-panel{flex:1;overflow-y:auto;padding:var(--sp-3) var(--sp-2);font-family:var(--font-mono);font-size:var(--fs-sm);line-height:var(--lh-code)}
+.code-line{display:flex;align-items:center;gap:var(--sp-2);padding:1px var(--sp-2);border-radius:var(--radius-sm)}
+.code-line.active{background:var(--active-line-bg)}
+.ln{min-width:18px;text-align:right;color:var(--text-tertiary);font-size:10px;user-select:none;flex-shrink:0;opacity:.6}
+.code-content{white-space:pre;flex:1}
+.resize-h{width:5px;cursor:col-resize;flex-shrink:0;background:transparent;position:relative;z-index:10;border-left:1px solid var(--border-color)}
+.resize-h:hover,.resize-h.active{background:rgba(99,102,241,.15)}
+.resize-h::after{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:3px;height:24px;border-radius:2px;background:rgba(0,0,0,.08)}
+.no-select{user-select:none!important;cursor:col-resize}
+.viz-panel{flex:1;overflow:auto;padding:var(--sp-3)}
+.vars-strip{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;padding:6px 10px;background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius-md)}
+.var-chip{display:inline-flex;align-items:center;gap:2px;padding:2px 7px;border-radius:var(--radius-md);background:var(--bg-secondary);border:1px solid var(--border-light);font-family:var(--font-mono);font-size:10px}
+.var-chip.vc-active{border-color:var(--accent-indigo);background:var(--accent-indigo-bg)}
+.var-chip.vc-safe{border-color:var(--accent-green);background:var(--accent-green-bg)}
+.var-chip.vc-flip{border-color:var(--accent-red);background:var(--accent-red-bg)}
+.vn{color:var(--text-tertiary);font-weight:500}.vv{font-weight:var(--fw-bold)}
+.viz-row{display:flex;gap:12px;align-items:flex-start;flex-wrap:wrap}
+.viz-card{background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius-md);padding:10px}
+.viz-title{font:600 9px var(--font-mono);text-transform:uppercase;letter-spacing:.04em;color:var(--text-tertiary);margin-bottom:4px}
+.tile-row{display:flex;gap:4px;flex-wrap:wrap}
+.tile{display:inline-flex;flex-direction:column;align-items:center;justify-content:center;width:34px;height:42px;border-radius:8px;border:1px solid var(--border-color);background:#fff;font-family:var(--font-mono);font-size:14px;font-weight:600;position:relative}
+.tile-idx{font-size:8px;color:var(--text-tertiary);font-weight:400;margin-top:1px}
+.tile-active{background:var(--accent-indigo-bg)!important;border-color:var(--accent-indigo)!important;animation:pulse-node 1.2s infinite}
+.tile-window{background:var(--accent-teal-bg)!important;border-color:var(--accent-teal)!important}
+.tile-done{background:var(--accent-green-bg);border-color:var(--accent-green);opacity:.85}
+.tile-prune{background:var(--accent-red-bg)!important;border-color:var(--accent-red)!important;animation:shake .3s}
+.stack-col{display:flex;flex-direction:column-reverse;gap:4px;min-height:120px;padding:8px;background:var(--bg-secondary);border-radius:var(--radius-md);border:1px dashed var(--border-color);min-width:280px}
+.stack-item{font:10px var(--font-mono);padding:5px 8px;border:1px solid var(--accent-indigo);background:var(--accent-indigo-bg);border-radius:6px;color:var(--accent-indigo-text);max-width:380px;word-break:break-all}
+.stack-item-top{border-color:var(--accent-amber);background:var(--accent-amber-bg);color:var(--accent-amber-text);animation:pulse-node 1.2s infinite}
+.chips{display:flex;gap:4px;flex-wrap:wrap}
+.chip{font:10px var(--font-mono);padding:3px 6px;border-radius:99px;background:var(--bg-secondary);border:1px solid var(--border-color)}
+.chip-win{background:var(--accent-green-bg);border-color:var(--accent-green);color:var(--accent-green-text);font-weight:700;animation:win-pulse 1.6s infinite}
+.empty-state{font-size:11px;color:var(--text-tertiary);font-style:italic}
+.expr-display{font-family:var(--font-mono);font-size:13px;font-weight:600;padding:6px 10px;background:var(--bg-secondary);border-radius:6px;border:1px solid var(--border-color);min-height:28px;display:inline-block;word-break:break-all}
+.expr-empty{color:var(--text-tertiary);font-style:italic;font-weight:400}
+.legend{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.legend span{display:inline-flex;align-items:center;gap:4px;font-size:10px;color:var(--text-secondary)}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:3px;border:1px solid var(--border-color)}
+.result-banner{margin-top:8px;padding:8px 12px;border-radius:var(--radius-md);font-family:var(--font-mono);font-size:var(--fs-md);font-weight:bold;display:inline-flex;align-items:center;gap:8px;background:var(--accent-green-bg);border:1.5px solid var(--accent-green);color:var(--accent-green-text);animation:win-pulse 1.6s infinite}
+.action-badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:var(--radius-sm);font-size:10px;font-weight:var(--fw-bold)}
+.action-badge--func-def,.action-badge--init,.action-badge--call,.action-badge--return,.action-badge--resume{background:rgba(130,80,255,.14);color:#8250ff}
+.action-badge--for-check,.action-badge--if-check,.action-badge--while-check,.action-badge--else-branch{background:rgba(56,139,253,.14);color:#388bfd}
+.action-badge--mark,.action-badge--push,.action-badge--pop,.action-badge--restore,.action-badge--found{background:rgba(63,185,80,.14);color:#3fb950}
+.action-badge--remove,.action-badge--prune,.action-badge--fail{background:rgba(248,81,73,.14);color:#f85149}
+.action-badge--exit,.action-badge--skip{background:rgba(85,84,80,.14);color:#555450}
+.log-card{border-radius:var(--radius-md);overflow:hidden;border:1px solid var(--border-color);border-left-width:4px;font-size:var(--fs-xs);background:var(--bg-card)}
+.log-card--func-def,.log-card--init,.log-card--call,.log-card--return,.log-card--resume{border-left-color:#8250ff}
+.log-card--for-check,.log-card--if-check,.log-card--while-check,.log-card--else-branch{border-left-color:#388bfd}
+.log-card--mark,.log-card--push,.log-card--pop,.log-card--restore,.log-card--found{border-left-color:#3fb950}
+.log-card--remove,.log-card--prune,.log-card--fail{border-left-color:#f85149}
+.log-card--exit,.log-card--skip{border-left-color:#555450}
+.log-badge{display:inline-flex;flex-shrink:0;border-radius:var(--radius-sm);font-size:9px;font-weight:var(--fw-bold);padding:2px 6px;white-space:nowrap}
+.log-badge--func-def,.log-badge--init,.log-badge--call,.log-badge--return,.log-badge--resume{background:rgba(130,80,255,.22);color:#8250ff}
+.log-badge--for-check,.log-badge--if-check,.log-badge--while-check,.log-badge--else-branch{background:rgba(56,139,253,.22);color:#388bfd}
+.log-badge--mark,.log-badge--push,.log-badge--pop,.log-badge--restore,.log-badge--found{background:rgba(63,185,80,.22);color:#3fb950}
+.log-badge--remove,.log-badge--prune,.log-badge--fail{background:rgba(248,81,73,.22);color:#f85149}
+.log-badge--exit,.log-badge--skip{background:rgba(85,84,80,.22);color:#555450}
+.log-card-header{display:flex;align-items:center;gap:6px;padding:8px 10px 6px;background:var(--bg-secondary);border-bottom:1px solid var(--border-light)}
+.log-line-ref{font:700 10px var(--font-mono);color:var(--accent-indigo);background:var(--accent-indigo-bg);padding:1px 6px;border-radius:4px;border:1px solid var(--accent-indigo)}
+.log-status-pill{font-family:system-ui,"Segoe UI Emoji",sans-serif;font-size:9px;font-weight:700;padding:2px 7px;border-radius:99px;text-transform:uppercase;letter-spacing:.04em;margin-left:auto}
+.log-status--success{background:var(--accent-green-bg);color:var(--accent-green-text);border:1px solid var(--accent-green)}
+.log-status--fail{background:var(--accent-red-bg);color:var(--accent-red-text);border:1px solid var(--accent-red)}
+.log-status--skip{background:var(--bg-tertiary);color:var(--text-tertiary);border:1px solid var(--border-color)}
+.log-status--loop{background:rgba(56,139,253,.14);color:#185FA5;border:1px solid #388bfd}
+.log-status--prune{background:var(--accent-red-bg);color:var(--accent-red-text);border:1px solid var(--accent-red)}
+.log-status--info{background:rgba(130,80,255,.14);color:#3C3489;border:1px solid #8250ff}
+.log-section{padding:7px 10px;border-bottom:1px dashed var(--border-light)}
+.log-section:last-child{border-bottom:none}
+.log-section-title{font:700 8px var(--font-mono);text-transform:uppercase;letter-spacing:.06em;color:var(--text-tertiary);margin-bottom:3px;display:flex;align-items:center;gap:4px}
+.log-section-title-icon{font-family:system-ui,"Segoe UI Emoji",sans-serif;font-size:10px}
+.log-code-snippet{font:600 11px var(--font-mono);background:#0d1117;color:#e6edf3;padding:6px 9px;border-radius:4px;display:block;overflow-x:auto;white-space:pre;border:1px solid #30363d}
+.log-code-snippet .ck{color:#ff7b72}.log-code-snippet .cs{color:#a5d6ff}.log-code-snippet .cn{color:#79c0ff}.log-code-snippet .cf{color:#d2a8ff}.log-code-snippet .cc{color:#8b949e;font-style:italic}
+.log-kv-row{display:flex;flex-wrap:wrap;gap:4px;margin-top:2px}
+.log-kv{display:inline-flex;align-items:center;gap:3px;font:11px var(--font-mono);padding:2px 7px;border-radius:4px;background:var(--bg-secondary);border:1px solid var(--border-light)}
+.log-kv-key{color:var(--text-tertiary);font-weight:500}
+.log-kv-val{color:var(--text-primary);font-weight:700}
+.log-kv--in{background:rgba(56,139,253,.08);border-color:rgba(56,139,253,.3)}
+.log-kv--out{background:rgba(63,185,80,.08);border-color:rgba(63,185,80,.4)}
+.log-kv--out .log-kv-val{color:#15803D}
+.log-kv--changed{background:rgba(180,83,9,.10);border-color:rgba(180,83,9,.4)}
+.log-verdict{display:flex;align-items:center;gap:6px;font:600 11px var(--font-mono);padding:5px 8px;border-radius:5px;background:var(--bg-secondary);border:1px solid var(--border-light)}
+.log-verdict--true{background:var(--accent-green-bg);border-color:var(--accent-green);color:var(--accent-green-text)}
+.log-verdict--false{background:var(--accent-red-bg);border-color:var(--accent-red);color:var(--accent-red-text)}
+.log-analogy{font:italic 11px var(--font-sans);color:var(--text-secondary);background:#FFF8E7;border:1px solid #FBE8A6;border-left:3px solid var(--accent-amber);padding:6px 9px;border-radius:4px;line-height:1.55}
+.log-analogy strong{color:var(--accent-amber-text);font-style:normal;font-weight:700}
+.log-why{font-size:11px;line-height:1.55;color:var(--text-primary);padding:4px 0}
+.log-why strong{color:var(--accent-indigo-text)}
+.log-popup{--log-scale:1;position:fixed;bottom:52px;right:14px;width:calc(480px * var(--log-scale));max-width:92vw;max-height:75vh;border-radius:var(--radius-lg);box-shadow:0 10px 32px rgba(0,0,0,.14);border:1px solid var(--border-color);background:var(--bg-card);overflow:hidden;display:flex;flex-direction:column;z-index:100;transition:opacity .15s,transform .15s;transform-origin:bottom right}
+.log-popup--hidden{opacity:0;transform:scale(.92);pointer-events:none}
+.log-popup-body{flex:1;overflow:auto;padding:0}
+.log-popup-body > .log-card{border-radius:0;border:none;border-left:0}
+.footer-bar{display:flex;flex-shrink:0;border-top:1px solid var(--border-color);background:var(--bg-card)}
+.footer-left{width:33%;min-width:140px;max-width:45vw;display:flex;align-items:center;gap:8px;padding:7px 12px;border-right:1px solid var(--border-light)}
+.footer-right{flex:1;display:flex;align-items:center;gap:6px;padding:7px 14px;flex-wrap:wrap}
+.footer-sep{width:1px;height:16px;background:var(--border-color);flex-shrink:0}
+.step-info{font:10px var(--font-mono);color:var(--text-tertiary)}
+.log-toggle-btn{padding:2px 8px;font:700 9px var(--font-mono);border:1px solid var(--accent-green);border-radius:99px;background:var(--accent-green-bg);color:var(--accent-green-text);cursor:pointer}
+.log-toggle-btn--off{background:var(--bg-tertiary);color:var(--text-tertiary);border-color:var(--border-color)}
+.log-zoom-label{font:10px var(--font-mono);color:var(--text-tertiary);min-width:28px;text-align:center}
+.btn-fullscreen{font-size:14px;padding:3px 8px;background:var(--accent-indigo-bg);border-color:var(--accent-indigo);color:var(--accent-indigo)}
+.btn-fullscreen:hover{background:var(--accent-indigo);color:#fff}
+</style>
+</head>
+<body>
+<div class="app-shell">
+  <header class="prob-header">
+    <div class="prob-header-left">
+      <a href="../00_HomePage/gt_learn_homepage.html" class="gt-home-btn">GT LEARN</a>
+      <span class="prob-num">#282</span>
+      <span class="prob-name">🎨 Expression Add Operators</span>
+      <span class="prob-diff--hard">HARD</span>
+      <span class="prob-tag">Backtracking</span>
+      <span class="prob-tag">String</span>
+      <span class="prob-tag">Math</span>
+    </div>
+    <div class="prob-header-right">
+      <span class="top-label">num=</span>
+      <input id="inputNum" class="input" style="width:90px" value="123">
+      <span class="top-label">target=</span>
+      <input id="inputTarget" class="input" style="width:60px" value="6">
+      <span id="expectedBadge" class="top-expected">exp: ["1+2+3","1*2*3"]</span>
+      <button id="probToggleBtn" class="prob-toggle-btn" type="button" onclick="toggleProblem()">▲ Hide</button>
+    </div>
+  </header>
+  <div id="probBody" class="prob-body">
+    <div class="prob-body-left">
+      <h3>📝 Problem Statement</h3>
+      <p class="prob-desc">Given a string <code>num</code> containing only digits and an integer <code>target</code>, return all possibilities to insert binary operators <code>+</code>, <code>-</code>, or <code>*</code> between the digits so that the resulting expression evaluates to <code>target</code>. Operands cannot have leading zeros (except "0" itself).</p>
+      <h3>🧠 Solving Approach</h3>
+      <p class="prob-desc">Backtracking — har position pe decide karo: kahan tak digits le ke ek operand banaye, aur usse pehle kaunsa operator (+, −, *) lagaye. Multiplication ke liye <code>prev</code> track karna padta hai kyunki * higher precedence rakhta hai.</p>
+      <h3>🎯 Core Concepts & Base Case</h3>
+      <div class="concept-block"><strong>Base Case:</strong> Jab <code>index == n</code>, agar <code>value == target</code> ho toh expression result mein add karo.</div>
+      <div class="concept-block"><strong>Transition:</strong> Substring <code>num[index..i]</code> ko operand banao, 3 branches try karo: +curr, −curr, *curr.</div>
+      <div class="concept-block"><strong>Pruning:</strong> Leading zero check — agar <code>i > index</code> aur <code>num[index] == '0'</code>, toh break.</div>
+      <div class="prob-complexity">
+        <span class="prob-complexity-chip"><span class="cc-label">Time </span><span class="cc-val">O(N·4ᴺ)</span></span>
+        <span class="prob-complexity-chip"><span class="cc-label">Space </span><span class="cc-val">O(N)</span></span>
+      </div>
+    </div>
+    <div class="prob-body-right">
+      <h3>🧪 Test Cases</h3>
+      <div id="testList" class="prob-tests"></div>
+      <div class="prob-live"><span class="pl-label">Result:</span><span id="liveOutput" class="pl-output">—</span></div>
+      <button class="btn btn-primary" type="button" onclick="resetWithInput()">▶ Run</button>
+    </div>
+  </div>
+  <div class="main-row">
+    <div id="col1" class="col col-code">
+      <div class="section-label">📜 Python Code</div>
+      <div id="codePanel" class="code-panel"></div>
+    </div>
+    <div id="resizeH1" class="resize-h"></div>
+    <div class="col col-viz">
+      <div class="section-label">📊 Visualization</div>
+      <div id="vizPanel" class="viz-panel"></div>
+    </div>
+  </div>
+  <div class="footer-bar">
+    <div id="footerLeft" class="footer-left">
+      <span id="stepInfo" class="step-info">0/0</span>
+      <span id="actionBadge" class="action-badge"></span>
+    </div>
+    <div class="footer-right">
+      <kbd>←</kbd><kbd>→</kbd>
+      <button class="btn" type="button" onclick="resetStep()">↺</button>
+      <button class="btn" type="button" onclick="stepBy(-1)">◀</button>
+      <button class="btn btn-primary" type="button" onclick="stepBy(1)">▶ Next</button>
+      <span class="footer-sep"></span>
+      <button id="logToggleBtn" class="log-toggle-btn" type="button" onclick="toggleLogPreview()">📋 ON</button>
+      <button class="btn-zoom" type="button" onclick="logZoom(-1)">−</button>
+      <span id="logZoomLabel" class="log-zoom-label">100%</span>
+      <button class="btn-zoom" type="button" onclick="logZoom(1)">+</button>
+      <button class="btn-zoom" type="button" onclick="logZoomReset()">↺</button>
+      <span class="footer-sep"></span>
+      <button class="btn btn-fullscreen" type="button" onclick="toggleFullscreen()">⛶</button>
+    </div>
+  </div>
+</div>
+<div id="logPopup" class="log-popup log-popup--hidden">
+  <div id="logPopupBody" class="log-popup-body"></div>
+</div>
+<script>
+var TESTS=[
+  {num:"123",target:6,e:'["1+2+3","1*2*3"]',tag:"basic"},
+  {num:"232",target:8,e:'["2*3+2","2+3*2"]',tag:"precedence"},
+  {num:"105",target:5,e:'["1*0+5","10-5"]',tag:"zero ok"},
+  {num:"00",target:0,e:'["0+0","0-0","0*0"]',tag:"leading zero"},
+  {num:"12",target:3,e:'["1+2"]',tag:"simple"}
+];
+
+var codeLines=[
+  "def addOperators(num, target):",
+  "    res = []",
+  "    n = len(num)",
+  "    def backtrack(index, expr, value, prev):",
+  "        if index == n:",
+  "            if value == target:",
+  "                res.append(expr)",
+  "            return",
+  "        for i in range(index, n):",
+  "            if i > index and num[index] == '0':",
+  "                break",
+  "            curr_str = num[index:i+1]",
+  "            curr = int(curr_str)",
+  "            if index == 0:",
+  "                backtrack(i+1, curr_str, curr, curr)",
+  "            else:",
+  "                backtrack(i+1, expr+'+'+curr_str, value+curr, curr)",
+  "                backtrack(i+1, expr+'-'+curr_str, value-curr, -curr)",
+  "                backtrack(i+1, expr+'*'+curr_str, value-prev+prev*curr, prev*curr)",
+  "    backtrack(0, '', 0, 0)",
+  "    return res"
+];
+
+var LOG_BADGE={"func-def":"📌 DEF","init":"⚙️ INIT","call":"📞 CALL","resume":"🔄 RESUME","for-check":"🔁 FOR","if-check":"🔎 IF","else-branch":"🔀 ELSE","while-check":"🔁 WHILE","mark":"✅ MARK","push":"⬆ PUSH","pop":"⬇ POP","remove":"✏️ EDIT","restore":"↩ RESTORE","exit":"🔚 EXIT","return":"🏆 RETURN","found":"🎉 FOUND","prune":"✂️ PRUNE","skip":"⏭ SKIP","fail":"❌ FAIL"};
+var BADGE_LABEL={"func-def":"DEF","init":"INIT","call":"CALL","resume":"RESUME","for-check":"FOR","if-check":"IF","else-branch":"ELSE","while-check":"WHILE","mark":"MARK","push":"PUSH","pop":"POP","remove":"EDIT","restore":"RESTORE","exit":"EXIT","return":"RETURN","found":"FOUND","prune":"PRUNE","skip":"SKIP","fail":"FAIL"};
+
+var steps=[],currentStep=0,codeWidthUserSet=false,curResult=null,logEnabled=true,logZoomLevel=100;
+
+function renderTests(){
+  document.getElementById("testList").innerHTML=TESTS.map(function(t,i){
+    return '<div class="prob-test'+(i===0?' prob-test--active':'')+'" onclick="loadTest('+i+',this)">'+
+      '<span class="pt-label">T'+(i+1)+'</span>'+
+      '<span class="pt-input">"'+t.num+'" → '+t.target+'</span>'+
+      '<span class="pt-tag">'+t.tag+'</span>'+
+      '<span class="pt-arrow">→</span>'+
+      '<span class="pt-expected" title=\''+t.e+'\'>'+t.e+'</span></div>';
+  }).join("");
+}
+
+function renderCode(){
+  var p=document.getElementById('codePanel');
+  p.innerHTML=codeLines.map(function(raw,i){
+    var h=raw;
+    h=h.replace(/("[^"]*"|'[^']*')/g,'\x01STR\x02$1\x03');
+    h=h.replace(/\b(def|for|in|if|return|break|continue|and|else|elif|True|False|None|not|or|while|lambda)\b/g,'\x01KW\x02$1\x03');
+    h=h.replace(/\b(len|range|int|str|list|append|pop|sorted|min|max|sum|abs|enumerate|zip|print|set|add)\b/g,'\x01FN\x02$1\x03');
+    h=h.replace(/(?<![.\w"\x01\x02\x03])(-?\d+)\b/g,'\x01NUM\x02$1\x03');
+    h=h.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    h=h.replace(/\x01([A-Z]+)\x02/g,function(_,c){return '<span class="'+c.toLowerCase()+'">';}).replace(/\x03/g,'</span>');
+    return '<div class="code-line" data-line="'+i+'"><span class="ln">'+(i+1)+'</span><span class="code-content">'+h+'</span></div>';
+  }).join('');
+}
+
+function toggleProblem(){
+  var body=document.getElementById('probBody'),btn=document.getElementById('probToggleBtn');
+  body.classList.toggle('problem-body--hidden');
+  btn.textContent=body.classList.contains('problem-body--hidden')?'▼ Show':'▲ Hide';
+}
+
+function syncFooterWidth(){document.getElementById('footerLeft').style.width=document.getElementById('col1').offsetWidth+'px';}
+
+function fitCodeWidth(){
+  if(codeWidthUserSet)return;
+  var c=document.getElementById('col1');
+  c.style.flex='none';c.style.width='max-content';
+  c.style.width=Math.min(c.offsetWidth,window.innerWidth*.45)+'px';
+  syncFooterWidth();
+}
+
+function hlCode(raw){
+  if(!raw)return '';
+  var h=raw;
+  h=h.replace(/("[^"]*"|'[^']*')/g,'\x01CS\x02$1\x03');
+  h=h.replace(/\b(def|for|in|if|return|break|continue|and|else|elif|True|False|None|not|or|while|lambda)\b/g,'\x01CK\x02$1\x03');
+  h=h.replace(/\b(len|range|int|str|list|append|pop|set|add|backtrack)\b/g,'\x01CF\x02$1\x03');
+  h=h.replace(/(?<![.\w"\x01\x02\x03])(-?\d+)\b/g,'\x01CN\x02$1\x03');
+  h=h.replace(/(#.*$)/g,'\x01CC\x02$1\x03');
+  h=h.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  h=h.replace(/\x01([A-Z]+)\x02/g,function(_,c){return '<span class="'+c.toLowerCase()+'">';}).replace(/\x03/g,'</span>');
+  return h;
+}
+
+function richLog(opts){
+  var statusMap={success:"✅ Success",fail:"❌ Failed",skip:"⏭ Skipped",loop:"🔁 Loop iter",prune:"✂️ Pruned",info:"ℹ️ Info"};
+  var status=opts.status||"info";
+  var html='<div class="log-card log-card--'+opts.action+'">';
+  html+='<div class="log-card-header">';
+  html+='<span class="log-badge log-badge--'+opts.action+'">'+(LOG_BADGE[opts.action]||opts.action)+'</span>';
+  html+='<span class="log-line-ref">L'+(opts.line+1)+'</span>';
+  html+='<span class="log-status-pill log-status--'+status+'">'+(statusMap[status]||status)+'</span>';
+  html+='</div>';
+  if(opts.code){
+    html+='<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">📜</span>Code Executing</div>';
+    html+='<code class="log-code-snippet">'+hlCode(opts.code)+'</code></div>';
+  }
+  if(opts.inputs&&opts.inputs.length){
+    html+='<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">📥</span>Input Values</div><div class="log-kv-row">';
+    opts.inputs.forEach(function(kv){html+='<span class="log-kv log-kv--in"><span class="log-kv-key">'+kv.k+'</span>=<span class="log-kv-val">'+kv.v+'</span></span>';});
+    html+='</div></div>';
+  }
+  if(opts.outputs&&opts.outputs.length){
+    html+='<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">📤</span>Output / State After Line</div><div class="log-kv-row">';
+    opts.outputs.forEach(function(kv){
+      var cls=kv.changed?'log-kv--changed':'log-kv--out';
+      html+='<span class="log-kv '+cls+'"><span class="log-kv-key">'+kv.k+'</span>=<span class="log-kv-val">'+kv.v+'</span></span>';
+    });
+    html+='</div></div>';
+  }
+  if(opts.verdict){
+    var vCls=opts.verdictTrue===true?'log-verdict--true':(opts.verdictTrue===false?'log-verdict--false':'');
+    var vIcon=opts.verdictTrue===true?'✓':(opts.verdictTrue===false?'✗':'•');
+    html+='<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">⚖️</span>Verdict / Decision</div>';
+    html+='<div class="log-verdict '+vCls+'">'+vIcon+' '+opts.verdict+'</div></div>';
+  }
+  if(opts.why){
+    html+='<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">💡</span>Why This Happens</div>';
+    html+='<div class="log-why">'+opts.why+'</div></div>';
+  }
+  if(opts.analogy){
+    html+='<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">🎭</span>Real-Life Analogy</div>';
+    html+='<div class="log-analogy">'+opts.analogy+'</div></div>';
+  }
+  html+='</div>';
+  return html;
+}
+
+function buildSteps(num,target){
+  var st=[],n=num.length,res=[],callStack=[],MAX_STEPS=8000;
+  var index=null,expr=null,value=null,prev=null,i=null,curr_str=null,curr=null;
+  var iStart=null,iEnd=null,pruneFlag=false,foundFlag=false;
+  var depth=0,callId=0;
+
+  function snap(x){
+    return Object.assign({
+      num:num,n:n,target:target,res:res.slice(),
+      callStack:callStack.map(function(c){return Object.assign({},c);}),
+      index:index,expr:expr,value:value,prev:prev,
+      i:i,curr_str:curr_str,curr:curr,iStart:iStart,iEnd:iEnd,
+      pruneFlag:pruneFlag,foundFlag:foundFlag,depth:depth
+    },x||{});
+  }
+  function pushStep(o){
+    if(st.length>=MAX_STEPS)return;
+    st.push(Object.assign({line:0,action:"func-def",logHTML:""},snap(o)));
+  }
+  function restoreLocals(idx,e,v,p,ii){
+    index=idx;expr=e;value=v;prev=p;i=ii;
+    curr_str=num.substring(idx,ii+1);curr=parseInt(curr_str,10);
+    iStart=idx;iEnd=ii;
+  }
+
+  function backtrack(idx,e,v,p){
+    callId++;
+    callStack.push({id:callId,index:idx,expr:e||"''",value:v,prev:p,depth:depth});
+    index=idx;expr=e;value=v;prev=p;i=null;curr_str=null;curr=null;iStart=null;iEnd=null;
+
+    // L4 — function entry
+    pushStep({line:3,action:"call",logHTML:richLog({
+      line:3,action:"call",
+      code:"def backtrack(index="+idx+", expr=\""+e+"\", value="+v+", prev="+p+"):",
+      status:"info",
+      inputs:[{k:"index",v:idx},{k:"expr",v:'"'+e+'"'},{k:"value",v:v},{k:"prev",v:p}],
+      outputs:[{k:"depth",v:depth,changed:true},{k:"stack frames",v:callStack.length,changed:true}],
+      why:"<strong>Recursion frame open</strong> ho gaya. Ab is call mein decide hoga — kya base case hit hua, ya next operand banana hai.",
+      analogy:"Socho ek <strong>chef</strong> recipe banana shuru karta hai. Yeh function call wahi naya 'kitchen entry' hai jahan se decision lena hai."
+    })});
+
+    // L5 — if index == n
+    var baseHit=(idx===n);
+    pushStep({line:4,action:"if-check",logHTML:richLog({
+      line:4,action:"if-check",
+      code:"if index == n:  # "+idx+" == "+n+"  → "+baseHit,
+      status:baseHit?"success":"skip",
+      inputs:[{k:"index",v:idx},{k:"n",v:n}],
+      verdict:"index ("+idx+") "+(baseHit?"==":"!=")+" n ("+n+")",
+      verdictTrue:baseHit,
+      why:baseHit?"<strong>Base case HIT!</strong> Saari digits consume ho gayi. Ab check karna hai value == target.":"Abhi <strong>"+(n-idx)+" digit(s) bachi hain</strong>. For-loop se operand banayenge.",
+      analogy:baseHit?"Train apne <strong>final station</strong> pe pahunch gayi — ticket check hoga.":"Train abhi raste mein hai — agle station ka decision lena hai."
+    })});
+
+    if(baseHit){
+      // L6 — if value == target
+      var matched=(v===target);
+      pushStep({line:5,action:"if-check",logHTML:richLog({
+        line:5,action:"if-check",
+        code:"if value == target:  # "+v+" == "+target+"  → "+matched,
+        status:matched?"success":"fail",
+        inputs:[{k:"value",v:v},{k:"target",v:target}],
+        verdict:"value ("+v+") "+(matched?"==":"!=")+" target ("+target+")",
+        verdictTrue:matched,
+        why:matched?"🎉 <strong>Expression valid hai!</strong> Yeh result list mein add hoga.":"<strong>Value match nahi hui</strong> — yeh path failed.",
+        analogy:matched?"Cricket match mein <strong>last ball pe required runs</strong> ban gaye — match jeet liya!":"Score short reh gaya. Wapas dressing room (parent call)."
+      })});
+
+      if(matched){
+        // L7 — res.append(expr)
+        res.push(e);
+        foundFlag=true;
+        pushStep({line:6,action:"found",logHTML:richLog({
+          line:6,action:"found",
+          code:"res.append(\""+e+"\")",
+          status:"success",
+          inputs:[{k:"expr",v:'"'+e+'"'},{k:"res (before)",v:'['+res.slice(0,-1).map(function(x){return '"'+x+'"';}).join(',')+']'}],
+          outputs:[{k:"res",v:'['+res.map(function(x){return '"'+x+'"';}).join(',')+']',changed:true},{k:"res.size",v:res.length,changed:true}],
+          why:"<strong>Valid expression mil gaya!</strong> '"+e+"' ko result list mein add kar diya. Total found = "+res.length,
+          analogy:"<strong>Trophy cabinet</strong> mein ek aur medal chamak raha hai 🏆"
+        })});
+        foundFlag=false;
+      }
+
+      // L8 — return (after base case)
+      pushStep({line:7,action:"return",logHTML:richLog({
+        line:7,action:"return",
+        code:"return  # base case complete, back to parent call",
+        status:"info",
+        inputs:[{k:"current depth",v:depth}],
+        outputs:[{k:"depth (after)",v:depth-1,changed:true},{k:"stack frames",v:callStack.length-1,changed:true}],
+        why:"Base case ne apna kaam khatam kiya — <strong>parent call wapas resume</strong> hoga.",
+        analogy:"Chef <strong>kitchen se bahar</strong> nikla — head chef ko report kar raha hai."
+      })});
+      callStack.pop();
+      index=null;expr=null;value=null;prev=null;
+      return;
+    }
+
+    // L9 — for loop start (entry)
+    if(idx<n){
+      pushStep({line:8,action:"for-check",logHTML:richLog({
+        line:8,action:"for-check",
+        code:"for i in range(index="+idx+", n="+n+"):",
+        status:"info",
+        inputs:[{k:"index",v:idx},{k:"n",v:n}],
+        outputs:[{k:"loop range",v:"["+idx+", "+n+")"},{k:"iterations",v:n-idx}],
+        why:"For-loop <strong>shuru</strong> ho raha hai. <strong>"+(n-idx)+" iterations</strong> honge — har baar alag size ka operand try karenge.",
+        analogy:"<strong>Pizza counter</strong> pe khade ho — 1 slice, 2 slice, ya 3 slice? Har option try karenge."
+      })});
+    }
+
+    for(var ii=idx;ii<n;ii++){
+      i=ii;iStart=idx;iEnd=ii;
+
+      // L9 — for loop iter
+      pushStep({line:8,action:"for-check",logHTML:richLog({
+        line:8,action:"for-check",
+        code:"# iter: i = "+ii+"  → operand window num["+idx+":"+(ii+1)+"]",
+        status:"loop",
+        inputs:[{k:"index",v:idx},{k:"n",v:n}],
+        outputs:[{k:"i",v:ii,changed:true},{k:"window",v:'num['+idx+':'+(ii+1)+'] = "'+num.substring(idx,ii+1)+'"',changed:true}],
+        why:"Loop iter — <strong>i="+ii+"</strong> means substring <code>num["+idx+":"+(ii+1)+"]</code> = <strong>\""+num.substring(idx,ii+1)+"\"</strong> ko operand banana try karenge.",
+        analogy:"<strong>Pizza slicing</strong> — pehle 1 digit slice, fir 2 digit, fir 3..."
+      })});
+
+      // L10 — leading zero check
+      var leadingZero=ii>idx&&num[idx]==='0';
+      pushStep({line:9,action:"if-check",logHTML:richLog({
+        line:9,action:"if-check",
+        code:"if i > index and num[index] == '0':  # "+ii+">"+idx+" and \""+num[idx]+"\"=='0' → "+leadingZero,
+        status:leadingZero?"prune":"skip",
+        inputs:[{k:"i",v:ii},{k:"index",v:idx},{k:"num[index]",v:'"'+num[idx]+'"'}],
+        verdict:"i>index="+(ii>idx)+" AND num[index]=='0'="+(num[idx]==='0')+" → "+(leadingZero?"BOTH TRUE":"FALSE"),
+        verdictTrue:leadingZero,
+        why:leadingZero?"<strong>Leading zero detected!</strong> Multi-digit operand jo '0' se start hota hai (jaise '01') invalid hai. Loop break.":"Leading zero issue nahi — operand build karenge.",
+        analogy:leadingZero?"Bank cheque pe <strong>'0123' likhna invalid</strong> — cheque reject!":"Sab clear hai — aage badho."
+      })});
+
+      if(leadingZero){
+        // L11 — break
+        pruneFlag=true;
+        pushStep({line:10,action:"prune",logHTML:richLog({
+          line:10,action:"prune",
+          code:"break  # exit for-loop early due to leading zero",
+          status:"prune",
+          inputs:[{k:"i",v:ii},{k:"reason",v:'"leading zero"'}],
+          outputs:[{k:"for-loop",v:"TERMINATED",changed:true}],
+          why:"✂️ <strong>Pruning</strong> — for-loop band kar diya. Aage jitne bhi multi-digit operands try karte, sab invalid hote.",
+          analogy:"<strong>Shortcut maaro</strong> — pata hai aage road blocked hai, U-turn lo. Petrol bachega!"
+        })});
+        pruneFlag=false;
+        break;
+      }
+
+      // L12 — curr_str
+      curr_str=num.substring(idx,ii+1);
+      pushStep({line:11,action:"init",logHTML:richLog({
+        line:11,action:"init",
+        code:'curr_str = num[index:i+1] = num['+idx+':'+(ii+1)+'] = "'+curr_str+'"',
+        status:"success",
+        inputs:[{k:"num",v:'"'+num+'"'},{k:"index",v:idx},{k:"i+1",v:ii+1}],
+        outputs:[{k:"curr_str",v:'"'+curr_str+'"',changed:true}],
+        why:"Substring extract — <strong>\""+curr_str+"\"</strong> hamara naya operand string form mein.",
+        analogy:"Tape se <strong>ek piece kaat liya</strong> — ab measure karenge."
+      })});
+
+      // L13 — curr int
+      curr=parseInt(curr_str,10);
+      pushStep({line:12,action:"init",logHTML:richLog({
+        line:12,action:"init",
+        code:'curr = int("'+curr_str+'") = '+curr,
+        status:"success",
+        inputs:[{k:"curr_str",v:'"'+curr_str+'"'}],
+        outputs:[{k:"curr",v:curr,changed:true}],
+        why:"String <strong>\""+curr_str+"\"</strong> ko integer <strong>"+curr+"</strong> mein convert kiya.",
+        analogy:"<strong>Currency note</strong> ko digital balance mein convert kar diya."
+      })});
+
+      // L14 — first operand?
+      var firstOp=(idx===0);
+      pushStep({line:13,action:"if-check",logHTML:richLog({
+        line:13,action:"if-check",
+        code:"if index == 0:  # "+idx+" == 0  → "+firstOp,
+        status:firstOp?"success":"skip",
+        inputs:[{k:"index",v:idx}],
+        verdict:"index ("+idx+") "+(firstOp?"==":"!=")+" 0",
+        verdictTrue:firstOp,
+        why:firstOp?"<strong>Pehla operand</strong> hai — koi operator nahi lagega.":"Pehla operand nahi — ab <strong>+, −, * teeno operators</strong> try karenge.",
+        analogy:firstOp?"<strong>Cricket innings ki first ball</strong> — koi previous run nahi.":"Innings already chal rahi — har ball pe choice hai."
+      })});
+
+      if(firstOp){
+        // L15 — first operand recursion call
+        pushStep({line:14,action:"call",logHTML:richLog({
+          line:14,action:"call",
+          code:"backtrack("+(ii+1)+", \""+curr_str+"\", "+curr+", "+curr+")",
+          status:"info",
+          inputs:[{k:"i+1",v:ii+1},{k:"curr_str",v:'"'+curr_str+'"'},{k:"curr",v:curr}],
+          outputs:[{k:"new index",v:ii+1,changed:true},{k:"new expr",v:'"'+curr_str+'"',changed:true},{k:"new value",v:curr,changed:true},{k:"new prev",v:curr,changed:true}],
+          why:"First operand directly use kar ke recurse — value aur prev <strong>dono curr ke barabar</strong>.",
+          analogy:"Game ki <strong>opening move</strong> — board pe pehla piece rakh diya."
+        })});
+        depth++;
+        backtrack(ii+1,curr_str,curr,curr);
+        depth--;
+        restoreLocals(idx,e,v,p,ii);
+
+        // RESUME after first-operand recursion
+        pushStep({line:14,action:"resume",logHTML:richLog({
+          line:14,action:"resume",
+          code:"# resumed after backtrack(...) returned",
+          status:"info",
+          inputs:[{k:"index",v:idx},{k:"i",v:ii},{k:"depth",v:depth}],
+          outputs:[{k:"local state",v:"restored",changed:true}],
+          why:"Recursion se <strong>wapas aa gaye</strong>. Local variables restore — for-loop ka next iter try karenge.",
+          analogy:"Sub-mission complete — base camp wapas. Ab <strong>agle path ka exploration</strong>."
+        })});
+      }else{
+        // L16 — else branch entry
+        pushStep({line:15,action:"else-branch",logHTML:richLog({
+          line:15,action:"else-branch",
+          code:"else:  # not first operand — try +, −, * branches",
+          status:"info",
+          inputs:[{k:"index",v:idx}],
+          outputs:[{k:"branches to try",v:"+, −, *"}],
+          why:"Else branch — ab <strong>3 alag recursion</strong> calls honge: addition, subtraction, multiplication.",
+          analogy:"<strong>Crossroad</strong> — 3 raste hain. Har ek try karenge ek-ek karke."
+        })});
+
+        // L17 — PLUS branch
+        pushStep({line:16,action:"call",logHTML:richLog({
+          line:16,action:"call",
+          code:"backtrack("+(ii+1)+", \""+e+"+"+curr_str+"\", "+v+"+"+curr+"="+(v+curr)+", "+curr+")",
+          status:"info",
+          inputs:[{k:"expr",v:'"'+e+'"'},{k:"value",v:v},{k:"curr",v:curr}],
+          outputs:[{k:"new expr",v:'"'+e+'+'+curr_str+'"',changed:true},{k:"new value",v:v+'+'+curr+'='+(v+curr),changed:true},{k:"new prev",v:curr,changed:true}],
+          why:"➕ <strong>Plus branch</strong> — value mein curr add. prev = curr (future * ke liye).",
+          analogy:"<strong>Salary mein bonus</strong> — total badh gaya."
+        })});
+        depth++;
+        backtrack(ii+1,e+"+"+curr_str,v+curr,curr);
+        depth--;
+        restoreLocals(idx,e,v,p,ii);
+
+        // RESUME after PLUS
+        pushStep({line:16,action:"resume",logHTML:richLog({
+          line:16,action:"resume",
+          code:"# resumed after PLUS branch returned",
+          status:"info",
+          inputs:[{k:"index",v:idx},{k:"i",v:ii}],
+          outputs:[{k:"local state",v:"restored for next branch",changed:true}],
+          why:"Plus branch se wapas — ab <strong>minus branch</strong> try karenge.",
+          analogy:"Pehla raasta dekh liya — ab <strong>doosra raasta</strong>."
+        })});
+
+        // L18 — MINUS branch
+        pushStep({line:17,action:"call",logHTML:richLog({
+          line:17,action:"call",
+          code:"backtrack("+(ii+1)+", \""+e+"-"+curr_str+"\", "+v+"-"+curr+"="+(v-curr)+", "+(-curr)+")",
+          status:"info",
+          inputs:[{k:"expr",v:'"'+e+'"'},{k:"value",v:v},{k:"curr",v:curr}],
+          outputs:[{k:"new expr",v:'"'+e+'-'+curr_str+'"',changed:true},{k:"new value",v:v+'-'+curr+'='+(v-curr),changed:true},{k:"new prev",v:-curr,changed:true}],
+          why:"➖ <strong>Minus branch</strong> — value se curr subtract. <strong>prev = -curr</strong> (negative!).",
+          analogy:"<strong>Bank withdrawal</strong> — balance kam. Agla * negative base se calculate hoga."
+        })});
+        depth++;
+        backtrack(ii+1,e+"-"+curr_str,v-curr,-curr);
+        depth--;
+        restoreLocals(idx,e,v,p,ii);
+
+        // RESUME after MINUS
+        pushStep({line:17,action:"resume",logHTML:richLog({
+          line:17,action:"resume",
+          code:"# resumed after MINUS branch returned",
+          status:"info",
+          inputs:[{k:"index",v:idx},{k:"i",v:ii}],
+          outputs:[{k:"local state",v:"restored for next branch",changed:true}],
+          why:"Minus branch se wapas — ab <strong>multiply branch</strong> try karenge.",
+          analogy:"Doosra raasta done — ab <strong>teesra (final) raasta</strong>."
+        })});
+
+        // L19 — MULTIPLY branch
+        var newVal=v-p+p*curr;
+        pushStep({line:18,action:"call",logHTML:richLog({
+          line:18,action:"call",
+          code:"backtrack("+(ii+1)+", \""+e+"*"+curr_str+"\", "+v+"-"+p+"+"+p+"*"+curr+"="+newVal+", "+p+"*"+curr+"="+(p*curr)+")",
+          status:"info",
+          inputs:[{k:"expr",v:'"'+e+'"'},{k:"value",v:v},{k:"prev",v:p},{k:"curr",v:curr}],
+          outputs:[{k:"new expr",v:'"'+e+'*'+curr_str+'"',changed:true},{k:"new value",v:v+'-'+p+'+'+p+'*'+curr+'='+newVal,changed:true},{k:"new prev",v:p+'*'+curr+'='+(p*curr),changed:true}],
+          why:"✖️ <strong>Multiply branch — precedence trick!</strong> <strong>Formula: value − prev + prev×curr</strong>",
+          analogy:"<strong>'2+3*4'</strong> = pehle 2 wala add undo karo, fir 3×4=12 add. Net = 14, na ki 20!"
+        })});
+        depth++;
+        backtrack(ii+1,e+"*"+curr_str,newVal,p*curr);
+        depth--;
+        restoreLocals(idx,e,v,p,ii);
+
+        // RESUME after MULTIPLY
+        pushStep({line:18,action:"resume",logHTML:richLog({
+          line:18,action:"resume",
+          code:"# resumed after MULTIPLY branch returned",
+          status:"info",
+          inputs:[{k:"index",v:idx},{k:"i",v:ii}],
+          outputs:[{k:"local state",v:"all 3 branches done for this i",changed:true}],
+          why:"<strong>Saare 3 branches (+, −, *) try ho gaye</strong> for i="+ii+". Ab next i (bigger operand) try karenge.",
+          analogy:"Teeno raaste explore done — ab <strong>bigger operand</strong> banake fir try karenge."
+        })});
+      }
+    }
+
+    // L9 — for-loop natural exit
+    pushStep({line:8,action:"exit",logHTML:richLog({
+      line:8,action:"exit",
+      code:"# for-loop EXIT: i exhausted range("+idx+", "+n+")",
+      status:"info",
+      inputs:[{k:"index",v:idx},{k:"final i",v:i},{k:"n",v:n}],
+      outputs:[{k:"frame ending",v:"true",changed:true},{k:"depth (after)",v:depth-1,changed:true}],
+      why:"For-loop ke <strong>saare iterations complete</strong>. Is recursion frame ka kaam khatam — parent ko return karenge.",
+      analogy:"<strong>Menu mein har dish dekh li</strong> — kitchen se bahar."
+    })});
+    callStack.pop();
+    index=null;expr=null;value=null;prev=null;i=null;curr_str=null;curr=null;
+  }
+
+  // L1 — function def
+  pushStep({line:0,action:"func-def",logHTML:richLog({
+    line:0,action:"func-def",
+    code:"def addOperators(num=\""+num+"\", target="+target+"):",
+    status:"info",
+    inputs:[{k:"num",v:'"'+num+'"'},{k:"target",v:target}],
+    outputs:[{k:"function",v:"addOperators registered"}],
+    why:"<strong>Main function entry</strong>. Goal: saare valid expressions dhundhna jo target ke barabar evaluate karte hain.",
+    analogy:"<strong>Treasure hunt shuru</strong> — bag, map (num), aur goal (target). Saare raste explore karenge."
+  })});
+
+  // L2 — res = []
+  pushStep({line:1,action:"init",logHTML:richLog({
+    line:1,action:"init",
+    code:"res = []",
+    status:"success",
+    inputs:[],
+    outputs:[{k:"res",v:"[]",changed:true}],
+    why:"Result list initialize — yahan <strong>saare valid expressions</strong> store honge.",
+    analogy:"<strong>Khaali trophy cabinet</strong> ready."
+  })});
+
+  // L3 — n = len(num)
+  pushStep({line:2,action:"init",logHTML:richLog({
+    line:2,action:"init",
+    code:"n = len(\""+num+"\") = "+n,
+    status:"success",
+    inputs:[{k:"num",v:'"'+num+'"'}],
+    outputs:[{k:"n",v:n,changed:true}],
+    why:"Input length cache — <strong>"+n+" digits</strong>.",
+    analogy:"<strong>Map ki length naap li</strong>."
+  })});
+
+  // L4 — backtrack function definition (registration)
+  pushStep({line:3,action:"func-def",logHTML:richLog({
+    line:3,action:"func-def",
+    code:"def backtrack(index, expr, value, prev):  # nested function defined",
+    status:"info",
+    inputs:[],
+    outputs:[{k:"backtrack",v:"defined (closure over res, num, n, target)"}],
+    why:"<strong>Inner function defined</strong>. Yeh closure hai — outer scope ke <code>res</code>, <code>num</code>, <code>n</code>, <code>target</code> access kar sakti hai.",
+    analogy:"<strong>Recipe likh di</strong> — abhi cook nahi ki, sirf instructions ready."
+  })});
+
+  if(n===0){
+    curResult=[];
+    pushStep({line:20,action:"return",logHTML:richLog({
+      line:20,action:"return",
+      code:"return res  # empty input",
+      status:"fail",
+      inputs:[{k:"res",v:"[]"}],
+      outputs:[{k:"return value",v:"[]"}],
+      why:"<strong>Empty input</strong> — koi expression nahi ban sakta.",
+      analogy:"Map blank hai — koi treasure hunt possible nahi."
+    })});
+    return st;
+  }
+
+  // L20 — initial backtrack call
+  pushStep({line:19,action:"call",logHTML:richLog({
+    line:19,action:"call",
+    code:"backtrack(0, '', 0, 0)  # kick off recursion",
+    status:"info",
+    inputs:[{k:"index",v:0},{k:"expr",v:'""'},{k:"value",v:0},{k:"prev",v:0}],
+    outputs:[{k:"recursion",v:"started",changed:true}],
+    why:"<strong>Initial recursion call</strong> from index 0 with empty expression.",
+    analogy:"<strong>Treasure hunt ka first step</strong> — base camp se chale."
+  })});
+
+  backtrack(0,"",0,0);
+
+  // RESUME after initial recursion completes
+  pushStep({line:19,action:"resume",logHTML:richLog({
+    line:19,action:"resume",
+    code:"# initial backtrack call completed — all paths explored",
+    status:"info",
+    inputs:[{k:"res",v:'['+res.map(function(x){return '"'+x+'"';}).join(',')+']'}],
+    outputs:[{k:"all recursion",v:"done",changed:true},{k:"res.size",v:res.length}],
+    why:"<strong>Saari recursion complete</strong>. Decision tree ke har branch explore ho gaya. Ab final return.",
+    analogy:"<strong>Treasure hunt complete</strong> — har raasta try kar liya. Ab medals count karenge."
+  })});
+
+  curResult=res.slice();
+  // L21 — return res
+  pushStep({line:20,action:"return",logHTML:richLog({
+    line:20,action:"return",
+    code:"return res  # final answer = "+(res.length>0?'['+res.map(function(x){return '"'+x+'"';}).join(',')+']':'[]'),
+    status:res.length>0?"success":"fail",
+    inputs:[{k:"res",v:'['+res.map(function(x){return '"'+x+'"';}).join(',')+']'}],
+    outputs:[{k:"final answer",v:res.length+" expression(s) found"}],
+    why:res.length>0?"🏆 <strong>"+res.length+" valid expression(s) found!</strong> Final result return.":"<strong>Koi valid expression nahi mila</strong> — target unreachable.",
+    analogy:res.length>0?"<strong>Treasure mil gaya!</strong> Cabinet bhar gaya medals se.":"<strong>Treasure nahi mila</strong> — saare paths exhausted."
+  })});
+  return st;
+}
+
+function renderViz(s){
+  function chip(n,v,cls){return '<span class="var-chip '+(cls||'')+'"><span class="vn">'+n+'</span><span class="vv">'+v+'</span></span>';}
+
+  var h='<div class="vars-strip">'+
+    chip("📍 index ",s.index===null?"—":s.index,(s.line===3||s.line===4||s.line===8)?"vc-active":"")+
+    chip("✏️ expr ",s.expr===null?"—":'"'+s.expr+'"',s.line===3?"vc-active":"")+
+    chip("🔢 value ",s.value===null?"—":s.value,(s.line===5||s.line===16||s.line===17||s.line===18)?"vc-active":(s.value===s.target&&s.value!==null?"vc-safe":""))+
+    chip("⏮ prev ",s.prev===null?"—":s.prev,s.line===18?"vc-active":"")+
+    chip("i ",s.i===null?"—":s.i,(s.line===8||s.line===9)?"vc-active":"")+
+    chip("curr ",s.curr===null?"—":s.curr,s.line===12?"vc-active":"")+
+    chip("🎯 target ",s.target,"")+
+    chip("📚 depth ",s.depth,"")+
+    chip("✅ res ",s.res.length,s.res.length>0?"vc-safe":"")+
+  '</div>';
+
+  h+='<div class="viz-row">';
+  h+='<div class="viz-card"><div class="viz-title">🔤 Input num — current operand window</div><div class="tile-row">';
+  for(var k=0;k<s.n;k++){
+    var cls='tile';
+    if(s.index!==null&&s.i!==null&&k>=s.iStart&&k<=s.iEnd)cls+=' tile-window';
+    else if(s.index!==null&&k===s.index)cls+=' tile-active';
+    else if(s.index!==null&&k<s.index)cls+=' tile-done';
+    if(s.pruneFlag&&k===s.index)cls+=' tile-prune';
+    h+='<div class="'+cls+'">'+s.num[k]+'<div class="tile-idx">'+k+'</div></div>';
+  }
+  h+='</div>';
+  h+='<div class="legend">'+
+    '<span><i style="background:#fff"></i>Unused</span>'+
+    '<span><i style="background:var(--accent-indigo-bg);border-color:var(--accent-indigo)"></i>index ptr</span>'+
+    '<span><i style="background:var(--accent-teal-bg);border-color:var(--accent-teal)"></i>operand window</span>'+
+    '<span><i style="background:var(--accent-green-bg);border-color:var(--accent-green)"></i>consumed</span>'+
+    '<span><i style="background:var(--accent-red-bg);border-color:var(--accent-red)"></i>pruned</span>'+
+  '</div></div>';
+
+  h+='<div class="viz-card"><div class="viz-title">📝 Current Expression</div>';
+  if(s.expr===null||s.expr===""){
+    h+='<div class="expr-display"><span class="expr-empty">(empty)</span></div>';
+  }else{
+    h+='<div class="expr-display">'+s.expr+' <span style="color:var(--text-tertiary)">= '+s.value+'</span></div>';
+  }
+  if(s.curr_str!==null&&s.curr!==null){
+    h+='<div style="margin-top:6px;font-size:11px;color:var(--text-secondary)">Operand bana raha: <code style="background:var(--accent-indigo-bg);padding:2px 6px;border-radius:4px;font-family:var(--font-mono)">"'+s.curr_str+'" → '+s.curr+'</code></div>';
+  }
+  h+='</div></div>';
+
+  h+='<div class="viz-row" style="margin-top:10px">';
+  h+='<div class="viz-card"><div class="viz-title">🗂️ Recursion Call Stack</div><div class="stack-col">';
+  if(!s.callStack.length){
+    h+='<div class="empty-state">Call stack empty</div>';
+  }else{
+    for(var c=0;c<s.callStack.length;c++){
+      var cs=s.callStack[c];
+      var topCls=(c===s.callStack.length-1)?' stack-item-top':'';
+      h+='<div class="stack-item'+topCls+'">backtrack(idx='+cs.index+', expr="'+cs.expr.replace(/^''$/,'')+'", val='+cs.value+', prev='+cs.prev+')</div>';
+    }
+  }
+  h+='</div></div>';
+
+  h+='<div class="viz-card" style="min-width:240px"><div class="viz-title">🏆 Found Expressions (res)</div><div class="chips">';
+  if(!s.res.length){
+    h+='<span class="empty-state">No valid expressions yet</span>';
+  }else{
+    for(var r=0;r<s.res.length;r++){
+      var winCls=(s.foundFlag&&r===s.res.length-1)?' chip-win':'';
+      h+='<span class="chip'+winCls+'">'+s.res[r]+' = '+s.target+'</span>';
+    }
+  }
+  h+='</div></div>';
+  h+='</div>';
+
+  if(s.action==="return"&&s.line===20){
+    h+='<div class="result-banner">🏆 Result: ['+s.res.map(function(x){return '"'+x+'"';}).join(", ")+'] — total '+s.res.length+'</div>';
+  }
+
+  document.getElementById("vizPanel").innerHTML=h;
+}
+
+function renderStep(idx){
+  if(!steps.length)return;
+  var s=steps[idx];currentStep=idx;
+  document.getElementById('stepInfo').textContent=(idx+1)+'/'+steps.length;
+  var bd=document.getElementById('actionBadge');
+  bd.textContent=BADGE_LABEL[s.action]||s.action;
+  bd.className='action-badge action-badge--'+s.action;
+  document.querySelectorAll('.code-line').forEach(function(el){el.classList.remove('active');});
+  var al=document.querySelector('.code-line[data-line="'+s.line+'"]');
+  if(al){al.classList.add('active');al.scrollIntoView({block:'nearest'});}
+  renderViz(s);
+  showLogPreview(s);
+}
+
+function showLogPreview(s){
+  if(!logEnabled)return;
+  document.getElementById('logPopupBody').innerHTML=s.logHTML||'';
+  document.getElementById('logPopup').classList.remove('log-popup--hidden');
+}
+function hideLogPopup(){document.getElementById('logPopup').classList.add('log-popup--hidden');}
+function toggleLogPreview(){
+  logEnabled=!logEnabled;
+  var btn=document.getElementById('logToggleBtn');
+  btn.textContent=logEnabled?'📋 ON':'📋 OFF';
+  btn.classList.toggle('log-toggle-btn--off',!logEnabled);
+  if(!logEnabled)hideLogPopup();
+  else if(steps.length)showLogPreview(steps[currentStep]);
+}
+function logZoom(dir){logZoomLevel=Math.max(60,Math.min(180,logZoomLevel+dir*20));updateLogZoom();}
+function logZoomReset(){logZoomLevel=100;updateLogZoom();}
+function updateLogZoom(){
+  document.getElementById('logZoomLabel').textContent=logZoomLevel+'%';
+  document.getElementById('logPopup').style.setProperty('--log-scale',logZoomLevel/100);
+}
+function toggleFullscreen(){
+  var viz=document.querySelector('.col-viz');
+  if(!document.fullscreenElement)viz.requestFullscreen().catch(function(){});
+  else document.exitFullscreen();
+}
+
+function resetWithInput(){
+  curResult=null;
+  var num=document.getElementById('inputNum').value.replace(/[^0-9]/g,'');
+  var target=parseInt(document.getElementById('inputTarget').value,10);
+  if(isNaN(target))target=0;
+  if(!num)num="123";
+  renderCode();fitCodeWidth();
+  steps=buildSteps(num,target);
+  currentStep=0;renderStep(0);
+  document.getElementById('liveOutput').textContent=curResult!==null?('['+curResult.map(function(x){return '"'+x+'"';}).join(",")+']'):'—';
+}
+
+function stepBy(d){var nx=currentStep+d;if(nx>=0&&nx<steps.length)renderStep(nx);}
+function resetStep(){renderStep(0);}
+
+function loadTest(i,el){
+  document.querySelectorAll('.prob-test').forEach(function(t){t.classList.remove('prob-test--active');});
+  if(el)el.classList.add('prob-test--active');
+  document.getElementById('inputNum').value=TESTS[i].num;
+  document.getElementById('inputTarget').value=TESTS[i].target;
+  document.getElementById('expectedBadge').textContent='exp: '+TESTS[i].e;
+  resetWithInput();
+}
+
+document.addEventListener('keydown',function(e){
+  if(e.target.tagName==='INPUT'||e.target.tagName==='SELECT')return;
+  if(e.key==='ArrowRight'){e.preventDefault();stepBy(1);}
+  else if(e.key==='ArrowLeft'){e.preventDefault();stepBy(-1);}
+  else if(e.key==='r'||e.key==='R'){e.preventDefault();resetStep();}
+});
+
+(function(){
+  var col1=document.getElementById('col1');
+  document.getElementById('resizeH1').addEventListener('mousedown',function(e){
+    e.preventDefault();codeWidthUserSet=true;
+    var startX=e.clientX,startW=col1.offsetWidth,h=this;
+    document.body.classList.add('no-select');h.classList.add('active');
+    function mv(e){col1.style.width=Math.max(140,startW+(e.clientX-startX))+'px';syncFooterWidth();}
+    function up(){document.removeEventListener('mousemove',mv);document.removeEventListener('mouseup',up);document.body.classList.remove('no-select');h.classList.remove('active');}
+    document.addEventListener('mousemove',mv);document.addEventListener('mouseup',up);
+  });
+})();
+
+window.addEventListener('resize',function(){if(!codeWidthUserSet)fitCodeWidth();else syncFooterWidth();});
+
+renderTests();renderCode();fitCodeWidth();resetWithInput();
+</script>
+</body>
+</html>

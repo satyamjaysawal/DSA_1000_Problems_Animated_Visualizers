@@ -1,0 +1,748 @@
+﻿
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>231. Power of Two — Dry Run Visualizer</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=DM+Sans:wght@400;500;600&display=swap');
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{--bg-primary:#FAFAF8;--bg-secondary:#F1EFE8;--bg-tertiary:#E2E0D8;--bg-card:#FFFFFF;--text-primary:#2C2C2A;--text-secondary:#5F5E5A;--text-tertiary:#888780;--border-color:rgba(0,0,0,.11);--border-light:rgba(0,0,0,.06);--border-focus:#534AB7;--accent-indigo:#534AB7;--accent-indigo-bg:#EEEDFE;--accent-indigo-text:#3C3489;--accent-indigo-hover:#4740A0;--accent-teal:#0F6E56;--accent-teal-bg:#E1F5EE;--accent-teal-text:#085041;--accent-red:#E24B4A;--accent-red-bg:#FCEBEB;--accent-red-text:#791F1F;--accent-amber:#B45309;--accent-amber-bg:#FEF3C7;--accent-amber-text:#78350F;--accent-green:#15803D;--accent-green-bg:#DCFCE7;--accent-green-text:#14532D;--syn-keyword:#534AB7;--syn-function:#185FA5;--syn-number:#993C1D;--syn-string:#0F6E56;--active-line-bg:#EEEDFE;--radius-sm:4px;--radius-md:6px;--radius-lg:10px;--sp-2:8px;--sp-3:12px;--sp-5:20px;--font-sans:'DM Sans',system-ui,sans-serif;--font-mono:'JetBrains Mono','Fira Code',monospace;--fs-xs:11px;--fs-sm:12px;--fs-base:14px;--fs-md:15px;--fw-medium:500;--fw-semibold:600;--fw-bold:700;--lh-normal:1.6;--lh-code:1.9;--ease:.18s ease}
+html,body{height:100%;background:var(--bg-primary);color:var(--text-primary);font:var(--fs-base) var(--font-sans)}
+.kw{color:var(--syn-keyword);font-weight:var(--fw-medium)}.fn{color:var(--syn-function)}.num{color:var(--syn-number)}.str{color:var(--syn-string)}
+.btn,.section-label,.action-badge,.log-badge,kbd{font-family:system-ui,"Segoe UI Emoji",var(--font-sans)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:4px;padding:5px var(--sp-3);font-size:var(--fs-sm);font-weight:var(--fw-medium);border:1px solid var(--border-color);border-radius:var(--radius-md);background:var(--bg-card);color:var(--text-primary);cursor:pointer;transition:all var(--ease);white-space:nowrap}.btn:hover{background:var(--bg-secondary)}.btn:active{transform:scale(.96)}.btn-primary{background:var(--accent-indigo);color:#fff;border-color:var(--accent-indigo)}.btn-primary:hover{background:var(--accent-indigo-hover)}
+.btn-zoom{display:inline-flex;align-items:center;justify-content:center;padding:2px 7px;font:700 12px var(--font-mono);border:1px solid var(--border-color);border-radius:var(--radius-sm);background:var(--bg-card);color:var(--text-secondary);cursor:pointer}.btn-zoom:hover{background:var(--accent-indigo-bg);border-color:var(--accent-indigo);color:var(--accent-indigo)}
+.input{padding:4px var(--sp-2);font:var(--fs-sm) var(--font-mono);border:1px solid var(--border-color);border-radius:var(--radius-md);background:var(--bg-card);color:var(--text-primary);outline:none}.input:focus{border-color:var(--border-focus)}
+kbd{display:inline-block;padding:1px 5px;border-radius:var(--radius-sm);font-size:10px;background:var(--bg-secondary);border:1px solid var(--border-color);color:var(--text-secondary);line-height:1.5}
+::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border-color);border-radius:3px}
+@keyframes pulse-node{0%,100%{box-shadow:0 0 5px var(--accent-indigo)}50%{box-shadow:0 0 14px var(--accent-indigo)}}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-3px)}75%{transform:translateX(3px)}}
+@keyframes win-pulse{0%,100%{box-shadow:0 0 5px rgba(234,179,8,.6)}50%{box-shadow:0 0 16px rgba(234,179,8,.95)}}
+@keyframes bit-flip{0%{transform:rotateY(0);background:#FEF3C7}50%{transform:rotateY(90deg)}100%{transform:rotateY(0)}}
+@keyframes glow-green{0%,100%{box-shadow:0 0 0 rgba(21,128,61,0)}50%{box-shadow:0 0 12px rgba(21,128,61,.7)}}
+.app-shell{display:flex;flex-direction:column;height:100vh;overflow:hidden;background:var(--bg-primary)}
+.prob-header{display:flex;align-items:center;gap:var(--sp-2);padding:8px var(--sp-5);border-bottom:1px solid var(--border-color);background:var(--bg-card);flex-wrap:wrap;flex-shrink:0}
+.prob-header-left{display:flex;align-items:center;gap:6px;flex-wrap:wrap;flex:1}
+.prob-header-right{display:flex;align-items:center;gap:var(--sp-2);flex-wrap:wrap}
+.gt-home-btn{padding:3px 10px;font-family:var(--font-sans);font-size:11px;font-weight:700;letter-spacing:.04em;border:1.5px solid var(--accent-indigo);border-radius:var(--radius-md);background:var(--accent-indigo);color:#fff;cursor:pointer;text-transform:uppercase}
+.gt-home-btn:hover{background:var(--accent-indigo-hover)}
+.prob-num{font-size:var(--fs-sm);font-weight:var(--fw-bold);color:var(--accent-indigo);font-family:var(--font-mono)}
+.prob-name{font-size:var(--fs-md);font-weight:var(--fw-semibold)}
+.prob-diff--easy{font-size:10px;padding:2px 8px;border-radius:99px;font-weight:var(--fw-semibold);background:var(--accent-green-bg);color:var(--accent-green-text)}
+.prob-tag{font-size:10px;padding:2px 8px;border-radius:99px;background:var(--bg-tertiary);color:var(--text-tertiary);border:1px solid var(--border-color);font-weight:var(--fw-medium)}
+.top-label{font:var(--fs-xs) var(--font-mono);color:var(--text-tertiary)}
+.top-expected{font:700 10px var(--font-mono);padding:2px 8px;border-radius:99px;background:var(--accent-teal-bg);color:var(--accent-teal-text);border:1px solid var(--accent-teal)}
+.prob-toggle-btn{font-family:system-ui,sans-serif;font-size:11px;padding:3px 10px;border-radius:var(--radius-md);background:var(--bg-secondary);border:1px solid var(--border-color);color:var(--text-secondary);cursor:pointer}
+.prob-body{display:flex;gap:var(--sp-5);padding:var(--sp-3) var(--sp-5);border-bottom:1px solid var(--border-color);background:var(--bg-card);flex-shrink:0}
+.problem-body--hidden{display:none!important}
+.prob-body-left{flex:1;min-width:0}.prob-body-right{width:340px;flex-shrink:0}
+.prob-body-left h3,.prob-body-right h3{font-size:var(--fs-sm);font-weight:var(--fw-semibold);color:var(--accent-indigo);margin:8px 0 3px}
+.prob-body-left h3:first-child{margin-top:0}
+.prob-desc{font-size:var(--fs-sm);color:var(--text-secondary);margin-bottom:4px}
+.prob-desc code{font-family:var(--font-mono);background:var(--bg-secondary);padding:1px 4px;border-radius:3px;font-size:var(--fs-xs)}
+.concept-block{background:var(--bg-secondary);border-radius:var(--radius-md);padding:8px 12px;margin:4px 0;font-size:var(--fs-sm);border-left:3px solid var(--accent-teal);color:var(--text-secondary)}
+.concept-block strong{color:var(--accent-teal-text);font-family:var(--font-mono);font-size:var(--fs-xs)}
+.prob-complexity{display:flex;gap:var(--sp-2);margin-top:6px}
+.prob-complexity-chip{font:10px var(--font-mono);padding:2px 8px;border-radius:var(--radius-md);background:var(--bg-secondary);border:1px solid var(--border-color)}
+.cc-label{color:var(--text-tertiary)}.cc-val{color:var(--accent-indigo-text);font-weight:var(--fw-bold)}
+.prob-tests{display:flex;flex-direction:column;gap:4px;margin-bottom:6px}
+.prob-test{display:flex;align-items:center;gap:5px;background:var(--bg-secondary);border:1px solid var(--border-color);border-radius:var(--radius-md);padding:5px 8px;font-size:var(--fs-xs);cursor:pointer;transition:all var(--ease)}
+.prob-test:hover{border-color:var(--accent-indigo)}
+.prob-test--active{border-color:var(--accent-indigo)!important;background:var(--accent-indigo-bg)!important}
+.pt-label{font-size:10px;font-weight:var(--fw-bold);color:var(--text-tertiary)}
+.pt-input{font-family:var(--font-mono);color:var(--text-primary);font-size:10px;flex:1}
+.pt-tag{font-size:8px;padding:1px 5px;border-radius:99px;background:var(--bg-tertiary);color:var(--text-tertiary);border:1px solid var(--border-color);font-weight:600;font-family:var(--font-mono)}
+.pt-arrow{color:var(--text-tertiary)}
+.pt-expected{font-family:var(--font-mono);font-weight:var(--fw-bold);color:var(--accent-teal);font-size:10px}
+.prob-live{display:flex;align-items:center;gap:6px;padding:6px var(--sp-3);border-radius:var(--radius-md);background:var(--bg-primary);border:1px solid var(--border-color);font-size:var(--fs-sm);margin-bottom:6px}
+.pl-label{font-size:var(--fs-xs);color:var(--text-tertiary)}
+.pl-output{font-family:var(--font-mono);font-weight:var(--fw-bold);color:var(--accent-indigo);font-size:var(--fs-sm)}
+.main-row{flex:1;display:flex;overflow:hidden;min-height:0}
+.col{display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.col-code{width:33%;min-width:140px;max-width:45vw}
+.col-viz{flex:1;min-width:0}
+.section-label{padding:5px var(--sp-3);font-size:var(--fs-xs);font-weight:var(--fw-semibold);color:var(--text-tertiary);text-transform:uppercase;letter-spacing:.07em;border-bottom:1px solid var(--border-color);flex-shrink:0;background:var(--bg-secondary)}
+.code-panel{flex:1;overflow-y:auto;padding:var(--sp-3) var(--sp-2);font-family:var(--font-mono);font-size:var(--fs-sm);line-height:var(--lh-code)}
+.code-line{display:flex;align-items:center;gap:var(--sp-2);padding:1px var(--sp-2);border-radius:var(--radius-sm)}
+.code-line.active{background:var(--active-line-bg)}
+.ln{min-width:18px;text-align:right;color:var(--text-tertiary);font-size:10px;user-select:none;flex-shrink:0;opacity:.6}
+.code-content{white-space:pre;flex:1}
+.resize-h{width:5px;cursor:col-resize;flex-shrink:0;background:transparent;position:relative;z-index:10;border-left:1px solid var(--border-color)}
+.resize-h:hover,.resize-h.active{background:rgba(99,102,241,.15)}
+.resize-h::after{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:3px;height:24px;border-radius:2px;background:rgba(0,0,0,.08)}
+.no-select{user-select:none!important;cursor:col-resize}
+.viz-panel{flex:1;overflow:auto;padding:var(--sp-3)}
+.vars-strip{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;padding:6px 10px;background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius-md)}
+.var-chip{display:inline-flex;align-items:center;gap:2px;padding:2px 7px;border-radius:var(--radius-md);background:var(--bg-secondary);border:1px solid var(--border-light);font-family:var(--font-mono);font-size:10px}
+.var-chip.vc-active{border-color:var(--accent-indigo);background:var(--accent-indigo-bg)}
+.var-chip.vc-safe{border-color:var(--accent-green);background:var(--accent-green-bg)}
+.var-chip.vc-flip{border-color:var(--accent-red);background:var(--accent-red-bg)}
+.vn{color:var(--text-tertiary);font-weight:500}.vv{font-weight:var(--fw-bold)}
+.viz-row{display:flex;gap:12px;align-items:flex-start;flex-wrap:wrap}
+.viz-card{background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius-md);padding:10px}
+.viz-title{font:600 9px var(--font-mono);text-transform:uppercase;letter-spacing:.04em;color:var(--text-tertiary);margin-bottom:6px}
+
+/* === BIT BOXES === */
+.bit-row{display:flex;align-items:center;gap:6px;margin:5px 0}
+.bit-label{font:700 11px var(--font-mono);min-width:88px;color:var(--text-primary);display:flex;flex-direction:column;gap:1px}
+.bit-label-decimal{font-size:10px;color:var(--text-tertiary);font-weight:500}
+.bit-grid{display:flex;gap:2px;background:#1e293b;padding:6px;border-radius:6px;border:1px solid #334155}
+.bit-cell{width:30px;height:36px;display:flex;align-items:center;justify-content:center;font:700 16px var(--font-mono);background:#0f172a;color:#64748b;border-radius:3px;border:1px solid #1e293b;position:relative;transition:all .25s}
+.bit-cell--one{background:#16a34a;color:#fff;border-color:#22c55e}
+.bit-cell--zero{background:#0f172a;color:#475569}
+.bit-cell--highlight{box-shadow:0 0 0 2px var(--accent-indigo);transform:translateY(-2px)}
+.bit-cell--matched{background:#fbbf24!important;color:#78350F;border-color:#f59e0b;animation:pulse-node 1s infinite}
+.bit-cell--diff{background:#ef4444!important;color:#fff;border-color:#dc2626}
+.bit-cell--flipped{animation:bit-flip .35s}
+.bit-cell--result-zero{background:#1e293b!important;color:#64748b;border-color:#334155}
+.bit-cell--ans-true{background:#16a34a!important;color:#fff;animation:glow-green 1.4s infinite}
+.bit-pos{font:9px var(--font-mono);color:#94a3b8;text-align:center;width:30px}
+.bit-pos-row{display:flex;gap:2px;padding:0 6px;margin-top:3px}
+
+.formula-box{background:#FFF8E7;border:1px solid #FBE8A6;border-left:3px solid var(--accent-amber);border-radius:var(--radius-md);padding:10px 14px;margin:8px 0;text-align:center}
+.formula-box-title{font:700 9px var(--font-mono);text-transform:uppercase;color:var(--accent-amber-text);margin-bottom:5px;letter-spacing:.05em}
+.formula-line{font:700 14px var(--font-mono);color:var(--accent-amber-text);line-height:1.7}
+.formula-num{font-size:16px}
+
+.outcome-banner{padding:14px 20px;border-radius:var(--radius-lg);font:700 18px var(--font-mono);text-align:center;margin-top:10px;display:flex;align-items:center;justify-content:center;gap:10px}
+.outcome-true{background:linear-gradient(135deg,#DCFCE7,#bbf7d0);color:var(--accent-green-text);border:2px solid var(--accent-green);animation:win-pulse 1.6s infinite}
+.outcome-false{background:linear-gradient(135deg,#FCEBEB,#fecaca);color:var(--accent-red-text);border:2px solid var(--accent-red)}
+.outcome-emoji{font-size:28px}
+
+.insight-card{background:linear-gradient(135deg,var(--accent-indigo-bg),#e0e7ff);border:1px solid var(--accent-indigo);border-radius:var(--radius-md);padding:8px 12px;margin-top:8px;font-size:11px;color:var(--accent-indigo-text);line-height:1.55}
+.insight-card strong{color:#1e1b4b}
+
+.set-bits-display{display:inline-flex;gap:4px;align-items:center;padding:3px 8px;background:var(--bg-secondary);border-radius:99px;font:700 11px var(--font-mono);border:1px solid var(--border-color);color:var(--text-secondary)}
+.set-bits-display .count{color:var(--accent-indigo);font-size:13px}
+
+.power-table{width:100%;border-collapse:collapse;font:11px var(--font-mono);margin-top:6px}
+.power-table th,.power-table td{padding:3px 6px;border:1px solid var(--border-light);text-align:center}
+.power-table th{background:var(--bg-secondary);color:var(--text-tertiary);font-weight:700;font-size:9px}
+.power-table tr.match td{background:var(--accent-green-bg);font-weight:700;color:var(--accent-green-text)}
+
+.action-badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:var(--radius-sm);font-size:10px;font-weight:var(--fw-bold)}
+.action-badge--func-def,.action-badge--init,.action-badge--call,.action-badge--return,.action-badge--resume{background:rgba(130,80,255,.14);color:#8250ff}
+.action-badge--for-check,.action-badge--if-check,.action-badge--while-check{background:rgba(56,139,253,.14);color:#388bfd}
+.action-badge--mark,.action-badge--push,.action-badge--pop,.action-badge--restore,.action-badge--found,.action-badge--update{background:rgba(63,185,80,.14);color:#3fb950}
+.action-badge--remove,.action-badge--prune,.action-badge--fail{background:rgba(248,81,73,.14);color:#f85149}
+.action-badge--exit,.action-badge--skip{background:rgba(85,84,80,.14);color:#555450}
+.log-card{border-radius:var(--radius-md);overflow:hidden;border:1px solid var(--border-color);border-left-width:4px;font-size:var(--fs-xs);background:var(--bg-card)}
+.log-card--func-def,.log-card--init,.log-card--call,.log-card--return,.log-card--resume{border-left-color:#8250ff}
+.log-card--for-check,.log-card--if-check,.log-card--while-check{border-left-color:#388bfd}
+.log-card--mark,.log-card--push,.log-card--pop,.log-card--restore,.log-card--found,.log-card--update{border-left-color:#3fb950}
+.log-card--remove,.log-card--prune,.log-card--fail{border-left-color:#f85149}
+.log-card--exit,.log-card--skip{border-left-color:#555450}
+.log-badge{display:inline-flex;flex-shrink:0;border-radius:var(--radius-sm);font-size:9px;font-weight:var(--fw-bold);padding:2px 6px;white-space:nowrap}
+.log-badge--func-def,.log-badge--init,.log-badge--call,.log-badge--return,.log-badge--resume{background:rgba(130,80,255,.22);color:#8250ff}
+.log-badge--for-check,.log-badge--if-check,.log-badge--while-check{background:rgba(56,139,253,.22);color:#388bfd}
+.log-badge--mark,.log-badge--push,.log-badge--pop,.log-badge--restore,.log-badge--found,.log-badge--update{background:rgba(63,185,80,.22);color:#3fb950}
+.log-badge--remove,.log-badge--prune,.log-badge--fail{background:rgba(248,81,73,.22);color:#f85149}
+.log-badge--exit,.log-badge--skip{background:rgba(85,84,80,.22);color:#555450}
+.log-card-header{display:flex;align-items:center;gap:6px;padding:8px 10px 6px;background:var(--bg-secondary);border-bottom:1px solid var(--border-light)}
+.log-line-ref{font:700 10px var(--font-mono);color:var(--accent-indigo);background:var(--accent-indigo-bg);padding:1px 6px;border-radius:4px;border:1px solid var(--accent-indigo)}
+.log-status-pill{font-family:system-ui,"Segoe UI Emoji",sans-serif;font-size:9px;font-weight:700;padding:2px 7px;border-radius:99px;text-transform:uppercase;letter-spacing:.04em;margin-left:auto}
+.log-status--success{background:var(--accent-green-bg);color:var(--accent-green-text);border:1px solid var(--accent-green)}
+.log-status--fail{background:var(--accent-red-bg);color:var(--accent-red-text);border:1px solid var(--accent-red)}
+.log-status--skip{background:var(--bg-tertiary);color:var(--text-tertiary);border:1px solid var(--border-color)}
+.log-status--loop{background:rgba(56,139,253,.14);color:#185FA5;border:1px solid #388bfd}
+.log-status--prune{background:var(--accent-red-bg);color:var(--accent-red-text);border:1px solid var(--accent-red)}
+.log-status--info{background:rgba(130,80,255,.14);color:#3C3489;border:1px solid #8250ff}
+.log-section{padding:7px 10px;border-bottom:1px dashed var(--border-light)}
+.log-section:last-child{border-bottom:none}
+.log-section-title{font:700 8px var(--font-mono);text-transform:uppercase;letter-spacing:.06em;color:var(--text-tertiary);margin-bottom:3px;display:flex;align-items:center;gap:4px}
+.log-section-title-icon{font-family:system-ui,"Segoe UI Emoji",sans-serif;font-size:10px}
+.log-code-snippet{font:600 11px var(--font-mono);background:#0d1117;color:#e6edf3;padding:6px 9px;border-radius:4px;display:block;overflow-x:auto;white-space:pre;border:1px solid #30363d}
+.log-code-snippet .ck{color:#ff7b72}.log-code-snippet .cs{color:#a5d6ff}.log-code-snippet .cn{color:#79c0ff}.log-code-snippet .cf{color:#d2a8ff}.log-code-snippet .cc{color:#8b949e;font-style:italic}
+.log-kv-row{display:flex;flex-wrap:wrap;gap:4px;margin-top:2px}
+.log-kv{display:inline-flex;align-items:center;gap:3px;font:11px var(--font-mono);padding:2px 7px;border-radius:4px;background:var(--bg-secondary);border:1px solid var(--border-light)}
+.log-kv-key{color:var(--text-tertiary);font-weight:500}
+.log-kv-val{color:var(--text-primary);font-weight:700}
+.log-kv--in{background:rgba(56,139,253,.08);border-color:rgba(56,139,253,.3)}
+.log-kv--out{background:rgba(63,185,80,.08);border-color:rgba(63,185,80,.4)}
+.log-kv--out .log-kv-val{color:#15803D}
+.log-kv--changed{background:rgba(180,83,9,.10);border-color:rgba(180,83,9,.4)}
+.log-verdict{display:flex;align-items:center;gap:6px;font:600 11px var(--font-mono);padding:5px 8px;border-radius:5px;background:var(--bg-secondary);border:1px solid var(--border-light)}
+.log-verdict--true{background:var(--accent-green-bg);border-color:var(--accent-green);color:var(--accent-green-text)}
+.log-verdict--false{background:var(--accent-red-bg);border-color:var(--accent-red);color:var(--accent-red-text)}
+.log-analogy{font:italic 11px var(--font-sans);color:var(--text-secondary);background:#FFF8E7;border:1px solid #FBE8A6;border-left:3px solid var(--accent-amber);padding:6px 9px;border-radius:4px;line-height:1.55}
+.log-analogy strong{color:var(--accent-amber-text);font-style:normal;font-weight:700}
+.log-why{font-size:11px;line-height:1.55;color:var(--text-primary);padding:4px 0}
+.log-why strong{color:var(--accent-indigo-text)}
+.log-popup{--log-scale:1;position:fixed;bottom:52px;right:14px;width:calc(480px * var(--log-scale));max-width:92vw;max-height:75vh;border-radius:var(--radius-lg);box-shadow:0 10px 32px rgba(0,0,0,.14);border:1px solid var(--border-color);background:var(--bg-card);overflow:hidden;display:flex;flex-direction:column;z-index:100;transition:opacity .15s,transform .15s;transform-origin:bottom right}
+.log-popup--hidden{opacity:0;transform:scale(.92);pointer-events:none}
+.log-popup-body{flex:1;overflow:auto;padding:0}
+.log-popup-body > .log-card{border-radius:0;border:none;border-left:0}
+.footer-bar{display:flex;flex-shrink:0;border-top:1px solid var(--border-color);background:var(--bg-card)}
+.footer-left{width:33%;min-width:140px;max-width:45vw;display:flex;align-items:center;gap:8px;padding:7px 12px;border-right:1px solid var(--border-light)}
+.footer-right{flex:1;display:flex;align-items:center;gap:6px;padding:7px 14px;flex-wrap:wrap}
+.footer-sep{width:1px;height:16px;background:var(--border-color);flex-shrink:0}
+.step-info{font:10px var(--font-mono);color:var(--text-tertiary)}
+.log-toggle-btn{padding:2px 8px;font:700 9px var(--font-mono);border:1px solid var(--accent-green);border-radius:99px;background:var(--accent-green-bg);color:var(--accent-green-text);cursor:pointer}
+.log-toggle-btn--off{background:var(--bg-tertiary);color:var(--text-tertiary);border-color:var(--border-color)}
+.log-zoom-label{font:10px var(--font-mono);color:var(--text-tertiary);min-width:28px;text-align:center}
+.btn-fullscreen{font-size:14px;padding:3px 8px;background:var(--accent-indigo-bg);border-color:var(--accent-indigo);color:var(--accent-indigo)}
+.btn-fullscreen:hover{background:var(--accent-indigo);color:#fff}
+</style>
+</head>
+<body>
+<div class="app-shell">
+  <header class="prob-header">
+    <div class="prob-header-left">
+      <a href="../00_HomePage/gt_learn_homepage.html" class="gt-home-btn">GT LEARN</a>
+      <span class="prob-num">#231</span>
+      <span class="prob-name">⚡ Power of Two</span>
+      <span class="prob-diff--easy">EASY</span>
+      <span class="prob-tag">Bit Manipulation</span>
+      <span class="prob-tag">Math</span>
+    </div>
+    <div class="prob-header-right">
+      <span class="top-label">n=</span>
+      <input id="inputN" class="input" style="width:90px;text-align:center" value="16" type="number">
+      <span id="expectedBadge" class="top-expected">exp: True</span>
+      <button id="probToggleBtn" class="prob-toggle-btn" type="button" onclick="toggleProblem()">▲ Hide</button>
+    </div>
+  </header>
+  <div id="probBody" class="prob-body">
+    <div class="prob-body-left">
+      <h3>📝 Problem Statement</h3>
+      <p class="prob-desc">Given an integer <code>n</code>, return <code>True</code> if it is a <strong>power of two</strong>, otherwise return <code>False</code>. An integer <code>n</code> is a power of two if there exists an integer <code>x</code> such that <code>n == 2^x</code>.</p>
+      <h3>🧠 Solving Approach (Bit Trick)</h3>
+      <p class="prob-desc">Use the elegant <code>n &amp; (n - 1) == 0</code> trick. <strong>Powers of 2 have exactly ONE bit set</strong> in binary. Subtracting 1 flips that bit to 0 and turns all lower bits to 1. AND-ing them gives <strong>0</strong>.</p>
+      <h3>🎯 Core Concepts</h3>
+      <div class="concept-block"><strong>Edge case:</strong> Negative numbers and zero are NOT powers of 2. Only positive integers qualify.</div>
+      <div class="concept-block"><strong>Bit insight:</strong> 8 = <code>1000</code>, 7 = <code>0111</code>, 8 &amp; 7 = <code>0000</code> ✓. Compare 6 = <code>110</code>, 5 = <code>101</code>, 6 &amp; 5 = <code>100</code> ≠ 0 ✗.</div>
+      <div class="concept-block"><strong>Why it works:</strong> A power of 2 in binary is a single 1 followed by zeros. <code>n-1</code> flips the pattern: 0 followed by 1s. No bit overlap → AND = 0.</div>
+      <div class="prob-complexity">
+        <span class="prob-complexity-chip"><span class="cc-label">Time </span><span class="cc-val">O(1)</span></span>
+        <span class="prob-complexity-chip"><span class="cc-label">Space </span><span class="cc-val">O(1)</span></span>
+      </div>
+    </div>
+    <div class="prob-body-right">
+      <h3>🧪 Test Cases</h3>
+      <div id="testList" class="prob-tests"></div>
+      <div class="prob-live"><span class="pl-label">Result:</span><span id="liveOutput" class="pl-output">—</span></div>
+      <button class="btn btn-primary" type="button" onclick="resetWithInput()">▶ Run</button>
+    </div>
+  </div>
+  <div class="main-row">
+    <div id="col1" class="col col-code">
+      <div class="section-label">📜 Python Code</div>
+      <div id="codePanel" class="code-panel"></div>
+    </div>
+    <div id="resizeH1" class="resize-h"></div>
+    <div class="col col-viz">
+      <div class="section-label">📊 Visualization</div>
+      <div id="vizPanel" class="viz-panel"></div>
+    </div>
+  </div>
+  <div class="footer-bar">
+    <div id="footerLeft" class="footer-left">
+      <span id="stepInfo" class="step-info">0/0</span>
+      <span id="actionBadge" class="action-badge"></span>
+    </div>
+    <div class="footer-right">
+      <kbd>←</kbd><kbd>→</kbd>
+      <button class="btn" type="button" onclick="resetStep()">↺</button>
+      <button class="btn" type="button" onclick="stepBy(-1)">◀</button>
+      <button class="btn btn-primary" type="button" onclick="stepBy(1)">▶ Next</button>
+      <span class="footer-sep"></span>
+      <button id="logToggleBtn" class="log-toggle-btn" type="button" onclick="toggleLogPreview()">📋 ON</button>
+      <button class="btn-zoom" type="button" onclick="logZoom(-1)">−</button>
+      <span id="logZoomLabel" class="log-zoom-label">100%</span>
+      <button class="btn-zoom" type="button" onclick="logZoom(1)">+</button>
+      <button class="btn-zoom" type="button" onclick="logZoomReset()">↺</button>
+      <span class="footer-sep"></span>
+      <button class="btn btn-fullscreen" type="button" onclick="toggleFullscreen()">⛶</button>
+    </div>
+  </div>
+</div>
+<div id="logPopup" class="log-popup log-popup--hidden">
+  <div id="logPopupBody" class="log-popup-body"></div>
+</div>
+<script>
+var TESTS=[
+  {n:1,e:"True",tag:"2^0"},
+  {n:2,e:"True",tag:"2^1"},
+  {n:16,e:"True",tag:"2^4"},
+  {n:1024,e:"True",tag:"2^10"},
+  {n:3,e:"False",tag:"odd"},
+  {n:6,e:"False",tag:"even,not pow2"},
+  {n:218,e:"False",tag:"random"},
+  {n:0,e:"False",tag:"zero"},
+  {n:-8,e:"False",tag:"negative"}
+];
+
+var codeLines=[
+  "def isPowerOfTwo(n):",
+  "    if n <= 0:",
+  "        return False",
+  "    n_minus_1 = n - 1",
+  "    result = n & n_minus_1",
+  "    return result == 0"
+];
+
+var LOG_BADGE={"func-def":"📌 DEF","init":"⚙️ INIT","call":"📞 CALL","resume":"🔄 RESUME","for-check":"🔁 FOR","while-check":"🔁 WHILE","if-check":"🔎 IF","mark":"✅ MARK","push":"⬆ PUSH","pop":"⬇ POP","update":"✏️ UPDATE","exit":"🔚 EXIT","return":"🏆 RETURN","found":"🎉 FOUND","prune":"✂️ PRUNE","skip":"⏭ SKIP","fail":"❌ FAIL","restore":"↩ RESTORE"};
+var BADGE_LABEL={"func-def":"DEF","init":"INIT","call":"CALL","resume":"RESUME","for-check":"FOR","while-check":"WHILE","if-check":"IF","mark":"MARK","push":"PUSH","pop":"POP","update":"UPDATE","exit":"EXIT","return":"RETURN","found":"FOUND","prune":"PRUNE","skip":"SKIP","fail":"FAIL","restore":"RESTORE"};
+
+var steps=[],currentStep=0,codeWidthUserSet=false,curResult=null,logEnabled=true,logZoomLevel=100;
+
+function renderTests(){
+  document.getElementById("testList").innerHTML=TESTS.map(function(t,i){
+    return '<div class="prob-test'+(t.n===16?' prob-test--active':'')+'" onclick="loadTest('+i+',this)">'+
+      '<span class="pt-label">T'+(i+1)+'</span>'+
+      '<span class="pt-input">n='+t.n+'</span>'+
+      '<span class="pt-tag">'+t.tag+'</span>'+
+      '<span class="pt-arrow">→</span>'+
+      '<span class="pt-expected">'+t.e+'</span></div>';
+  }).join("");
+}
+
+function renderCode(){
+  var p=document.getElementById('codePanel');
+  p.innerHTML=codeLines.map(function(raw,i){
+    var h=raw;
+    h=h.replace(/("[^"]*"|'[^']*')/g,'\x01STR\x02$1\x03');
+    h=h.replace(/\b(def|for|in|if|return|break|continue|and|else|elif|True|False|None|not|or|while|lambda)\b/g,'\x01KW\x02$1\x03');
+    h=h.replace(/\b(len|range|int|str|list|append|pop|sorted|min|max|sum|abs|enumerate|zip|print|set|add|isPowerOfTwo)\b/g,'\x01FN\x02$1\x03');
+    h=h.replace(/(?<![.\w"\x01\x02\x03])(-?\d+)\b/g,'\x01NUM\x02$1\x03');
+    h=h.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    h=h.replace(/\x01([A-Z]+)\x02/g,function(_,c){return '<span class="'+c.toLowerCase()+'">';}).replace(/\x03/g,'</span>');
+    return '<div class="code-line" data-line="'+i+'"><span class="ln">'+(i+1)+'</span><span class="code-content">'+h+'</span></div>';
+  }).join('');
+}
+
+function toggleProblem(){
+  var body=document.getElementById('probBody'),btn=document.getElementById('probToggleBtn');
+  body.classList.toggle('problem-body--hidden');
+  btn.textContent=body.classList.contains('problem-body--hidden')?'▼ Show':'▲ Hide';
+}
+
+function syncFooterWidth(){document.getElementById('footerLeft').style.width=document.getElementById('col1').offsetWidth+'px';}
+
+function fitCodeWidth(){
+  if(codeWidthUserSet)return;
+  var c=document.getElementById('col1');
+  c.style.flex='none';c.style.width='max-content';
+  c.style.width=Math.min(c.offsetWidth,window.innerWidth*.45)+'px';
+  syncFooterWidth();
+}
+
+function hlCode(raw){
+  if(!raw)return '';
+  var h=raw;
+  h=h.replace(/("[^"]*"|'[^']*')/g,'\x01CS\x02$1\x03');
+  h=h.replace(/\b(def|for|in|if|return|break|continue|and|else|elif|True|False|None|not|or|while|lambda)\b/g,'\x01CK\x02$1\x03');
+  h=h.replace(/\b(len|range|int|str|list|append|pop|sorted|min|max|sum|abs|set|add|isPowerOfTwo)\b/g,'\x01CF\x02$1\x03');
+  h=h.replace(/(?<![.\w"\x01\x02\x03])(-?\d+)\b/g,'\x01CN\x02$1\x03');
+  h=h.replace(/(#.*$)/g,'\x01CC\x02$1\x03');
+  h=h.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  h=h.replace(/\x01([A-Z]+)\x02/g,function(_,c){return '<span class="'+c.toLowerCase()+'">';}).replace(/\x03/g,'</span>');
+  return h;
+}
+
+function richLog(opts){
+  var statusMap={success:"✅ Success",fail:"❌ Failed",skip:"⏭ Skipped",loop:"🔁 Loop iter",prune:"✂️ Pruned",info:"ℹ️ Info"};
+  var status=opts.status||"info";
+  var html='<div class="log-card log-card--'+opts.action+'">';
+  html+='<div class="log-card-header">';
+  html+='<span class="log-badge log-badge--'+opts.action+'">'+(LOG_BADGE[opts.action]||opts.action)+'</span>';
+  html+='<span class="log-line-ref">L'+(opts.line+1)+'</span>';
+  html+='<span class="log-status-pill log-status--'+status+'">'+(statusMap[status]||status)+'</span>';
+  html+='</div>';
+  if(opts.code){
+    html+='<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">📜</span>Code Executing</div>';
+    html+='<code class="log-code-snippet">'+hlCode(opts.code)+'</code></div>';
+  }
+  if(opts.inputs&&opts.inputs.length){
+    html+='<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">📥</span>Input Values</div><div class="log-kv-row">';
+    opts.inputs.forEach(function(kv){html+='<span class="log-kv log-kv--in"><span class="log-kv-key">'+kv.k+'</span>=<span class="log-kv-val">'+kv.v+'</span></span>';});
+    html+='</div></div>';
+  }
+  if(opts.outputs&&opts.outputs.length){
+    html+='<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">📤</span>Output / State After Line</div><div class="log-kv-row">';
+    opts.outputs.forEach(function(kv){
+      var cls=kv.changed?'log-kv--changed':'log-kv--out';
+      html+='<span class="log-kv '+cls+'"><span class="log-kv-key">'+kv.k+'</span>=<span class="log-kv-val">'+kv.v+'</span></span>';
+    });
+    html+='</div></div>';
+  }
+  if(opts.verdict){
+    var vCls=opts.verdictTrue===true?'log-verdict--true':(opts.verdictTrue===false?'log-verdict--false':'');
+    var vIcon=opts.verdictTrue===true?'✓':(opts.verdictTrue===false?'✗':'•');
+    html+='<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">⚖️</span>Verdict / Decision</div>';
+    html+='<div class="log-verdict '+vCls+'">'+vIcon+' '+opts.verdict+'</div></div>';
+  }
+  if(opts.why){
+    html+='<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">💡</span>Why This Happens</div>';
+    html+='<div class="log-why">'+opts.why+'</div></div>';
+  }
+  if(opts.analogy){
+    html+='<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">🎭</span>Real-Life Analogy</div>';
+    html+='<div class="log-analogy">'+opts.analogy+'</div></div>';
+  }
+  html+='</div>';
+  return html;
+}
+
+// Helper: convert int to 16-bit binary array (MSB first), handle negatives via 2's complement
+function toBits(num,width){
+  width=width||16;
+  var n=num;
+  if(n<0)n=(Math.pow(2,width)+n)>>>0;
+  var bits=[];
+  for(var i=width-1;i>=0;i--)bits.push((n>>i)&1);
+  return bits;
+}
+
+function countSetBits(num){
+  if(num<0)return -1;
+  var c=0,n=num;
+  while(n){c+=(n&1);n=n>>>1;}
+  return c;
+}
+
+// Auto-pick bit width based on n magnitude
+function pickWidth(n){
+  var abs=Math.abs(n);
+  if(abs<=1)return 4;
+  if(abs<=15)return 4;
+  if(abs<=255)return 8;
+  if(abs<=4095)return 12;
+  if(abs<=65535)return 16;
+  return 20;
+}
+
+function buildSteps(n){
+  var st=[];
+  var hl={
+    n:n,
+    nMinus1:null,
+    result:null,
+    width:pickWidth(n),
+    phase:"start",
+    highlightBit:null, // index for AND visual
+    showFinal:false,
+    answer:null,
+    earlyExit:false
+  };
+
+  function snap(x){return Object.assign({},hl,x||{});}
+  function pushStep(o){st.push(Object.assign({line:0,action:"func-def",logHTML:""},snap(o)));}
+
+  // ── L1: function entry ──
+  pushStep({line:0,action:"func-def",phase:"start",logHTML:richLog({
+    line:0,action:"func-def",
+    code:"def isPowerOfTwo(n="+n+"):",
+    status:"info",
+    inputs:[{k:"n",v:n}],
+    outputs:[{k:"function",v:"entered"}],
+    why:"<strong>Function entry</strong> — input <code>n="+n+"</code> mil gaya. Goal: check karna hai ki yeh number power of 2 hai ya nahi.",
+    analogy:"<strong>Test laboratory mein sample aaya</strong> 🧪 — ab inspector ko decide karna hai 'pure power of 2' hai ya 'imposter'."
+  })});
+
+  // ── L2: if n <= 0 ──
+  var isNeg=n<=0;
+  hl.phase="check-positive";
+  pushStep({line:1,action:"if-check",logHTML:richLog({
+    line:1,action:"if-check",
+    code:"if n <= 0:  # n="+n+" <= 0 → "+isNeg,
+    status:isNeg?"prune":"success",
+    inputs:[{k:"n",v:n}],
+    verdict:"n ("+n+") "+(isNeg?"<=":">")+" 0",
+    verdictTrue:isNeg,
+    why:isNeg?"<strong>Edge case caught!</strong> Negative numbers ya 0 kabhi power of 2 nahi hote — kyunki <code>2^x</code> always positive deta hai (smallest is <code>2^0 = 1</code>).":"<strong>n positive hai</strong> ✓ — proceed with bit-magic check.",
+    analogy:isNeg?"<strong>Bouncer check at club entrance</strong> 🚷 — '0 ya negative number? Andar nahi aa sakta, return False!'":"<strong>Positive ID verified</strong> ✅ — entry granted, ab actual test honga."
+  })});
+
+  if(isNeg){
+    // ── L3: return False ──
+    hl.answer=false;hl.earlyExit=true;hl.showFinal=true;
+    curResult=false;
+    pushStep({line:2,action:"return",logHTML:richLog({
+      line:2,action:"return",
+      code:"return False  # n="+n+" is non-positive",
+      status:"fail",
+      inputs:[{k:"n",v:n}],
+      outputs:[{k:"return",v:"False"}],
+      why:"<strong>Early return False</strong> — non-positive numbers automatically rejected. Function khatam.",
+      analogy:"<strong>Ticket counter pe wapas bhej diya</strong> 🎫❌ — '"+n+"? Sorry, eligibility nahi.'"
+    })});
+    return st;
+  }
+
+  // ── L4: n_minus_1 = n - 1 ──
+  var nm1=n-1;
+  hl.nMinus1=nm1;hl.phase="computed-nm1";
+  pushStep({line:3,action:"update",logHTML:richLog({
+    line:3,action:"update",
+    code:"n_minus_1 = n - 1 = "+n+" - 1 = "+nm1,
+    status:"success",
+    inputs:[{k:"n",v:n}],
+    outputs:[{k:"n_minus_1",v:nm1,changed:true}],
+    why:"<strong>Compute n-1</strong>. Yeh <strong>magic number</strong> hai jo bit-trick ka heart hai. Binary mein dekho — agar n power of 2 hua, toh n-1 ke saare lower bits flip ho jate hain.",
+    analogy:"<strong>Mirror image banaya</strong> 🪞 — original n se ek kam karke uska 'opposite pattern' nikala. Ab compare karenge."
+  })});
+
+  // ── L5: result = n & n_minus_1 ──
+  var result=n&nm1;
+  hl.result=result;hl.phase="computed-result";hl.highlightBit=null;
+  pushStep({line:4,action:"update",logHTML:richLog({
+    line:4,action:"update",
+    code:"result = n & n_minus_1 = "+n+" & "+nm1+" = "+result,
+    status:"success",
+    inputs:[{k:"n",v:n+" (bin: "+n.toString(2)+")"},{k:"n_minus_1",v:nm1+" (bin: "+nm1.toString(2)+")"}],
+    outputs:[{k:"result",v:result+" (bin: "+result.toString(2)+")",changed:true}],
+    why:"<strong>Bitwise AND operation</strong> — har position pe dono bits 1 honi chahiye to get 1. Power of 2 ke liye <strong>koi bhi position match nahi hogi</strong> → result = 0.",
+    analogy:"<strong>Do photos overlay kar diye</strong> 🎬 — sirf woh part visible jahan dono mein same spot pe color tha. Power of 2 mein koi overlap nahi → blank screen!"
+  })});
+
+  // ── L6: return result == 0 ──
+  var ans=result===0;
+  hl.answer=ans;hl.showFinal=true;
+  curResult=ans;
+  pushStep({line:5,action:"return",logHTML:richLog({
+    line:5,action:"return",
+    code:"return result == 0  # "+result+" == 0 → "+ans,
+    status:ans?"success":"fail",
+    inputs:[{k:"result",v:result}],
+    verdict:"result ("+result+") "+(ans?"==":"!=")+" 0",
+    verdictTrue:ans,
+    outputs:[{k:"return",v:ans?"True":"False"}],
+    why:ans?"🎉 <strong>result is 0</strong> → confirmed power of 2! n="+n+" mein <strong>exactly ONE bit set</strong> tha (= "+countSetBits(n)+" set bit), aur n-1 ne usse complement kar diya.":"<strong>result is "+result+"</strong> (non-zero) → NOT a power of 2. n="+n+" mein <strong>"+countSetBits(n)+" bits set</strong> the — power of 2 ke liye exactly 1 hona zaroori.",
+    analogy:ans?"<strong>Lock pe sahi key fit ho gayi</strong> 🔓 — clean click! Confirmed: pure power of 2.":"<strong>Lock pe key fit nahi hui</strong> 🔒 — kuch bits bach gaye, matlab impostor number hai."
+  })});
+
+  return st;
+}
+
+// ── VIZ ──
+function renderViz(s){
+  function chip(n,v,cls){return '<span class="var-chip '+(cls||'')+'"><span class="vn">'+n+'</span><span class="vv">'+v+'</span></span>';}
+
+  // Vars strip
+  var h='<div class="vars-strip">'+
+    chip("n ",s.n,"vc-active")+
+    chip("n-1 ",s.nMinus1!==null?s.nMinus1:"—",s.nMinus1!==null?"vc-active":"")+
+    chip("result ",s.result!==null?s.result:"—",s.result!==null?(s.result===0?"vc-safe":"vc-flip"):"")+
+    chip("setBits(n) ",s.n>0?countSetBits(s.n):"—","")+
+    chip("answer ",s.answer===null?"—":(s.answer?"True":"False"),s.answer===null?"":(s.answer?"vc-safe":"vc-flip"))+
+  '</div>';
+
+  // ── ROW 1: Bit visualization ──
+  h+='<div class="viz-card" style="width:100%"><div class="viz-title">🔢 Binary Bit Representation ('+s.width+'-bit)</div>';
+
+  // n bits
+  var nBits=s.n>=0?toBits(s.n,s.width):toBits(s.n,s.width);
+  h+='<div class="bit-row">';
+  h+='<div class="bit-label">n<span class="bit-label-decimal">decimal: '+s.n+'</span></div>';
+  h+='<div class="bit-grid">';
+  for(var i=0;i<s.width;i++){
+    var b=nBits[i];
+    var cls='bit-cell '+(b===1?'bit-cell--one':'bit-cell--zero');
+    if(s.phase==='computed-result'||s.phase==='check-positive')cls+=b===1?' bit-cell--highlight':'';
+    h+='<div class="'+cls+'">'+b+'</div>';
+  }
+  h+='</div>';
+  if(s.n>0){h+='<span class="set-bits-display">set bits: <span class="count">'+countSetBits(s.n)+'</span></span>';}
+  h+='</div>';
+
+  // n-1 bits (only if computed)
+  if(s.nMinus1!==null){
+    var nm1Bits=toBits(s.nMinus1,s.width);
+    h+='<div class="bit-row">';
+    h+='<div class="bit-label">n-1<span class="bit-label-decimal">decimal: '+s.nMinus1+'</span></div>';
+    h+='<div class="bit-grid">';
+    for(var j=0;j<s.width;j++){
+      var b2=nm1Bits[j];
+      var cls2='bit-cell '+(b2===1?'bit-cell--one':'bit-cell--zero');
+      // mark bits that flipped from n
+      if(s.phase==='computed-nm1'||s.phase==='computed-result'){
+        if(nBits[j]!==b2)cls2+=' bit-cell--flipped';
+      }
+      h+='<div class="'+cls2+'">'+b2+'</div>';
+    }
+    h+='</div>';
+    h+='<span class="set-bits-display">set bits: <span class="count">'+countSetBits(s.nMinus1)+'</span></span>';
+    h+='</div>';
+  }
+
+  // AND operator visualization
+  if(s.result!==null){
+    h+='<div style="display:flex;align-items:center;gap:6px;margin:5px 0">';
+    h+='<div class="bit-label" style="text-align:center;color:var(--accent-indigo)">&amp; (AND)<span class="bit-label-decimal">bitwise</span></div>';
+    h+='<div style="flex:1;border-top:2px dashed var(--accent-indigo);margin-left:6px"></div>';
+    h+='</div>';
+
+    // result bits
+    var resBits=toBits(s.result,s.width);
+    h+='<div class="bit-row">';
+    h+='<div class="bit-label">result<span class="bit-label-decimal">decimal: '+s.result+'</span></div>';
+    h+='<div class="bit-grid">';
+    for(var k=0;k<s.width;k++){
+      var b3=resBits[k];
+      var cls3='bit-cell '+(b3===1?'bit-cell--diff':'bit-cell--result-zero');
+      if(s.answer===true&&b3===0)cls3='bit-cell bit-cell--ans-true';
+      if(b3===1&&s.answer===false)cls3='bit-cell bit-cell--diff';
+      h+='<div class="'+cls3+'">'+b3+'</div>';
+    }
+    h+='</div>';
+    var resSetBits=s.result===0?0:countSetBits(s.result);
+    h+='<span class="set-bits-display" style="background:'+(s.result===0?'var(--accent-green-bg)':'var(--accent-red-bg)')+'">set bits in result: <span class="count" style="color:'+(s.result===0?'var(--accent-green-text)':'var(--accent-red-text)')+'">'+resSetBits+'</span></span>';
+    h+='</div>';
+  }
+
+  // bit positions row
+  h+='<div style="display:flex;align-items:center;gap:6px">';
+  h+='<div class="bit-label" style="font-size:9px;color:var(--text-tertiary)">bit pos →</div>';
+  h+='<div class="bit-pos-row">';
+  for(var p=s.width-1;p>=0;p--)h+='<div class="bit-pos">'+p+'</div>';
+  h+='</div></div>';
+
+  h+='</div>';
+
+  // ── Formula box ──
+  if(s.phase==='computed-result'||s.phase==='check-positive'){
+    h+='<div class="formula-box">';
+    h+='<div class="formula-box-title">⚡ The Magic Formula</div>';
+    if(s.result!==null){
+      h+='<div class="formula-line"><span class="formula-num">'+s.n+'</span> &amp; <span class="formula-num">'+s.nMinus1+'</span> = <span class="formula-num" style="color:'+(s.result===0?'var(--accent-green-text)':'var(--accent-red-text)')+'">'+s.result+'</span></div>';
+      h+='<div class="formula-line" style="font-size:11px;font-weight:500;margin-top:4px">'+s.n.toString(2)+' &amp; '+s.nMinus1.toString(2)+' = '+s.result.toString(2)+'</div>';
+    }else{
+      h+='<div class="formula-line">n &amp; (n - 1) == 0 ?</div>';
+    }
+    h+='</div>';
+  }
+
+  // ── Final outcome ──
+  if(s.showFinal){
+    if(s.answer===true){
+      var exp=Math.log2(s.n);
+      h+='<div class="outcome-banner outcome-true"><span class="outcome-emoji">🎉</span><div>POWER OF 2 ✓<div style="font-size:12px;font-weight:500;margin-top:3px">'+s.n+' = 2^'+exp+'</div></div></div>';
+    }else{
+      h+='<div class="outcome-banner outcome-false"><span class="outcome-emoji">❌</span><div>NOT a power of 2<div style="font-size:12px;font-weight:500;margin-top:3px">'+(s.earlyExit?'(non-positive number)':'set bits = '+countSetBits(s.n)+', need exactly 1')+'</div></div></div>';
+    }
+  }
+
+  // ── ROW 2: Insight + Power table ──
+  h+='<div class="viz-row" style="margin-top:10px">';
+
+  // Insight card
+  h+='<div class="viz-card" style="flex:1;min-width:260px"><div class="viz-title">💡 Bit-Trick Insight</div>';
+  h+='<div class="insight-card">';
+  if(s.phase==='start'){
+    h+='<strong>Why <code>n &amp; (n-1) == 0</code> works:</strong><br>Power of 2 in binary = single 1 followed by zeros.<br>Example: <code>8 = 1000</code>, <code>7 = 0111</code> → AND = <code>0000</code> ✓';
+  }else if(s.phase==='check-positive'){
+    h+='Positive check passed! Now we apply the bit trick.<br>Negative aur zero rejected because <code>2^x</code> always positive.';
+  }else if(s.phase==='computed-nm1'){
+    h+='<strong>n-1 ka pattern:</strong> Lowest set bit aur uske right-side ke saare 0 → flip ho jate hain.<br>If n=power of 2 → n-1 = "all zeros above + all ones below the bit".';
+  }else if(s.phase==='computed-result'){
+    if(s.result===0)h+='<strong>RESULT = 0:</strong> No bit overlap! n had exactly 1 set bit, n-1 had 0 in that position. AND gave clean zero. ✓ Power of 2 confirmed.';
+    else h+='<strong>RESULT ≠ 0:</strong> n and n-1 share at least one set bit. Means n has multiple set bits → NOT a pure power of 2.';
+  }
+  h+='</div></div>';
+
+  // Power-of-2 reference table
+  h+='<div class="viz-card" style="flex:1;min-width:240px"><div class="viz-title">📊 Powers of 2 Reference</div>';
+  h+='<table class="power-table"><thead><tr><th>x</th><th>2^x</th><th>Binary</th></tr></thead><tbody>';
+  var powers=[0,1,2,3,4,5,6,7,8,9,10];
+  for(var pi=0;pi<powers.length;pi++){
+    var px=powers[pi],pv=Math.pow(2,px);
+    var match=s.n===pv?' class="match"':'';
+    h+='<tr'+match+'><td>'+px+'</td><td>'+pv+'</td><td>'+pv.toString(2)+'</td></tr>';
+  }
+  h+='</tbody></table></div>';
+
+  h+='</div>';
+
+  document.getElementById("vizPanel").innerHTML=h;
+}
+
+function renderStep(idx){
+  if(!steps.length)return;
+  var s=steps[idx];currentStep=idx;
+  document.getElementById('stepInfo').textContent=(idx+1)+'/'+steps.length;
+  var bd=document.getElementById('actionBadge');
+  bd.textContent=BADGE_LABEL[s.action]||s.action;
+  bd.className='action-badge action-badge--'+s.action;
+  document.querySelectorAll('.code-line').forEach(function(el){el.classList.remove('active');});
+  var al=document.querySelector('.code-line[data-line="'+s.line+'"]');
+  if(al){al.classList.add('active');al.scrollIntoView({block:'nearest'});}
+  renderViz(s);
+  showLogPreview(s);
+}
+
+function showLogPreview(s){
+  if(!logEnabled)return;
+  document.getElementById('logPopupBody').innerHTML=s.logHTML||'';
+  document.getElementById('logPopup').classList.remove('log-popup--hidden');
+}
+function hideLogPopup(){document.getElementById('logPopup').classList.add('log-popup--hidden');}
+function toggleLogPreview(){
+  logEnabled=!logEnabled;
+  var btn=document.getElementById('logToggleBtn');
+  btn.textContent=logEnabled?'📋 ON':'📋 OFF';
+  btn.classList.toggle('log-toggle-btn--off',!logEnabled);
+  if(!logEnabled)hideLogPopup();
+  else if(steps.length)showLogPreview(steps[currentStep]);
+}
+function logZoom(dir){logZoomLevel=Math.max(60,Math.min(180,logZoomLevel+dir*20));updateLogZoom();}
+function logZoomReset(){logZoomLevel=100;updateLogZoom();}
+function updateLogZoom(){
+  document.getElementById('logZoomLabel').textContent=logZoomLevel+'%';
+  document.getElementById('logPopup').style.setProperty('--log-scale',logZoomLevel/100);
+}
+function toggleFullscreen(){
+  var viz=document.querySelector('.col-viz');
+  if(!document.fullscreenElement)viz.requestFullscreen().catch(function(){});
+  else document.exitFullscreen();
+}
+
+function resetWithInput(){
+  curResult=null;
+  var n=parseInt(document.getElementById('inputN').value,10);
+  if(isNaN(n))n=16;
+  document.getElementById('inputN').value=n;
+  renderCode();fitCodeWidth();
+  steps=buildSteps(n);
+  currentStep=0;renderStep(0);
+  document.getElementById('liveOutput').textContent=curResult!==null?(curResult?'True ✓':'False ✗'):'—';
+}
+
+function stepBy(d){var nx=currentStep+d;if(nx>=0&&nx<steps.length)renderStep(nx);}
+function resetStep(){renderStep(0);}
+
+function loadTest(i,el){
+  document.querySelectorAll('.prob-test').forEach(function(t){t.classList.remove('prob-test--active');});
+  if(el)el.classList.add('prob-test--active');
+  document.getElementById('inputN').value=TESTS[i].n;
+  document.getElementById('expectedBadge').textContent='exp: '+TESTS[i].e;
+  resetWithInput();
+}
+
+document.addEventListener('keydown',function(e){
+  if(e.target.tagName==='INPUT'||e.target.tagName==='SELECT')return;
+  if(e.key==='ArrowRight'){e.preventDefault();stepBy(1);}
+  else if(e.key==='ArrowLeft'){e.preventDefault();stepBy(-1);}
+  else if(e.key==='r'||e.key==='R'){e.preventDefault();resetStep();}
+});
+
+(function(){
+  var col1=document.getElementById('col1');
+  document.getElementById('resizeH1').addEventListener('mousedown',function(e){
+    e.preventDefault();codeWidthUserSet=true;
+    var startX=e.clientX,startW=col1.offsetWidth,h=this;
+    document.body.classList.add('no-select');h.classList.add('active');
+    function mv(e){col1.style.width=Math.max(140,startW+(e.clientX-startX))+'px';syncFooterWidth();}
+    function up(){document.removeEventListener('mousemove',mv);document.removeEventListener('mouseup',up);document.body.classList.remove('no-select');h.classList.remove('active');}
+    document.addEventListener('mousemove',mv);document.addEventListener('mouseup',up);
+  });
+})();
+
+window.addEventListener('resize',function(){if(!codeWidthUserSet)fitCodeWidth();else syncFooterWidth();});
+
+renderTests();renderCode();fitCodeWidth();resetWithInput();
+</script>
+</body>
+</html>

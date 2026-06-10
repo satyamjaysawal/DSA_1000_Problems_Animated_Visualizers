@@ -1,0 +1,1089 @@
+﻿
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>85. Maximal Rectangle — Dry Run Visualizer</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=DM+Sans:wght@400;500;600&display=swap');
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{--bg-primary:#FAFAF8;--bg-secondary:#F1EFE8;--bg-tertiary:#E2E0D8;--bg-card:#FFFFFF;--text-primary:#2C2C2A;--text-secondary:#5F5E5A;--text-tertiary:#888780;--border-color:rgba(0,0,0,.11);--border-light:rgba(0,0,0,.06);--border-focus:#534AB7;--accent-indigo:#534AB7;--accent-indigo-bg:#EEEDFE;--accent-indigo-text:#3C3489;--accent-indigo-hover:#4740A0;--accent-teal:#0F6E56;--accent-teal-bg:#E1F5EE;--accent-teal-text:#085041;--accent-red:#E24B4A;--accent-red-bg:#FCEBEB;--accent-red-text:#791F1F;--accent-amber:#B45309;--accent-amber-bg:#FEF3C7;--accent-amber-text:#78350F;--accent-green:#15803D;--accent-green-bg:#DCFCE7;--accent-green-text:#14532D;--syn-keyword:#534AB7;--syn-function:#185FA5;--syn-number:#993C1D;--syn-string:#0F6E56;--active-line-bg:#EEEDFE;--radius-sm:4px;--radius-md:6px;--radius-lg:10px;--sp-2:8px;--sp-3:12px;--sp-5:20px;--font-sans:'DM Sans',system-ui,sans-serif;--font-mono:'JetBrains Mono','Fira Code',monospace;--fs-xs:11px;--fs-sm:12px;--fs-base:14px;--fs-md:15px;--fw-medium:500;--fw-semibold:600;--fw-bold:700;--lh-normal:1.6;--lh-code:1.9;--ease:.18s ease}
+html,body{height:100%;background:var(--bg-primary);color:var(--text-primary);font:var(--fs-base) var(--font-sans)}
+.kw{color:var(--syn-keyword);font-weight:var(--fw-medium)}.fn{color:var(--syn-function)}.num{color:var(--syn-number)}.str{color:var(--syn-string)}
+.btn,.section-label,.action-badge,.log-badge,kbd{font-family:system-ui,"Segoe UI Emoji",var(--font-sans)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:4px;padding:5px var(--sp-3);font-size:var(--fs-sm);font-weight:var(--fw-medium);border:1px solid var(--border-color);border-radius:var(--radius-md);background:var(--bg-card);color:var(--text-primary);cursor:pointer;transition:all var(--ease);white-space:nowrap}.btn:hover{background:var(--bg-secondary)}.btn:active{transform:scale(.96)}.btn-primary{background:var(--accent-indigo);color:#fff;border-color:var(--accent-indigo)}.btn-primary:hover{background:var(--accent-indigo-hover)}
+.btn-zoom{display:inline-flex;align-items:center;justify-content:center;padding:2px 7px;font:700 12px var(--font-mono);border:1px solid var(--border-color);border-radius:var(--radius-sm);background:var(--bg-card);color:var(--text-secondary);cursor:pointer}.btn-zoom:hover{background:var(--accent-indigo-bg);border-color:var(--accent-indigo);color:var(--accent-indigo)}
+.input{padding:4px var(--sp-2);font:var(--fs-sm) var(--font-mono);border:1px solid var(--border-color);border-radius:var(--radius-md);background:var(--bg-card);color:var(--text-primary);outline:none}.input:focus{border-color:var(--border-focus)}
+kbd{display:inline-block;padding:1px 5px;border-radius:var(--radius-sm);font-size:10px;background:var(--bg-secondary);border:1px solid var(--border-color);color:var(--text-secondary);line-height:1.5}
+::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border-color);border-radius:3px}
+@keyframes pulse-node{0%,100%{box-shadow:0 0 4px var(--accent-indigo)}50%{box-shadow:0 0 12px var(--accent-indigo)}}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-3px)}75%{transform:translateX(3px)}}
+@keyframes win-pulse{0%,100%{box-shadow:0 0 3px rgba(234,179,8,.5)}50%{box-shadow:0 0 8px rgba(234,179,8,.9)}}
+@keyframes grow-bar{0%{transform:scaleY(0)}100%{transform:scaleY(1)}}
+.app-shell{display:flex;flex-direction:column;height:100vh;overflow:hidden;background:var(--bg-primary)}
+.prob-header{display:flex;align-items:center;gap:var(--sp-2);padding:8px var(--sp-5);border-bottom:1px solid var(--border-color);background:var(--bg-card);flex-wrap:wrap;flex-shrink:0}
+.prob-header-left{display:flex;align-items:center;gap:6px;flex-wrap:wrap;flex:1}
+.prob-header-right{display:flex;align-items:center;gap:var(--sp-2);flex-wrap:wrap}
+.gt-home-btn{padding:3px 10px;font-family:var(--font-sans);font-size:11px;font-weight:700;letter-spacing:.04em;border:1.5px solid var(--accent-indigo);border-radius:var(--radius-md);background:var(--accent-indigo);color:#fff;cursor:pointer;text-transform:uppercase}
+.gt-home-btn:hover{background:var(--accent-indigo-hover)}
+.prob-num{font-size:var(--fs-sm);font-weight:var(--fw-bold);color:var(--accent-indigo);font-family:var(--font-mono)}
+.prob-name{font-size:var(--fs-md);font-weight:var(--fw-semibold)}
+.prob-diff--hard{font-size:10px;padding:2px 8px;border-radius:99px;font-weight:var(--fw-semibold);background:var(--accent-red-bg);color:var(--accent-red-text)}
+.prob-tag{font-size:10px;padding:2px 8px;border-radius:99px;background:var(--bg-tertiary);color:var(--text-tertiary);border:1px solid var(--border-color);font-weight:var(--fw-medium)}
+.top-label{font:var(--fs-xs) var(--font-mono);color:var(--text-tertiary)}
+.top-expected{font:700 10px var(--font-mono);padding:2px 8px;border-radius:99px;background:var(--accent-teal-bg);color:var(--accent-teal-text);border:1px solid var(--accent-teal)}
+.prob-toggle-btn{font-family:system-ui,sans-serif;font-size:11px;padding:3px 10px;border-radius:var(--radius-md);background:var(--bg-secondary);border:1px solid var(--border-color);color:var(--text-secondary);cursor:pointer}
+.prob-body{display:flex;gap:var(--sp-5);padding:var(--sp-3) var(--sp-5);border-bottom:1px solid var(--border-color);background:var(--bg-card);flex-shrink:0}
+.problem-body--hidden{display:none!important}
+.prob-body-left{flex:1;min-width:0}.prob-body-right{width:340px;flex-shrink:0}
+.prob-body-left h3,.prob-body-right h3{font-size:var(--fs-sm);font-weight:var(--fw-semibold);color:var(--accent-indigo);margin:8px 0 3px}
+.prob-body-left h3:first-child{margin-top:0}
+.prob-desc{font-size:var(--fs-sm);color:var(--text-secondary);margin-bottom:4px}
+.prob-desc code{font-family:var(--font-mono);background:var(--bg-secondary);padding:1px 4px;border-radius:3px;font-size:var(--fs-xs)}
+.concept-block{background:var(--bg-secondary);border-radius:var(--radius-md);padding:8px 12px;margin:4px 0;font-size:var(--fs-sm);border-left:3px solid var(--accent-teal);color:var(--text-secondary)}
+.concept-block strong{color:var(--accent-teal-text);font-family:var(--font-mono);font-size:var(--fs-xs)}
+.prob-complexity{display:flex;gap:var(--sp-2);margin-top:6px}
+.prob-complexity-chip{font:10px var(--font-mono);padding:2px 8px;border-radius:var(--radius-md);background:var(--bg-secondary);border:1px solid var(--border-color)}
+.cc-label{color:var(--text-tertiary)}.cc-val{color:var(--accent-indigo-text);font-weight:var(--fw-bold)}
+.prob-tests{display:flex;flex-direction:column;gap:4px;margin-bottom:6px}
+.prob-test{display:flex;align-items:center;gap:5px;background:var(--bg-secondary);border:1px solid var(--border-color);border-radius:var(--radius-md);padding:5px 8px;font-size:var(--fs-xs);cursor:pointer;transition:all var(--ease)}
+.prob-test:hover{border-color:var(--accent-indigo)}
+.prob-test--active{border-color:var(--accent-indigo)!important;background:var(--accent-indigo-bg)!important}
+.pt-label{font-size:10px;font-weight:var(--fw-bold);color:var(--text-tertiary)}
+.pt-input{font-family:var(--font-mono);color:var(--text-primary);font-size:9px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pt-tag{font-size:7px;padding:1px 4px;border-radius:99px;background:var(--bg-tertiary);color:var(--text-tertiary);border:1px solid var(--border-color);font-weight:600;font-family:var(--font-mono)}
+.pt-arrow{color:var(--text-tertiary)}
+.pt-expected{font-family:var(--font-mono);font-weight:var(--fw-bold);color:var(--accent-teal);font-size:10px}
+.prob-live{display:flex;align-items:center;gap:6px;padding:6px var(--sp-3);border-radius:var(--radius-md);background:var(--bg-primary);border:1px solid var(--border-color);font-size:var(--fs-sm);margin-bottom:6px}
+.pl-label{font-size:var(--fs-xs);color:var(--text-tertiary)}
+.pl-output{font-family:var(--font-mono);font-weight:var(--fw-bold);color:var(--accent-indigo);font-size:var(--fs-sm)}
+.main-row{flex:1;display:flex;overflow:hidden;min-height:0}
+.col{display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.col-code{width:33%;min-width:140px;max-width:45vw}
+.col-viz{flex:1;min-width:0}
+.section-label{padding:5px var(--sp-3);font-size:var(--fs-xs);font-weight:var(--fw-semibold);color:var(--text-tertiary);text-transform:uppercase;letter-spacing:.07em;border-bottom:1px solid var(--border-color);flex-shrink:0;background:var(--bg-secondary)}
+.code-panel{flex:1;overflow-y:auto;padding:var(--sp-3) var(--sp-2);font-family:var(--font-mono);font-size:var(--fs-sm);line-height:var(--lh-code)}
+.code-line{display:flex;align-items:center;gap:var(--sp-2);padding:1px var(--sp-2);border-radius:var(--radius-sm)}
+.code-line.active{background:var(--active-line-bg)}
+.ln{min-width:18px;text-align:right;color:var(--text-tertiary);font-size:10px;user-select:none;flex-shrink:0;opacity:.6}
+.code-content{white-space:pre;flex:1}
+.resize-h{width:5px;cursor:col-resize;flex-shrink:0;background:transparent;position:relative;z-index:10;border-left:1px solid var(--border-color)}
+.resize-h:hover,.resize-h.active{background:rgba(99,102,241,.15)}
+.resize-h::after{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:3px;height:24px;border-radius:2px;background:rgba(0,0,0,.08)}
+.no-select{user-select:none!important;cursor:col-resize}
+.viz-panel{flex:1;overflow:auto;padding:var(--sp-3)}
+.vars-strip{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;padding:6px 10px;background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius-md)}
+.var-chip{display:inline-flex;align-items:center;gap:2px;padding:2px 7px;border-radius:var(--radius-md);background:var(--bg-secondary);border:1px solid var(--border-light);font-family:var(--font-mono);font-size:10px}
+.var-chip.vc-active{border-color:var(--accent-indigo);background:var(--accent-indigo-bg)}
+.var-chip.vc-safe{border-color:var(--accent-green);background:var(--accent-green-bg)}
+.var-chip.vc-flip{border-color:var(--accent-red);background:var(--accent-red-bg)}
+.vn{color:var(--text-tertiary);font-weight:500}.vv{font-weight:var(--fw-bold)}
+.viz-row{display:flex;gap:12px;align-items:flex-start;flex-wrap:wrap}
+.viz-card{background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius-md);padding:10px}
+.viz-title{font:600 9px var(--font-mono);text-transform:uppercase;letter-spacing:.04em;color:var(--text-tertiary);margin-bottom:6px}
+
+/* === MATRIX GRID === */
+.matrix-wrap{display:inline-block;padding:6px;background:var(--bg-secondary);border-radius:var(--radius-md);border:1px solid var(--border-color)}
+.matrix-row{display:flex;gap:2px;margin-bottom:2px}
+.matrix-row:last-child{margin-bottom:0}
+.matrix-cell{width:30px;height:30px;border-radius:4px;border:1.5px solid var(--border-color);display:flex;align-items:center;justify-content:center;font:700 13px var(--font-mono);position:relative;background:#fff;transition:all .2s}
+.matrix-cell--zero{background:#dbeafe;color:#1e40af;border-color:#93c5fd}
+.matrix-cell--one{background:#fef3c7;color:#78350f;border-color:#fbbf24}
+.matrix-cell--curr-row{box-shadow:0 0 0 2px var(--accent-indigo);z-index:2}
+.matrix-cell--curr{background:var(--accent-indigo-bg)!important;border-color:var(--accent-indigo)!important;animation:pulse-node 1.2s infinite;z-index:3}
+.matrix-cell--in-rect{background:var(--accent-green-bg)!important;border-color:var(--accent-green)!important;color:var(--accent-green-text)}
+.matrix-cell--rect-best{background:#fef3c7!important;border-color:#B45309!important;animation:win-pulse 1.4s infinite}
+.matrix-row-label{display:flex;align-items:center;justify-content:center;width:18px;font:700 9px var(--font-mono);color:var(--text-tertiary);margin-right:3px}
+.matrix-col-labels{display:flex;gap:2px;margin-bottom:2px;margin-left:21px}
+.matrix-col-label{width:30px;text-align:center;font:700 9px var(--font-mono);color:var(--text-tertiary)}
+
+/* === HISTOGRAM === */
+.hist-wrap{display:inline-block;padding:8px;background:#0f172a;border-radius:var(--radius-md);border:1px solid var(--border-color)}
+.hist-bars{display:flex;align-items:flex-end;gap:3px;height:140px;padding-bottom:18px;position:relative}
+.hist-bar{width:30px;display:flex;align-items:flex-end;justify-content:center;color:#fff;font:700 11px var(--font-mono);border-radius:3px 3px 0 0;position:relative;transition:all .2s;transform-origin:bottom}
+.hist-bar--zero{height:3px!important;background:#475569;color:#cbd5e1}
+.hist-bar--idle{background:linear-gradient(180deg,#3b82f6,#1e40af)}
+.hist-bar--top-stack{background:linear-gradient(180deg,#fbbf24,#B45309)!important;animation:pulse-node 1.2s infinite}
+.hist-bar--popping{background:linear-gradient(180deg,#fca5a5,#E24B4A)!important;animation:shake .35s}
+.hist-bar--in-rect{background:linear-gradient(180deg,#86efac,#15803D)!important}
+.hist-bar--rect-best{background:linear-gradient(180deg,#fde68a,#B45309)!important;animation:win-pulse 1.4s infinite}
+.hist-bar-label{position:absolute;bottom:-16px;left:50%;transform:translateX(-50%);font:700 9px var(--font-mono);color:#94a3b8}
+.hist-bar-h{padding-bottom:3px;text-shadow:0 1px 2px rgba(0,0,0,.6)}
+.hist-marker-i{position:absolute;bottom:-32px;font:700 10px var(--font-mono);color:#fbbf24;display:flex;flex-direction:column;align-items:center}
+.hist-marker-arrow{font-size:14px;line-height:1}
+
+/* === STACK === */
+.stack-col{display:flex;flex-direction:column-reverse;gap:3px;min-height:100px;padding:6px;background:var(--bg-secondary);border-radius:var(--radius-md);border:1px dashed var(--border-color);min-width:140px}
+.stack-item{font:10px var(--font-mono);padding:4px 7px;border-radius:5px;background:#fff;border:1px solid var(--accent-indigo);color:var(--accent-indigo-text);display:flex;justify-content:space-between;gap:6px}
+.stack-item--top{background:var(--accent-amber-bg)!important;border-color:var(--accent-amber)!important;color:var(--accent-amber-text);font-weight:700;animation:pulse-node 1.2s infinite}
+.stack-item--popping{background:var(--accent-red-bg)!important;border-color:var(--accent-red)!important;animation:shake .35s}
+
+.empty-state{font-size:11px;color:var(--text-tertiary);font-style:italic;text-align:center;padding:8px}
+.legend{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.legend span{display:inline-flex;align-items:center;gap:4px;font-size:10px;color:var(--text-secondary)}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:3px;border:1px solid var(--border-color)}
+.max-area-display{font:700 28px var(--font-mono);color:var(--accent-amber-text);text-align:center;padding:8px}
+.result-banner{margin-top:8px;padding:8px 12px;border-radius:var(--radius-md);font-family:var(--font-mono);font-size:var(--fs-md);font-weight:bold;background:var(--accent-green-bg);border:1.5px solid var(--accent-green);color:var(--accent-green-text);animation:win-pulse 1.6s infinite}
+
+.action-badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:var(--radius-sm);font-size:10px;font-weight:var(--fw-bold)}
+.action-badge--func-def,.action-badge--init,.action-badge--call,.action-badge--return,.action-badge--resume{background:rgba(130,80,255,.14);color:#8250ff}
+.action-badge--for-check,.action-badge--if-check,.action-badge--while-check{background:rgba(56,139,253,.14);color:#388bfd}
+.action-badge--mark,.action-badge--push,.action-badge--pop,.action-badge--restore,.action-badge--found,.action-badge--update{background:rgba(63,185,80,.14);color:#3fb950}
+.action-badge--remove,.action-badge--prune,.action-badge--fail{background:rgba(248,81,73,.14);color:#f85149}
+.action-badge--exit,.action-badge--skip{background:rgba(85,84,80,.14);color:#555450}
+.log-card{border-radius:var(--radius-md);overflow:hidden;border:1px solid var(--border-color);border-left-width:4px;font-size:var(--fs-xs);background:var(--bg-card)}
+.log-card--func-def,.log-card--init,.log-card--call,.log-card--return,.log-card--resume{border-left-color:#8250ff}
+.log-card--for-check,.log-card--if-check,.log-card--while-check{border-left-color:#388bfd}
+.log-card--mark,.log-card--push,.log-card--pop,.log-card--restore,.log-card--found,.log-card--update{border-left-color:#3fb950}
+.log-card--remove,.log-card--prune,.log-card--fail{border-left-color:#f85149}
+.log-card--exit,.log-card--skip{border-left-color:#555450}
+.log-badge{display:inline-flex;flex-shrink:0;border-radius:var(--radius-sm);font-size:9px;font-weight:var(--fw-bold);padding:2px 6px;white-space:nowrap}
+.log-badge--func-def,.log-badge--init,.log-badge--call,.log-badge--return,.log-badge--resume{background:rgba(130,80,255,.22);color:#8250ff}
+.log-badge--for-check,.log-badge--if-check,.log-badge--while-check{background:rgba(56,139,253,.22);color:#388bfd}
+.log-badge--mark,.log-badge--push,.log-badge--pop,.log-badge--restore,.log-badge--found,.log-badge--update{background:rgba(63,185,80,.22);color:#3fb950}
+.log-badge--remove,.log-badge--prune,.log-badge--fail{background:rgba(248,81,73,.22);color:#f85149}
+.log-badge--exit,.log-badge--skip{background:rgba(85,84,80,.22);color:#555450}
+.log-card-header{display:flex;align-items:center;gap:6px;padding:8px 10px 6px;background:var(--bg-secondary);border-bottom:1px solid var(--border-light)}
+.log-line-ref{font:700 10px var(--font-mono);color:var(--accent-indigo);background:var(--accent-indigo-bg);padding:1px 6px;border-radius:4px;border:1px solid var(--accent-indigo)}
+.log-status-pill{font-family:system-ui,"Segoe UI Emoji",sans-serif;font-size:9px;font-weight:700;padding:2px 7px;border-radius:99px;text-transform:uppercase;letter-spacing:.04em;margin-left:auto}
+.log-status--success{background:var(--accent-green-bg);color:var(--accent-green-text);border:1px solid var(--accent-green)}
+.log-status--fail{background:var(--accent-red-bg);color:var(--accent-red-text);border:1px solid var(--accent-red)}
+.log-status--skip{background:var(--bg-tertiary);color:var(--text-tertiary);border:1px solid var(--border-color)}
+.log-status--loop{background:rgba(56,139,253,.14);color:#185FA5;border:1px solid #388bfd}
+.log-status--prune{background:var(--accent-red-bg);color:var(--accent-red-text);border:1px solid var(--accent-red)}
+.log-status--info{background:rgba(130,80,255,.14);color:#3C3489;border:1px solid #8250ff}
+.log-section{padding:7px 10px;border-bottom:1px dashed var(--border-light)}
+.log-section:last-child{border-bottom:none}
+.log-section-title{font:700 8px var(--font-mono);text-transform:uppercase;letter-spacing:.06em;color:var(--text-tertiary);margin-bottom:3px;display:flex;align-items:center;gap:4px}
+.log-section-title-icon{font-family:system-ui,"Segoe UI Emoji",sans-serif;font-size:10px}
+.log-code-snippet{font:600 11px var(--font-mono);background:#0d1117;color:#e6edf3;padding:6px 9px;border-radius:4px;display:block;overflow-x:auto;white-space:pre;border:1px solid #30363d}
+.log-code-snippet .ck{color:#ff7b72}.log-code-snippet .cs{color:#a5d6ff}.log-code-snippet .cn{color:#79c0ff}.log-code-snippet .cf{color:#d2a8ff}.log-code-snippet .cc{color:#8b949e;font-style:italic}
+.log-kv-row{display:flex;flex-wrap:wrap;gap:4px;margin-top:2px}
+.log-kv{display:inline-flex;align-items:center;gap:3px;font:11px var(--font-mono);padding:2px 7px;border-radius:4px;background:var(--bg-secondary);border:1px solid var(--border-light)}
+.log-kv-key{color:var(--text-tertiary);font-weight:500}
+.log-kv-val{color:var(--text-primary);font-weight:700}
+.log-kv--in{background:rgba(56,139,253,.08);border-color:rgba(56,139,253,.3)}
+.log-kv--out{background:rgba(63,185,80,.08);border-color:rgba(63,185,80,.4)}
+.log-kv--out .log-kv-val{color:#15803D}
+.log-kv--changed{background:rgba(180,83,9,.10);border-color:rgba(180,83,9,.4)}
+.log-verdict{display:flex;align-items:center;gap:6px;font:600 11px var(--font-mono);padding:5px 8px;border-radius:5px;background:var(--bg-secondary);border:1px solid var(--border-light)}
+.log-verdict--true{background:var(--accent-green-bg);border-color:var(--accent-green);color:var(--accent-green-text)}
+.log-verdict--false{background:var(--accent-red-bg);border-color:var(--accent-red);color:var(--accent-red-text)}
+.log-analogy{font:italic 11px var(--font-sans);color:var(--text-secondary);background:#FFF8E7;border:1px solid #FBE8A6;border-left:3px solid var(--accent-amber);padding:6px 9px;border-radius:4px;line-height:1.55}
+.log-analogy strong{color:var(--accent-amber-text);font-style:normal;font-weight:700}
+.log-why{font-size:11px;line-height:1.55;color:var(--text-primary);padding:4px 0}
+.log-why strong{color:var(--accent-indigo-text)}
+.log-popup{--log-scale:1;position:fixed;bottom:52px;right:14px;width:calc(480px * var(--log-scale));max-width:92vw;max-height:75vh;border-radius:var(--radius-lg);box-shadow:0 10px 32px rgba(0,0,0,.14);border:1px solid var(--border-color);background:var(--bg-card);overflow:hidden;display:flex;flex-direction:column;z-index:100;transition:opacity .15s,transform .15s;transform-origin:bottom right}
+.log-popup--hidden{opacity:0;transform:scale(.92);pointer-events:none}
+.log-popup-body{flex:1;overflow:auto;padding:0}
+.log-popup-body > .log-card{border-radius:0;border:none;border-left:0}
+.footer-bar{display:flex;flex-shrink:0;border-top:1px solid var(--border-color);background:var(--bg-card)}
+.footer-left{width:33%;min-width:140px;max-width:45vw;display:flex;align-items:center;gap:8px;padding:7px 12px;border-right:1px solid var(--border-light)}
+.footer-right{flex:1;display:flex;align-items:center;gap:6px;padding:7px 14px;flex-wrap:wrap}
+.footer-sep{width:1px;height:16px;background:var(--border-color);flex-shrink:0}
+.step-info{font:10px var(--font-mono);color:var(--text-tertiary)}
+.log-toggle-btn{padding:2px 8px;font:700 9px var(--font-mono);border:1px solid var(--accent-green);border-radius:99px;background:var(--accent-green-bg);color:var(--accent-green-text);cursor:pointer}
+.log-toggle-btn--off{background:var(--bg-tertiary);color:var(--text-tertiary);border-color:var(--border-color)}
+.log-zoom-label{font:10px var(--font-mono);color:var(--text-tertiary);min-width:28px;text-align:center}
+.btn-fullscreen{font-size:14px;padding:3px 8px;background:var(--accent-indigo-bg);border-color:var(--accent-indigo);color:var(--accent-indigo)}
+.btn-fullscreen:hover{background:var(--accent-indigo);color:#fff}
+</style>
+</head>
+<body>
+<div class="app-shell">
+  <header class="prob-header">
+    <div class="prob-header-left">
+      <a href="../00_HomePage/gt_learn_homepage.html" class="gt-home-btn">GT LEARN</a>
+      <span class="prob-num">#85</span>
+      <span class="prob-name">🧱 Maximal Rectangle</span>
+      <span class="prob-diff--hard">HARD</span>
+      <span class="prob-tag">Stack</span>
+      <span class="prob-tag">Histogram</span>
+      <span class="prob-tag">DP</span>
+    </div>
+    <div class="prob-header-right">
+      <span class="top-label">matrix=</span>
+      <input id="inputMtx" class="input" style="width:220px" value="10100;10111;11111;10010">
+      <span id="expectedBadge" class="top-expected">exp: 6</span>
+      <button id="probToggleBtn" class="prob-toggle-btn" type="button" onclick="toggleProblem()">▲ Hide</button>
+    </div>
+  </header>
+  <div id="probBody" class="prob-body">
+    <div class="prob-body-left">
+      <h3>📝 Problem Statement</h3>
+      <p class="prob-desc">Given a binary matrix of <code>'0'</code>s and <code>'1'</code>s, find the <strong>largest rectangle containing only 1s</strong> and return its area. Rectangle must be axis-aligned (sides parallel to matrix).</p>
+      <h3>🧠 Solving Approach</h3>
+      <p class="prob-desc">Har row ko <strong>histogram base</strong> treat karo — column ke continuous 1s ki count = bar height. Fir har row pe <strong>Largest Rectangle in Histogram</strong> (LC 84) ka <strong>monotonic stack</strong> algorithm chalao. Max across all rows = answer.</p>
+      <h3>🎯 Core Concepts & Base Case</h3>
+      <div class="concept-block"><strong>Heights array:</strong> <code>heights[c]</code> = current row se upar continuous 1s ki count. Agar <code>'0'</code> mile → reset to 0.</div>
+      <div class="concept-block"><strong>Monotonic stack:</strong> Indices stored in increasing order of height. Jab choti bar mile, taller bars pop karke unka rectangle calculate karo.</div>
+      <div class="concept-block"><strong>Sentinel trick:</strong> Loop <code>i = cols</code> tak (extra), virtual h=0 use karke remaining stack flush — taaki pending bars bhi process ho.</div>
+      <div class="prob-complexity">
+        <span class="prob-complexity-chip"><span class="cc-label">Time </span><span class="cc-val">O(R·C)</span></span>
+        <span class="prob-complexity-chip"><span class="cc-label">Space </span><span class="cc-val">O(C)</span></span>
+      </div>
+    </div>
+    <div class="prob-body-right">
+      <h3>🧪 Test Cases</h3>
+      <div id="testList" class="prob-tests"></div>
+      <div class="prob-live"><span class="pl-label">Result:</span><span id="liveOutput" class="pl-output">—</span></div>
+      <button class="btn btn-primary" type="button" onclick="resetWithInput()">▶ Run</button>
+      <p style="font-size:9px;color:var(--text-tertiary);margin-top:6px;font-family:var(--font-mono)">Format: <code>row1;row2;...</code> with 0/1 chars</p>
+    </div>
+  </div>
+  <div class="main-row">
+    <div id="col1" class="col col-code">
+      <div class="section-label">📜 Python Code</div>
+      <div id="codePanel" class="code-panel"></div>
+    </div>
+    <div id="resizeH1" class="resize-h"></div>
+    <div class="col col-viz">
+      <div class="section-label">📊 Visualization</div>
+      <div id="vizPanel" class="viz-panel"></div>
+    </div>
+  </div>
+  <div class="footer-bar">
+    <div id="footerLeft" class="footer-left">
+      <span id="stepInfo" class="step-info">0/0</span>
+      <span id="actionBadge" class="action-badge"></span>
+    </div>
+    <div class="footer-right">
+      <kbd>←</kbd><kbd>→</kbd>
+      <button class="btn" type="button" onclick="resetStep()">↺</button>
+      <button class="btn" type="button" onclick="stepBy(-1)">◀</button>
+      <button class="btn btn-primary" type="button" onclick="stepBy(1)">▶ Next</button>
+      <span class="footer-sep"></span>
+      <button id="logToggleBtn" class="log-toggle-btn" type="button" onclick="toggleLogPreview()">📋 ON</button>
+      <button class="btn-zoom" type="button" onclick="logZoom(-1)">−</button>
+      <span id="logZoomLabel" class="log-zoom-label">100%</span>
+      <button class="btn-zoom" type="button" onclick="logZoom(1)">+</button>
+      <button class="btn-zoom" type="button" onclick="logZoomReset()">↺</button>
+      <span class="footer-sep"></span>
+      <button class="btn btn-fullscreen" type="button" onclick="toggleFullscreen()">⛶</button>
+    </div>
+  </div>
+</div>
+<div id="logPopup" class="log-popup log-popup--hidden">
+  <div id="logPopupBody" class="log-popup-body"></div>
+</div>
+<script>
+var TESTS=[
+  {mtx:"10100;10111;11111;10010",e:"6",tag:"classic LC85"},
+  {mtx:"0",e:"0",tag:"single 0"},
+  {mtx:"1",e:"1",tag:"single 1"},
+  {mtx:"00;00",e:"0",tag:"all zeros"},
+  {mtx:"11;11",e:"4",tag:"2x2 ones"}
+];
+
+var codeLines=[
+  "def maximalRectangle(matrix):",
+  "    if not matrix: return 0",
+  "    rows, cols = len(matrix), len(matrix[0])",
+  "    heights = [0] * cols",
+  "    maxArea = 0",
+  "    for r in range(rows):",
+  "        for c in range(cols):",
+  "            if matrix[r][c] == '1':",
+  "                heights[c] += 1",
+  "            else:",
+  "                heights[c] = 0",
+  "        maxArea = max(maxArea, largestRect(heights))",
+  "    return maxArea",
+  "",
+  "def largestRect(heights):",
+  "    stack, best = [], 0",
+  "    for i in range(len(heights) + 1):",
+  "        h = heights[i] if i < len(heights) else 0",
+  "        while stack and heights[stack[-1]] > h:",
+  "            top = stack.pop()",
+  "            width = i if not stack else i - stack[-1] - 1",
+  "            best = max(best, heights[top] * width)",
+  "        stack.append(i)",
+  "    return best"
+];
+
+var LOG_BADGE={"func-def":"📌 DEF","init":"⚙️ INIT","call":"📞 CALL","resume":"🔄 RESUME","for-check":"🔁 FOR","if-check":"🔎 IF","while-check":"🔁 WHILE","mark":"✅ MARK","push":"⬆ PUSH","pop":"⬇ POP","update":"✏️ UPDATE","exit":"🔚 EXIT","return":"🏆 RETURN","found":"🎉 FOUND","prune":"✂️ PRUNE","skip":"⏭ SKIP","fail":"❌ FAIL","restore":"↩ RESTORE"};
+var BADGE_LABEL={"func-def":"DEF","init":"INIT","call":"CALL","resume":"RESUME","for-check":"FOR","if-check":"IF","while-check":"WHILE","mark":"MARK","push":"PUSH","pop":"POP","update":"UPDATE","exit":"EXIT","return":"RETURN","found":"FOUND","prune":"PRUNE","skip":"SKIP","fail":"FAIL","restore":"RESTORE"};
+
+var steps=[],currentStep=0,codeWidthUserSet=false,curResult=null,logEnabled=true,logZoomLevel=100;
+
+function renderTests(){
+  document.getElementById("testList").innerHTML=TESTS.map(function(t,i){
+    return '<div class="prob-test'+(i===0?' prob-test--active':'')+'" onclick="loadTest('+i+',this)">'+
+      '<span class="pt-label">T'+(i+1)+'</span>'+
+      '<span class="pt-input" title="'+t.mtx+'">'+t.mtx+'</span>'+
+      '<span class="pt-tag">'+t.tag+'</span>'+
+      '<span class="pt-arrow">→</span>'+
+      '<span class="pt-expected">'+t.e+'</span></div>';
+  }).join("");
+}
+
+function renderCode(){
+  var p=document.getElementById('codePanel');
+  p.innerHTML=codeLines.map(function(raw,i){
+    var h=raw;
+    h=h.replace(/("[^"]*"|'[^']*')/g,'\x01STR\x02$1\x03');
+    h=h.replace(/\b(def|for|in|if|return|break|continue|and|else|elif|True|False|None|not|or|while|lambda)\b/g,'\x01KW\x02$1\x03');
+    h=h.replace(/\b(len|range|int|str|list|append|pop|sorted|min|max|sum|abs|enumerate|zip|print|set|add)\b/g,'\x01FN\x02$1\x03');
+    h=h.replace(/(?<![.\w"\x01\x02\x03])(-?\d+)\b/g,'\x01NUM\x02$1\x03');
+    h=h.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    h=h.replace(/\x01([A-Z]+)\x02/g,function(_,c){return '<span class="'+c.toLowerCase()+'">';}).replace(/\x03/g,'</span>');
+    return '<div class="code-line" data-line="'+i+'"><span class="ln">'+(i+1)+'</span><span class="code-content">'+h+'</span></div>';
+  }).join('');
+}
+
+function toggleProblem(){
+  var body=document.getElementById('probBody'),btn=document.getElementById('probToggleBtn');
+  body.classList.toggle('problem-body--hidden');
+  btn.textContent=body.classList.contains('problem-body--hidden')?'▼ Show':'▲ Hide';
+}
+
+function syncFooterWidth(){document.getElementById('footerLeft').style.width=document.getElementById('col1').offsetWidth+'px';}
+
+function fitCodeWidth(){
+  if(codeWidthUserSet)return;
+  var c=document.getElementById('col1');
+  c.style.flex='none';c.style.width='max-content';
+  c.style.width=Math.min(c.offsetWidth,window.innerWidth*.45)+'px';
+  syncFooterWidth();
+}
+
+function hlCode(raw){
+  if(!raw)return '';
+  var h=raw;
+  h=h.replace(/("[^"]*"|'[^']*')/g,'\x01CS\x02$1\x03');
+  h=h.replace(/\b(def|for|in|if|return|break|continue|and|else|elif|True|False|None|not|or|while|lambda)\b/g,'\x01CK\x02$1\x03');
+  h=h.replace(/\b(len|range|int|str|list|append|pop|sorted|min|max|sum|abs|largestRect|maximalRectangle)\b/g,'\x01CF\x02$1\x03');
+  h=h.replace(/(?<![.\w"\x01\x02\x03])(-?\d+)\b/g,'\x01CN\x02$1\x03');
+  h=h.replace(/(#.*$)/g,'\x01CC\x02$1\x03');
+  h=h.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  h=h.replace(/\x01([A-Z]+)\x02/g,function(_,c){return '<span class="'+c.toLowerCase()+'">';}).replace(/\x03/g,'</span>');
+  return h;
+}
+
+function richLog(opts){
+  var statusMap={success:"✅ Success",fail:"❌ Failed",skip:"⏭ Skipped",loop:"🔁 Loop iter",prune:"✂️ Pruned",info:"ℹ️ Info"};
+  var status=opts.status||"info";
+  var html='<div class="log-card log-card--'+opts.action+'">';
+  html+='<div class="log-card-header">';
+  html+='<span class="log-badge log-badge--'+opts.action+'">'+(LOG_BADGE[opts.action]||opts.action)+'</span>';
+  html+='<span class="log-line-ref">L'+(opts.line+1)+'</span>';
+  html+='<span class="log-status-pill log-status--'+status+'">'+(statusMap[status]||status)+'</span>';
+  html+='</div>';
+  if(opts.code){
+    html+='<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">📜</span>Code Executing</div>';
+    html+='<code class="log-code-snippet">'+hlCode(opts.code)+'</code></div>';
+  }
+  if(opts.inputs&&opts.inputs.length){
+    html+='<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">📥</span>Input Values</div><div class="log-kv-row">';
+    opts.inputs.forEach(function(kv){html+='<span class="log-kv log-kv--in"><span class="log-kv-key">'+kv.k+'</span>=<span class="log-kv-val">'+kv.v+'</span></span>';});
+    html+='</div></div>';
+  }
+  if(opts.outputs&&opts.outputs.length){
+    html+='<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">📤</span>Output / State After Line</div><div class="log-kv-row">';
+    opts.outputs.forEach(function(kv){
+      var cls=kv.changed?'log-kv--changed':'log-kv--out';
+      html+='<span class="log-kv '+cls+'"><span class="log-kv-key">'+kv.k+'</span>=<span class="log-kv-val">'+kv.v+'</span></span>';
+    });
+    html+='</div></div>';
+  }
+  if(opts.verdict){
+    var vCls=opts.verdictTrue===true?'log-verdict--true':(opts.verdictTrue===false?'log-verdict--false':'');
+    var vIcon=opts.verdictTrue===true?'✓':(opts.verdictTrue===false?'✗':'•');
+    html+='<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">⚖️</span>Verdict / Decision</div>';
+    html+='<div class="log-verdict '+vCls+'">'+vIcon+' '+opts.verdict+'</div></div>';
+  }
+  if(opts.why){
+    html+='<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">💡</span>Why This Happens</div>';
+    html+='<div class="log-why">'+opts.why+'</div></div>';
+  }
+  if(opts.analogy){
+    html+='<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">🎭</span>Real-Life Analogy</div>';
+    html+='<div class="log-analogy">'+opts.analogy+'</div></div>';
+  }
+  html+='</div>';
+  return html;
+}
+
+function buildSteps(matrix){
+  var st=[],MAX_STEPS=8000;
+  var rows=matrix.length;
+  var cols=rows>0?matrix[0].length:0;
+  var heights=cols>0?new Array(cols).fill(0):[];
+  var maxArea=0;
+  var r_var=null,c_var=null,i_var=null,h_var=null,top_var=null,width_var=null,best_var=null;
+  var stack=[],phase="init",bestRect=null;
+  // bestRect = {r1, r2, c1, c2, area}  → for highlighting overall winner
+  var currHistRow=null;  // which row's histogram are we currently visualizing
+  var poppingIdx=null;  // index being popped this step
+  var rectInRect=null;  // current rect being measured: {topIdx, left, right, h}
+
+  function snap(x){
+    return Object.assign({
+      matrix:matrix.map(function(r){return r.slice();}),
+      rows:rows,cols:cols,
+      heights:heights.slice(),
+      maxArea:maxArea,bestRect:bestRect?Object.assign({},bestRect):null,
+      r_var:r_var,c_var:c_var,i_var:i_var,h_var:h_var,top_var:top_var,width_var:width_var,best_var:best_var,
+      stack:stack.slice(),phase:phase,currHistRow:currHistRow,
+      poppingIdx:poppingIdx,rectInRect:rectInRect?Object.assign({},rectInRect):null
+    },x||{});
+  }
+  function pushStep(o){if(st.length>=MAX_STEPS)return;st.push(Object.assign({line:0,action:"func-def",logHTML:""},snap(o)));}
+
+  // L1
+  pushStep({line:0,action:"func-def",logHTML:richLog({
+    line:0,action:"func-def",
+    code:"def maximalRectangle(matrix):  # "+rows+"x"+cols,
+    status:"info",
+    inputs:[{k:"matrix",v:rows+"×"+cols}],
+    outputs:[{k:"function",v:"maximalRectangle registered"}],
+    why:"<strong>Main function entry</strong>. Goal: binary matrix mein <strong>largest all-1s rectangle</strong> dhundhna.",
+    analogy:"<strong>Real estate agent</strong> property dhundh raha hai 🏠 — sabse bada empty plot (sirf 1s ka)."
+  })});
+
+  // L2 — empty check
+  var isEmpty=(rows===0||cols===0);
+  pushStep({line:1,action:"if-check",logHTML:richLog({
+    line:1,action:"if-check",
+    code:"if not matrix: return 0  # rows="+rows+", cols="+cols+" → "+isEmpty,
+    status:isEmpty?"prune":"skip",
+    inputs:[{k:"rows",v:rows},{k:"cols",v:cols}],
+    verdict:isEmpty?"matrix is empty":"matrix has "+rows+" rows × "+cols+" cols",
+    verdictTrue:isEmpty,
+    why:isEmpty?"<strong>Empty matrix</strong> → straight return 0.":"Matrix mein data hai, aage badho.",
+    analogy:isEmpty?"Plot ka <strong>map blank</strong> — kuch nahi 0.":"<strong>Map ready</strong> — search shuru."
+  })});
+
+  if(isEmpty){
+    curResult=0;
+    pushStep({line:1,action:"return",logHTML:richLog({
+      line:1,action:"return",code:"return 0",status:"fail",
+      inputs:[],outputs:[{k:"return",v:0}],
+      why:"Empty → answer 0.",analogy:"<strong>Khaali plot</strong> — kuch banane ke liye nahi."
+    })});
+    return st;
+  }
+
+  // L3 — rows, cols
+  pushStep({line:2,action:"init",logHTML:richLog({
+    line:2,action:"init",
+    code:"rows, cols = "+rows+", "+cols,
+    status:"success",
+    outputs:[{k:"rows",v:rows,changed:true},{k:"cols",v:cols,changed:true}],
+    why:"Matrix dimensions cache.",
+    analogy:"Plot ki <strong>length × width</strong> naap li 📐"
+  })});
+
+  // L4 — heights init
+  pushStep({line:3,action:"init",logHTML:richLog({
+    line:3,action:"init",
+    code:"heights = [0] * "+cols+" = "+JSON.stringify(heights),
+    status:"success",
+    outputs:[{k:"heights",v:JSON.stringify(heights),changed:true}],
+    why:"<strong>Heights array</strong> initialize — har column ke liye consecutive 1s count store karega.",
+    analogy:"Har column ke liye <strong>histogram bar empty</strong> 📊 — abhi sab 0."
+  })});
+
+  // L5 — maxArea init
+  pushStep({line:4,action:"init",logHTML:richLog({
+    line:4,action:"init",
+    code:"maxArea = 0",
+    status:"success",
+    outputs:[{k:"maxArea",v:0,changed:true}],
+    why:"Best answer tracker <strong>initialize zero</strong>.",
+    analogy:"<strong>Scoreboard zero</strong> — abhi koi rectangle nahi mila."
+  })});
+
+  // L6 — outer for r
+  phase="rows";
+  pushStep({line:5,action:"for-check",logHTML:richLog({
+    line:5,action:"for-check",
+    code:"for r in range("+rows+"):",
+    status:"info",
+    inputs:[{k:"rows",v:rows}],
+    outputs:[{k:"loop range",v:"[0,"+rows+")"}],
+    why:"<strong>Row-by-row scan</strong> shuru — har row ko histogram base bana ke check karenge.",
+    analogy:"<strong>Top floor se ground floor tak</strong> har layer scan 🏢"
+  })});
+
+  for(var r=0;r<rows;r++){
+    r_var=r;currHistRow=r;
+    pushStep({line:5,action:"for-check",logHTML:richLog({
+      line:5,action:"for-check",
+      code:"# r = "+r,
+      status:"loop",
+      inputs:[{k:"rows",v:rows}],
+      outputs:[{k:"r",v:r,changed:true}],
+      why:"Row <strong>"+r+"</strong> ka iteration — ab is row ke saare cells dekh ke heights update karenge.",
+      analogy:"<strong>Floor "+r+"</strong> pe pahunch gaye — yahan ki dimensions check."
+    })});
+
+    // L7 — inner for c
+    pushStep({line:6,action:"for-check",logHTML:richLog({
+      line:6,action:"for-check",
+      code:"for c in range("+cols+"):",
+      status:"info",
+      inputs:[{k:"cols",v:cols}],
+      outputs:[{k:"loop range",v:"[0,"+cols+")"}],
+      why:"Inner loop — row "+r+" ke <strong>saare columns</strong> traverse.",
+      analogy:"Floor "+r+" pe <strong>left-to-right walk</strong> 🚶"
+    })});
+
+    for(var c=0;c<cols;c++){
+      c_var=c;
+      pushStep({line:6,action:"for-check",logHTML:richLog({
+        line:6,action:"for-check",
+        code:"# c = "+c+", cell = '"+matrix[r][c]+"'",
+        status:"loop",
+        inputs:[{k:"cols",v:cols}],
+        outputs:[{k:"c",v:c,changed:true},{k:"matrix["+r+"]["+c+"]",v:'"'+matrix[r][c]+'"',changed:true}],
+        why:"Column <strong>"+c+"</strong> — cell value '"+matrix[r][c]+"'.",
+        analogy:"Position <strong>("+r+","+c+")</strong> pe khade hain."
+      })});
+
+      // L8 — if matrix[r][c] == '1'
+      var isOne=matrix[r][c]==='1';
+      pushStep({line:7,action:"if-check",logHTML:richLog({
+        line:7,action:"if-check",
+        code:"if matrix["+r+"]["+c+"] == '1':  # '"+matrix[r][c]+"' → "+isOne,
+        status:isOne?"success":"skip",
+        inputs:[{k:"cell",v:'"'+matrix[r][c]+'"'}],
+        verdict:'matrix['+r+']['+c+']="'+matrix[r][c]+'" '+(isOne?"==":"!=")+' "1"',
+        verdictTrue:isOne,
+        why:isOne?"<strong>Cell '1' hai!</strong> Column "+c+" ki height +1 increment hogi.":"<strong>Cell '0' hai!</strong> Column "+c+" ki height reset to 0.",
+        analogy:isOne?"Yeh cell <strong>'building block'</strong> 🧱 — column ki height grow.":"Yeh cell <strong>'paani'</strong> 💧 — column ki height crash to 0."
+      })});
+
+      if(isOne){
+        // L9 — heights[c] += 1
+        var oldH=heights[c];
+        heights[c]+=1;
+        pushStep({line:8,action:"update",logHTML:richLog({
+          line:8,action:"update",
+          code:"heights["+c+"] += 1  # "+oldH+" → "+heights[c],
+          status:"success",
+          inputs:[{k:"heights["+c+"] (before)",v:oldH}],
+          outputs:[{k:"heights["+c+"]",v:heights[c],changed:true},{k:"heights",v:JSON.stringify(heights)}],
+          why:"Column "+c+" ki <strong>vertical run of 1s</strong> grow ho gayi to "+heights[c]+".",
+          analogy:"Column "+c+" ki <strong>tower height "+heights[c]+"</strong> ho gayi 🗼"
+        })});
+      }else{
+        // L10 — else branch (just for stepping)
+        pushStep({line:9,action:"skip",logHTML:richLog({
+          line:9,action:"skip",
+          code:"else:  # cell != '1'",
+          status:"skip",
+          inputs:[{k:"cell",v:'"'+matrix[r][c]+'"'}],
+          why:"Cell '0' hai, else branch.",
+          analogy:"<strong>Else ki taraf</strong> — height reset karna hai."
+        })});
+        // L11 — heights[c] = 0
+        var oldH2=heights[c];
+        heights[c]=0;
+        pushStep({line:10,action:"update",logHTML:richLog({
+          line:10,action:"update",
+          code:"heights["+c+"] = 0  # was "+oldH2,
+          status:"success",
+          inputs:[{k:"heights["+c+"] (before)",v:oldH2}],
+          outputs:[{k:"heights["+c+"]",v:0,changed:true},{k:"heights",v:JSON.stringify(heights)}],
+          why:"<strong>Reset!</strong> Column "+c+" pe '0' aa gaya — vertical run toot gayi, height back to 0.",
+          analogy:"Tower <strong>foundation se hi gir gaya</strong> 💥 — phir se zero se start."
+        })});
+      }
+    }
+
+    c_var=null;
+    // inner for exit
+    pushStep({line:6,action:"exit",logHTML:richLog({
+      line:6,action:"exit",
+      code:"# inner for-loop exit (row "+r+" complete)",
+      status:"info",
+      inputs:[{k:"row",v:r}],
+      outputs:[{k:"heights",v:JSON.stringify(heights),changed:true}],
+      why:"Row "+r+" ke <strong>saare columns process ho gaye</strong>. Heights array updated.",
+      analogy:"Floor "+r+" ka <strong>histogram blueprint ready</strong> 📊"
+    })});
+
+    // L12 — maxArea = max(maxArea, largestRect(heights))
+    pushStep({line:11,action:"call",logHTML:richLog({
+      line:11,action:"call",
+      code:"maxArea = max(maxArea, largestRect("+JSON.stringify(heights)+"))",
+      status:"info",
+      inputs:[{k:"maxArea (before)",v:maxArea},{k:"heights",v:JSON.stringify(heights)}],
+      outputs:[{k:"calling",v:"largestRect("+JSON.stringify(heights)+")",changed:true}],
+      why:"<strong>Histogram subroutine call</strong> — current heights array pe largest rectangle.",
+      analogy:"<strong>Specialist ko bula liya</strong> 👨‍🔧 — yeh histogram pe biggest plot dhundhega."
+    })});
+
+    // ── largestRect subroutine ──
+    phase="histogram";
+    var rectArea=largestRectSteps(heights,r,pushStep,snap);
+    var newMax=Math.max(maxArea,rectArea);
+
+    // After largestRect returns
+    pushStep({line:11,action:"resume",logHTML:richLog({
+      line:11,action:"resume",
+      code:"# largestRect returned "+rectArea+"; max("+maxArea+", "+rectArea+") = "+newMax,
+      status:"success",
+      inputs:[{k:"maxArea",v:maxArea},{k:"largestRect ret",v:rectArea}],
+      outputs:[{k:"maxArea",v:newMax,changed:newMax!==maxArea}],
+      why:newMax>maxArea?"🎉 <strong>New best!</strong> Row "+r+" ka histogram diya area "+rectArea+" — overall max update.":"Area "+rectArea+" pichle "+maxArea+" se kam — koi update nahi.",
+      analogy:newMax>maxArea?"<strong>Naya record!</strong> "+rectArea+" sq.units ka plot mil gaya 🏆":"Existing record "+maxArea+" abhi safe — yeh wala chota tha."
+    })});
+    if(newMax>maxArea){
+      maxArea=newMax;
+      // Note: bestRect already updated inside largestRectSteps
+    }
+    phase="rows";
+  }
+
+  r_var=null;
+  // outer for exit
+  pushStep({line:5,action:"exit",logHTML:richLog({
+    line:5,action:"exit",
+    code:"# outer for-loop exit — all rows scanned",
+    status:"info",
+    outputs:[{k:"maxArea",v:maxArea}],
+    why:"<strong>Saari rows ke histograms check ho gaye</strong>. Final answer ready.",
+    analogy:"<strong>Pure building ki har floor inspect</strong> ho gayi 🏢✅"
+  })});
+
+  curResult=maxArea;
+  // L13 — return maxArea
+  pushStep({line:12,action:"return",logHTML:richLog({
+    line:12,action:"return",
+    code:"return maxArea  # = "+maxArea,
+    status:maxArea>0?"success":"fail",
+    inputs:[{k:"maxArea",v:maxArea}],
+    outputs:[{k:"return",v:maxArea}],
+    why:maxArea>0?"🏆 <strong>Largest rectangle area = "+maxArea+"</strong> sq.units!":"Saare 0s the — koi rectangle nahi.",
+    analogy:maxArea>0?"<strong>Plot finalized!</strong> "+maxArea+" sq.units ka biggest area.":"<strong>Plot empty</strong> — kuch nahi mila."
+  })});
+  return st;
+
+  // ── Helper: largestRect with stepping ──
+  function largestRectSteps(arr,rowForViz,pushStep,snap){
+    // Reset locals
+    stack=[];
+    var best=0;
+    best_var=0;
+    var n=arr.length;
+
+    // L15 — def largestRect (visit definition once per call)
+    pushStep({line:14,action:"func-def",logHTML:richLog({
+      line:14,action:"func-def",
+      code:"def largestRect(heights="+JSON.stringify(arr)+"):",
+      status:"info",
+      inputs:[{k:"heights",v:JSON.stringify(arr)}],
+      outputs:[{k:"function",v:"largestRect entered"}],
+      why:"<strong>Histogram subroutine entry</strong> — monotonic stack se max rectangle nikalenge.",
+      analogy:"<strong>Specialist ka office open</strong> 🏛️ — heights ka analysis shuru."
+    })});
+
+    // L16 — stack, best
+    pushStep({line:15,action:"init",logHTML:richLog({
+      line:15,action:"init",
+      code:"stack, best = [], 0",
+      status:"success",
+      outputs:[{k:"stack",v:"[]",changed:true},{k:"best",v:0,changed:true}],
+      why:"<strong>Empty stack</strong> + <strong>best=0</strong> initialize.",
+      analogy:"<strong>Khaali clipboard</strong> 📋 — abhi koi entry nahi."
+    })});
+
+    // L17 — for i in range(len+1)
+    pushStep({line:16,action:"for-check",logHTML:richLog({
+      line:16,action:"for-check",
+      code:"for i in range(len(heights) + 1):  # range(0, "+(n+1)+")",
+      status:"info",
+      inputs:[{k:"len(heights)",v:n}],
+      outputs:[{k:"loop range",v:"[0,"+(n+1)+") incl. sentinel"}],
+      why:"<strong>i = 0 to "+n+"</strong> (ek extra for sentinel) — last iter virtual h=0 dega taaki stack flush ho.",
+      analogy:"Histogram ke <strong>"+n+" bars + 1 sentinel</strong> wall — sab process honge."
+    })});
+
+    for(var i=0;i<=n;i++){
+      i_var=i;
+      pushStep({line:16,action:"for-check",logHTML:richLog({
+        line:16,action:"for-check",
+        code:"# i = "+i+(i===n?"  [SENTINEL]":""),
+        status:"loop",
+        inputs:[{k:"i",v:i},{k:"n",v:n}],
+        outputs:[{k:"i",v:i,changed:true}],
+        why:i===n?"<strong>Sentinel iteration!</strong> Virtual bar with h=0 — saare pending bars flush.":"Bar index <strong>"+i+"</strong> process kar rahe.",
+        analogy:i===n?"<strong>End wall</strong> 🧱 — sab kuch close out karne ke liye.":"Bar <strong>#"+i+"</strong> pe focus."
+      })});
+
+      // L18 — h = heights[i] if i < len else 0
+      var h=i<n?arr[i]:0;
+      h_var=h;
+      pushStep({line:17,action:"init",logHTML:richLog({
+        line:17,action:"init",
+        code:"h = heights["+i+"] if "+i+" < "+n+" else 0  # h = "+h,
+        status:"success",
+        inputs:[{k:"i",v:i},{k:"n",v:n},{k:"heights[i]",v:i<n?arr[i]:"out-of-bounds"}],
+        outputs:[{k:"h",v:h,changed:true}],
+        why:i<n?"Current bar ki <strong>height = "+h+"</strong>.":"Out of range — sentinel virtual <strong>h=0</strong> use kar rahe.",
+        analogy:i<n?"Bar #"+i+" ki <strong>height naap li</strong>.":"<strong>Wall touch ho gayi</strong> — height 0 imagine karo."
+      })});
+
+      // L19 — while stack and heights[stack[-1]] > h
+      var whileIters=0;
+      while(true){
+        var stackNonEmpty=stack.length>0;
+        var topH=stackNonEmpty?arr[stack[stack.length-1]]:null;
+        var shouldPop=stackNonEmpty&&topH>h;
+        pushStep({line:18,action:"while-check",logHTML:richLog({
+          line:18,action:"while-check",
+          code:"while stack and heights[stack[-1]] > h:  # "+(stackNonEmpty?("heights["+stack[stack.length-1]+"]="+topH+" > h="+h):"stack empty")+" → "+shouldPop,
+          status:shouldPop?"loop":"info",
+          inputs:[{k:"stack",v:JSON.stringify(stack)},{k:"top h",v:stackNonEmpty?topH:"—"},{k:"h",v:h}],
+          verdict:stackNonEmpty?"top_h ("+topH+") "+(shouldPop?">":"<=")+" h ("+h+")":"stack is empty",
+          verdictTrue:shouldPop,
+          why:shouldPop?"<strong>Top bar choti current bar se taller hai!</strong> Iska maximum rectangle abhi calculate karna hoga (kyunki yeh ab extend nahi ho sakti).":(stackNonEmpty?"Top bar "+topH+" ≤ h ("+h+") — current bar tak extend ho sakti, while exit.":"Stack khaali — kuch pop karne ko nahi."),
+          analogy:shouldPop?"<strong>Tall guest ko bahar nikalna padega</strong> — chota guest aa gaya, taller wala fit nahi.":"Stack <strong>safe state</strong> mein — koi pop nahi."
+        })});
+        if(!shouldPop)break;
+
+        // L20 — top = stack.pop()
+        poppingIdx=stack[stack.length-1];
+        var popped=stack.pop();
+        top_var=popped;
+        pushStep({line:19,action:"pop",logHTML:richLog({
+          line:19,action:"pop",
+          code:"top = stack.pop()  # popped index "+popped+" (h="+arr[popped]+")",
+          status:"success",
+          inputs:[{k:"stack (before)",v:JSON.stringify(stack.concat([popped]))}],
+          outputs:[{k:"top",v:popped,changed:true},{k:"stack",v:JSON.stringify(stack),changed:true}],
+          why:"Bar index <strong>"+popped+"</strong> (height "+arr[popped]+") ko stack se nikala — iska maximum rect ab nikalega.",
+          analogy:"<strong>Bar "+popped+" ka exit slip</strong> ✂️ — ab iska total area calculate."
+        })});
+
+        // L21 — width = i if not stack else i - stack[-1] - 1
+        var width=stack.length===0?i:i-stack[stack.length-1]-1;
+        width_var=width;
+        pushStep({line:20,action:"init",logHTML:richLog({
+          line:20,action:"init",
+          code:"width = "+(stack.length===0?("i = "+i):(i+" - stack[-1]("+stack[stack.length-1]+") - 1 = "+width)),
+          status:"success",
+          inputs:[{k:"i",v:i},{k:"stack",v:JSON.stringify(stack)}],
+          outputs:[{k:"width",v:width,changed:true}],
+          why:stack.length===0?"<strong>Stack empty</strong> — popped bar leftmost tak extend hoti hai. width = i = "+i+".":"Stack mein next bar at index "+stack[stack.length-1]+" — popped bar uske right se i tak extend. width = i - stack[-1] - 1 = "+width+".",
+          analogy:"<strong>Plot ki width naap li</strong> 📏 — kahan se kahan tak yeh height continuous thi."
+        })});
+
+        // L22 — best = max(best, heights[top] * width)
+        var thisArea=arr[popped]*width;
+        var newBest=Math.max(best,thisArea);
+        var rectLeft=stack.length===0?0:stack[stack.length-1]+1;
+        var rectRight=i-1;
+        rectInRect={topIdx:popped,left:rectLeft,right:rectRight,h:arr[popped],area:thisArea};
+        pushStep({line:21,action:newBest>best?"found":"update",logHTML:richLog({
+          line:21,action:newBest>best?"found":"update",
+          code:"best = max("+best+", "+arr[popped]+" * "+width+") = max("+best+", "+thisArea+") = "+newBest,
+          status:"success",
+          inputs:[{k:"heights[top]",v:arr[popped]},{k:"width",v:width},{k:"area",v:thisArea}],
+          outputs:[{k:"best",v:newBest,changed:newBest!==best}],
+          verdict:thisArea+" "+(newBest>best?">":"<=")+" "+best,
+          verdictTrue:newBest>best,
+          why:newBest>best?"🎉 <strong>New best in this histogram!</strong> Bar "+popped+" se rect of area "+thisArea+" mila — pichle "+best+" se bada.":"Area "+thisArea+" pichle best "+best+" se kam — no update.",
+          analogy:newBest>best?"<strong>New record!</strong> "+arr[popped]+"×"+width+" = "+thisArea+" 🏆":"<strong>Existing champ safe</strong> — yeh wala chota nikla."
+        })});
+        if(newBest>best){
+          best=newBest;best_var=best;
+          // update overall bestRect for global viz
+          if(thisArea>maxArea){
+            bestRect={r1:rowForViz-arr[popped]+1,r2:rowForViz,c1:rectLeft,c2:rectRight,area:thisArea};
+          }
+        }
+        rectInRect=null;
+        poppingIdx=null;
+        whileIters++;
+        if(whileIters>50)break;
+      }
+
+      // L23 — stack.append(i)
+      stack.push(i);
+      pushStep({line:22,action:"push",logHTML:richLog({
+        line:22,action:"push",
+        code:"stack.append("+i+")",
+        status:"success",
+        inputs:[{k:"i",v:i}],
+        outputs:[{k:"stack",v:JSON.stringify(stack),changed:true},{k:"stack.size",v:stack.length}],
+        why:"Index <strong>"+i+"</strong> stack mein push — yeh future bars ke liye <strong>boundary</strong> ban sakta hai.",
+        analogy:"Bar "+i+" ka <strong>'check-in slip'</strong> clipboard pe lag gaya 📋"
+      })});
+    }
+
+    i_var=null;h_var=null;top_var=null;width_var=null;
+    // L17 exit
+    pushStep({line:16,action:"exit",logHTML:richLog({
+      line:16,action:"exit",
+      code:"# largestRect for-loop exit",
+      status:"info",
+      outputs:[{k:"best",v:best},{k:"stack",v:JSON.stringify(stack)}],
+      why:"<strong>Saare bars + sentinel process</strong> ho gaye. Best area for this histogram = "+best+".",
+      analogy:"Specialist ka <strong>analysis complete</strong> 📊"
+    })});
+
+    // L24 — return best
+    pushStep({line:23,action:"return",logHTML:richLog({
+      line:23,action:"return",
+      code:"return best  # = "+best,
+      status:best>0?"success":"fail",
+      inputs:[{k:"best",v:best}],
+      outputs:[{k:"return",v:best}],
+      why:best>0?"<strong>Histogram best = "+best+"</strong> — caller ko return.":"Histogram mein sab 0s the — area 0 return.",
+      analogy:"<strong>Report submit</strong> 📄 — histogram ka final number."
+    })});
+    return best;
+  }
+}
+
+// ── VIZ ──
+function renderViz(s){
+  function chip(n,v,cls){return '<span class="var-chip '+(cls||'')+'"><span class="vn">'+n+'</span><span class="vv">'+v+'</span></span>';}
+
+  // VARS STRIP
+  var h='<div class="vars-strip">'+
+    chip("📊 phase ",s.phase,"")+
+    chip("rows ",s.rows,"")+
+    chip("cols ",s.cols,"")+
+    chip("r ",s.r_var===null?"—":s.r_var,(s.line===5)?"vc-active":"")+
+    chip("c ",s.c_var===null?"—":s.c_var,(s.line===6||s.line===7||s.line===8||s.line===10)?"vc-active":"")+
+    chip("i ",s.i_var===null?"—":s.i_var,(s.line===16||s.line===17||s.line===18||s.line===22)?"vc-active":"")+
+    chip("h ",s.h_var===null?"—":s.h_var,s.line===17?"vc-active":"")+
+    chip("top ",s.top_var===null?"—":s.top_var,s.line===19?"vc-active":"")+
+    chip("width ",s.width_var===null?"—":s.width_var,s.line===20?"vc-active":"")+
+    chip("📚 stack ",s.stack.length,(s.line>=18&&s.line<=22)?"vc-active":"")+
+    chip("🏆 maxArea ",s.maxArea,s.maxArea>0?"vc-safe":"")+
+  '</div>';
+
+  // ── ROW 1: Matrix + Heights snapshot ──
+  h+='<div class="viz-row">';
+  h+='<div class="viz-card"><div class="viz-title">🧱 Binary Matrix ('+s.rows+'×'+s.cols+')</div>';
+  h+='<div class="matrix-wrap">';
+// Column labels
+  if(s.cols>0){
+    h+='<div class="matrix-col-labels">';
+    for(var cc=0;cc<s.cols;cc++)h+='<div class="matrix-col-label">'+cc+'</div>';
+    h+='</div>';
+  }
+  for(var rr=0;rr<s.rows;rr++){
+    h+='<div class="matrix-row">';
+    h+='<div class="matrix-row-label">'+rr+'</div>';
+    for(var cc2=0;cc2<s.cols;cc2++){
+      var val=s.matrix[rr][cc2];
+      var cls='matrix-cell '+(val==='1'?'matrix-cell--one':'matrix-cell--zero');
+      if(rr===s.r_var)cls+=' matrix-cell--curr-row';
+      if(rr===s.r_var&&cc2===s.c_var)cls+=' matrix-cell--curr';
+      // best rectangle highlight
+      if(s.bestRect&&s.line===12&&rr>=s.bestRect.r1&&rr<=s.bestRect.r2&&cc2>=s.bestRect.c1&&cc2<=s.bestRect.c2){
+        cls+=' matrix-cell--rect-best';
+      }
+      h+='<div class="'+cls+'">'+val+'</div>';
+    }
+    h+='</div>';
+  }
+  h+='</div>';
+  h+='<div class="legend">'+
+    '<span><i style="background:#fef3c7;border-color:#fbbf24"></i>1 (block)</span>'+
+    '<span><i style="background:#dbeafe;border-color:#93c5fd"></i>0 (gap)</span>'+
+    '<span><i style="background:var(--accent-indigo-bg);border:2px solid var(--accent-indigo)"></i>Current row</span>'+
+    '<span><i style="background:#fef3c7;border-color:#B45309;box-shadow:0 0 4px #B45309"></i>Best rect</span>'+
+  '</div></div>';
+
+  // Histogram (current row's heights)
+  h+='<div class="viz-card"><div class="viz-title">📊 Histogram for row '+(s.currHistRow!==null?s.currHistRow:'—')+' (heights='+JSON.stringify(s.heights)+')</div>';
+  h+='<div class="hist-wrap"><div class="hist-bars">';
+  var maxH=Math.max.apply(null,s.heights.length?s.heights:[1]);if(maxH<1)maxH=1;
+  var topOfStack=s.stack.length>0?s.stack[s.stack.length-1]:-1;
+  var poppingIdxLocal=s.poppingIdx;
+  var rectInfo=s.rectInRect;
+  for(var bi=0;bi<s.heights.length;bi++){
+    var bh=s.heights[bi];
+    var pct=bh===0?0:(bh/maxH)*100;
+    var bcls='hist-bar';
+    if(bh===0)bcls+=' hist-bar--zero';
+    else bcls+=' hist-bar--idle';
+    if(bi===topOfStack&&s.stack.length>0)bcls=bcls.replace('hist-bar--idle','hist-bar--top-stack');
+    if(bi===poppingIdxLocal)bcls=bcls.replace('hist-bar--idle','hist-bar--popping').replace('hist-bar--top-stack','hist-bar--popping');
+    if(rectInfo&&bi>=rectInfo.left&&bi<=rectInfo.right&&s.heights[bi]>=rectInfo.h){
+      bcls=bcls.replace('hist-bar--idle','hist-bar--in-rect').replace('hist-bar--top-stack','hist-bar--in-rect');
+    }
+    var heightPx=bh===0?3:Math.max(8,(bh/Math.max(maxH,1))*120);
+    h+='<div class="'+bcls+'" style="height:'+heightPx+'px">';
+    if(bh>0)h+='<span class="hist-bar-h">'+bh+'</span>';
+    h+='<span class="hist-bar-label">'+bi+'</span>';
+    h+='</div>';
+  }
+  // sentinel marker if i === heights.length
+  if(s.i_var!==null&&s.i_var===s.heights.length){
+    h+='<div class="hist-bar hist-bar--zero" style="height:3px;border:1px dashed #fbbf24;background:transparent">';
+    h+='<span class="hist-bar-label" style="color:#fbbf24">i='+s.i_var+'</span>';
+    h+='</div>';
+  }
+  // i marker (arrow)
+  if(s.i_var!==null&&s.i_var<s.heights.length){
+    var iPos=s.i_var*(30+3);
+    h+='<div class="hist-marker-i" style="left:'+iPos+'px"><span class="hist-marker-arrow">▲</span><span>i='+s.i_var+'</span></div>';
+  }
+  h+='</div></div>';
+  if(rectInfo){
+    h+='<div style="margin-top:8px;font:11px var(--font-mono);color:var(--accent-amber-text);text-align:center;background:#FEF3C7;padding:5px;border-radius:5px;border:1px solid #fbbf24">📐 Measuring: bar '+rectInfo.topIdx+' (h='+rectInfo.h+') × width '+(rectInfo.right-rectInfo.left+1)+' = <strong>'+rectInfo.area+'</strong></div>';
+  }
+  h+='</div>';
+  h+='</div>';
+
+  // ── ROW 2: Stack + Heights table + maxArea display ──
+  h+='<div class="viz-row" style="margin-top:10px">';
+  // Stack
+  h+='<div class="viz-card"><div class="viz-title">🗂️ Monotonic Stack (size '+s.stack.length+')</div>';
+  h+='<div class="stack-col">';
+  if(!s.stack.length){
+    h+='<div class="empty-state">Stack empty</div>';
+  }else{
+    for(var si=0;si<s.stack.length;si++){
+      var sCls='stack-item';
+      if(si===s.stack.length-1)sCls+=' stack-item--top';
+      var stkH=s.stack[si]<s.heights.length?s.heights[s.stack[si]]:0;
+      h+='<div class="'+sCls+'">'+(si===s.stack.length-1?'⭐ ':'')+'<span>idx '+s.stack[si]+'</span><span style="opacity:.7">h='+stkH+'</span></div>';
+    }
+  }
+  h+='</div></div>';
+
+  // Heights table
+  h+='<div class="viz-card"><div class="viz-title">📋 heights[] array (live)</div>';
+  h+='<div style="display:flex;gap:2px">';
+  for(var hi=0;hi<s.heights.length;hi++){
+    var hCellCls='matrix-cell';
+    if(s.heights[hi]===0)hCellCls+=' matrix-cell--zero';
+    else hCellCls+=' matrix-cell--one';
+    if(hi===s.c_var)hCellCls+=' matrix-cell--curr';
+    h+='<div style="display:flex;flex-direction:column;align-items:center;gap:1px"><div style="font:700 9px var(--font-mono);color:var(--text-tertiary)">'+hi+'</div><div class="'+hCellCls+'">'+s.heights[hi]+'</div></div>';
+  }
+  h+='</div></div>';
+
+  // Max Area display
+  h+='<div class="viz-card" style="text-align:center"><div class="viz-title">🏆 Max Area So Far</div>';
+  h+='<div class="max-area-display">'+s.maxArea+'</div>';
+  if(s.bestRect){
+    h+='<div style="font:10px var(--font-mono);color:var(--text-tertiary)">rect=['+s.bestRect.r1+'..'+s.bestRect.r2+'] × ['+s.bestRect.c1+'..'+s.bestRect.c2+']</div>';
+  }
+  h+='</div>';
+  h+='</div>';
+
+  // Result banner
+  if(s.line===12){
+    h+='<div class="result-banner">🏆 Maximum Rectangle Area = '+s.maxArea+(s.bestRect?'  (rows '+s.bestRect.r1+'-'+s.bestRect.r2+', cols '+s.bestRect.c1+'-'+s.bestRect.c2+')':'')+'</div>';
+  }
+
+  document.getElementById("vizPanel").innerHTML=h;
+}
+
+function renderStep(idx){
+  if(!steps.length)return;
+  var s=steps[idx];currentStep=idx;
+  document.getElementById('stepInfo').textContent=(idx+1)+'/'+steps.length;
+  var bd=document.getElementById('actionBadge');
+  bd.textContent=BADGE_LABEL[s.action]||s.action;
+  bd.className='action-badge action-badge--'+s.action;
+  document.querySelectorAll('.code-line').forEach(function(el){el.classList.remove('active');});
+  var al=document.querySelector('.code-line[data-line="'+s.line+'"]');
+  if(al){al.classList.add('active');al.scrollIntoView({block:'nearest'});}
+  renderViz(s);
+  showLogPreview(s);
+}
+
+function showLogPreview(s){
+  if(!logEnabled)return;
+  document.getElementById('logPopupBody').innerHTML=s.logHTML||'';
+  document.getElementById('logPopup').classList.remove('log-popup--hidden');
+}
+function hideLogPopup(){document.getElementById('logPopup').classList.add('log-popup--hidden');}
+function toggleLogPreview(){
+  logEnabled=!logEnabled;
+  var btn=document.getElementById('logToggleBtn');
+  btn.textContent=logEnabled?'📋 ON':'📋 OFF';
+  btn.classList.toggle('log-toggle-btn--off',!logEnabled);
+  if(!logEnabled)hideLogPopup();
+  else if(steps.length)showLogPreview(steps[currentStep]);
+}
+function logZoom(dir){logZoomLevel=Math.max(60,Math.min(180,logZoomLevel+dir*20));updateLogZoom();}
+function logZoomReset(){logZoomLevel=100;updateLogZoom();}
+function updateLogZoom(){
+  document.getElementById('logZoomLabel').textContent=logZoomLevel+'%';
+  document.getElementById('logPopup').style.setProperty('--log-scale',logZoomLevel/100);
+}
+function toggleFullscreen(){
+  var viz=document.querySelector('.col-viz');
+  if(!document.fullscreenElement)viz.requestFullscreen().catch(function(){});
+  else document.exitFullscreen();
+}
+
+function parseInput(raw){
+  raw=raw.trim();
+  if(!raw)return [["1","0","1","0","0"],["1","0","1","1","1"],["1","1","1","1","1"],["1","0","0","1","0"]];
+  var rows=raw.split(';').filter(function(r){return r.trim().length>0;});
+  var out=[];
+  for(var i=0;i<rows.length;i++){
+    var rowChars=rows[i].trim().split('').filter(function(ch){return ch==='0'||ch==='1';});
+    if(rowChars.length>0)out.push(rowChars);
+  }
+  if(!out.length)return [["0"]];
+  // Ensure all rows same length
+  var w=out[0].length;
+  for(var k=0;k<out.length;k++){
+    while(out[k].length<w)out[k].push('0');
+    if(out[k].length>w)out[k]=out[k].slice(0,w);
+  }
+  return out;
+}
+
+function resetWithInput(){
+  curResult=null;
+  var raw=document.getElementById('inputMtx').value;
+  var mtx=parseInput(raw);
+  renderCode();fitCodeWidth();
+  steps=buildSteps(mtx);
+  currentStep=0;renderStep(0);
+  document.getElementById('liveOutput').textContent=curResult!==null?curResult:'—';
+}
+
+function stepBy(d){var nx=currentStep+d;if(nx>=0&&nx<steps.length)renderStep(nx);}
+function resetStep(){renderStep(0);}
+
+function loadTest(i,el){
+  document.querySelectorAll('.prob-test').forEach(function(t){t.classList.remove('prob-test--active');});
+  if(el)el.classList.add('prob-test--active');
+  document.getElementById('inputMtx').value=TESTS[i].mtx;
+  document.getElementById('expectedBadge').textContent='exp: '+TESTS[i].e;
+  resetWithInput();
+}
+
+document.addEventListener('keydown',function(e){
+  if(e.target.tagName==='INPUT'||e.target.tagName==='SELECT')return;
+  if(e.key==='ArrowRight'){e.preventDefault();stepBy(1);}
+  else if(e.key==='ArrowLeft'){e.preventDefault();stepBy(-1);}
+  else if(e.key==='r'||e.key==='R'){e.preventDefault();resetStep();}
+});
+
+(function(){
+  var col1=document.getElementById('col1');
+  document.getElementById('resizeH1').addEventListener('mousedown',function(e){
+    e.preventDefault();codeWidthUserSet=true;
+    var startX=e.clientX,startW=col1.offsetWidth,h=this;
+    document.body.classList.add('no-select');h.classList.add('active');
+    function mv(e){col1.style.width=Math.max(140,startW+(e.clientX-startX))+'px';syncFooterWidth();}
+    function up(){document.removeEventListener('mousemove',mv);document.removeEventListener('mouseup',up);document.body.classList.remove('no-select');h.classList.remove('active');}
+    document.addEventListener('mousemove',mv);document.addEventListener('mouseup',up);
+  });
+})();
+
+window.addEventListener('resize',function(){if(!codeWidthUserSet)fitCodeWidth();else syncFooterWidth();});
+
+renderTests();renderCode();fitCodeWidth();resetWithInput();
+</script>
+</body>
+</html>

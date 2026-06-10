@@ -1,0 +1,1257 @@
+﻿
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LC 1368 — Min Cost to Make Valid Path in Grid</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+:root{
+  --bg-primary:#FAFAF8;--bg-secondary:#F1EFE8;--bg-tertiary:#E2E0D8;--bg-card:#FFFFFF;
+  --text-primary:#2C2C2A;--text-secondary:#5F5E5A;--text-tertiary:#888780;
+  --border-color:rgba(0,0,0,.11);--border-light:rgba(0,0,0,.06);--border-focus:#534AB7;
+  --accent-indigo:#534AB7;--accent-indigo-bg:#EEEDFE;--accent-indigo-text:#3C3489;--accent-indigo-hover:#4740A0;
+  --accent-teal:#0F6E56;--accent-teal-bg:#E1F5EE;--accent-teal-text:#085041;
+  --accent-red:#E24B4A;--accent-red-bg:#FCEBEB;--accent-red-text:#791F1F;
+  --accent-amber:#B45309;--accent-amber-bg:#FEF3C7;--accent-amber-text:#78350F;
+  --accent-green:#15803D;--accent-green-bg:#DCFCE7;--accent-green-text:#14532D;
+  --syn-keyword:#534AB7;--syn-function:#185FA5;--syn-number:#993C1D;--syn-string:#0F6E56;
+  --active-line-bg:#EEEDFE;
+  --radius-sm:4px;--radius-md:6px;--radius-lg:10px;
+  --font-sans:'DM Sans',system-ui,sans-serif;
+  --font-mono:'JetBrains Mono','Fira Code',monospace;
+  --fs-xs:11px;--fs-sm:12px;--fs-base:14px;
+  --ease:.18s ease;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:var(--bg-primary);color:var(--text-primary);font-family:var(--font-sans);font-size:var(--fs-base)}
+body.no-select{user-select:none}
+::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border-color);border-radius:3px}
+
+.app-shell{display:flex;flex-direction:column;height:100vh;overflow:hidden}
+.problem-card{flex-shrink:0;border-bottom:1px solid var(--border-color);background:var(--bg-card)}
+.pc-header{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:8px 14px;border-bottom:1px solid var(--border-light)}
+.gt-btn{font:700 11px var(--font-sans);padding:5px 10px;background:var(--accent-indigo);color:#fff;border:none;border-radius:99px;cursor:pointer;letter-spacing:.04em}
+.gt-btn:hover{background:var(--accent-indigo-hover)}
+.lc-num{font:700 12px var(--font-mono);color:var(--text-tertiary)}
+.lc-title{font:700 15px var(--font-sans)}
+.lc-diff{font:700 9px var(--font-mono);padding:2px 8px;border-radius:99px;letter-spacing:.06em;background:var(--accent-red-bg);color:var(--accent-red-text);border:1px solid var(--accent-red)}
+.lc-tag{font:600 10px var(--font-mono);padding:2px 8px;border-radius:99px;background:var(--bg-secondary);color:var(--text-secondary);border:1px solid var(--border-color)}
+.pc-header-right{margin-left:auto;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.input-wrap{display:flex;align-items:center;gap:4px}
+.input-wrap label{font:600 10px var(--font-mono);color:var(--text-tertiary)}
+.input-wrap input{font:600 11px var(--font-mono);padding:3px 6px;border:1px solid var(--border-color);border-radius:4px;width:280px}
+.input-wrap input:focus{outline:none;border-color:var(--border-focus)}
+.expected-badge{font:600 10px var(--font-mono);padding:3px 8px;border-radius:4px;background:var(--accent-teal-bg);color:var(--accent-teal-text);border:1px solid var(--accent-teal)}
+.toggle-btn{font-family:system-ui,"Segoe UI Emoji",sans-serif;font:600 10px var(--font-mono);padding:3px 8px;border-radius:4px;background:var(--bg-secondary);border:1px solid var(--border-color);color:var(--text-secondary);cursor:pointer}
+
+.pc-body{display:flex;gap:16px;padding:10px 14px;max-height:34vh;overflow:auto}
+.pc-left{flex:2;min-width:0}.pc-right{flex:1;min-width:0;border-left:1px solid var(--border-light);padding-left:14px}
+.pc-section{margin-bottom:8px}
+.pc-section h4{font:700 11px var(--font-sans);text-transform:uppercase;letter-spacing:.06em;color:var(--text-tertiary);margin-bottom:4px}
+.pc-section p{font-size:12px;line-height:1.55;color:var(--text-secondary)}
+.pc-section code{font:600 11px var(--font-mono);background:var(--bg-secondary);padding:1px 5px;border-radius:3px;color:var(--accent-indigo-text)}
+.pc-section strong{color:var(--text-primary)}
+.concept-block{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
+.concept-card{flex:1;min-width:130px;padding:6px 8px;background:var(--bg-secondary);border-radius:5px;border-left:3px solid var(--accent-indigo);font-size:11px;line-height:1.5}
+.concept-card strong{display:block;color:var(--accent-indigo-text);margin-bottom:2px;font-size:10px;text-transform:uppercase}
+.complexity-row{display:flex;gap:6px;margin-top:4px}
+.cx-chip{font:600 11px var(--font-mono);padding:3px 8px;border-radius:99px;background:var(--accent-indigo-bg);color:var(--accent-indigo-text);border:1px solid var(--accent-indigo)}
+
+.test-chip{display:flex;flex-direction:column;gap:3px;padding:6px 8px;margin-bottom:5px;background:var(--bg-secondary);border-radius:5px;border:1px solid var(--border-color);cursor:pointer;transition:all var(--ease)}
+.test-chip:hover{border-color:var(--accent-indigo);background:var(--accent-indigo-bg)}
+.tc-row{display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+.tc-row code{font:600 10px var(--font-mono);color:var(--text-secondary)}
+.pt-tag{font:600 9px var(--font-mono);padding:1px 5px;border-radius:3px;background:var(--accent-indigo);color:#fff;text-transform:uppercase}
+.tc-exp{font:600 10px var(--font-mono);color:var(--accent-teal-text);margin-left:auto}
+.run-row{display:flex;align-items:center;gap:8px;margin-top:6px}
+.btn-run{font-family:system-ui,"Segoe UI Emoji",sans-serif;font:700 11px var(--font-sans);padding:5px 12px;background:var(--accent-indigo);color:#fff;border:none;border-radius:5px;cursor:pointer}
+.live-output{font:700 12px var(--font-mono);padding:4px 10px;background:var(--accent-green-bg);color:var(--accent-green-text);border-radius:4px;border:1px solid var(--accent-green)}
+
+.main-row{flex:1;display:flex;overflow:hidden;min-height:0}
+.col{display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.col-code{width:33%;min-width:140px;max-width:45vw;background:var(--bg-card);border-right:1px solid var(--border-color)}
+.col-viz{flex:1;min-width:0;background:var(--bg-primary)}
+.section-label{font-family:system-ui,"Segoe UI Emoji",sans-serif;font:700 10px var(--font-sans);text-transform:uppercase;letter-spacing:.08em;color:var(--text-tertiary);padding:8px 12px;border-bottom:1px solid var(--border-light);background:var(--bg-card)}
+
+#codePanel{flex:1;overflow-y:auto;padding:8px 0;font-family:var(--font-mono);font-size:12px;line-height:1.9}
+.code-line{display:flex;padding:0 12px;transition:background var(--ease)}
+.code-line.active{background:var(--active-line-bg);border-left:3px solid var(--accent-indigo);padding-left:9px}
+.code-line .ln{display:inline-block;width:24px;text-align:right;color:var(--text-tertiary);user-select:none;margin-right:10px;font-size:10px}
+.code-content{white-space:pre}
+.code-content .kw{color:var(--syn-keyword);font-weight:600}
+.code-content .fn{color:var(--syn-function)}
+.code-content .num{color:var(--syn-number)}
+.code-content .str{color:var(--syn-string)}
+
+#vizPanel{flex:1;overflow:auto;padding:14px}
+.vars-strip{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.var-chip{font:600 11px var(--font-mono);padding:4px 9px;border-radius:99px;background:var(--bg-card);border:1px solid var(--border-color);color:var(--text-secondary)}
+.var-chip span.k{color:var(--text-tertiary);margin-right:3px}
+.var-chip span.v{color:var(--text-primary);font-weight:700}
+.vc-active{background:var(--accent-indigo-bg);border-color:var(--accent-indigo);color:var(--accent-indigo-text)}
+.vc-active span.v{color:var(--accent-indigo-text)}
+.vc-safe{background:var(--accent-green-bg);border-color:var(--accent-green)}
+.vc-safe span.v{color:var(--accent-green-text)}
+.vc-warn{background:var(--accent-amber-bg);border-color:var(--accent-amber);color:var(--accent-amber-text)}
+.vc-warn span.v{color:var(--accent-amber-text)}
+.vc-bad{background:var(--accent-red-bg);border-color:var(--accent-red);color:var(--accent-red-text)}
+.vc-bad span.v{color:var(--accent-red-text)}
+
+.viz-row{display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap;margin-bottom:14px}
+.viz-card{background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius-md);padding:12px;min-width:240px}
+.viz-card h5{font:700 10px var(--font-sans);text-transform:uppercase;letter-spacing:.06em;color:var(--text-tertiary);margin-bottom:8px;display:flex;align-items:center;gap:5px}
+
+/* ── Matrix grid ── */
+.matrix-wrap{display:inline-block;padding:14px;background:#1e293b;border-radius:8px;border:2px solid #334155;position:relative}
+.matrix-grid{display:grid;gap:3px;border-radius:3px;position:relative}
+.mat-cell{width:62px;height:62px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:var(--font-mono);font-weight:700;border-radius:6px;background:#fff;color:#1e293b;border:2px solid transparent;position:relative;transition:all .25s}
+.mat-cell-coord{font-size:8px;color:var(--text-tertiary);font-weight:500;position:absolute;top:2px;left:3px;opacity:.7}
+.mat-cell-arrow{font-size:24px;line-height:1;color:#475569}
+.mat-cell-dist{font-size:11px;font-weight:700;color:#0F6E56;margin-top:1px;background:#DCFCE7;padding:1px 5px;border-radius:3px;border:1px solid #15803D}
+.mat-cell-dist.inf{color:#888;background:#F1EFE8;border-color:#aaa}
+.mat-cell--curr{background:#FEF3C7!important;border-color:#B45309!important;animation:pulse-amber 1.1s infinite;transform:scale(1.06);z-index:3}
+.mat-cell--start{box-shadow:inset 0 0 0 3px #15803D}
+.mat-cell--end{box-shadow:inset 0 0 0 3px #534AB7}
+.mat-cell--neighbor{background:#E0F2FE!important;border-color:#0284C7!important;animation:pulse-blue 1.1s infinite;z-index:2}
+.mat-cell--relaxed-free{background:#DCFCE7!important;border-color:#15803D!important;animation:relax-pulse-green .9s ease-out}
+.mat-cell--relaxed-cost{background:#FEE2E2!important;border-color:#E24B4A!important;animation:relax-pulse-red .9s ease-out}
+.mat-cell--popped{background:#F1EFE8;color:#888;border-color:#aaa}
+.mat-cell--in-deque{box-shadow:0 0 0 2px #B45309 inset}
+
+@keyframes pulse-amber{0%,100%{box-shadow:0 0 4px #B45309}50%{box-shadow:0 0 14px #B45309}}
+@keyframes pulse-blue{0%,100%{box-shadow:0 0 4px #0284C7}50%{box-shadow:0 0 12px #0284C7}}
+@keyframes pulse-node{0%,100%{box-shadow:0 0 4px var(--accent-indigo)}50%{box-shadow:0 0 14px var(--accent-indigo)}}
+@keyframes win-pulse{0%,100%{box-shadow:0 0 3px rgba(234,179,8,.5)}50%{box-shadow:0 0 10px rgba(234,179,8,.95)}}
+@keyframes relax-pulse-green{0%{box-shadow:0 0 0 #15803D}50%{box-shadow:0 0 16px #15803D}100%{box-shadow:0 0 4px #15803D}}
+@keyframes relax-pulse-red{0%{box-shadow:0 0 0 #E24B4A}50%{box-shadow:0 0 16px #E24B4A}100%{box-shadow:0 0 4px #E24B4A}}
+@keyframes flow-dash{to{stroke-dashoffset:-18}}
+
+/* SVG flow overlay */
+.flow-svg{position:absolute;top:14px;left:14px;pointer-events:none;z-index:6;overflow:visible}
+.flow-line{stroke-width:2.5;fill:none}
+.flow-line.free{stroke:#22c55e;stroke-dasharray:5,4;animation:flow-dash 1s linear infinite;filter:drop-shadow(0 0 2px rgba(34,197,94,.6))}
+.flow-line.cost{stroke:#ef4444;stroke-dasharray:5,4;animation:flow-dash 1s linear infinite;filter:drop-shadow(0 0 2px rgba(239,68,68,.6))}
+.flow-line.curr-edge{stroke:#f59e0b;stroke-width:3.5;stroke-dasharray:4,3;animation:flow-dash .55s linear infinite;filter:drop-shadow(0 0 4px rgba(245,158,11,.85))}
+
+/* ── Deque visualization ── */
+.deque-row{display:flex;align-items:center;gap:6px;padding:8px;background:var(--bg-secondary);border-radius:8px;border:1px dashed var(--border-color);min-height:54px;overflow-x:auto}
+.deque-arrow{color:var(--text-tertiary);font-weight:700;font-size:14px;flex-shrink:0}
+.deque-front-label,.deque-back-label{font:700 9px var(--font-mono);color:var(--text-tertiary);text-transform:uppercase;flex-shrink:0}
+.deque-item{flex-shrink:0;padding:5px 10px;background:#fff;border:2px solid var(--border-color);border-radius:6px;font:700 11px var(--font-mono);min-width:54px;text-align:center;transition:all .25s;position:relative}
+.deque-item.front{border-color:var(--accent-indigo);background:var(--accent-indigo-bg);color:var(--accent-indigo-text);animation:pulse-node 1.2s infinite}
+.deque-item.just-front{border-color:#15803D;background:#DCFCE7;color:#14532D;animation:relax-pulse-green .8s ease-out}
+.deque-item.just-back{border-color:#B45309;background:#FEF3C7;color:#78350F;animation:relax-pulse-red .8s ease-out}
+.deque-empty{font:italic 11px var(--font-sans);color:var(--text-tertiary);padding:0 8px}
+
+/* ── Banner ── */
+.banner{display:flex;align-items:center;gap:8px;padding:8px 14px;border-radius:8px;font:700 13px var(--font-mono);margin-bottom:10px}
+.banner-init{background:var(--bg-secondary);color:var(--text-secondary);border:1px solid var(--border-color)}
+.banner-pop{background:var(--accent-amber-bg);color:var(--accent-amber-text);border:1px solid var(--accent-amber)}
+.banner-explore{background:#E0F2FE;color:#075985;border:1px solid #0284C7}
+.banner-relax-free{background:var(--accent-green-bg);color:var(--accent-green-text);border:1px solid var(--accent-green)}
+.banner-relax-cost{background:var(--accent-red-bg);color:var(--accent-red-text);border:1px solid var(--accent-red)}
+.banner-skip{background:var(--bg-tertiary);color:var(--text-secondary);border:1px solid var(--border-color)}
+.banner-done{background:var(--accent-teal-bg);color:var(--accent-teal-text);border:2px solid var(--accent-teal);animation:win-pulse 1.5s infinite}
+
+.footer-bar{display:flex;flex-shrink:0;border-top:1px solid var(--border-color);background:var(--bg-card)}
+.footer-left{width:33%;min-width:140px;max-width:45vw;display:flex;align-items:center;gap:8px;padding:7px 12px;border-right:1px solid var(--border-light)}
+.footer-right{flex:1;display:flex;align-items:center;gap:6px;padding:7px 14px;flex-wrap:wrap}
+.step-info{font:700 12px var(--font-mono)}
+.action-badge{font-family:system-ui,"Segoe UI Emoji",sans-serif;font:700 10px var(--font-mono);padding:3px 9px;border-radius:99px}
+.action-badge--init,.action-badge--func-def,.action-badge--call,.action-badge--return{background:rgba(130,80,255,.14);color:#3C3489;border:1px solid #8250ff}
+.action-badge--for-check,.action-badge--while-check,.action-badge--if-check{background:rgba(56,139,253,.14);color:#185FA5;border:1px solid #388bfd}
+.action-badge--mark,.action-badge--push,.action-badge--pop,.action-badge--restore,.action-badge--found{background:var(--accent-green-bg);color:var(--accent-green-text);border:1px solid var(--accent-green)}
+.action-badge--remove,.action-badge--prune,.action-badge--fail{background:var(--accent-red-bg);color:var(--accent-red-text);border:1px solid var(--accent-red)}
+.action-badge--exit,.action-badge--skip{background:var(--bg-secondary);color:var(--text-secondary);border:1px solid var(--border-color)}
+
+kbd{font-family:system-ui,"Segoe UI Emoji",sans-serif;font:600 10px var(--font-mono);padding:2px 6px;background:var(--bg-secondary);border:1px solid var(--border-color);border-radius:3px;color:var(--text-secondary)}
+.btn{font-family:system-ui,"Segoe UI Emoji",sans-serif;font:600 12px var(--font-sans);padding:5px 11px;border:1px solid var(--border-color);background:var(--bg-card);border-radius:5px;cursor:pointer;transition:all var(--ease)}
+.btn:hover{background:var(--bg-secondary);border-color:var(--accent-indigo)}
+.btn-primary{background:var(--accent-indigo);color:#fff;border-color:var(--accent-indigo)}
+.btn-primary:hover{background:var(--accent-indigo-hover);color:#fff}
+.btn-fullscreen{font-size:13px;padding:4px 10px}
+.btn-zoom{font-family:system-ui,"Segoe UI Emoji",sans-serif;font:600 11px var(--font-mono);padding:3px 8px;border:1px solid var(--border-color);background:var(--bg-card);color:var(--text-secondary);border-radius:4px;cursor:pointer}
+.btn-zoom:hover{background:var(--bg-secondary)}
+.log-zoom-label{font:600 10px var(--font-mono);color:var(--text-tertiary);min-width:38px;text-align:center}
+.log-toggle-btn{font-family:system-ui,"Segoe UI Emoji",sans-serif;font:600 11px var(--font-mono);padding:4px 9px;border:1px solid var(--accent-indigo);background:var(--accent-indigo-bg);color:var(--accent-indigo-text);border-radius:4px;cursor:pointer}
+.log-toggle-btn--off{background:var(--bg-secondary);border-color:var(--border-color);color:var(--text-tertiary)}
+.footer-sep{width:1px;height:18px;background:var(--border-color);margin:0 4px}
+
+.resize-h{width:5px;background:transparent;cursor:col-resize;position:relative;flex-shrink:0;z-index:5}
+.resize-h::before{content:'';position:absolute;top:0;bottom:0;left:2px;width:1px;background:var(--border-color)}
+.resize-h:hover::before,.resize-h.active::before{background:var(--accent-indigo);width:2px;left:1.5px}
+
+.log-popup{--log-scale:1;position:fixed;bottom:52px;right:14px;width:calc(480px*var(--log-scale));max-width:92vw;max-height:75vh;border-radius:var(--radius-lg);box-shadow:0 10px 32px rgba(0,0,0,.14);border:1px solid var(--border-color);background:var(--bg-card);overflow:hidden;display:flex;flex-direction:column;z-index:100;transition:opacity .15s,transform .15s;transform-origin:bottom right}
+.log-popup--hidden{opacity:0;transform:scale(.92);pointer-events:none}
+.log-popup-body{flex:1;overflow:auto;padding:0}
+.log-popup-body>.log-card{border-radius:0;border:none;border-left:0}
+
+.log-card{border-radius:var(--radius-md);overflow:hidden;border:1px solid var(--border-color);border-left-width:4px;font-size:var(--fs-xs);background:var(--bg-card)}
+.log-card--for-check,.log-card--while-check,.log-card--if-check{border-left-color:#388bfd}
+.log-card--func-def,.log-card--init,.log-card--call,.log-card--return{border-left-color:#8250ff}
+.log-card--mark,.log-card--push,.log-card--pop,.log-card--restore,.log-card--found{border-left-color:#3fb950}
+.log-card--remove,.log-card--prune,.log-card--fail{border-left-color:#f85149}
+.log-card--exit,.log-card--skip{border-left-color:#888780}
+.log-card-header{display:flex;align-items:center;gap:6px;padding:8px 10px 6px;background:var(--bg-secondary);border-bottom:1px solid var(--border-light)}
+.log-badge{font-family:system-ui,"Segoe UI Emoji",sans-serif;font:700 10px var(--font-mono);padding:2px 7px;border-radius:99px}
+.log-badge--init,.log-badge--func-def,.log-badge--call,.log-badge--return{background:rgba(130,80,255,.14);color:#3C3489}
+.log-badge--for-check,.log-badge--while-check,.log-badge--if-check{background:rgba(56,139,253,.14);color:#185FA5}
+.log-badge--mark,.log-badge--push,.log-badge--pop,.log-badge--restore,.log-badge--found{background:var(--accent-green-bg);color:var(--accent-green-text)}
+.log-badge--remove,.log-badge--prune,.log-badge--fail{background:var(--accent-red-bg);color:var(--accent-red-text)}
+.log-badge--exit,.log-badge--skip{background:var(--bg-secondary);color:var(--text-secondary)}
+.log-line-ref{font:700 10px var(--font-mono);color:var(--accent-indigo);background:var(--accent-indigo-bg);padding:1px 6px;border-radius:4px;border:1px solid var(--accent-indigo)}
+.log-status-pill{font-family:system-ui,"Segoe UI Emoji",sans-serif;font-size:9px;font-weight:700;padding:2px 7px;border-radius:99px;text-transform:uppercase;margin-left:auto}
+.log-status--success{background:var(--accent-green-bg);color:var(--accent-green-text);border:1px solid var(--accent-green)}
+.log-status--fail{background:var(--accent-red-bg);color:var(--accent-red-text);border:1px solid var(--accent-red)}
+.log-status--skip{background:var(--bg-tertiary);color:var(--text-tertiary);border:1px solid var(--border-color)}
+.log-status--loop{background:rgba(56,139,253,.14);color:#185FA5;border:1px solid #388bfd}
+.log-status--prune{background:var(--accent-red-bg);color:var(--accent-red-text);border:1px solid var(--accent-red)}
+.log-status--info{background:rgba(130,80,255,.14);color:#3C3489;border:1px solid #8250ff}
+.log-section{padding:7px 10px;border-bottom:1px dashed var(--border-light)}
+.log-section:last-child{border-bottom:none}
+.log-section-title{font:700 8px var(--font-mono);text-transform:uppercase;letter-spacing:.06em;color:var(--text-tertiary);margin-bottom:3px;display:flex;align-items:center;gap:4px}
+.log-section-title-icon{font-family:system-ui,"Segoe UI Emoji",sans-serif;font-size:11px}
+.log-code-snippet{font:600 11px var(--font-mono);background:#0d1117;color:#e6edf3;padding:6px 9px;border-radius:4px;display:block;overflow-x:auto;white-space:pre;border:1px solid #30363d}
+.log-code-snippet .ck{color:#ff7b72}.log-code-snippet .cs{color:#a5d6ff}
+.log-code-snippet .cn{color:#79c0ff}.log-code-snippet .cf{color:#d2a8ff}
+.log-code-snippet .cc{color:#8b949e;font-style:italic}
+.log-kv-row{display:flex;flex-wrap:wrap;gap:4px}
+.log-kv{display:inline-flex;align-items:center;gap:3px;font:11px var(--font-mono);padding:2px 7px;border-radius:4px;background:var(--bg-secondary);border:1px solid var(--border-light)}
+.log-kv-key{color:var(--text-tertiary);font-weight:500}
+.log-kv-val{color:var(--text-primary);font-weight:700}
+.log-kv--in{background:rgba(56,139,253,.08);border-color:rgba(56,139,253,.3)}
+.log-kv--out{background:rgba(63,185,80,.08);border-color:rgba(63,185,80,.4)}
+.log-kv--out .log-kv-val{color:#15803D}
+.log-kv--changed{background:rgba(180,83,9,.10);border-color:rgba(180,83,9,.4)}
+.log-kv--changed .log-kv-val{color:var(--accent-amber-text)}
+.log-verdict{display:flex;align-items:center;gap:6px;font:600 11px var(--font-mono);padding:5px 8px;border-radius:5px;background:var(--bg-secondary);border:1px solid var(--border-light)}
+.log-verdict--true{background:var(--accent-green-bg);border-color:var(--accent-green);color:var(--accent-green-text)}
+.log-verdict--false{background:var(--accent-red-bg);border-color:var(--accent-red);color:var(--accent-red-text)}
+.log-analogy{font:italic 11px var(--font-sans);color:var(--text-secondary);background:#FFF8E7;border:1px solid #FBE8A6;border-left:3px solid var(--accent-amber);padding:6px 9px;border-radius:4px;line-height:1.55}
+.log-analogy strong{color:var(--accent-amber-text);font-style:normal;font-weight:700}
+.log-why{font-size:11px;line-height:1.55;color:var(--text-primary);padding:4px 0}
+.log-why strong{color:var(--accent-indigo-text)}
+.log-why code{font:600 10px var(--font-mono);background:var(--bg-secondary);padding:1px 4px;border-radius:3px;color:var(--accent-indigo-text)}
+
+.legend{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px;padding:0 4px}
+.legend span{display:inline-flex;align-items:center;gap:5px;font-size:10px;color:var(--text-secondary)}
+.legend i{display:inline-block;width:14px;height:14px;border-radius:3px;border:1px solid var(--border-color)}
+.legend i.flow-leg{width:22px;height:0;border:0;border-top:2.5px dashed #22c55e}
+.legend i.flow-leg-cost{width:22px;height:0;border:0;border-top:2.5px dashed #ef4444}
+.legend i.flow-leg-curr{width:22px;height:0;border:0;border-top:3px dashed #f59e0b}
+</style>
+</head>
+<body>
+<div class="app-shell">
+
+  <div class="problem-card" id="problemCard">
+    <div class="pc-header">
+      <a href="../00_HomePage/gt_learn_homepage.html" class="gt-btn">GT LEARN</a>
+      <span class="lc-num">#1368</span>
+      <span class="lc-title">🗺️ Min Cost to Make Valid Path in Grid</span>
+      <span class="lc-diff">HARD</span>
+      <span class="lc-tag">0-1 BFS</span>
+      <span class="lc-tag">Deque</span>
+      <span class="lc-tag">Shortest Path</span>
+      <div class="pc-header-right">
+        <div class="input-wrap"><label>grid</label><input id="inGrid" type="text" value="[[1,2],[4,3]]"></div>
+        <span class="expected-badge" id="expBadge">expected: 1</span>
+        <button class="toggle-btn" type="button" onclick="toggleProblem()" id="toggleBtn">▲ Hide</button>
+      </div>
+    </div>
+
+    <div class="pc-body" id="pcBody">
+      <div class="pc-left">
+        <div class="pc-section">
+          <h4>📝 Problem Statement</h4>
+          <p>Diya gaya <code>m × n</code> grid jahan har cell mein <strong>arrow</strong> hai: <code>1=right, 2=left, 3=down, 4=up</code>. Cell pe pohochke us arrow ki direction mein <strong>follow karte hain</strong>. <code>(0,0)</code> se <code>(m-1, n-1)</code> tak ka <strong>valid path</strong> banane ke liye <strong>minimum number of cell-arrow modifications</strong> chahiye. Har modification cost <code>1</code>.</p>
+        </div>
+        <div class="pc-section">
+          <h4>🧠 Solving Approach</h4>
+          <p><strong>0-1 BFS with deque</strong>: Graph banao jahan har cell se 4 neighbors connected hain — agar cell ka arrow neighbor ki taraf point karta hai, edge weight = <strong>0</strong>; warna <strong>1</strong>. Deque use karo: <code>0-cost</code> edges ke liye <code>appendleft</code>, <code>1-cost</code> edges ke liye <code>append</code>. Yeh Dijkstra ka special O(m·n) version hai!</p>
+        </div>
+        <div class="pc-section">
+          <h4>🎯 Core Concepts</h4>
+          <div class="concept-block">
+            <div class="concept-card"><strong>Free Edge</strong>Cell ka arrow already neighbor ki taraf — cost <code>0</code>, deque ke <strong>front</strong> mein.</div>
+            <div class="concept-card"><strong>Cost Edge</strong>Arrow ulta hai — modify chahiye, cost <code>1</code>, deque ke <strong>back</strong> mein.</div>
+            <div class="concept-card"><strong>Relaxation</strong>Naya path shorter? Toh <code>dist[nr][nc]</code> update + deque mein push.</div>
+          </div>
+        </div>
+        <div class="pc-section">
+          <h4>⏱ Complexity</h4>
+          <div class="complexity-row">
+            <span class="cx-chip">Time: O(m·n)</span>
+            <span class="cx-chip">Space: O(m·n)</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="pc-right">
+        <h4 style="font:700 11px var(--font-sans);text-transform:uppercase;letter-spacing:.06em;color:var(--text-tertiary);margin-bottom:6px">🧪 Test Cases</h4>
+        <div class="test-chip" onclick="loadTest('[[1,2],[4,3]]', '1', 'small 2x2')">
+          <div class="tc-row"><span class="pt-tag">T1</span><code>[[1,2],[4,3]]</code></div>
+          <div class="tc-row"><span style="font:11px var(--font-sans);color:var(--text-secondary)">smallest valid case</span><span class="tc-exp">→ 1</span></div>
+        </div>
+        <div class="test-chip" onclick="loadTest('[[1,1,3],[3,2,2],[1,1,4]]', '0', 'already valid')">
+          <div class="tc-row"><span class="pt-tag">T2</span><code>[[1,1,3],[3,2,2],[1,1,4]]</code></div>
+          <div class="tc-row"><span style="font:11px var(--font-sans);color:var(--text-secondary)">arrows form valid path — no edits</span><span class="tc-exp">→ 0</span></div>
+        </div>
+        <div class="test-chip" onclick="loadTest('[[1,1],[1,1]]', '1', 'all right arrows')">
+          <div class="tc-row"><span class="pt-tag">T3</span><code>[[1,1],[1,1]]</code></div>
+          <div class="tc-row"><span style="font:11px var(--font-sans);color:var(--text-secondary)">need 1 down-modification</span><span class="tc-exp">→ 1</span></div>
+        </div>
+        <div class="test-chip" onclick="loadTest('[[2,2,2],[2,2,2]]', '3', 'all wrong arrows')">
+          <div class="tc-row"><span class="pt-tag">T4</span><code>[[2,2,2],[2,2,2]]</code></div>
+          <div class="tc-row"><span style="font:11px var(--font-sans);color:var(--text-secondary)">all left — many modifications</span><span class="tc-exp">→ 3</span></div>
+        </div>
+        <div class="test-chip" onclick="loadTest('[[4]]', '0', 'single cell')">
+          <div class="tc-row"><span class="pt-tag">T5</span><code>[[4]]</code></div>
+          <div class="tc-row"><span style="font:11px var(--font-sans);color:var(--text-secondary)">single cell — already at target</span><span class="tc-exp">→ 0</span></div>
+        </div>
+        <div class="run-row">
+          <button class="btn-run" type="button" onclick="resetWithInput()">▶ Run</button>
+          <span class="live-output" id="liveOutput">—</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="main-row">
+    <div class="col col-code" id="col1">
+      <div class="section-label">📜 Python Code</div>
+      <div id="codePanel"></div>
+    </div>
+    <div class="resize-h" id="resizeH1"></div>
+    <div class="col col-viz">
+      <div class="section-label">📊 Visualization</div>
+      <div id="vizPanel"></div>
+    </div>
+  </div>
+
+  <div class="footer-bar">
+    <div class="footer-left" id="footerLeft">
+      <span id="stepInfo" class="step-info">0/0</span>
+      <span id="actionBadge" class="action-badge"></span>
+    </div>
+    <div class="footer-right">
+      <kbd>←</kbd><kbd>→</kbd><kbd>R</kbd>
+      <button class="btn" type="button" onclick="resetStep()">↺</button>
+      <button class="btn" type="button" onclick="stepBy(-1)">◀</button>
+      <button class="btn btn-primary" type="button" onclick="stepBy(1)">▶ Next</button>
+      <span class="footer-sep"></span>
+      <button id="logToggleBtn" class="log-toggle-btn" type="button" onclick="toggleLogPreview()">📋 ON</button>
+      <button class="btn-zoom" type="button" onclick="logZoom(-1)">−</button>
+      <span id="logZoomLabel" class="log-zoom-label">100%</span>
+      <button class="btn-zoom" type="button" onclick="logZoom(1)">+</button>
+      <button class="btn-zoom" type="button" onclick="logZoomReset()">↺</button>
+      <span class="footer-sep"></span>
+      <button class="btn btn-fullscreen" type="button" onclick="toggleFullscreen()">⛶</button>
+    </div>
+  </div>
+</div>
+
+<div class="log-popup" id="logPopup">
+  <div class="log-popup-body" id="logPopupBody"></div>
+</div>
+
+<script>
+/* ============ PYTHON CODE ============ */
+var codeLines = [
+  "def minCost(grid):",
+  "    m, n = len(grid), len(grid[0])",
+  "    dirs = [(0,1),(0,-1),(1,0),(-1,0)]  # 1=R, 2=L, 3=D, 4=U",
+  "    dist = [[float('inf')] * n for _ in range(m)]",
+  "    dist[0][0] = 0",
+  "    dq = deque([(0, 0)])",
+  "    while dq:",
+  "        r, c = dq.popleft()",
+  "        for k in range(4):",
+  "            dr, dc = dirs[k]",
+  "            nr, nc = r + dr, c + dc",
+  "            if 0 <= nr < m and 0 <= nc < n:",
+  "                cost = 0 if grid[r][c] == k + 1 else 1",
+  "                if dist[r][c] + cost < dist[nr][nc]:",
+  "                    dist[nr][nc] = dist[r][c] + cost",
+  "                    if cost == 0:",
+  "                        dq.appendleft((nr, nc))",
+  "                    else:",
+  "                        dq.append((nr, nc))",
+  "    return dist[m-1][n-1]"
+];
+
+/* ============ STATE ============ */
+var steps=[], currentStep=0, codeWidthUserSet=false, curResult=null;
+var logEnabled=true, logZoomLevel=100;
+
+var LOG_BADGE = {
+  "func-def":"📌 DEF","init":"⚙️ INIT","call":"📞 CALL","return":"🏆 RETURN",
+  "for-check":"🔁 FOR","while-check":"🔁 WHILE","if-check":"🔎 IF",
+  "mark":"✅ MARK","push":"⬆ PUSH","pop":"⬇ POP","restore":"↩ RESTORE","found":"🎉 FOUND",
+  "remove":"✏️ EDIT","prune":"✂️ PRUNE","fail":"❌ FAIL","exit":"🔚 EXIT","skip":"⏭ SKIP"
+};
+var BADGE_LABEL = {
+  "func-def":"DEF","init":"INIT","call":"CALL","return":"RETURN",
+  "for-check":"FOR","while-check":"WHILE","if-check":"IF",
+  "mark":"MARK","push":"PUSH","pop":"POP","restore":"RESTORE","found":"FOUND",
+  "remove":"EDIT","prune":"PRUNE","fail":"FAIL","exit":"EXIT","skip":"SKIP"
+};
+
+var ARROW_CHAR = {1:"➡",2:"⬅",3:"⬇",4:"⬆"};
+var DIR_NAME = {1:"right",2:"left",3:"down",4:"up"};
+
+/* ============ CODE RENDERER ============ */
+function renderCode(){
+  var p = document.getElementById('codePanel');
+  p.innerHTML = codeLines.map(function(raw,i){
+    var h = raw;
+    h = h.replace(/("[^"]*"|'[^']*')/g, '\x01STR\x02$1\x03');
+    h = h.replace(/\b(def|for|in|if|return|break|continue|and|else|elif|True|False|None|not|or|while|lambda)\b/g, '\x01KW\x02$1\x03');
+    h = h.replace(/\b(len|range|int|str|list|append|appendleft|pop|popleft|sorted|min|max|sum|abs|enumerate|zip|print|set|add|float|deque)\b/g, '\x01FN\x02$1\x03');
+    h = h.replace(/(?<![.\w"\x01\x02\x03])(-?\d+)\b/g, '\x01NUM\x02$1\x03');
+    h = h.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    h = h.replace(/\x01([A-Z]+)\x02/g, function(_,c){
+      return '<span class="'+(c==='KW'?'kw':c==='FN'?'fn':c==='NUM'?'num':'str')+'">';
+    }).replace(/\x03/g,'</span>');
+    return '<div class="code-line" data-line="'+i+'"><span class="ln">'+(i+1)+'</span><span class="code-content">'+h+'</span></div>';
+  }).join('');
+}
+
+/* ============ MINI HIGHLIGHTER ============ */
+function hlCode(raw){
+  var h = raw;
+  h = h.replace(/("[^"]*"|'[^']*')/g, '\x01s\x02$1\x03');
+  h = h.replace(/\b(def|for|in|if|return|break|continue|and|else|elif|True|False|None|not|or|while|lambda)\b/g, '\x01k\x02$1\x03');
+  h = h.replace(/\b(len|range|int|str|list|append|appendleft|pop|popleft|sorted|min|max|sum|abs|enumerate|zip|print|set|add|float|deque)\b/g, '\x01f\x02$1\x03');
+  h = h.replace(/(?<![.\w"\x01\x02\x03])(-?\d+)\b/g, '\x01n\x02$1\x03');
+  h = h.replace(/(#.*$)/gm, '\x01c\x02$1\x03');
+  h = h.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  h = h.replace(/\x01([a-z])\x02/g, function(_,c){return '<span class="c'+c+'">';}).replace(/\x03/g,'</span>');
+  return h;
+}
+
+/* ============ richLog ============ */
+function richLog(opts){
+  var statusMap = {success:"✅ Success",fail:"❌ Failed",skip:"⏭ Skipped",loop:"🔁 Loop iter",prune:"✂️ Pruned",info:"ℹ️ Info"};
+  var status = opts.status || "info";
+  var html = '<div class="log-card log-card--'+opts.action+'">';
+  html += '<div class="log-card-header">';
+  html += '<span class="log-badge log-badge--'+opts.action+'">'+(LOG_BADGE[opts.action]||opts.action)+'</span>';
+  html += '<span class="log-line-ref">L'+(opts.line+1)+'</span>';
+  html += '<span class="log-status-pill log-status--'+status+'">'+statusMap[status]+'</span></div>';
+  if(opts.code){
+    html += '<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">📜</span>Code Executing</div>';
+    html += '<code class="log-code-snippet">'+hlCode(opts.code)+'</code></div>';
+  }
+  if(opts.inputs && opts.inputs.length){
+    html += '<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">📥</span>Input Values (line is using these)</div><div class="log-kv-row">';
+    opts.inputs.forEach(function(kv){
+      html += '<span class="log-kv log-kv--in"><span class="log-kv-key">'+kv.k+'</span>=<span class="log-kv-val">'+kv.v+'</span></span>';
+    });
+    html += '</div></div>';
+  }
+  if(opts.outputs && opts.outputs.length){
+    html += '<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">📤</span>Output / State After Line</div><div class="log-kv-row">';
+    opts.outputs.forEach(function(kv){
+      var cls = kv.changed ? 'log-kv--changed':'log-kv--out';
+      html += '<span class="log-kv '+cls+'"><span class="log-kv-key">'+kv.k+'</span>=<span class="log-kv-val">'+kv.v+'</span></span>';
+    });
+    html += '</div></div>';
+  }
+  if(opts.verdict){
+    var vCls = opts.verdictTrue===true?'log-verdict--true':(opts.verdictTrue===false?'log-verdict--false':'');
+    var vIcon = opts.verdictTrue===true?'✓':(opts.verdictTrue===false?'✗':'•');
+    html += '<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">⚖️</span>Verdict / Decision</div>';
+    html += '<div class="log-verdict '+vCls+'">'+vIcon+' '+opts.verdict+'</div></div>';
+  }
+  if(opts.why){
+    html += '<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">💡</span>Why This Happens</div><div class="log-why">'+opts.why+'</div></div>';
+  }
+  if(opts.analogy){
+    html += '<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">🎭</span>Real-Life Analogy</div><div class="log-analogy">'+opts.analogy+'</div></div>';
+  }
+  html += '</div>';
+  return html;
+}
+
+/* ============ INPUT PARSING ============ */
+function parseGrid(s){
+  s = s.trim();
+  try{
+    var v = JSON.parse(s);
+    if(!Array.isArray(v) || !Array.isArray(v[0])) return [[1]];
+    return v;
+  }catch(e){ return [[1]]; }
+}
+
+/* ============ buildSteps ============ */
+function buildSteps(p){
+  var st=[], MAX=2500;
+  var grid = p.grid.map(function(r){return r.slice();});
+  var m = grid.length;
+  var n = grid[0].length;
+  var INF = Infinity;
+  var dirs = [[0,1],[0,-1],[1,0],[-1,0]];
+  var dirsLabel = ["1=R","2=L","3=D","4=U"];
+  var dist = [];
+  var dq = [];        // array of [r,c]
+  var r=null, c=null, k=null, dr=null, dc=null, nr=null, nc=null, cost=null;
+  var phase = "init";
+  var lastRelax = null;     // [nr,nc, type:'free'|'cost']
+  var lastDqOp = null;      // 'popleft' | 'appendleft' | 'append'
+  var lastDqItem = null;    // [r,c] just touched in dq
+
+  function fmtDist(){
+    return dist.map(function(row){
+      return row.map(function(v){return v===INF?"∞":v;});
+    });
+  }
+  function dqStr(){
+    if(dq.length===0) return "[]";
+    return "["+dq.map(function(p){return "("+p[0]+","+p[1]+")";}).join(",")+"]";
+  }
+  function snap(extra){
+    return Object.assign({
+      grid: grid.map(function(rr){return rr.slice();}),
+      m:m, n:n,
+      dist: dist.map(function(rr){return rr.slice();}),
+      dq: dq.map(function(p){return p.slice();}),
+      r:r, c:c, k:k, dr:dr, dc:dc, nr:nr, nc:nc, cost:cost,
+      phase: phase,
+      lastRelax: lastRelax ? lastRelax.slice() : null,
+      lastDqOp: lastDqOp,
+      lastDqItem: lastDqItem ? lastDqItem.slice() : null
+    }, extra||{});
+  }
+  function push(o){ if(st.length>=MAX) return; st.push(Object.assign({line:0,action:"init",logHTML:""}, snap(o))); }
+
+  // ── L0: function def ──
+  push({
+    line:0, action:"func-def",
+    logHTML: richLog({
+      line:0, action:"func-def",
+      code:"def minCost(grid):",
+      status:"info",
+      inputs:[{k:"grid",v:JSON.stringify(grid)},{k:"size",v:m+"×"+n}],
+      why:"Function start — <code>"+m+"×"+n+"</code> grid mila with arrow directions. Hum <code>(0,0)</code> se <code>("+(m-1)+","+(n-1)+")</code> tak <strong>min modifications</strong> nikalenge.",
+      analogy:"Tum traffic engineer ho — har crossroad pe pre-painted arrow hai. Agar wrong direction point karta hai toh <strong>repaint cost</strong> lagti hai. Min repaints chahiye!"
+    })
+  });
+
+  // ── L1: m, n = len(grid), len(grid[0]) ──
+  push({
+    line:1, action:"init",
+    logHTML: richLog({
+      line:1, action:"init",
+      code:"m, n = len(grid), len(grid[0])  # m="+m+", n="+n,
+      status:"success",
+      inputs:[{k:"len(grid)",v:m},{k:"len(grid[0])",v:n}],
+      outputs:[{k:"m",v:m,changed:true},{k:"n",v:n,changed:true}],
+      why:"Dimensions capture: <code>m="+m+"</code> rows, <code>n="+n+"</code> cols. Bounds check ke liye chahiye later.",
+      analogy:"City map ka size note kar liya — <strong>"+m+" lambai × "+n+" chaudai blocks</strong>."
+    })
+  });
+
+  // ── L2: dirs = ... ──
+  push({
+    line:2, action:"init",
+    logHTML: richLog({
+      line:2, action:"init",
+      code:"dirs = [(0,1),(0,-1),(1,0),(-1,0)]  # k=0:R, k=1:L, k=2:D, k=3:U",
+      status:"success",
+      outputs:[{k:"dirs",v:"[(0,1),(0,-1),(1,0),(-1,0)]",changed:true}],
+      why:"Direction vectors. <strong>Index k</strong> ka mapping: <code>k=0→Right</code>, <code>k=1→Left</code>, <code>k=2→Down</code>, <code>k=3→Up</code>. Grid arrow values <code>1,2,3,4</code> match karte hain <code>k+1</code> se.",
+      analogy:"Compass nikal liya — <strong>4 directions ki mapping</strong> ready: index 0 right, 1 left, 2 down, 3 up. Grid mein 1/2/3/4 likha hai — bilkul same order!"
+    })
+  });
+
+  // ── L3: dist = [[INF]*n for _] ──
+  dist = [];
+  for(var ii=0;ii<m;ii++){
+    var row=[];
+    for(var jj=0;jj<n;jj++) row.push(INF);
+    dist.push(row);
+  }
+  push({
+    line:3, action:"init",
+    logHTML: richLog({
+      line:3, action:"init",
+      code:"dist = [[float('inf')] * "+n+" for _ in range("+m+")]",
+      status:"success",
+      outputs:[{k:"dist",v:JSON.stringify(fmtDist()),changed:true},{k:"shape",v:m+"×"+n,changed:true}],
+      why:"<code>dist</code> matrix ko <strong>infinity</strong> se initialize kiya — abhi tak kisi cell tak pahuncha nahi. Shortest-path algorithms ka standard pattern.",
+      analogy:"Har cell pe initially likha hai: <strong>'∞ — abhi tak koi nahi pahuncha'</strong>. Jaise empty bus stops board pe '— —' likha hota hai."
+    })
+  });
+
+  // ── L4: dist[0][0] = 0 ──
+  dist[0][0] = 0;
+  push({
+    line:4, action:"mark",
+    logHTML: richLog({
+      line:4, action:"mark",
+      code:"dist[0][0] = 0",
+      status:"success",
+      outputs:[{k:"dist[0][0]",v:0,changed:true},{k:"dist",v:JSON.stringify(fmtDist()),changed:true}],
+      why:"Source cell <code>(0,0)</code> ka distance <code>0</code> — yahan se start kar rahe hain, koi modification nahi lagi.",
+      analogy:"Start point pe pohonche — <strong>0 paint cans use</strong> abhi tak. Yahin se safar shuru."
+    })
+  });
+
+  // ── L5: dq = deque([(0,0)]) ──
+  dq = [[0,0]];
+  lastDqOp = "init";
+  lastDqItem = [0,0];
+  push({
+    line:5, action:"push",
+    logHTML: richLog({
+      line:5, action:"push",
+      code:"dq = deque([(0, 0)])",
+      status:"success",
+      outputs:[{k:"dq",v:dqStr(),changed:true},{k:"dq.size",v:1,changed:true}],
+      why:"<strong>Deque initialize</strong> — sirf source <code>(0,0)</code> daala. 0-1 BFS ka core data structure: front se popleft, free edges front mein, cost edges back mein.",
+      analogy:"Traffic team ka <strong>to-visit list</strong> shuru — pehla cell <code>(0,0)</code> queue mein. Front se uthayenge, free routes ko front mein, paid routes ko back mein."
+    })
+  });
+
+  phase = "loop";
+  var iterCount = 0;
+
+  // ── L6: while dq ──
+  while(dq.length > 0){
+    iterCount++;
+    if(st.length >= MAX-30) break;
+
+    push({
+      line:6, action:"while-check",
+      logHTML: richLog({
+        line:6, action:"while-check",
+        code:"while dq:  # dq has "+dq.length+" item(s)",
+        status:"loop",
+        inputs:[{k:"dq.size",v:dq.length},{k:"dq",v:dqStr()}],
+        verdict:"dq.size ("+dq.length+") > 0 → True",
+        verdictTrue:true,
+        why:"Deque mein <strong>"+dq.length+" cell(s)</strong> bachi hain — process karna hai. Iteration <strong>#"+iterCount+"</strong>.",
+        analogy:"To-visit list khaali nahi — abhi <strong>"+dq.length+" address(es)</strong> visit baaki. Chalo, agla uthao."
+      })
+    });
+
+    // ── L7: r, c = dq.popleft() ──
+    var popped = dq.shift();
+    r = popped[0]; c = popped[1];
+    lastDqOp = "popleft";
+    lastDqItem = [r,c];
+    phase = "popped";
+    push({
+      line:7, action:"pop",
+      logHTML: richLog({
+        line:7, action:"pop",
+        code:"r, c = dq.popleft()  # ("+r+","+c+")",
+        status:"success",
+        inputs:[{k:"dq (before)",v:"["+(popped?"("+r+","+c+"),":"")+(dq.length?dq.map(function(p){return "("+p[0]+","+p[1]+")";}).join(","):"")+"]"}],
+        outputs:[
+          {k:"r",v:r,changed:true},{k:"c",v:c,changed:true},
+          {k:"dq (after)",v:dqStr(),changed:true},
+          {k:"dist[r][c]",v:dist[r][c]===INF?"∞":dist[r][c]}
+        ],
+        why:"Front se cell <code>("+r+","+c+")</code> nikali — current best dist <code>"+(dist[r][c]===INF?"∞":dist[r][c])+"</code>. Ab iske 4 neighbors check karenge.",
+        analogy:"List ke <strong>top se</strong> address uthaya — <strong>("+r+","+c+")</strong>. Current paint-cost yahaan tak: <strong>"+(dist[r][c]===INF?"∞":dist[r][c])+"</strong>."
+      })
+    });
+
+    // ── L8: for k in range(4) ──
+    for(var kk=0;kk<4;kk++){
+      k = kk;
+      phase = "explore";
+      dr = dirs[k][0]; dc = dirs[k][1];
+      nr = r + dr; nc = c + dc;
+
+      push({
+        line:8, action:"for-check",
+        logHTML: richLog({
+          line:8, action:"for-check",
+          code:"for k in range(4): k="+k+"  # exploring "+DIR_NAME[k+1],
+          status:"loop",
+          inputs:[{k:"k",v:k},{k:"direction",v:DIR_NAME[k+1]+" ("+ARROW_CHAR[k+1]+")"}],
+          outputs:[{k:"k",v:k,changed:true}],
+          verdict:"k ("+k+") < 4 → True",
+          verdictTrue:true,
+          why:"Neighbor scan <strong>"+(k+1)+"/4</strong> — direction <strong>"+DIR_NAME[k+1]+"</strong> "+ARROW_CHAR[k+1]+". Cell <code>("+r+","+c+")</code> ke iss taraf jaane ka cost calculate karenge.",
+          analogy:"Crossroad pe khade ho — <strong>"+DIR_NAME[k+1]+" ki taraf</strong> ki road check kar rahe ho. Yeh "+(k+1)+"-th option hai 4 mein se."
+        })
+      });
+
+      // ── L9: dr, dc = dirs[k] ──
+      push({
+        line:9, action:"init",
+        logHTML: richLog({
+          line:9, action:"init",
+          code:"dr, dc = dirs["+k+"]  # ("+dr+","+dc+")",
+          status:"success",
+          inputs:[{k:"dirs["+k+"]",v:"("+dr+","+dc+")"}],
+          outputs:[{k:"dr",v:dr,changed:true},{k:"dc",v:dc,changed:true}],
+          why:"Direction vector unpack: <code>dr="+dr+", dc="+dc+"</code>. Yeh row-col delta hai naye cell ke liye.",
+          analogy:"Step direction nikal li: <strong>row mein "+dr+", col mein "+dc+"</strong> jaana hai."
+        })
+      });
+
+      // ── L10: nr, nc = r + dr, c + dc ──
+      push({
+        line:10, action:"init",
+        logHTML: richLog({
+          line:10, action:"init",
+          code:"nr, nc = "+r+" + "+dr+", "+c+" + "+dc+"  # ("+nr+","+nc+")",
+          status:"success",
+          inputs:[{k:"r",v:r},{k:"c",v:c},{k:"dr",v:dr},{k:"dc",v:dc}],
+          outputs:[{k:"nr",v:nr,changed:true},{k:"nc",v:nc,changed:true}],
+          why:"Naya cell coordinates compute: <code>("+nr+","+nc+")</code>. Yeh grid ke andar hai ya nahi — agla check.",
+          analogy:"Naye address ka calculation ho gaya: <strong>("+nr+","+nc+")</strong>. Ab dekho — yeh sheher ke andar hai bhi ya nahi?"
+        })
+      });
+
+      // ── L11: bounds check ──
+      var inBounds = (0 <= nr && nr < m && 0 <= nc && nc < n);
+      push({
+        line:11, action:"if-check",
+        logHTML: richLog({
+          line:11, action:"if-check",
+          code:"if 0 <= "+nr+" < "+m+" and 0 <= "+nc+" < "+n+":",
+          status: inBounds ? "success" : "skip",
+          inputs:[{k:"nr",v:nr},{k:"nc",v:nc},{k:"m",v:m},{k:"n",v:n}],
+          verdict:"("+nr+" in [0,"+m+")) and ("+nc+" in [0,"+n+")) → "+(inBounds?"True":"False"),
+          verdictTrue: inBounds,
+          why: inBounds
+            ? "Naya cell <code>("+nr+","+nc+")</code> grid ke <strong>andar</strong> hai. Cost calculate karke relax try karenge."
+            : "Cell <code>("+nr+","+nc+")</code> grid ke <strong>bahar</strong> hai (out-of-bounds). Skip karke agle direction try karenge.",
+          analogy: inBounds
+            ? "Naya address valid hai — sheher ke andar hai. <strong>Aage check karte hain.</strong>"
+            : "Yeh address city limits ke <strong>bahar</strong> hai — chhod do, agli direction try karo."
+        })
+      });
+
+      if(!inBounds){ continue; }
+
+      // ── L12: cost = 0 if grid[r][c] == k+1 else 1 ──
+      cost = (grid[r][c] === k+1) ? 0 : 1;
+      var matches = (grid[r][c] === k+1);
+      push({
+        line:12, action:"init",
+        logHTML: richLog({
+          line:12, action:"init",
+          code:"cost = 0 if grid["+r+"]["+c+"] == "+(k+1)+" else 1  # grid="+grid[r][c]+" "+ARROW_CHAR[grid[r][c]]+", k+1="+(k+1)+" "+ARROW_CHAR[k+1]+" → cost="+cost,
+          status:"success",
+          inputs:[
+            {k:"grid["+r+"]["+c+"]",v:grid[r][c]+" ("+ARROW_CHAR[grid[r][c]]+" "+DIR_NAME[grid[r][c]]+")"},
+            {k:"k+1",v:(k+1)+" ("+ARROW_CHAR[k+1]+" "+DIR_NAME[k+1]+")"}
+          ],
+          outputs:[{k:"cost",v:cost,changed:true},{k:"edge type",v:cost===0?"FREE 🟢":"PAY 🔴",changed:true}],
+          why: matches
+            ? "<strong>🎉 Free edge!</strong> Cell <code>("+r+","+c+")</code> ka arrow <strong>"+ARROW_CHAR[grid[r][c]]+" "+DIR_NAME[grid[r][c]]+"</strong> already neighbor ki taraf point karta hai. <code>cost=0</code>."
+            : "Cell <code>("+r+","+c+")</code> ka arrow <strong>"+ARROW_CHAR[grid[r][c]]+" "+DIR_NAME[grid[r][c]]+"</strong> hai but neighbor <strong>"+DIR_NAME[k+1]+"</strong> taraf hai — modification chahiye. <code>cost=1</code>.",
+          analogy: matches
+            ? "Crossroad pe arrow <strong>already sahi taraf point</strong> kar raha hai — <strong>FREE pass!</strong> Koi paint cost nahi."
+            : "Arrow ulta hai — <strong>repaint karna padega</strong>. <strong>1 paint can</strong> kharch."
+        })
+      });
+
+      // ── L13: if dist[r][c] + cost < dist[nr][nc] ──
+      var newDist = dist[r][c] + cost;
+      var canRelax = newDist < dist[nr][nc];
+      push({
+        line:13, action:"if-check",
+        logHTML: richLog({
+          line:13, action:"if-check",
+          code:"if "+dist[r][c]+" + "+cost+" < "+(dist[nr][nc]===INF?"inf":dist[nr][nc])+":  # "+newDist+" < "+(dist[nr][nc]===INF?"inf":dist[nr][nc]),
+          status: canRelax ? "success" : "skip",
+          inputs:[
+            {k:"dist[r][c]",v:dist[r][c]},
+            {k:"cost",v:cost},
+            {k:"dist[nr][nc]",v:dist[nr][nc]===INF?"∞":dist[nr][nc]}
+          ],
+          verdict: newDist+" < "+(dist[nr][nc]===INF?"∞":dist[nr][nc])+" → "+(canRelax?"True":"False"),
+          verdictTrue: canRelax,
+          why: canRelax
+            ? "<strong>Better path mila!</strong> <code>("+nr+","+nc+")</code> tak ka new cost <code>"+newDist+"</code> previous best <code>"+(dist[nr][nc]===INF?"∞":dist[nr][nc])+"</code> se kam hai. <strong>Relax</strong> karenge."
+            : "Naya path <code>"+newDist+"</code> already-known best <code>"+(dist[nr][nc]===INF?"∞":dist[nr][nc])+"</code> se <strong>better nahi</strong>. Skip — usi answer ko rakhenge.",
+          analogy: canRelax
+            ? "Naya route <strong>sasta</strong> nikla — <strong>record update karo!</strong> Pehle wala plan throw."
+            : "Pehle ka route <strong>already cheaper</strong> ya same — naya route bekaar. <strong>Skip!</strong>"
+        })
+      });
+
+      if(!canRelax) continue;
+
+      // ── L14: dist[nr][nc] = dist[r][c] + cost ──
+      var oldDist = dist[nr][nc];
+      dist[nr][nc] = newDist;
+      lastRelax = [nr, nc, cost===0?"free":"cost"];
+      phase = cost===0 ? "relax-free" : "relax-cost";
+      push({
+        line:14, action:"mark",
+        logHTML: richLog({
+          line:14, action:"mark",
+          code:"dist["+nr+"]["+nc+"] = "+dist[r][c]+" + "+cost+"  # "+(oldDist===INF?"∞":oldDist)+" → "+newDist,
+          status:"success",
+          inputs:[{k:"dist[r][c]",v:dist[r][c]},{k:"cost",v:cost}],
+          outputs:[
+            {k:"dist["+nr+"]["+nc+"] (old)",v:oldDist===INF?"∞":oldDist},
+            {k:"dist["+nr+"]["+nc+"] (new)",v:newDist,changed:true}
+          ],
+          why:"<strong>Distance updated!</strong> <code>("+nr+","+nc+")</code> ka new best <code>"+newDist+"</code>. Ab cost <code>"+cost+"</code> ke hisaab se deque mein <strong>"+(cost===0?"front":"back")+"</strong> mein daalenge.",
+          analogy:"Result-card pe naya score: <strong>"+newDist+"</strong>. Ab "+(cost===0?"<strong>front mein</strong> daalo (priority — free path)":"<strong>back mein</strong> daalo (paid path, agle iterations mein)")+"."
+        })
+      });
+
+      // ── L15: if cost == 0 ──
+      var isFree = (cost === 0);
+      push({
+        line:15, action:"if-check",
+        logHTML: richLog({
+          line:15, action:"if-check",
+          code:"if "+cost+" == 0:",
+          status: isFree ? "success" : "skip",
+          inputs:[{k:"cost",v:cost}],
+          verdict:"cost ("+cost+") == 0 → "+(isFree?"True":"False"),
+          verdictTrue: isFree,
+          why: isFree
+            ? "<strong>Free edge!</strong> Deque ke <strong>front</strong> mein <code>appendleft</code> karenge — taaki ye cell next iteration mein priority pe process ho. Yahi 0-1 BFS ki magic hai."
+            : "<strong>Cost edge!</strong> Deque ke <strong>back</strong> mein <code>append</code> karenge — taaki saari free options pehle process hon, baad mein paid.",
+          analogy: isFree
+            ? "Free pass mila — <strong>VIP queue ke front mein</strong> jaaye! Pehle yahi process ho."
+            : "Paid entry — <strong>normal queue ke peeche</strong> jaaye. Pehle saare free wale process hon."
+        })
+      });
+
+      if(isFree){
+        // ── L16: dq.appendleft((nr, nc)) ──
+        dq.unshift([nr, nc]);
+        lastDqOp = "appendleft";
+        lastDqItem = [nr, nc];
+        push({
+          line:16, action:"push",
+          logHTML: richLog({
+            line:16, action:"push",
+            code:"dq.appendleft(("+nr+", "+nc+"))",
+            status:"success",
+            inputs:[{k:"(nr,nc)",v:"("+nr+","+nc+")"}],
+            outputs:[{k:"dq (after)",v:dqStr(),changed:true},{k:"dq.size",v:dq.length,changed:true}],
+            why:"<code>("+nr+","+nc+")</code> ko deque ke <strong>front</strong> mein push kiya. Yeh cell next iteration mein <strong>priority</strong> se process hogi — kyunki 0-cost route hai.",
+            analogy:"Free-pass holder ko <strong>queue ke sabse aage</strong> bula liya — bina paise diye seedha andar."
+          })
+        });
+      } else {
+        // ── L17: else (skip step for if-false branch is already L15) ──
+        // ── L18: dq.append((nr, nc)) ──
+        dq.push([nr, nc]);
+        lastDqOp = "append";
+        lastDqItem = [nr, nc];
+        push({
+          line:18, action:"push",
+          logHTML: richLog({
+            line:18, action:"push",
+            code:"dq.append(("+nr+", "+nc+"))",
+            status:"success",
+            inputs:[{k:"(nr,nc)",v:"("+nr+","+nc+")"}],
+            outputs:[{k:"dq (after)",v:dqStr(),changed:true},{k:"dq.size",v:dq.length,changed:true}],
+            why:"<code>("+nr+","+nc+")</code> ko deque ke <strong>back</strong> mein push kiya. Saare free-cost cells pehle process honge, fir ye paid wala.",
+            analogy:"Paid ticket holder <strong>queue ke piche</strong> lag gaya — pehle free passes wale, fir ye."
+          })
+        });
+      }
+    }
+
+    // ── L8 EXIT (inner for loop) ──
+    push({
+      line:8, action:"exit",
+      logHTML: richLog({
+        line:8, action:"exit",
+        code:"# inner for-loop exit (k reached 4)",
+        status:"info",
+        inputs:[{k:"final k",v:4}],
+        verdict:"k (4) < 4 → False",
+        verdictTrue:false,
+        why:"Saare 4 directions check ho gaye <code>("+r+","+c+")</code> se. Ab while loop ka next iteration — agla cell deque se uthayenge.",
+        analogy:"Iss crossroad ke saare 4 raste check kar liye. <strong>Agla crossroad uthao</strong> list se."
+      })
+    });
+    lastRelax = null;
+  }
+
+  // ── L6: while-exit ──
+  push({
+    line:6, action:"exit",
+    logHTML: richLog({
+      line:6, action:"exit",
+      code:"# while-loop exit (dq is empty)",
+      status:"info",
+      inputs:[{k:"dq.size",v:0}],
+      verdict:"dq is empty → False",
+      verdictTrue:false,
+      outputs:[{k:"final dist",v:JSON.stringify(fmtDist())}],
+      why:"<strong>BFS complete!</strong> Saare reachable cells visit ho gaye. <code>dist</code> matrix ready — har cell tak ka shortest cost calculated.",
+      analogy:"<strong>Pure sheher ka survey complete</strong> — har address tak ka min paint-cost map mein likha hua. Ab final answer dekho."
+    })
+  });
+
+  phase = "done";
+  curResult = dist[m-1][n-1] === INF ? -1 : dist[m-1][n-1];
+
+  // ── L19: return dist[m-1][n-1] ──
+  push({
+    line:19, action:"return",
+    logHTML: richLog({
+      line:19, action:"return",
+      code:"return dist["+(m-1)+"]["+(n-1)+"]  # "+(dist[m-1][n-1]===INF?"inf":dist[m-1][n-1]),
+      status:"success",
+      inputs:[{k:"dist["+(m-1)+"]["+(n-1)+"]",v:dist[m-1][n-1]===INF?"∞":dist[m-1][n-1]}],
+      outputs:[{k:"return",v:dist[m-1][n-1]===INF?"∞":dist[m-1][n-1],changed:true}],
+      why:"<strong>🏆 Final answer:</strong> <code>"+(dist[m-1][n-1]===INF?"∞":dist[m-1][n-1])+"</code> minimum modifications. Iska matlab "+(dist[m-1][n-1])+" cell-arrows ko repaint karna padega valid path banane ke liye.",
+      analogy:"<strong>Final report:</strong> sheher ke "+(m-1)+","+(n-1)+" corner tak pohonchne ke liye sirf <strong>"+(dist[m-1][n-1])+" arrows repaint</strong> karne padenge. Mission complete!"
+    })
+  });
+
+  return st;
+}
+
+/* ============ VARS STRIP ============ */
+function buildVars(s){
+  var chips=[];
+  function chip(k,v,cls){ chips.push('<span class="var-chip '+(cls||'')+'"><span class="k">'+k+':</span><span class="v">'+v+'</span></span>'); }
+
+  var phaseLabel = {
+    "init":"Setup","loop":"Main loop","popped":"Popped","explore":"Exploring neighbor",
+    "relax-free":"🟢 Relaxed (free)","relax-cost":"🔴 Relaxed (cost)","done":"🏁 Done"
+  };
+  var phaseCls = "vc-active";
+  if(s.phase==="relax-free") phaseCls="vc-safe";
+  else if(s.phase==="relax-cost") phaseCls="vc-bad";
+  else if(s.phase==="popped") phaseCls="vc-warn";
+  else if(s.phase==="done") phaseCls="vc-safe";
+
+  chip("phase", phaseLabel[s.phase] || s.phase, phaseCls);
+  chip("size", s.m+"×"+s.n);
+  if(s.r !== null) chip("(r,c)", "("+s.r+","+s.c+")", "vc-warn");
+  if(s.k !== null && (s.phase==="explore" || s.phase==="relax-free" || s.phase==="relax-cost")){
+    chip("k", s.k+" ("+ARROW_CHAR[s.k+1]+")", "vc-active");
+    if(s.nr !== null) chip("(nr,nc)", "("+s.nr+","+s.nc+")", "vc-active");
+  }
+  if(s.cost !== null && (s.phase==="explore" || s.phase==="relax-free" || s.phase==="relax-cost")){
+    chip("cost", s.cost, s.cost===0?"vc-safe":"vc-bad");
+  }
+  chip("dq.size", s.dq.length, s.dq.length>0?"vc-active":"");
+  return '<div class="vars-strip">'+chips.join('')+'</div>';
+}
+
+/* ============ GRID VIZ ============ */
+function gridCard(s){
+  var CELL = 62, GAP = 3, PAD = 14;
+  var html = '<div class="matrix-wrap" style="position:relative">';
+  html += '<div class="matrix-grid" style="grid-template-columns:repeat('+s.n+', '+CELL+'px)">';
+
+  for(var i=0;i<s.m;i++){
+    for(var j=0;j<s.n;j++){
+      var cls = "mat-cell";
+      var isCurr = (s.r===i && s.c===j);
+      var isNeighbor = (s.nr===i && s.nc===j && (s.phase==="explore"));
+      var isLastRelax = s.lastRelax && s.lastRelax[0]===i && s.lastRelax[1]===j;
+
+      if(i===0 && j===0) cls += " mat-cell--start";
+      if(i===s.m-1 && j===s.n-1) cls += " mat-cell--end";
+
+      if(isCurr && s.phase!=="done" && s.phase!=="init") cls += " mat-cell--curr";
+      else if(isNeighbor) cls += " mat-cell--neighbor";
+
+      if(isLastRelax){
+        cls += s.lastRelax[2]==="free" ? " mat-cell--relaxed-free" : " mat-cell--relaxed-cost";
+      }
+
+      var inDq = false;
+      for(var dqi=0; dqi<s.dq.length; dqi++){
+        if(s.dq[dqi][0]===i && s.dq[dqi][1]===j){ inDq=true; break; }
+      }
+      if(inDq && !isCurr) cls += " mat-cell--in-deque";
+
+      var distVal = s.dist[i][j]===Infinity ? "∞" : s.dist[i][j];
+      var distCls = "mat-cell-dist" + (s.dist[i][j]===Infinity ? " inf" : "");
+
+      html += '<div class="'+cls+'">';
+      html += '<span class="mat-cell-coord">('+i+','+j+')</span>';
+      html += '<span class="mat-cell-arrow">'+ARROW_CHAR[s.grid[i][j]]+'</span>';
+      html += '<span class="'+distCls+'">'+distVal+'</span>';
+      html += '</div>';
+    }
+  }
+  html += '</div>';
+
+  // SVG overlay — current edge being explored
+  if(s.phase==="explore" || s.phase==="relax-free" || s.phase==="relax-cost"){
+    if(s.r!==null && s.nr!==null && s.r>=0 && s.c>=0 && s.nr>=0 && s.nc>=0 && s.nr<s.m && s.nc<s.n){
+      var totalW = s.n * CELL + (s.n-1) * GAP;
+      var totalH = s.m * CELL + (s.m-1) * GAP;
+      function cx(col){ return col*(CELL+GAP) + CELL/2; }
+      function cy(row){ return row*(CELL+GAP) + CELL/2; }
+      var x1=cx(s.c), y1=cy(s.r), x2=cx(s.nc), y2=cy(s.nr);
+      var dx=x2-x1, dy=y2-y1, len=Math.sqrt(dx*dx+dy*dy);
+      var shrink=20, ux=dx/len, uy=dy/len;
+      var sx1=x1+ux*shrink, sy1=y1+uy*shrink;
+      var sx2=x2-ux*shrink, sy2=y2-uy*shrink;
+      var edgeCls = "flow-line curr-edge";
+      var markerColor = "#f59e0b";
+      if(s.phase==="relax-free"){ edgeCls = "flow-line free"; markerColor="#22c55e"; }
+      else if(s.phase==="relax-cost"){ edgeCls = "flow-line cost"; markerColor="#ef4444"; }
+      html += '<svg class="flow-svg" width="'+totalW+'" height="'+totalH+'" viewBox="0 0 '+totalW+' '+totalH+'">';
+      html += '<defs><marker id="ah-curr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="'+markerColor+'"/></marker></defs>';
+      html += '<line class="'+edgeCls+'" x1="'+sx1+'" y1="'+sy1+'" x2="'+sx2+'" y2="'+sy2+'" marker-end="url(#ah-curr)"/>';
+      html += '</svg>';
+    }
+  }
+
+  html += '</div>';
+
+  // Legend
+  html += '<div class="legend" style="margin-top:10px">';
+  html += '<span><i style="background:#fff;box-shadow:inset 0 0 0 3px #15803D"></i>Start (0,0)</span>';
+  html += '<span><i style="background:#fff;box-shadow:inset 0 0 0 3px #534AB7"></i>Target</span>';
+  html += '<span><i style="background:#FEF3C7;border-color:#B45309"></i>Current (r,c)</span>';
+  html += '<span><i style="background:#E0F2FE;border-color:#0284C7"></i>Neighbor (nr,nc)</span>';
+  html += '<span><i style="background:#DCFCE7;border-color:#15803D"></i>Just relaxed (free)</span>';
+  html += '<span><i style="background:#FEE2E2;border-color:#E24B4A"></i>Just relaxed (cost)</span>';
+  html += '<span><i style="background:#fff;box-shadow:inset 0 0 0 2px #B45309"></i>In deque</span>';
+  html += '<span><i class="flow-leg"></i>Free edge (cost 0)</span>';
+  html += '<span><i class="flow-leg-cost"></i>Cost edge (cost 1)</span>';
+  html += '<span><i class="flow-leg-curr"></i>Currently exploring</span>';
+  html += '</div>';
+
+  return html;
+}
+
+/* ============ DEQUE VIZ ============ */
+function dequeCard(s){
+  var html = '<div class="deque-row">';
+  html += '<span class="deque-front-label">FRONT ←</span>';
+  if(s.dq.length === 0){
+    html += '<span class="deque-empty">deque empty</span>';
+  } else {
+    for(var i=0; i<s.dq.length; i++){
+      var p = s.dq[i];
+      var cls = "deque-item";
+      if(s.lastDqItem && s.lastDqItem[0]===p[0] && s.lastDqItem[1]===p[1]){
+        if(s.lastDqOp==="appendleft") cls += " just-front";
+        else if(s.lastDqOp==="append") cls += " just-back";
+        else if(s.lastDqOp==="init") cls += " front";
+      } else if(i===0){
+        cls += " front";
+      }
+      html += '<span class="'+cls+'">('+p[0]+','+p[1]+')</span>';
+      if(i < s.dq.length-1) html += '<span class="deque-arrow">→</span>';
+    }
+  }
+  html += '<span class="deque-back-label">→ BACK</span>';
+  html += '</div>';
+
+  // Operation indicator
+  if(s.lastDqOp){
+    var opLabel = "", opCls = "";
+    if(s.lastDqOp==="popleft"){ opLabel = "⬅ popleft → ("+s.lastDqItem[0]+","+s.lastDqItem[1]+")"; opCls="color:#B45309"; }
+    else if(s.lastDqOp==="appendleft"){ opLabel = "appendleft (("+s.lastDqItem[0]+","+s.lastDqItem[1]+")) ⬅ FRONT (free)"; opCls="color:#15803D"; }
+    else if(s.lastDqOp==="append"){ opLabel = "BACK ➡ append (("+s.lastDqItem[0]+","+s.lastDqItem[1]+")) (cost)"; opCls="color:#E24B4A"; }
+    else if(s.lastDqOp==="init"){ opLabel = "deque initialized with ("+s.lastDqItem[0]+","+s.lastDqItem[1]+")"; opCls="color:#534AB7"; }
+    html += '<div style="margin-top:8px;font:600 11px var(--font-mono);'+opCls+'">'+opLabel+'</div>';
+  }
+
+  return html;
+}
+
+/* ============ GRID META INFO ============ */
+function metaCard(s){
+  var html = '<div style="display:grid;grid-template-columns:auto 1fr;gap:6px 10px;font:11px var(--font-mono)">';
+  if(s.r !== null && s.phase !== "init" && s.phase !== "done"){
+    html += '<span style="color:var(--text-tertiary);font-weight:600">current cell</span>';
+    html += '<span><strong>('+s.r+','+s.c+')</strong> arrow='+ARROW_CHAR[s.grid[s.r][s.c]]+' '+DIR_NAME[s.grid[s.r][s.c]]+'</span>';
+    html += '<span style="color:var(--text-tertiary);font-weight:600">dist[r][c]</span>';
+    html += '<span style="color:#15803D;font-weight:700">'+(s.dist[s.r][s.c]===Infinity?"∞":s.dist[s.r][s.c])+'</span>';
+  }
+  if(s.k !== null && s.phase !== "init" && s.phase !== "done" && s.phase !== "popped"){
+    html += '<span style="color:var(--text-tertiary);font-weight:600">trying k</span>';
+    html += '<span><strong>k='+s.k+'</strong> → '+DIR_NAME[s.k+1]+' '+ARROW_CHAR[s.k+1]+'</span>';
+    if(s.nr !== null && s.nc !== null){
+      html += '<span style="color:var(--text-tertiary);font-weight:600">neighbor</span>';
+      var nrInBounds = (0<=s.nr && s.nr<s.m && 0<=s.nc && s.nc<s.n);
+      html += '<span><strong>('+s.nr+','+s.nc+')</strong> '+(nrInBounds?'<span style="color:#0284C7">in bounds</span>':'<span style="color:#E24B4A">OUT of bounds</span>')+'</span>';
+    }
+    if(s.cost !== null){
+      html += '<span style="color:var(--text-tertiary);font-weight:600">edge cost</span>';
+      var costColor = s.cost===0 ? "#15803D" : "#E24B4A";
+      var costLabel = s.cost===0 ? "0 (FREE — arrow matches!)" : "1 (PAY — modify needed)";
+      html += '<span style="color:'+costColor+';font-weight:700">'+costLabel+'</span>';
+    }
+  }
+  if(s.phase === "done"){
+    html += '<span style="color:var(--text-tertiary);font-weight:600">final answer</span>';
+    var ans = s.dist[s.m-1][s.n-1];
+    html += '<span style="color:#0F6E56;font-weight:700;font-size:14px">dist['+(s.m-1)+']['+(s.n-1)+'] = '+(ans===Infinity?"∞":ans)+'</span>';
+  }
+  html += '</div>';
+  return html;
+}
+
+/* ============ RENDER VIZ ============ */
+function renderViz(s){
+  var v = document.getElementById('vizPanel');
+  var html = '';
+  html += buildVars(s);
+
+  // Banner
+  var bannerCls, bannerText;
+  if(s.phase==="init"){ bannerCls="banner-init"; bannerText="⚙️ Setup phase — building dist matrix and deque"; }
+  else if(s.phase==="loop"){ bannerCls="banner-init"; bannerText="🔁 Main while-loop — deque has "+s.dq.length+" cell(s)"; }
+  else if(s.phase==="popped"){ bannerCls="banner-pop"; bannerText="⬇ Popped from front: ("+s.r+","+s.c+") — dist="+(s.dist[s.r][s.c]===Infinity?"∞":s.dist[s.r][s.c]); }
+  else if(s.phase==="explore"){ bannerCls="banner-explore"; bannerText="🔎 Exploring neighbor ("+s.nr+","+s.nc+") in direction "+DIR_NAME[s.k+1]+" "+ARROW_CHAR[s.k+1]; }
+  else if(s.phase==="relax-free"){ bannerCls="banner-relax-free"; bannerText="🟢 Relaxed (free): ("+s.nr+","+s.nc+") dist = "+s.dist[s.nr][s.nc]+" → appendleft"; }
+  else if(s.phase==="relax-cost"){ bannerCls="banner-relax-cost"; bannerText="🔴 Relaxed (cost): ("+s.nr+","+s.nc+") dist = "+s.dist[s.nr][s.nc]+" → append"; }
+  else if(s.phase==="done"){
+    var ans = s.dist[s.m-1][s.n-1];
+    bannerCls="banner-done";
+    bannerText="🏆 Done — minimum modifications = "+(ans===Infinity?"∞":ans);
+  }
+  html += '<div class="banner '+bannerCls+'">'+bannerText+'</div>';
+
+  // Row 1: Grid + Meta
+  html += '<div class="viz-row">';
+  html += '<div class="viz-card" style="flex:0 0 auto"><h5>🗺️ Grid (arrow + dist[i][j])</h5>'+gridCard(s)+'</div>';
+  html += '<div class="viz-card" style="flex:1;min-width:260px"><h5>🎯 Current State</h5>'+metaCard(s)+'</div>';
+  html += '</div>';
+
+  // Row 2: Deque
+  html += '<div class="viz-card"><h5>📦 Deque (0-1 BFS — front for free, back for cost)</h5>'+dequeCard(s)+'</div>';
+
+  v.innerHTML = html;
+}
+
+/* ============ STEP CONTROLS ============ */
+function renderStep(idx){
+  if(!steps.length) return;
+  var s = steps[idx];
+  currentStep = idx;
+  document.getElementById('stepInfo').textContent = (idx+1)+'/'+steps.length;
+  var bd = document.getElementById('actionBadge');
+  bd.textContent = BADGE_LABEL[s.action] || s.action;
+  bd.className = 'action-badge action-badge--'+s.action;
+  document.querySelectorAll('.code-line').forEach(function(el){el.classList.remove('active');});
+  var al = document.querySelector('.code-line[data-line="'+s.line+'"]');
+  if(al){ al.classList.add('active'); al.scrollIntoView({block:'nearest'}); }
+  renderViz(s);
+  showLogPreview(s);
+}
+function showLogPreview(s){
+  if(!logEnabled) return;
+  document.getElementById('logPopupBody').innerHTML = s.logHTML || '';
+  document.getElementById('logPopup').classList.remove('log-popup--hidden');
+}
+function hideLogPopup(){ document.getElementById('logPopup').classList.add('log-popup--hidden'); }
+function stepBy(d){
+  var n = currentStep + d;
+  if(n<0||n>=steps.length) return;
+  renderStep(n);
+}
+function resetStep(){ if(steps.length) renderStep(0); }
+
+/* ============ POPUP CONTROLS ============ */
+function toggleLogPreview(){
+  logEnabled = !logEnabled;
+  var btn = document.getElementById('logToggleBtn');
+  btn.textContent = logEnabled ? '📋 ON' : '📋 OFF';
+  btn.classList.toggle('log-toggle-btn--off', !logEnabled);
+  if(!logEnabled) hideLogPopup();
+  else if(steps.length) showLogPreview(steps[currentStep]);
+}
+function logZoom(dir){ logZoomLevel = Math.max(60, Math.min(180, logZoomLevel + dir*20)); updateLogZoom(); }
+function logZoomReset(){ logZoomLevel=100; updateLogZoom(); }
+function updateLogZoom(){
+  document.getElementById('logZoomLabel').textContent = logZoomLevel+'%';
+  document.getElementById('logPopup').style.setProperty('--log-scale', logZoomLevel/100);
+}
+function toggleFullscreen(){
+  var viz = document.querySelector('.col-viz');
+  if(!document.fullscreenElement) viz.requestFullscreen().catch(function(){});
+  else document.exitFullscreen();
+}
+function toggleProblem(){
+  var b = document.getElementById('pcBody');
+  var btn = document.getElementById('toggleBtn');
+  if(b.style.display==='none'){ b.style.display=''; btn.textContent='▲ Hide'; }
+  else { b.style.display='none'; btn.textContent='▼ Show'; }
+}
+
+/* ============ TEST LOADER ============ */
+function loadTest(gridStr, exp, note){
+  document.getElementById('inGrid').value = gridStr;
+  document.getElementById('expBadge').textContent = 'expected: '+exp+' ('+note+')';
+  resetWithInput();
+}
+
+/* ============ RESET WITH INPUT ============ */
+function resetWithInput(){
+  curResult = null;
+  var grid = parseGrid(document.getElementById('inGrid').value);
+  renderCode();
+  fitCodeWidth();
+  steps = buildSteps({grid: grid});
+  currentStep = 0;
+  renderStep(0);
+  document.getElementById('liveOutput').textContent = curResult!==null ? String(curResult) : '—';
+}
+
+/* ============ CODE WIDTH ============ */
+function fitCodeWidth(){ syncFooterWidth(); }
+function syncFooterWidth(){
+  document.getElementById('footerLeft').style.width = document.getElementById('col1').offsetWidth + 'px';
+}
+
+/* ============ RESIZE HANDLE ============ */
+(function(){
+  var col1 = document.getElementById('col1');
+  document.getElementById('resizeH1').addEventListener('mousedown', function(e){
+    e.preventDefault();
+    codeWidthUserSet = true;
+    var startX = e.clientX, startW = col1.offsetWidth, h = this;
+    document.body.classList.add('no-select');
+    h.classList.add('active');
+    function mv(e){
+      col1.style.width = Math.max(140, startW + (e.clientX - startX)) + 'px';
+      syncFooterWidth();
+    }
+    function up(){
+      document.removeEventListener('mousemove', mv);
+      document.removeEventListener('mouseup', up);
+      document.body.classList.remove('no-select');
+      h.classList.remove('active');
+    }
+    document.addEventListener('mousemove', mv);
+    document.addEventListener('mouseup', up);
+  });
+})();
+window.addEventListener('resize', function(){
+  if(!codeWidthUserSet) fitCodeWidth();
+  else syncFooterWidth();
+});
+
+/* ============ KEYBOARD ============ */
+document.addEventListener('keydown', function(e){
+  if(e.target.tagName==='INPUT' || e.target.tagName==='SELECT') return;
+  if(e.key==='ArrowRight'){ e.preventDefault(); stepBy(1); }
+  else if(e.key==='ArrowLeft'){ e.preventDefault(); stepBy(-1); }
+  else if(e.key==='r' || e.key==='R'){ e.preventDefault(); resetStep(); }
+});
+
+/* ============ INIT ============ */
+renderCode();
+syncFooterWidth();
+resetWithInput();
+</script>
+</body>
+</html>

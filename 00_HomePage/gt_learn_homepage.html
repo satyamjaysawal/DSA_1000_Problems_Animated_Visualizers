@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>GT Learn · Coding Problems Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  darkMode: 'class',
+  theme: {
+    extend: {
+      colors: { accent: '#7c6aff', accent2: '#38bdf8', accent3: '#f87171' },
+      fontFamily: { mono: ['"Space Mono"', 'monospace'], sans: ['Syne', 'sans-serif'] }
+    }
+  }
+}
+</script>
+<style>
+/* ── Dark theme — deep slate navy ── */
+:root{
+  --bg:#0d1117;
+  --bg2:#161b22;
+  --bg3:#1c2128;
+  --surface:#21262d;
+  --surface2:#2d333b;
+  --border:#30363d;
+  --border2:#444c56;
+  --text:#e6edf3;
+  --text2:#b3c0cc;
+  --text3:#6e7f8d;
+  --accent:#7c6aff;
+  --accent2:#38bdf8;
+  --accent3:#f87171;
+  --easy:#34d399;
+  --medium:#fbbf24;
+  --hard:#f87171;
+  --easy-bg:rgba(52,211,153,.09);
+  --medium-bg:rgba(251,191,36,.09);
+  --hard-bg:rgba(248,113,113,.09);
+  --radius:4px;
+  --radius-lg:8px;
+  --tr:.18s cubic-bezier(.4,0,.2,1);
+  --mono:'Space Mono',monospace;
+  --sans:'Syne',sans-serif
+}
+/* ── Light theme — clean white + slate ── */
+[data-theme=light]{
+  --bg:#f6f8fa;
+  --bg2:#ffffff;
+  --bg3:#eaeef2;
+  --surface:#ffffff;
+  --surface2:#f0f3f6;
+  --border:#d0d7de;
+  --border2:#b4bcc4;
+  --text:#1c2128;
+  --text2:#3d444d;
+  --text3:#656d76;
+  --accent:#6150e8;
+  --accent2:#0284c7;
+  --accent3:#dc2626;
+  --easy:#059669;
+  --medium:#d97706;
+  --hard:#dc2626;
+  --easy-bg:rgba(5,150,105,.08);
+  --medium-bg:rgba(217,119,6,.08);
+  --hard-bg:rgba(220,38,38,.08)
+}
+:root{--hdr-h:56px;--top-offset:var(--hdr-h)}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;scroll-padding-top:calc(var(--hdr-h) + 54px)}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh;line-height:1.6;transition:background var(--tr),color var(--tr)}
+.main-grid{display:grid;grid-template-columns:268px 1fr;gap:20px;align-items:start}
+a{color:inherit;text-decoration:none}
+button{cursor:pointer;font-family:var(--sans)}
+::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-track{background:var(--bg2)}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}::-webkit-scrollbar-thumb:hover{background:var(--accent)}
+.gt-brand-title{background:linear-gradient(90deg,var(--accent),var(--accent2));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+@keyframes ri{from{opacity:0;transform:translateY(3px)}to{opacity:1;transform:translateY(0)}}
+
+/* problem rows */
+.pr{display:grid;grid-template-columns:36px 1fr 96px 110px 128px 60px 72px 76px;column-gap:8px;padding:8px 14px;border-bottom:1px solid var(--border);align-items:center;transition:background var(--tr);animation:ri .25s ease both}
+.pr:last-child{border-bottom:none}
+.pr:hover{background:var(--surface2)}
+.pr.sv .pn{text-decoration:line-through;color:var(--text3)}
+.pnc{display:flex;align-items:center;gap:8px;overflow:hidden}
+.pnum{font-family:var(--mono);font-size:11px;color:var(--text3);flex-shrink:0;min-width:26px}
+.pn{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transition:color var(--tr)}
+.pr:hover .pn:not(.sv .pn){color:var(--accent2)}
+.chk{display:flex;align-items:center;justify-content:center}
+.cb{width:19px;height:19px;border:2px solid var(--border2);border-radius:0;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all var(--tr);position:relative}
+.cb:hover{border-color:var(--accent)}
+.cb.ck{background:var(--accent);border-color:var(--accent);box-shadow:0 0 8px rgba(124,106,255,.35)}
+.cb.ck::after{content:'✓';color:#fff;font-size:11px;font-weight:900;line-height:1}
+#master-cb{border-color:#ff6b6b}
+#master-cb:hover{border-color:#ff4444;background:rgba(255,68,68,.1)}
+#master-cb.ck{background:#ff4444;border-color:#ff4444;box-shadow:0 0 8px rgba(255,68,68,.35)}
+#master-cb::after{content:'✕';color:#ff6b6b;font-size:13px;font-weight:900;line-height:1;display:flex;align-items:center;justify-content:center}
+#master-cb.ck::after{content:'✕';color:#fff;display:flex;align-items:center;justify-content:center}
+.db{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:0;font-size:10px;font-weight:700;letter-spacing:.3px}
+.db.easy{color:var(--easy);background:var(--easy-bg)}
+.db.medium{color:var(--medium);background:var(--medium-bg)}
+.db.hard{color:var(--hard);background:var(--hard-bg)}
+.ct{display:inline-flex;align-items:center;gap:4px;font-size:10px;color:var(--text3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ct-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.lc{display:flex;align-items:center;justify-content:center}
+.lb{display:inline-flex;align-items:center;gap:4px;padding:4px 9px;border-radius:0;border:1px solid var(--border);background:transparent;color:var(--text3);font-size:10px;font-weight:600;transition:all var(--tr);white-space:nowrap}
+.lb-lc:hover{border-color:#f89f1b;color:#f89f1b;background:rgba(248,159,27,.08)}
+.lb-gfg:hover{border-color:#2f8d46;color:#2f8d46;background:rgba(47,141,70,.08)}
+.lb-hr:hover{border-color:#2ec866;color:#2ec866;background:rgba(46,200,102,.08)}
+.lb-cf:hover{border-color:#1890ff;color:#1890ff;background:rgba(24,144,255,.08)}
+.lb-ib:hover{border-color:#f55533;color:#f55533;background:rgba(245,85,51,.08)}
+.lb-sd:hover{border-color:#a855f7;color:#a855f7;background:rgba(168,85,247,.08)}
+.sv{opacity:.65}
+
+/* filter/toolbar */
+.fg{display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+.fl{font-size:10px;color:var(--text3);letter-spacing:.6px;text-transform:uppercase;white-space:nowrap}
+.fb{padding:5px 12px;border-radius:0;border:1px solid var(--border);background:transparent;color:var(--text2);font-size:11px;font-weight:700;transition:all var(--tr);white-space:nowrap}
+.fb:hover{border-color:var(--accent2);color:var(--text)}
+.fb.fa{border-color:var(--accent2);background:rgba(56,189,248,.1);color:var(--accent2)}
+.fb.fe{border-color:var(--easy);background:var(--easy-bg);color:var(--easy)}
+.fb.fm{border-color:var(--medium);background:var(--medium-bg);color:var(--medium)}
+.fb.fh{border-color:var(--hard);background:var(--hard-bg);color:var(--hard)}
+.fb.fp-lc.fa{border-color:#f89f1b;background:rgba(248,159,27,.12);color:#f89f1b}
+.fb.fp-gfg.fa{border-color:#2f8d46;background:rgba(47,141,70,.12);color:#2f8d46}
+.fb.fp-hr.fa{border-color:#2ec866;background:rgba(46,200,102,.12);color:#2ec866}
+.fb.fp-cf.fa{border-color:#1890ff;background:rgba(24,144,255,.12);color:#1890ff}
+.fb.fp-ib.fa{border-color:#f55533;background:rgba(245,85,51,.12);color:#f55533}
+.fb.fp-sd.fa{border-color:#a855f7;background:rgba(168,85,247,.12);color:#a855f7}
+.fb.fp-custom.fa{border-color:#94a3b8;background:rgba(148,163,184,.12);color:#94a3b8}
+.plat-badge{display:inline-block;font-size:9px;font-family:var(--mono);font-weight:700;padding:2px 6px;border-radius:0;white-space:nowrap;vertical-align:middle;margin-left:4px}
+.plat-lc{color:#f89f1b;background:rgba(248,159,27,.12)}
+.plat-gfg{color:#2f8d46;background:rgba(47,141,70,.12)}
+.plat-hr{color:#2ec866;background:rgba(46,200,102,.12)}
+.plat-cf{color:#1890ff;background:rgba(24,144,255,.12)}
+.plat-ib{color:#f55533;background:rgba(245,85,51,.12)}
+.plat-sd{color:#a855f7;background:rgba(168,85,247,.12)}
+.plat-custom{color:#94a3b8;background:rgba(148,163,184,.12)}
+.dv{width:1px;height:26px;background:var(--border);flex-shrink:0}
+.hs-btn,.sv-btn{display:flex;align-items:center;gap:7px;padding:5px 11px;border-radius:0;border:1px solid var(--border);background:transparent;color:var(--text2);font-size:11px;font-weight:600;transition:all var(--tr)}
+.hs-btn:hover,.sv-btn:hover{border-color:var(--accent);color:var(--accent)}
+.hs-btn.on{border-color:var(--accent);background:rgba(124,106,255,.1);color:var(--accent)}
+.sv-btn.on{border-color:#10b981;background:rgba(16,185,129,.12);color:#10b981}
+.viz-btn{display:flex;align-items:center;gap:7px;padding:5px 11px;border-radius:0;border:1px solid #f59e0b;background:rgba(245,158,11,.1);color:#f59e0b;font-size:11px;font-weight:700;transition:all var(--tr);cursor:pointer;font-family:var(--sans)}
+.viz-btn:hover{border-color:#f59e0b;color:#fff;background:#f59e0b;box-shadow:0 0 12px rgba(245,158,11,.3)}
+.viz-btn.on{border-color:#f59e0b;background:#f59e0b;color:#fff;box-shadow:0 0 12px rgba(245,158,11,.35)}
+.rc{font-family:var(--mono);font-size:11px;color:var(--text3);padding:0 4px}
+.rc span{color:var(--accent2)}
+.reset-btn{padding:6px 12px;border-radius:0;border:1px solid #ff6b6b;background:rgba(255,107,107,.1);color:#ff6b6b;font-family:var(--mono);font-size:11px;font-weight:700;cursor:pointer;transition:all var(--tr);white-space:nowrap}
+.reset-btn:hover{border-color:#ff4444;color:#fff;background:#ff4444;box-shadow:0 0 12px rgba(255,68,68,.3)}
+/* table header */
+.th{display:grid;grid-template-columns:36px 1fr 96px 110px 128px 60px 72px 76px;column-gap:8px;padding:10px 14px;background:var(--bg3);border-bottom:2px solid var(--border2);border-top:1px solid var(--border);font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.8px;text-transform:uppercase;position:sticky;top:calc(var(--hdr-h) + 8px);z-index:9;align-items:center}
+.th-center{text-align:center}
+.hcat{font-size:10px;color:var(--text3)}
+.hpar{font-size:10px;color:var(--text3);font-weight:600}
+.hnot{font-size:10px;color:var(--text3)}
+.hlc{font-size:10px;color:var(--text3)}
+.hplat{font-size:10px;color:var(--text3)}
+.plat-cell{display:flex;align-items:center;justify-content:center}
+.lc-num{text-align:center}
+.lcn{font-family:var(--mono);font-size:11px;color:var(--accent2);font-weight:700}
+.lcn-na{font-family:var(--mono);font-size:11px;color:var(--text3);opacity:.4}
+
+/* pagination */
+.pg{display:flex;align-items:center;justify-content:center;gap:5px;padding:14px;border-top:1px solid var(--border);flex-wrap:wrap}
+.pgb{width:32px;height:32px;border-radius:0;border:1px solid var(--border);background:transparent;color:var(--text2);font-size:12px;font-family:var(--mono);transition:all var(--tr);display:flex;align-items:center;justify-content:center}
+.pgb:hover{border-color:var(--accent2);color:var(--accent2)}
+.pgb.pa{border-color:var(--accent);background:rgba(124,106,255,.12);color:var(--accent);font-weight:700}
+.pgb:disabled{opacity:.3;cursor:not-allowed}
+.pgi{font-family:var(--mono);font-size:11px;color:var(--text3);padding:0 6px}
+
+/* empty state */
+.empty{padding:50px 20px;text-align:center;color:var(--text3)}
+.empty .ei{font-size:36px;margin-bottom:10px}
+
+/* sidebar */
+.ref-list{padding:4px;display:flex;flex-direction:column;gap:1px}
+.ref-link{display:flex;align-items:center;gap:8px;padding:8px 10px;font-size:11px;color:var(--text2);transition:all var(--tr);border-left:2px solid transparent;border-bottom:1px solid var(--border)}
+.ref-link:last-child{border-bottom:none}
+.ref-link:hover{background:var(--surface2);color:var(--accent2);border-left-color:var(--accent2)}
+.ref-link .ri{font-size:13px;flex-shrink:0}
+.ref-link .rn{font-weight:600}
+.ref-link .ra{margin-left:auto;opacity:.5;font-size:11px}
+
+/* category progress */
+.plat-sb-item{display:flex;align-items:center;gap:8px;padding:8px 12px;cursor:pointer;border-left:3px solid transparent;border-bottom:1px solid var(--border);transition:all var(--tr)}
+.plat-sb-item:last-child{border-bottom:none}
+.plat-sb-item:hover{background:var(--surface2);border-left-color:var(--border2)}
+.plat-sb-active{background:color-mix(in srgb,var(--plat-c) 8%,transparent);border-left-color:var(--plat-c)!important}
+.plat-sb-active .plat-sb-name{color:var(--plat-c);font-weight:700}
+.plat-sb-icon{font-size:13px;flex-shrink:0;width:18px;text-align:center}
+.plat-sb-name{font-size:12px;color:var(--text2);font-weight:500;flex:1;transition:color var(--tr)}
+.plat-sb-item:hover .plat-sb-name{color:var(--text)}
+.plat-sb-cnt{font-family:var(--mono);font-size:10px;color:var(--text3);background:var(--bg3);padding:2px 7px;border:1px solid var(--border)}
+.cprog-item{padding:8px 12px;cursor:pointer;border-left:3px solid transparent;border-bottom:1px solid var(--border);transition:all var(--tr)}
+.cprog-item:last-child{border-bottom:none}
+.cprog-item:hover{background:var(--surface2);border-left-color:var(--border2)}
+.cprog-item.cp-active{background:rgba(124,106,255,.07);border-left-color:var(--accent)}
+.cprog-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px}
+.cprog-name{font-size:11px;color:var(--text2);font-weight:600;transition:color var(--tr)}
+.cprog-item:hover .cprog-name,.cprog-item.cp-active .cprog-name{color:var(--text)}
+.cprog-frac{font-family:var(--mono);font-size:10px;color:var(--text3);background:var(--bg3);padding:1px 6px;border:1px solid var(--border)}
+.cprog-pct{font-family:var(--mono);font-size:9px;margin-left:4px;opacity:.7}
+.cprog-track{width:100%;height:4px;background:var(--bg3);overflow:hidden}
+.cprog-fill{height:100%;transition:width .6s ease}
+.cprog-all .cprog-name{font-weight:700;color:var(--text)}
+.cprog-all.cp-active .cprog-name{color:var(--accent)}
+
+/* ref grid */
+.rg{display:grid;grid-template-columns:repeat(auto-fill,minmax(165px,1fr));gap:10px}
+.rc2{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:14px;display:flex;flex-direction:column;gap:7px;transition:all var(--tr);text-decoration:none;color:inherit}
+.rc2:hover{border-color:var(--accent2);background:var(--surface2);transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.18),0 0 16px rgba(56,189,248,.12)}
+.rc2-icon{font-size:22px;line-height:1}
+.rc2-name{font-size:12px;font-weight:700}
+.rc2-desc{font-size:10px;color:var(--text3);line-height:1.5}
+.rc2-tag{display:inline-block;font-size:9px;font-family:var(--mono);padding:2px 6px;border-radius:0;background:var(--bg3);color:var(--text3);border:1px solid var(--border);margin-top:auto;align-self:flex-start}
+
+/* paradigm rows */
+.par-row{cursor:pointer;transition:background .15s,border-color .15s}
+.par-row:hover{background:rgba(255,255,255,.04)!important}
+.par-row:hover .par-name{color:var(--accent)}
+.par-active{background:rgba(124,106,255,.07)!important;outline:1px solid rgba(124,106,255,.25)}
+.par-active .par-name{color:var(--accent)!important}
+.par-clear{margin-left:8px;font-size:10px;opacity:.6;cursor:pointer;padding:1px 5px;border-radius:0;background:rgba(255,100,100,.15);color:#ff6b6b}
+.par-cnt{font-family:var(--mono);font-size:10px;color:var(--text3);background:var(--bg3);padding:1px 7px;border-radius:0;white-space:nowrap}
+.par-filter-bar{padding:8px 12px 4px;display:flex;align-items:center;min-height:28px}
+.par-hint{font-size:11px;color:var(--text3);opacity:.7}
+.par-active-badge{font-size:12px;color:var(--text2);display:flex;align-items:center;gap:8px}
+.par-active-badge strong{color:var(--accent)}
+.par-clear-btn{border:none;background:rgba(255,100,100,.15);color:#ff6b6b;border-radius:0;padding:2px 8px;cursor:pointer;font-size:11px;font-family:var(--mono)}
+.par-tag{font-size:10px;color:var(--text3);cursor:pointer;padding:2px 7px;background:var(--bg3);border:1px solid var(--border);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:120px;transition:all .15s;display:flex;align-items:center;gap:4px}
+.par-tag:hover{background:rgba(124,106,255,.1);border-color:var(--accent);color:var(--accent)}
+.par-tag-icon{font-size:11px;flex-shrink:0}
+.par-name{font-weight:700;color:var(--text);display:flex;align-items:center;gap:8px}
+.par-icon{font-size:16px;flex-shrink:0}
+.par-tc{font-family:var(--mono);font-size:11px;color:var(--accent2)}
+.par-problems,.par-probs{color:var(--text2);font-size:12px}
+.par-best{color:var(--text2);font-size:12px}
+.par-table{width:100%;border-collapse:collapse;font-size:13px}
+.par-table thead tr{background:var(--surface2)}
+.par-table th{padding:10px 14px;text-align:left;font-family:var(--mono);font-size:10px;letter-spacing:.8px;text-transform:uppercase;color:var(--text3);border-bottom:2px solid var(--border2);white-space:nowrap}
+.par-table td{padding:10px 14px;border-bottom:1px solid var(--border);vertical-align:top;line-height:1.55}
+.par-table tbody tr{transition:background var(--tr)}
+.par-table tbody tr:hover{background:var(--surface2)}
+
+/* section collapse */
+.sec-body{overflow:clip;transition:opacity .25s,max-height .35s ease;max-height:0;opacity:0;pointer-events:none}
+.sec-body.sec-open{max-height:6000px;opacity:1;pointer-events:auto}
+
+/* sidebar sticky */
+.sidebar-col{position:sticky;top:calc(var(--hdr-h) + 8px);height:calc(100vh - var(--hdr-h) - 16px);align-self:start;min-width:0}
+.sidebar-inner{height:100%;overflow-y:auto;display:flex;flex-direction:column;gap:14px;padding-bottom:8px}
+.sidebar-inner::-webkit-scrollbar{width:3px}
+.sidebar-inner::-webkit-scrollbar-track{background:transparent}
+.sidebar-inner::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+
+.sec-toggle.on{border-color:var(--accent);color:var(--accent);background:rgba(124,106,255,.08)}
+.si-input{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:0;padding:7px 10px 7px 32px;color:var(--text);font-family:var(--mono);font-size:12px;outline:none;transition:border-color var(--tr)}
+.si-input::placeholder{color:var(--text3)}
+.si-input:focus{border-color:var(--accent2)}
+
+/* visualizer link indicator on problem name */
+.pn-viz{color:inherit;text-decoration:none;cursor:pointer}
+.pn-viz::after{content:'⚡';font-size:9px;margin-left:4px;opacity:.45;vertical-align:middle}
+.pr:hover .pn-viz{color:var(--accent)!important;text-decoration:underline}
+.pr.sv .pn-viz{text-decoration:line-through;color:var(--text3)}
+
+@media(max-width:660px){
+  .th,.pr{grid-template-columns:36px 1fr 88px 32px}
+  .th .hcat,.th .hpar,.th .hlc,.th .hplat,.ct,.par-tag,.lc-num,.plat-cell{display:none}
+}
+</style>
+</head>
+<body class="font-sans">
+
+<!-- HEADER -->
+<header class="border-b border-[var(--border)] bg-[var(--bg2)] sticky top-0 z-50">
+  <div class="max-w-[1380px] mx-auto px-4 h-[var(--hdr-h)] flex items-center gap-0">
+    <a href="gt_learn_homepage.html" class="flex items-center gap-2.5 flex-shrink-0 pr-4 border-r border-[var(--border)] no-underline cursor-pointer transition-all hover:opacity-80" style="text-decoration:none;color:inherit">
+      <span class="w-[32px] h-[32px] flex items-center justify-center font-mono text-[13px] font-bold text-white flex-shrink-0 rounded"
+            style="background:linear-gradient(135deg,#7c6aff,#38bdf8)">GT</span>
+      <div class="flex flex-col justify-center leading-none">
+        <div class="gt-brand-title text-[14px] font-extrabold tracking-tight">GT Learn</div>
+        <div class="font-mono text-[8px] text-[var(--text3)] tracking-[.5px] uppercase">Tracker</div>
+      </div>
+    </a>
+    <div class="flex items-center flex-1 h-full">
+      <div class="flex flex-col items-center justify-center gap-0 px-4 h-full border-r border-[var(--border)] min-w-[72px]">
+        <span id="s-total" class="font-mono text-[15px] font-bold text-[var(--accent)] leading-none">0</span>
+        <span class="text-[8px] text-[var(--text3)] tracking-[.6px] uppercase mt-0.5">Total</span>
+      </div>
+      <div class="flex flex-col items-center justify-center gap-0 px-4 h-full border-r border-[var(--border)] min-w-[72px]">
+        <span id="s-solved" class="font-mono text-[15px] font-bold text-[var(--accent2)] leading-none">0</span>
+        <span class="text-[8px] text-[var(--text3)] tracking-[.6px] uppercase mt-0.5">Solved</span>
+      </div>
+      <div class="flex flex-col items-center justify-center gap-0 px-4 h-full border-r border-[var(--border)] min-w-[72px]">
+        <span id="s-easy" class="font-mono text-[15px] font-bold leading-none" style="color:var(--easy)">0</span>
+        <span class="text-[8px] text-[var(--text3)] tracking-[.6px] uppercase mt-0.5">Easy</span>
+      </div>
+      <div class="flex flex-col items-center justify-center gap-0 px-4 h-full border-r border-[var(--border)] min-w-[72px]">
+        <span id="s-med" class="font-mono text-[15px] font-bold leading-none" style="color:var(--medium)">0</span>
+        <span class="text-[8px] text-[var(--text3)] tracking-[.6px] uppercase mt-0.5">Medium</span>
+      </div>
+      <div class="flex flex-col items-center justify-center gap-0 px-4 h-full border-r border-[var(--border)] min-w-[72px]">
+        <span id="s-hard" class="font-mono text-[15px] font-bold leading-none" style="color:var(--hard)">0</span>
+        <span class="text-[8px] text-[var(--text3)] tracking-[.6px] uppercase mt-0.5">Hard</span>
+      </div>
+      <div class="flex flex-col items-center justify-center gap-0 px-4 h-full border-r border-[var(--border)] min-w-[72px] cursor-pointer transition-all hover:bg-[var(--surface2)]" onclick="toggleVizFilter()" title="Click to filter visualizer problems">
+        <span id="s-viz" class="font-mono text-[15px] font-bold leading-none" style="color:#f59e0b">0</span>
+        <span class="text-[8px] text-[var(--text3)] tracking-[.6px] uppercase mt-0.5">⚡ Viz</span>
+      </div>
+      <div class="flex items-center gap-3 px-4 h-full border-r border-[var(--border)] flex-1 min-w-[160px]">
+        <div class="flex flex-col gap-1 flex-1">
+          <div class="flex items-center justify-between">
+            <span class="text-[8px] text-[var(--text3)] uppercase tracking-[.6px]">Progress</span>
+            <strong id="s-pct" class="font-mono text-[11px] text-[var(--accent)]">0%</strong>
+          </div>
+          <div class="w-full h-[4px] bg-[var(--surface2)] overflow-hidden">
+            <div id="pf" class="h-full transition-[width_.8s_ease]" style="width:0%;background:linear-gradient(90deg,#7c6aff,#38bdf8)"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <button type="button" id="theme-btn" onclick="toggleTheme()" title="Toggle theme"
+            class="flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 text-xs border border-[var(--border)] bg-[var(--surface)] text-[var(--text2)] transition-all hover:border-[var(--accent)] hover:text-[var(--accent)] ml-3">
+      <span id="ti">☀</span><span id="tl">Light</span>
+    </button>
+  </div>
+</header>
+
+<!-- MAIN -->
+<div class="py-6 pb-16">
+  <div class="max-w-[1380px] mx-auto px-6">
+    <div class="main-grid">
+
+      <!-- SIDEBAR -->
+      <aside class="sidebar-col">
+      <div class="sidebar-inner">
+
+        <!-- Platform Filter -->
+        <div class="bg-[var(--surface)] border border-[var(--border)]">
+          <div class="px-3 py-2 text-[10px] font-bold tracking-[1px] uppercase border-b border-[var(--border)] bg-[var(--bg3)] flex items-center gap-2">
+            <span class="flex-1 text-[var(--text2)]">🌐 Platform</span>
+            <button type="button" id="tog-plat" onclick="toggleSec('plat')" class="sec-toggle border border-[var(--border)] text-[var(--text3)] text-[10px] font-mono px-2 py-0.5 cursor-pointer transition-all hover:border-[var(--accent2)] hover:text-[var(--accent2)] flex-shrink-0">▲</button>
+          </div>
+          <div class="sec-body sec-open" id="body-plat">
+            <div class="flex flex-col" id="plat-list"></div>
+          </div>
+        </div>
+
+        <!-- Categories -->
+        <div class="bg-[var(--surface)] border border-[var(--border)]">
+          <div class="px-3 py-2 text-[10px] font-bold tracking-[1px] uppercase border-b border-[var(--border)] bg-[var(--bg3)] flex items-center gap-2">
+            <span class="flex-1 text-[var(--text2)]">📂 Categories</span>
+            <button type="button" id="tog-cats" onclick="toggleSec('cats')" class="sec-toggle border border-[var(--border)] text-[var(--text3)] text-[10px] font-mono px-2 py-0.5 cursor-pointer transition-all hover:border-[var(--accent2)] hover:text-[var(--accent2)] flex-shrink-0">▲</button>
+          </div>
+          <div class="sec-body sec-open" id="body-cats">
+            <div class="flex flex-col" id="cprog-list"></div>
+          </div>
+        </div>
+
+        <!-- Quick Links -->
+        <div class="bg-[var(--surface)] border border-[var(--border)]">
+          <div class="px-3 py-2 text-[10px] font-bold tracking-[1px] uppercase border-b border-[var(--border)] bg-[var(--bg3)] flex items-center gap-2">
+            <span class="flex-1 text-[var(--text2)]">🔗 Quick Links</span>
+            <button type="button" id="tog-ql" onclick="toggleSec('ql')" class="sec-toggle border border-[var(--border)] text-[var(--text3)] text-[10px] font-mono px-2 py-0.5 cursor-pointer transition-all hover:border-[var(--accent2)] hover:text-[var(--accent2)] flex-shrink-0">▼</button>
+          </div>
+          <div class="sec-body" id="body-ql">
+            <div class="ref-list" id="sidebar-links"></div>
+          </div>
+        </div>
+
+      </div>
+      </aside>
+
+      <!-- CONTENT -->
+      <div class="flex flex-col gap-4">
+
+        <!-- DSA ALGO PROBLEMS -->
+        <div class="flex items-center gap-2.5 text-xs font-bold tracking-[1px] uppercase text-[var(--text3)]">
+          📋 DSA ALGO PROBLEMS
+          <span class="text-[9px] text-[var(--text3)] font-mono normal-case tracking-normal ml-1 opacity-60">⚡ = has visualizer</span>
+          <div class="flex-1 h-px bg-[var(--border)]"></div>
+          <button type="button"
+                  class="sec-toggle bg-[var(--surface)] border border-[var(--border)] text-[var(--text3)] text-[10px] font-mono px-2 py-0.5 cursor-pointer transition-all hover:border-[var(--accent2)] hover:text-[var(--accent2)] hover:bg-[rgba(124,106,255,.06)] flex-shrink-0 tracking-[.4px]"
+                  id="tog-prob" onclick="toggleSec('prob')">▼ Show</button>
+        </div>
+        <div class="sec-body" id="body-prob">
+          <!-- Toolbar -->
+          <div class="flex items-center gap-2.5 flex-wrap bg-[var(--surface)] border border-[var(--border)] px-3.5 py-2.5 mb-0">
+            <div class="sw flex-1 min-w-[180px] relative flex items-center">
+              <span class="si absolute left-2.5 text-[var(--text3)] text-[13px] pointer-events-none">🔍</span>
+              <input class="si-input" id="si" type="text" placeholder="Search name, LC#, category, paradigm, difficulty" oninput="applyFilters()" onkeydown="if(event.key==='Enter')event.preventDefault()"/>
+            </div>
+            <div class="dv"></div>
+            <div class="fg">
+              <span class="fl">Diff</span>
+              <button type="button" class="fb fa" id="d-all"  onclick="setDiff('all')">All</button>
+              <button type="button" class="fb"    id="d-easy" onclick="setDiff('Easy')">Easy</button>
+              <button type="button" class="fb"    id="d-med"  onclick="setDiff('Medium')">Medium</button>
+              <button type="button" class="fb"    id="d-hard" onclick="setDiff('Hard')">Hard</button>
+            </div>
+            <div class="dv"></div>
+            <button type="button" class="sv-btn" id="sv-btn" onclick="toggleShowSolved()"><span>✅</span> Solved</button>
+            <button type="button" class="hs-btn" id="hs-btn" onclick="toggleHide()"><span>👁</span> Hide Solved</button>
+            <button type="button" class="viz-btn" id="viz-btn" onclick="toggleVizFilter()"><span>⚡</span> Visualizer</button>
+            <button type="button" class="reset-btn" id="reset-btn" onclick="resetFilters()" title="Reset all filters">↺ Reset</button>
+            <div class="rc" id="rc"></div>
+          </div>
+          <!-- Table header -->
+          <div class="th">
+            <div class="chk"><div class="cb" id="master-cb" onclick="toggleAllSolved()" title="Uncheck all solved"></div></div>
+            <div>Problem</div>
+            <div>Difficulty</div>
+            <div class="hcat">Category</div>
+            <div class="hpar">Paradigm</div>
+            <div class="hlc th-center">LC #</div>
+            <div class="hplat th-center">Platform</div>
+
+            <div class="th-center">Link</div>
+          </div>
+          <div class="pw bg-[var(--surface)] border border-[var(--border)] border-t-0">
+            <div id="plist"></div>
+          </div>
+          <div class="pg" id="pg"></div>
+        </div>
+
+        <!-- PARADIGMS -->
+        <div class="mt-8 par-section">
+          <div class="flex items-center gap-2.5 text-xs font-bold tracking-[1px] uppercase text-[var(--text3)] mb-3">
+            🧠 Problem-Solving Paradigms
+            <div class="flex-1 h-px bg-[var(--border)]"></div>
+            <button type="button"
+                    class="sec-toggle bg-[var(--surface)] border border-[var(--border)] text-[var(--text3)] text-[10px] font-mono px-2 py-0.5 cursor-pointer transition-all hover:border-[var(--accent2)] hover:text-[var(--accent2)] hover:bg-[rgba(124,106,255,.06)] flex-shrink-0 tracking-[.4px]"
+                    id="tog-par" onclick="toggleSec('par')">▼ Show</button>
+          </div>
+          <div class="sec-body" id="body-par">
+            <div id="paradigms-wrap"></div>
+          </div>
+        </div>
+
+        <!-- LEARNING RESOURCES -->
+        <div class="flex items-center gap-2.5 text-xs font-bold tracking-[1px] uppercase text-[var(--text3)]">
+          📚 Learning Resources
+          <div class="flex-1 h-px bg-[var(--border)]"></div>
+          <button type="button"
+                  class="sec-toggle bg-[var(--surface)] border border-[var(--border)] text-[var(--text3)] text-[10px] font-mono px-2 py-0.5 cursor-pointer transition-all hover:border-[var(--accent2)] hover:text-[var(--accent2)] hover:bg-[rgba(124,106,255,.06)] flex-shrink-0 tracking-[.4px]"
+                  id="tog-learn" onclick="toggleSec('learn')">▼ Show</button>
+        </div>
+        <div class="sec-body" id="body-learn">
+          <div class="rg" id="ref-grid"></div>
+        </div>
+
+      </div><!-- /content -->
+    </div><!-- /layout -->
+  </div><!-- /container -->
+</div><!-- /main -->
+
+
+<div class="toast fixed bottom-[74px] right-6 bg-[var(--surface)] border border-[var(--border)] px-[15px] py-[9px] text-xs text-[var(--text)] shadow-[0_4px_18px_rgba(0,0,0,.3)] translate-y-3.5 opacity-0 transition-all duration-300 pointer-events-none z-20 [&.show]:translate-y-0 [&.show]:opacity-100"
+     id="toast"></div>
+
+<script>
+/* ─── DATA (loaded from JSON) ──────────────────────────────────── */
+let CATS={}, SITES={}, PROBLEMS=[], PLAT_SIDEBAR={}, PARADIGMS={};
+let CATS_LIST=[], SITES_LIST=[], PLAT_LIST=[], PAR_LIST=[];
+
+/* ─── STATE ─────────────────────────────────────────────────────── */
+let solved=JSON.parse(localStorage.getItem('gt_s')||'{}');
+let activeCat='all',activeDiff='all',activeParadigm='all',activePlatform='all',hideSolved=false,showSolvedOnly=false,showVizOnly=false,curPage=1;
+const PAGE=30;
+
+/* ─── INIT ──────────────────────────────────────────────────────── */
+function syncHeaderHeight(){
+  const h=document.querySelector('header');
+  if(h) document.documentElement.style.setProperty('--hdr-h',h.getBoundingClientRect().height+'px');
+}
+window.addEventListener('resize',syncHeaderHeight);
+
+document.addEventListener('DOMContentLoaded',()=>{
+  syncHeaderHeight();
+  fetch('coding-problems.json')
+    .then(r=>{if(!r.ok)throw new Error('HTTP '+r.status);return r.json();})
+  .then(data=>{
+    CATS=data.categories; SITES=data.sites; PLAT_SIDEBAR=data.platforms; PARADIGMS=data.paradigms; PROBLEMS=data.problems;
+    CATS_LIST=Object.entries(CATS).map(([id,v])=>({id,...v}));
+    PLAT_LIST=Object.entries(PLAT_SIDEBAR).map(([id,v])=>({id,...v}));
+    PAR_LIST=Object.entries(PARADIGMS).map(([name,v])=>({name,...v}));
+    SITES_LIST=Object.entries(SITES).map(([name,v])=>({name,...v}));
+    restoreFilters();
+    buildCatProg(); buildPlatFilter(); buildSidebarLinks(); buildRefGrid();
+    applyFilters(); updateStats(); syncMasterCb(); buildParadigms();
+    restoreSecStates();
+    const t=localStorage.getItem('gt_theme');
+    if(t&&t!=='dark'){
+      document.documentElement.setAttribute('data-theme',t);
+      document.getElementById('ti').textContent='🌞';
+      document.getElementById('tl').textContent='Dark Mode';
+    }
+  })
+  .catch(()=>{
+    document.getElementById('plist').innerHTML='<div class="empty"><div class="ei">⚠️</div><p>Failed to load <code>coding-problems.json</code>.<br>Serve via a local server (e.g. <code>npx serve .</code>).</p></div>';
+  });
+});
+
+/* ─── SIDEBAR ──────────────────────────────────────────────────── */
+function buildPlatFilter(){
+  const el=document.getElementById('plat-list');
+  if(!el) return;
+  const counts={all:PROBLEMS.length};
+  PLAT_LIST.forEach(({id})=>{if(id!=='all')counts[id]=0;});
+  PROBLEMS.forEach(p=>{const k=getProblemPlatform(p);if(counts[k]!==undefined)counts[k]++;});
+  el.innerHTML=PLAT_LIST.map(({id,name,color,icon})=>{
+    const cnt=counts[id]||0;
+    const isActive=activePlatform===id;
+    return`<div class="plat-sb-item${isActive?' plat-sb-active':''}" onclick="setPlatform('${id}');buildPlatFilter();" style="--plat-c:${color}">
+      <span class="plat-sb-icon">${icon}</span>
+      <span class="plat-sb-name">${name}</span>
+      <span class="plat-sb-cnt">${cnt}</span>
+    </div>`;
+  }).join('');
+}
+
+function buildCatProg(){
+  const l=document.getElementById('cprog-list');
+  const allDone=CATS_LIST.reduce((s,c)=>s+PROBLEMS.filter(p=>p.cat===c.id&&solved[p.id]).length,0);
+  const allTot=PROBLEMS.length;
+  const allPct=allTot?Math.round(allDone/allTot*100):0;
+  const isAllActive=activeCat==='all';
+  l.innerHTML=`<div class="cprog-item cprog-all${isAllActive?' cp-active':''}" onclick="setCatFromProg('all')" title="All Problems">
+    <div class="cprog-hdr">
+      <span class="cprog-name"><span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#666;margin-right:6px;vertical-align:middle"></span>All Problems</span>
+      <span class="cprog-frac">${allDone}/${allTot}<span class="cprog-pct">${allPct}%</span></span>
+    </div>
+    <div class="cprog-track"><div class="cprog-fill" style="width:${allPct}%;background:var(--accent)"></div></div>
+  </div>`+CATS_LIST.map(c=>{
+    const tot=PROBLEMS.filter(p=>p.cat===c.id).length;
+    const done=PROBLEMS.filter(p=>p.cat===c.id&&solved[p.id]).length;
+    const pct=tot?Math.round(done/tot*100):0;
+    const isActive=activeCat===c.id;
+    return`<div class="cprog-item${isActive?' cp-active':''}" onclick="setCatFromProg('${c.id}')" title="Filter: ${c.name}">
+      <div class="cprog-hdr">
+        <span class="cprog-name"><span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:${c.color};margin-right:6px;vertical-align:middle"></span>${c.name}</span>
+        <span class="cprog-frac">${done}/${tot}<span class="cprog-pct">${pct}%</span></span>
+      </div>
+      <div class="cprog-track"><div class="cprog-fill" style="width:${pct}%;background:${c.color}"></div></div>
+    </div>`;
+  }).join('');
+}
+
+function setCatFromProg(id){
+  const isSame=activeCat===id;
+  setCat(id==='all'?'all':(isSame?'all':id));
+  const body=document.getElementById('body-prob');
+  const btn=document.getElementById('tog-prob');
+  if(body&&!body.classList.contains('sec-open')){
+    body.classList.add('sec-open');
+    if(btn){btn.innerHTML='▲ Hide';btn.classList.add('on');}
+  }
+  if(!isSame&&id!=='all') showToast('🔍 '+CATS[id]?.name);
+}
+
+function buildSidebarLinks(){
+  document.getElementById('sidebar-links').innerHTML=SITES_LIST.map(s=>
+    `<a class="ref-link" href="${s.url}" target="_blank" rel="noopener"><span class="ri">${s.icon}</span><span class="rn">${s.name}</span><span class="ra">↗</span></a>`
+  ).join('');
+}
+
+function buildRefGrid(){
+  document.getElementById('ref-grid').innerHTML=SITES_LIST.map(s=>
+    `<a class="rc2" href="${s.url}" target="_blank" rel="noopener"><div class="rc2-icon">${s.icon}</div><div class="rc2-name">${s.name}</div><div class="rc2-desc">${s.desc}</div><span class="rc2-tag">${s.type}</span></a>`
+  ).join('');
+}
+
+/* ─── FILTERS ──────────────────────────────────────────────────── */
+function setCat(id){ activeCat=id;curPage=1;buildCatProg();applyFilters(); }
+
+function setDiff(d){
+  if(d!=='all'&&activeDiff===d) d='all';
+  activeDiff=d;curPage=1;
+  const map={all:'fa',Easy:'fe',Medium:'fm',Hard:'fh'};
+  const ids={all:'d-all',Easy:'d-easy',Medium:'d-med',Hard:'d-hard'};
+  document.querySelectorAll('.fb').forEach(b=>b.classList.remove('fa','fe','fm','fh'));
+  document.getElementById(ids[d])?.classList.add(map[d]);
+  applyFilters();
+}
+
+function getProblemPlatform(p){ return p.plat||'lc'; }
+
+function setPlatform(pl){
+  if(pl!=='all'&&activePlatform===pl) pl='all';
+  activePlatform=pl;curPage=1;
+  applyFilters();buildPlatFilter();
+  if(pl!=='all') showToast('🌐 '+PLAT_SIDEBAR[pl]?.name);
+}
+
+function toggleShowSolved(){
+  showSolvedOnly=!showSolvedOnly;curPage=1;
+  if(showSolvedOnly) hideSolved=false;
+  const sb=document.getElementById('sv-btn');
+  if(sb){sb.classList.toggle('on',showSolvedOnly);sb.innerHTML=showSolvedOnly?'<span>✅</span> All Problems':'<span>✅</span> Solved';}
+  const hb=document.getElementById('hs-btn');
+  if(hb){hb.classList.toggle('on',hideSolved);hb.innerHTML='<span>👁</span> Hide Solved';}
+  applyFilters();
+  if(showSolvedOnly) showToast('✅ Showing solved problems');
+}
+
+function toggleHide(){
+  hideSolved=!hideSolved;curPage=1;
+  if(hideSolved) showSolvedOnly=false;
+  const b=document.getElementById('hs-btn');
+  b.classList.toggle('on',hideSolved);
+  b.innerHTML=hideSolved?'<span>🙈</span> Show Solved':'<span>👁</span> Hide Solved';
+  const sb=document.getElementById('sv-btn');
+  if(sb){sb.classList.toggle('on',showSolvedOnly);sb.innerHTML='<span>✅</span> Solved';}
+  applyFilters();
+}
+
+function toggleVizFilter(){
+  showVizOnly=!showVizOnly;curPage=1;
+  const b=document.getElementById('viz-btn');
+  if(b){b.classList.toggle('on',showVizOnly);b.innerHTML=showVizOnly?'<span>⚡</span> All Problems':'<span>⚡</span> Visualizer';}
+  const body=document.getElementById('body-prob');
+  const btn=document.getElementById('tog-prob');
+  if(body&&!body.classList.contains('sec-open')){body.classList.add('sec-open');if(btn){btn.innerHTML='▲ Hide';btn.classList.add('on');}}
+  applyFilters();
+  if(showVizOnly) showToast('⚡ Showing visualizer problems');
+}
+
+function resetFilters(){
+  activeCat='all';activeDiff='all';activeParadigm='all';activePlatform='all';hideSolved=false;showSolvedOnly=false;showVizOnly=false;curPage=1;
+  document.getElementById('si').value='';
+  const svb=document.getElementById('sv-btn');
+  if(svb){svb.classList.remove('on');svb.innerHTML='<span>✅</span> Solved';}
+  const hsb=document.getElementById('hs-btn');
+  if(hsb){hsb.classList.remove('on');hsb.innerHTML='<span>👁</span> Hide Solved';}
+  const vzb=document.getElementById('viz-btn');
+  if(vzb){vzb.classList.remove('on');vzb.innerHTML='<span>⚡</span> Visualizer';}
+  document.querySelectorAll('.fb').forEach(b=>b.classList.remove('fa','fe','fm','fh'));
+  document.getElementById('d-all')?.classList.add('fa');
+  localStorage.removeItem('gt_f');
+  buildCatProg();buildParadigms();applyFilters();buildPlatFilter();
+  showToast('↺ All filters reset');
+}
+
+function applyFilters(){
+  const q=document.getElementById('si').value.toLowerCase().trim();
+  const f=PROBLEMS.filter(p=>{
+    if(activeCat!=='all'&&p.cat!==activeCat)return false;
+    if(activeDiff!=='all'&&p.diff!==activeDiff)return false;
+    if(activeParadigm!=='all'&&p.paradigm!==activeParadigm)return false;
+    if(activePlatform!=='all'&&getProblemPlatform(p)!==activePlatform)return false;
+    if(hideSolved&&solved[p.id])return false;
+    if(showSolvedOnly&&!solved[p.id])return false;
+    if(showVizOnly&&!p.viz)return false;
+    if(q){
+      const cat=CATS[p.cat];
+      const lcNum=p.lcNum?String(p.lcNum):'';
+      const haystack=[
+        (p.name||'').toLowerCase(),String(p.id),lcNum,
+        (p.diff||'').toLowerCase(),p.cat||'',
+        cat?cat.name.toLowerCase():'',cat?cat.short.toLowerCase():'',
+        p.paradigm?p.paradigm.toLowerCase():'',
+        p.plat||'',
+      ].join(' ');
+      if(!haystack.includes(q))return false;
+    }
+    return true;
+  });
+  document.getElementById('rc').innerHTML=`Showing <span>${f.length}</span>`;
+  renderPage(f);
+  saveFilters();
+}
+
+/* ─── RENDER ───────────────────────────────────────────────────── */
+function renderPage(f){
+  const pages=Math.max(1,Math.ceil(f.length/PAGE));
+  if(curPage>pages)curPage=pages;
+  const sl=f.slice((curPage-1)*PAGE,curPage*PAGE);
+  const list=document.getElementById('plist');
+  if(!sl.length){list.innerHTML='<div class="empty"><div class="ei">🔍</div><p>No problems match your filters.</p></div>';}
+  else list.innerHTML=sl.map(renderRow).join('');
+  renderPg(pages);
+}
+
+function renderRow(p){
+  const isSv=!!solved[p.id];
+  const cat=CATS[p.cat];
+  const dc=(p.diff||'').toLowerCase();
+  const dd={Easy:'●',Medium:'◆',Hard:'▲'}[p.diff]||'●';
+  const plat=getProblemPlatform(p);
+  const _pvh=p.viz||null;
+  const PLAT_LABEL={lc:'LC',gfg:'GFG',hr:'HR',cf:'CF',ib:'IB',sd:'SD',custom:''};
+  const PLAT_ICON={lc:'↗',gfg:'↗',hr:'↗',cf:'↗',ib:'↗',sd:'↗',custom:''};
+  const href=p.url||'#';
+  const linkLabel=PLAT_ICON[plat]+' '+PLAT_LABEL[plat];
+  const par=PARADIGMS[p.paradigm];
+  return`<div class="pr${isSv?' sv':''}" id="r${p.id}">
+<div class="chk"><div class="cb${isSv?' ck':''}" onclick="toggleSolved(${p.id})"></div></div>
+<div class="pnc"><span class="pnum">#${p.id}</span>${_pvh?`<a class="pn pn-viz" href="${_pvh}" title="Open Visualizer">${p.name}</a>`:`<span class="pn">${p.name}</span>`}</div>
+<div><span class="db ${dc}">${dd} ${p.diff}</span></div>
+<div class="ct"><span class="ct-dot" style="background:${cat?cat.color:'#888'}"></span>${cat?cat.short:p.cat}</div>
+<div class="par-tag" onclick="setParadigm('${(p.paradigm||'').replace(/'/g,"\\'")}')"><span class="par-tag-icon">${par?par.icon:''}</span>${p.paradigm||''}</div>
+<div class="lc-num th-center">${p.lcNum?'<span class="lcn">#'+p.lcNum+'</span>':'<span class="lcn-na"></span>'}</div>
+<div class="plat-cell th-center"><span class="plat-badge plat-${plat}" style="cursor:pointer" onclick="setPlatform('${plat}')" title="Filter by ${PLAT_LABEL[plat]}">${PLAT_LABEL[plat]}</span></div>
+<div class="lc">${plat!=='custom'?`<a class="lb lb-${plat}" href="${href}" target="_blank" rel="noopener">${linkLabel}</a>`:'<span class="lcn-na"></span>'}</div>
+</div>`;
+}
+
+function renderPg(pages){
+  const pg=document.getElementById('pg');
+  if(pages<=1){pg.innerHTML='';return;}
+  let h=`<button class="pgb" onclick="goPage(${curPage-1})" ${curPage===1?'disabled':''}></button>`;
+  for(let i=1;i<=pages;i++){
+    if(pages>8&&Math.abs(i-curPage)>2&&i!==1&&i!==pages){if(i===2||i===pages-1)h+=`<span class="pgi"></span>`;continue;}
+    h+=`<button class="pgb${i===curPage?' pa':''}" onclick="goPage(${i})">${i}</button>`;
+  }
+  h+=`<button class="pgb" onclick="goPage(${curPage+1})" ${curPage===pages?'disabled':''}></button>`;
+  h+=`<span class="pgi">Page ${curPage}/${pages}</span>`;
+  pg.innerHTML=h;
+}
+
+function goPage(n){curPage=n;applyFilters();document.querySelector('.th').scrollIntoView({behavior:'smooth',block:'start'});}
+
+/* ─── SOLVED ───────────────────────────────────────────────────── */
+function toggleSolved(id){
+  solved[id]=!solved[id];if(!solved[id])delete solved[id];
+  localStorage.setItem('gt_s',JSON.stringify(solved));
+  updateStats();buildCatProg();
+  const row=document.getElementById('r'+id);
+  if(row){
+    const ck=solved[id];
+    row.classList.toggle('sv',ck);
+    row.querySelector('.cb').classList.toggle('ck',ck);
+    const pnEl=row.querySelector('.pn');if(pnEl)pnEl.style.textDecoration=ck?'line-through':'';
+    showToast(ck?'✅ Solved!':'↩ Unmarked');
+    syncMasterCb();
+    if(hideSolved&&ck)applyFilters();
+  }
+}
+
+function toggleAllSolved(){
+  const hasSolved=Object.keys(solved).some(id=>solved[id]);
+  if(hasSolved){
+    solved={};
+    localStorage.setItem('gt_s',JSON.stringify(solved));
+    updateStats();buildCatProg();applyFilters();syncMasterCb();
+    showToast('✕ All checkboxes cleared');
+  } else {
+    showToast('No solved problems to clear');
+  }
+}
+
+function syncMasterCb(){
+  const mcb=document.getElementById('master-cb');
+  if(!mcb)return;
+  const hasSolved=Object.keys(solved).some(id=>solved[id]);
+  mcb.classList.toggle('ck',hasSolved);
+}
+
+/* ─── STATS ────────────────────────────────────────────────────── */
+function updateStats(){
+  const tot=PROBLEMS.length;
+  const sn=Object.keys(solved).filter(id=>solved[id]).length;
+  const pct=tot?Math.round(sn/tot*100):0;
+  document.getElementById('s-total').textContent=tot;
+  document.getElementById('s-solved').textContent=sn;
+  document.getElementById('s-easy').textContent=PROBLEMS.filter(p=>p.diff==='Easy').length;
+  document.getElementById('s-med').textContent=PROBLEMS.filter(p=>p.diff==='Medium').length;
+  document.getElementById('s-hard').textContent=PROBLEMS.filter(p=>p.diff==='Hard').length;
+  document.getElementById('s-pct').textContent=pct+'%';
+  document.getElementById('pf').style.width=pct+'%';
+  document.getElementById('s-viz').textContent=PROBLEMS.filter(p=>!!p.viz).length;
+}
+
+
+/* ─── THEME ────────────────────────────────────────────────────── */
+function toggleTheme(){
+  const d=document.documentElement.getAttribute('data-theme')==='dark';
+  document.documentElement.setAttribute('data-theme',d?'light':'dark');
+  document.getElementById('ti').textContent=d?'🌙':'☀️';
+  document.getElementById('tl').textContent=d?'Dark Mode':'Light Mode';
+  localStorage.setItem('gt_theme',d?'light':'dark');
+}
+
+/* ─── SECTION TOGGLE ───────────────────────────────────────────── */
+function toggleSec(id){
+  const body=document.getElementById('body-'+id);
+  const btn=document.getElementById('tog-'+id);
+  const open=body.classList.toggle('sec-open');
+  btn.innerHTML=open?'▲ Hide':'▼ Show';
+  btn.classList.toggle('on',open);
+  const st=JSON.parse(localStorage.getItem('gt_sec')||'{}');
+  st[id]=open;
+  localStorage.setItem('gt_sec',JSON.stringify(st));
+}
+
+/* ─── FILTER PERSISTENCE ───────────────────────────────────────── */
+function saveFilters(){
+  localStorage.setItem('gt_f',JSON.stringify({
+    cat:activeCat, diff:activeDiff, paradigm:activeParadigm, platform:activePlatform,
+    hide:hideSolved, solvedOnly:showSolvedOnly, viz:showVizOnly, page:curPage, search:document.getElementById('si')?.value||'',
+  }));
+}
+
+function restoreFilters(){
+  const f=JSON.parse(localStorage.getItem('gt_f')||'null');
+  if(!f)return;
+  activeCat=f.cat||'all'; activeDiff=f.diff||'all';
+  activeParadigm=f.paradigm||'all'; activePlatform=f.platform||'all';
+  hideSolved=!!f.hide; showSolvedOnly=!!f.solvedOnly; showVizOnly=!!f.viz; curPage=f.page||1;
+  const si=document.getElementById('si'); if(si)si.value=f.search||'';
+  const dmap={all:'fa',Easy:'fe',Medium:'fm',Hard:'fh'};
+  const dids={all:'d-all',Easy:'d-easy',Medium:'d-med',Hard:'d-hard'};
+  document.querySelectorAll('.fb').forEach(b=>b.classList.remove('fa','fe','fm','fh'));
+  document.getElementById(dids[activeDiff])?.classList.add(dmap[activeDiff]);
+  const svb=document.getElementById('sv-btn');
+  if(svb){svb.classList.toggle('on',showSolvedOnly);svb.innerHTML=showSolvedOnly?'<span>✅</span> All Problems':'<span>✅</span> Solved';}
+  const hsb=document.getElementById('hs-btn');
+  if(hsb){hsb.classList.toggle('on',hideSolved);hsb.innerHTML=hideSolved?'<span>🙈</span> Show Solved':'<span>👁</span> Hide Solved';}
+  const vzb=document.getElementById('viz-btn');
+  if(vzb){vzb.classList.toggle('on',showVizOnly);vzb.innerHTML=showVizOnly?'<span>⚡</span> All Problems':'<span>⚡</span> Visualizer';}
+}
+
+function restoreSecStates(){
+  const st=JSON.parse(localStorage.getItem('gt_sec')||'{}');
+  Object.entries(st).forEach(([id,open])=>{
+    const body=document.getElementById('body-'+id);
+    const btn=document.getElementById('tog-'+id);
+    if(!body||!btn)return;
+    body.classList.toggle('sec-open',open);
+    btn.innerHTML=open?'▲ Hide':'▼ Show';
+    btn.classList.toggle('on',open);
+  });
+}
+
+/* ─── TOAST ────────────────────────────────────────────────────── */
+let tt;function showToast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('show'),2200);}
+
+/* ─── PARADIGMS ────────────────────────────────────────────────── */
+function buildParadigms(){
+  const rows=PAR_LIST.map(p=>{
+    const cnt=PROBLEMS.filter(q=>q.paradigm===p.name).length;
+    const isAct=activeParadigm===p.name;
+    return`<tr class="par-row${isAct?' par-active':''}" onclick="setParadigm('${p.name.replace(/'/g,"\'")}')">
+      <td><span class="par-name"><span class="par-icon">${p.icon}</span>${p.name}</span>${isAct?'<span class="par-clear" onclick="event.stopPropagation();setParadigm(\'all\')">✕</span>':''}</td>
+      <td><span class="par-best">${p.desc}</span></td>
+      <td><span class="par-tc">${p.complexity}</span></td>
+      <td><span class="par-problems">${p.examples}</span></td>
+      <td><span class="par-cnt">${cnt}</span></td>
+    </tr>`;
+  }).join('');
+  document.getElementById('paradigms-wrap').innerHTML=`
+    <div class="par-filter-bar">${activeParadigm!=='all'?`<span class="par-active-badge">Filtering: <strong>${activeParadigm}</strong> <button type="button" onclick="setParadigm('all')" class="par-clear-btn">✕ Clear</button></span>`:'<span class="par-hint">Click a row to filter problems ↓</span>'}</div>
+    <table class="par-table">
+      <thead><tr><th>Paradigm</th><th>Best For</th><th>Time Complexity</th><th>Key Problems</th><th>#</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>`;
+}
+
+function setParadigm(name){
+  if(!name) return;
+  if(name!=='all'&&activeParadigm===name) name='all';
+  activeParadigm=name;curPage=1;
+  buildParadigms();applyFilters();
+  if(name!=='all'){
+    const body=document.getElementById('body-prob');
+    if(body&&!body.classList.contains('sec-open')) toggleSec('prob');
+    showToast('🎯 '+name);
+  }
+}
+</script>
+</body>
+</html>

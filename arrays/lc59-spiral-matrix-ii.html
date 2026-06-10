@@ -1,0 +1,1208 @@
+﻿
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LC #59 — Spiral Matrix II | Dry Run Visualizer</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+:root {
+  --bg-primary:#FAFAF8; --bg-secondary:#F1EFE8; --bg-tertiary:#E2E0D8; --bg-card:#FFFFFF;
+  --text-primary:#2C2C2A; --text-secondary:#5F5E5A; --text-tertiary:#888780;
+  --border-color:rgba(0,0,0,0.11); --border-light:rgba(0,0,0,0.06); --border-focus:#534AB7;
+  --accent-indigo:#534AB7; --accent-indigo-bg:#EEEDFE; --accent-indigo-text:#3C3489; --accent-indigo-hover:#4740A0;
+  --accent-teal:#0F6E56; --accent-teal-bg:#E1F5EE; --accent-teal-text:#085041;
+  --accent-red:#E24B4A; --accent-red-bg:#FCEBEB; --accent-red-text:#791F1F;
+  --accent-amber:#B45309; --accent-amber-bg:#FEF3C7; --accent-amber-text:#78350F;
+  --accent-green:#15803D; --accent-green-bg:#DCFCE7; --accent-green-text:#14532D;
+  --syn-keyword:#534AB7; --syn-function:#185FA5; --syn-number:#993C1D; --syn-string:#0F6E56;
+  --active-line-bg:#EEEDFE;
+  --radius-sm:4px; --radius-md:6px; --radius-lg:10px; --radius-xl:14px;
+  --font-sans:'DM Sans', system-ui, sans-serif;
+  --font-mono:'JetBrains Mono', 'Fira Code', monospace;
+  --fs-xs:11px; --fs-sm:12px; --fs-base:14px;
+  --ease:.18s ease;
+}
+* { box-sizing:border-box; margin:0; padding:0 }
+html, body { height:100%; overflow:hidden }
+body { font-family:var(--font-sans); color:var(--text-primary); background:var(--bg-primary); font-size:var(--fs-base); line-height:1.5 }
+.no-select { user-select:none }
+::-webkit-scrollbar { width:5px; height:5px }
+::-webkit-scrollbar-track { background:transparent }
+::-webkit-scrollbar-thumb { background:var(--border-color); border-radius:3px }
+
+.app-shell { display:flex; flex-direction:column; height:100vh; overflow:hidden }
+.problem-card { flex-shrink:0; border-bottom:1px solid var(--border-color); background:var(--bg-card) }
+.main-row { flex:1; display:flex; overflow:hidden; min-height:0 }
+.col { display:flex; flex-direction:column; overflow:hidden; min-width:0 }
+.col-code { width:33%; min-width:140px; max-width:45vw; background:var(--bg-card); border-right:1px solid var(--border-color) }
+.col-viz { flex:1; min-width:0; background:var(--bg-primary) }
+.resize-h { width:5px; cursor:col-resize; background:transparent; flex-shrink:0; transition:background var(--ease) }
+.resize-h:hover, .resize-h.active { background:var(--accent-indigo) }
+.footer-bar { display:flex; flex-shrink:0; border-top:1px solid var(--border-color); background:var(--bg-card) }
+.footer-left { width:33%; min-width:140px; max-width:45vw; display:flex; align-items:center; gap:8px; padding:7px 12px; border-right:1px solid var(--border-light) }
+.footer-right { flex:1; display:flex; align-items:center; gap:8px; padding:7px 20px; flex-wrap:wrap }
+.footer-sep { width:1px; height:20px; background:var(--border-color); margin:0 4px }
+
+.pc-header { display:flex; align-items:center; gap:10px; padding:10px 16px; border-bottom:1px solid var(--border-light); flex-wrap:wrap }
+.gt-learn { background:var(--accent-indigo); color:#fff; font-weight:700; font-size:11px; padding:5px 12px; border-radius:99px; border:none; cursor:pointer; letter-spacing:.05em }
+.gt-learn:hover { background:var(--accent-indigo-hover) }
+.lc-num { font:700 12px var(--font-mono); color:var(--text-tertiary) }
+.lc-title { font-size:15px; font-weight:700; flex:1 }
+.lc-diff { font:700 10px var(--font-mono); padding:3px 9px; border-radius:99px; background:var(--accent-amber-bg); color:var(--accent-amber-text); border:1px solid var(--accent-amber) }
+.lc-tag { font:600 10px var(--font-mono); padding:3px 9px; border-radius:99px; background:var(--accent-indigo-bg); color:var(--accent-indigo-text); border:1px solid var(--accent-indigo) }
+.pc-input-row { display:flex; align-items:center; gap:8px; flex-wrap:wrap }
+.pc-input-row label { font:600 11px var(--font-mono); color:var(--text-secondary) }
+.pc-input-row input { font:600 12px var(--font-mono); padding:4px 8px; border:1px solid var(--border-color); border-radius:var(--radius-sm); background:var(--bg-card); width:80px }
+.pc-input-row input:focus { outline:none; border-color:var(--border-focus) }
+.exp-badge { font:600 11px var(--font-mono); padding:4px 8px; background:var(--accent-green-bg); color:var(--accent-green-text); border-radius:var(--radius-sm); border:1px solid var(--accent-green) }
+.toggle-btn { background:var(--bg-secondary); border:1px solid var(--border-color); border-radius:var(--radius-sm); padding:4px 10px; font-size:11px; cursor:pointer; font-family:system-ui,"Segoe UI Emoji",sans-serif }
+.pc-body { display:flex; gap:16px; padding:14px 16px; max-height:34vh; overflow:auto }
+.pc-body.hidden { display:none }
+.pc-left { flex:1.5 }
+.pc-right { flex:1; display:flex; flex-direction:column; gap:8px }
+.pc-section-title { font:700 11px var(--font-mono); text-transform:uppercase; letter-spacing:.06em; color:var(--text-tertiary); margin-bottom:6px }
+.pc-text { font-size:13px; line-height:1.6; color:var(--text-secondary); margin-bottom:10px }
+.pc-text code { font:600 12px var(--font-mono); background:var(--bg-secondary); padding:1px 5px; border-radius:3px; color:var(--accent-indigo-text) }
+.pc-text strong { color:var(--text-primary) }
+.concept-block { background:var(--bg-secondary); border-left:3px solid var(--accent-indigo); padding:7px 11px; border-radius:var(--radius-sm); margin-bottom:6px; font-size:12px }
+.concept-block strong { color:var(--accent-indigo-text); font-size:11px; text-transform:uppercase; letter-spacing:.05em }
+.complexity-row { display:flex; gap:8px; margin-top:8px }
+.cx-chip { font:600 11px var(--font-mono); padding:4px 9px; border-radius:99px; background:var(--bg-secondary); border:1px solid var(--border-color) }
+.cx-chip.cx-time { background:var(--accent-amber-bg); border-color:var(--accent-amber); color:var(--accent-amber-text) }
+.cx-chip.cx-space { background:var(--accent-teal-bg); border-color:var(--accent-teal); color:var(--accent-teal-text) }
+.tc-chip { background:var(--bg-secondary); border:1px solid var(--border-color); border-radius:var(--radius-md); padding:8px 10px; cursor:pointer; transition:all var(--ease); display:flex; flex-direction:column; gap:5px }
+.tc-chip:hover { border-color:var(--accent-indigo); background:var(--accent-indigo-bg) }
+.tc-row1 { display:flex; align-items:center; gap:6px; flex-wrap:wrap }
+.pt-tag { font:600 9px var(--font-mono); text-transform:uppercase; padding:2px 6px; border-radius:3px; background:var(--accent-indigo-bg); color:var(--accent-indigo-text); border:1px solid var(--accent-indigo) }
+.tc-label { font-size:11px; color:var(--text-secondary); flex:1 }
+.tc-expected { font:700 11px var(--font-mono); color:var(--accent-green-text); background:var(--accent-green-bg); padding:2px 6px; border-radius:3px; border:1px solid var(--accent-green) }
+.tc-vals { display:flex; gap:4px; flex-wrap:wrap; align-items:center }
+.tc-vals code { font:600 10px var(--font-mono); background:var(--bg-card); border:1px solid var(--border-color); padding:1px 5px; border-radius:3px }
+.tc-vals .vk { font-size:10px; color:var(--text-tertiary); font-weight:600 }
+.run-row { display:flex; align-items:center; gap:8px; margin-top:6px }
+.btn-run { background:var(--accent-indigo); color:#fff; border:none; padding:7px 16px; border-radius:var(--radius-md); font-weight:700; cursor:pointer; font-family:system-ui,"Segoe UI Emoji",sans-serif; font-size:12px }
+.btn-run:hover { background:var(--accent-indigo-hover) }
+.live-out { font:700 12px var(--font-mono); padding:5px 10px; background:var(--bg-secondary); border-radius:var(--radius-sm); border:1px solid var(--border-color); flex:1 }
+
+.code-header, .viz-header { padding:6px 14px; font:700 11px var(--font-mono); text-transform:uppercase; letter-spacing:.06em; color:var(--text-tertiary); border-bottom:1px solid var(--border-light); background:var(--bg-secondary); flex-shrink:0; font-family:system-ui,"Segoe UI Emoji",sans-serif }
+.code-panel { flex:1; overflow-y:auto; padding:10px 0; font:500 13px var(--font-mono); line-height:1.9 }
+.code-line { display:flex; padding:1px 14px; transition:background var(--ease); white-space:pre }
+.code-line.active { background:var(--active-line-bg); border-left:3px solid var(--accent-indigo); padding-left:11px }
+.ln { color:var(--text-tertiary); margin-right:14px; user-select:none; min-width:24px; text-align:right }
+.kw { color:var(--syn-keyword); font-weight:600 }
+.fn { color:var(--syn-function); font-weight:600 }
+.num { color:var(--syn-number) }
+.str { color:var(--syn-string) }
+
+.viz-panel { flex:1; overflow-y:auto; padding:14px 18px }
+.vars-strip { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:12px }
+.var-chip { font:600 11px var(--font-mono); padding:5px 10px; border-radius:var(--radius-md); background:var(--bg-card); border:1px solid var(--border-color); display:inline-flex; align-items:center; gap:4px }
+.var-chip .vk { color:var(--text-tertiary); font-weight:500 }
+.var-chip .vv { color:var(--text-primary); font-weight:700 }
+.vc-active { background:var(--accent-indigo-bg); border-color:var(--accent-indigo); color:var(--accent-indigo-text) }
+.vc-safe { background:var(--accent-green-bg); border-color:var(--accent-green); color:var(--accent-green-text) }
+.vc-amber { background:var(--accent-amber-bg); border-color:var(--accent-amber); color:var(--accent-amber-text) }
+.vc-flip { background:var(--accent-red-bg); border-color:var(--accent-red); color:var(--accent-red-text) }
+.viz-row { display:flex; gap:12px; align-items:flex-start; flex-wrap:wrap; margin-bottom:14px }
+.viz-card { background:var(--bg-card); border:1px solid var(--border-color); border-radius:var(--radius-md); padding:10px 12px; min-width:200px }
+.viz-card-title { font:700 10px var(--font-mono); text-transform:uppercase; letter-spacing:.06em; color:var(--text-tertiary); margin-bottom:8px; display:flex; align-items:center; gap:5px; font-family:system-ui,"Segoe UI Emoji",sans-serif }
+
+/* Matrix grid (V9) */
+.matrix-wrap { display:inline-block; padding:14px; background:#1e293b; border-radius:8px; border:2px solid #334155; position:relative }
+.matrix-grid { display:grid; gap:3px; border-radius:3px; position:relative }
+.mat-cell { width:50px; height:50px; display:flex; flex-direction:column; align-items:center; justify-content:center;
+  font-family:var(--font-mono); font-size:18px; font-weight:700; border-radius:6px;
+  background:#fff; color:#1e293b; border:2px solid transparent; position:relative; transition:all .25s }
+.mat-cell-coord { font-size:7px; color:var(--text-tertiary); font-weight:400; position:absolute; top:2px; left:3px; opacity:.6 }
+.mat-cell--empty { background:#475569; color:#94a3b8; border-color:#64748b }
+.mat-cell--curr   { background:#FEF3C7!important; border-color:#B45309!important; color:#78350F!important; animation:pulse-node 1.1s infinite; transform:scale(1.08); z-index:2 }
+.mat-cell--visited{ background:#DCFCE7; color:#14532D; border-color:#15803D }
+.mat-cell--ring { background:#EEEDFE!important; border-color:#534AB7!important; color:#3C3489!important }
+
+/* Boundaries display */
+.bound-grid { display:grid; grid-template-columns:auto auto; gap:6px 14px; font:600 11px var(--font-mono); align-items:center }
+.bound-grid .bk { color:var(--text-tertiary); text-align:right }
+.bound-grid .bv { font-weight:700; color:var(--accent-indigo-text); background:var(--accent-indigo-bg); padding:2px 8px; border-radius:4px; border:1px solid var(--accent-indigo); min-width:28px; text-align:center }
+.bound-grid .bv-changed { background:var(--accent-amber-bg); color:var(--accent-amber-text); border-color:var(--accent-amber); animation:pulse-node 1.1s infinite }
+
+/* Direction display */
+.dir-row { display:flex; gap:6px; align-items:center }
+.dir-pill { font:700 12px var(--font-mono); padding:4px 10px; border-radius:99px; background:var(--bg-secondary); border:1px solid var(--border-color); color:var(--text-secondary); display:inline-flex; align-items:center; gap:4px }
+.dir-pill--active { background:var(--accent-indigo); color:#fff; border-color:var(--accent-indigo); box-shadow:0 0 8px rgba(83,74,183,.5) }
+
+/* Flow SVG (V9) */
+.flow-svg { position:absolute; top:14px; left:14px; pointer-events:none; z-index:6; overflow:visible }
+.flow-line {
+  stroke:#dc2626; stroke-width:2.5; stroke-dasharray:5,4; fill:none;
+  animation: flow-dash 1s linear infinite, flow-pulse 1.4s ease-in-out infinite;
+  filter: drop-shadow(0 0 2px rgba(220,38,38,.5));
+}
+.flow-line--current {
+  stroke:#f59e0b; stroke-width:3; stroke-dasharray:4,3;
+  animation: flow-dash .6s linear infinite;
+  filter: drop-shadow(0 0 3px rgba(245,158,11,.7));
+}
+.flow-line--turn { stroke:#8b5cf6; stroke-width:2.2; stroke-dasharray:2,3; opacity:.85 }
+
+.legend { display:flex; gap:10px; flex-wrap:wrap; margin-top:8px; padding:6px 8px; background:var(--bg-secondary); border-radius:var(--radius-sm) }
+.legend span { display:inline-flex; align-items:center; gap:5px; font-size:10px; color:var(--text-secondary) }
+.legend i { display:inline-block; width:14px; height:14px; border-radius:3px; border:1px solid var(--border-color) }
+.legend i.legend-flow      { width:22px; height:0; border:0; border-top:2.5px dashed #dc2626 }
+.legend i.legend-flow-curr { width:22px; height:0; border:0; border-top:3px dashed #f59e0b }
+.legend i.legend-flow-turn { width:22px; height:0; border:0; border-top:2.2px dashed #8b5cf6 }
+
+.empty-state { font-size:11px; color:var(--text-tertiary); font-style:italic; padding:8px }
+
+.result-banner { background:linear-gradient(135deg, var(--accent-green-bg), var(--accent-teal-bg)); border:2px solid var(--accent-green); padding:14px 18px; border-radius:var(--radius-md); margin-top:10px; animation:win-pulse 1.6s ease-in-out infinite }
+.result-banner-title { font:700 13px var(--font-mono); color:var(--accent-green-text); text-transform:uppercase; letter-spacing:.06em; margin-bottom:4px }
+.result-banner-val { font:800 16px var(--font-mono); color:var(--accent-green-text) }
+
+@keyframes pulse-node { 0%,100% {box-shadow:0 0 4px var(--accent-indigo)} 50% {box-shadow:0 0 12px var(--accent-indigo)} }
+@keyframes shake { 0%,100% {transform:translateX(0)} 25% {transform:translateX(-3px)} 75% {transform:translateX(3px)} }
+@keyframes win-pulse { 0%,100% {box-shadow:0 0 3px rgba(21,128,61,.4)} 50% {box-shadow:0 0 12px rgba(21,128,61,.7)} }
+@keyframes flow-dash { to { stroke-dashoffset: -18 } }
+@keyframes flow-pulse { 0%,100% { opacity: .85 } 50% { opacity: 1 } }
+
+.step-info { font:700 12px var(--font-mono); color:var(--text-secondary); padding:3px 8px; background:var(--bg-secondary); border-radius:var(--radius-sm) }
+.action-badge { font:700 10px var(--font-mono); padding:3px 9px; border-radius:99px; text-transform:uppercase; font-family:system-ui,"Segoe UI Emoji",sans-serif }
+.action-badge--func-def, .action-badge--init, .action-badge--call, .action-badge--return { background:rgba(130,80,255,.14); color:#3C3489; border:1px solid #8250ff }
+.action-badge--for-check, .action-badge--while-check, .action-badge--if-check { background:rgba(56,139,253,.14); color:#185FA5; border:1px solid #388bfd }
+.action-badge--mark, .action-badge--push, .action-badge--pop, .action-badge--restore, .action-badge--found { background:var(--accent-green-bg); color:var(--accent-green-text); border:1px solid var(--accent-green) }
+.action-badge--remove, .action-badge--prune, .action-badge--fail { background:var(--accent-red-bg); color:var(--accent-red-text); border:1px solid var(--accent-red) }
+.action-badge--exit, .action-badge--skip { background:var(--bg-tertiary); color:var(--text-secondary); border:1px solid var(--border-color) }
+kbd { font:600 10px var(--font-mono); padding:2px 6px; background:var(--bg-secondary); border:1px solid var(--border-color); border-radius:3px; color:var(--text-secondary); font-family:system-ui,"Segoe UI Emoji",sans-serif }
+.btn { background:var(--bg-card); border:1px solid var(--border-color); padding:5px 11px; border-radius:var(--radius-sm); cursor:pointer; font:600 12px var(--font-mono); color:var(--text-primary); font-family:system-ui,"Segoe UI Emoji",sans-serif }
+.btn:hover { background:var(--bg-secondary); border-color:var(--accent-indigo) }
+.btn-primary { background:var(--accent-indigo); color:#fff; border-color:var(--accent-indigo) }
+.btn-primary:hover { background:var(--accent-indigo-hover) }
+.btn-zoom { width:24px; height:24px; padding:0; display:inline-flex; align-items:center; justify-content:center; background:var(--bg-card); border:1px solid var(--border-color); border-radius:var(--radius-sm); cursor:pointer; font:600 12px var(--font-mono); font-family:system-ui,"Segoe UI Emoji",sans-serif }
+.log-zoom-label { font:600 11px var(--font-mono); color:var(--text-secondary); min-width:36px; text-align:center }
+.log-toggle-btn { background:var(--accent-green-bg); color:var(--accent-green-text); border:1px solid var(--accent-green); padding:4px 10px; border-radius:var(--radius-sm); cursor:pointer; font:700 11px var(--font-mono); font-family:system-ui,"Segoe UI Emoji",sans-serif }
+.log-toggle-btn--off { background:var(--bg-tertiary); color:var(--text-secondary); border-color:var(--border-color) }
+
+.log-popup {
+  --log-scale: 1;
+  position: fixed; bottom: 52px; right: 14px;
+  width: calc(480px * var(--log-scale));
+  max-width: 92vw; max-height: 75vh;
+  border-radius: var(--radius-lg);
+  box-shadow: 0 10px 32px rgba(0,0,0,.14);
+  border: 1px solid var(--border-color);
+  background: var(--bg-card);
+  overflow: hidden;
+  display: flex; flex-direction: column;
+  z-index: 100;
+  transition: opacity .15s, transform .15s;
+  transform-origin: bottom right;
+}
+.log-popup--hidden { opacity: 0; transform: scale(.92); pointer-events: none; }
+.log-popup-body { flex: 1; overflow: auto; padding: 0 }
+.log-popup-body > .log-card { border-radius: 0; border: none; border-left: 0 }
+
+.log-card { border-radius:var(--radius-md); overflow:hidden; border:1px solid var(--border-color); border-left-width:4px; font-size:var(--fs-xs); background:var(--bg-card) }
+.log-card--func-def, .log-card--init, .log-card--call, .log-card--return { border-left-color:#8250ff }
+.log-card--for-check, .log-card--while-check, .log-card--if-check { border-left-color:#388bfd }
+.log-card--mark, .log-card--push, .log-card--pop, .log-card--restore, .log-card--found { border-left-color:var(--accent-green) }
+.log-card--remove, .log-card--prune, .log-card--fail { border-left-color:var(--accent-red) }
+.log-card--exit, .log-card--skip { border-left-color:var(--text-tertiary) }
+.log-card-header { display:flex; align-items:center; gap:6px; padding:8px 10px 6px; background:var(--bg-secondary); border-bottom:1px solid var(--border-light); flex-wrap:wrap }
+.log-badge { font:700 10px var(--font-mono); padding:2px 7px; border-radius:4px; font-family:system-ui,"Segoe UI Emoji",sans-serif }
+.log-badge--func-def, .log-badge--init, .log-badge--call, .log-badge--return { background:rgba(130,80,255,.14); color:#3C3489; border:1px solid #8250ff }
+.log-badge--for-check, .log-badge--while-check, .log-badge--if-check { background:rgba(56,139,253,.14); color:#185FA5; border:1px solid #388bfd }
+.log-badge--mark, .log-badge--push, .log-badge--pop, .log-badge--restore, .log-badge--found { background:var(--accent-green-bg); color:var(--accent-green-text); border:1px solid var(--accent-green) }
+.log-badge--remove, .log-badge--prune, .log-badge--fail { background:var(--accent-red-bg); color:var(--accent-red-text); border:1px solid var(--accent-red) }
+.log-badge--exit, .log-badge--skip { background:var(--bg-tertiary); color:var(--text-secondary); border:1px solid var(--border-color) }
+.log-line-ref { font:700 10px var(--font-mono); color:var(--accent-indigo); background:var(--accent-indigo-bg); padding:1px 6px; border-radius:4px; border:1px solid var(--accent-indigo) }
+.log-status-pill { font-family:system-ui,"Segoe UI Emoji",sans-serif; font-size:9px; font-weight:700; padding:2px 7px; border-radius:99px; text-transform:uppercase; margin-left:auto }
+.log-status--success { background:var(--accent-green-bg); color:var(--accent-green-text); border:1px solid var(--accent-green) }
+.log-status--fail { background:var(--accent-red-bg); color:var(--accent-red-text); border:1px solid var(--accent-red) }
+.log-status--skip { background:var(--bg-tertiary); color:var(--text-tertiary); border:1px solid var(--border-color) }
+.log-status--loop { background:rgba(56,139,253,.14); color:#185FA5; border:1px solid #388bfd }
+.log-status--prune { background:var(--accent-red-bg); color:var(--accent-red-text); border:1px solid var(--accent-red) }
+.log-status--info { background:rgba(130,80,255,.14); color:#3C3489; border:1px solid #8250ff }
+.log-section { padding:7px 10px; border-bottom:1px dashed var(--border-light) }
+.log-section:last-child { border-bottom:none }
+.log-section-title { font:700 8px var(--font-mono); text-transform:uppercase; letter-spacing:.06em; color:var(--text-tertiary); margin-bottom:4px; display:flex; align-items:center; gap:4px }
+.log-section-title-icon { font-family:system-ui,"Segoe UI Emoji",sans-serif }
+.log-code-snippet { font:600 11px var(--font-mono); background:#0d1117; color:#e6edf3; padding:6px 9px; border-radius:4px; display:block; overflow-x:auto; white-space:pre; border:1px solid #30363d }
+.log-code-snippet .ck { color:#ff7b72 }
+.log-code-snippet .cs { color:#a5d6ff }
+.log-code-snippet .cn { color:#79c0ff }
+.log-code-snippet .cf { color:#d2a8ff }
+.log-code-snippet .cc { color:#8b949e; font-style:italic }
+.log-kv-row { display:flex; gap:4px; flex-wrap:wrap }
+.log-kv { display:inline-flex; align-items:center; gap:3px; font:11px var(--font-mono); padding:2px 7px; border-radius:4px; background:var(--bg-secondary); border:1px solid var(--border-light) }
+.log-kv-key { color:var(--text-tertiary); font-weight:500 }
+.log-kv-val { color:var(--text-primary); font-weight:700 }
+.log-kv--in { background:rgba(56,139,253,.08); border-color:rgba(56,139,253,.3) }
+.log-kv--out { background:rgba(63,185,80,.08); border-color:rgba(63,185,80,.4) }
+.log-kv--out .log-kv-val { color:#15803D }
+.log-kv--changed { background:rgba(180,83,9,.10); border-color:rgba(180,83,9,.4) }
+.log-verdict { display:flex; align-items:center; gap:6px; font:600 11px var(--font-mono); padding:5px 8px; border-radius:5px; background:var(--bg-secondary); border:1px solid var(--border-light) }
+.log-verdict--true { background:var(--accent-green-bg); border-color:var(--accent-green); color:var(--accent-green-text) }
+.log-verdict--false { background:var(--accent-red-bg); border-color:var(--accent-red); color:var(--accent-red-text) }
+.log-analogy { font:italic 11px var(--font-sans); color:var(--text-secondary); background:#FFF8E7; border:1px solid #FBE8A6; border-left:3px solid var(--accent-amber); padding:6px 9px; border-radius:4px; line-height:1.55 }
+.log-analogy strong { color:var(--accent-amber-text); font-style:normal; font-weight:700 }
+.log-why { font-size:11px; line-height:1.55; color:var(--text-primary); padding:4px 0 }
+.log-why strong { color:var(--accent-indigo-text) }
+.log-why code { font:600 10.5px var(--font-mono); background:var(--bg-secondary); padding:1px 4px; border-radius:3px; color:var(--accent-indigo-text) }
+</style>
+</head>
+<body>
+<div class="app-shell">
+
+<div class="problem-card" id="problemCard">
+  <div class="pc-header">
+    <a href="../00_HomePage/gt_learn_homepage.html" class="gt-learn">GT LEARN</a>
+    <span class="lc-num">#59</span>
+    <span class="lc-title">🌀 Spiral Matrix II</span>
+    <span class="lc-diff">MEDIUM</span>
+    <span class="lc-tag">Matrix · Simulation · O(n²)</span>
+    <span class="pc-input-row">
+      <label>n=</label><input id="inN" value="3">
+      <span class="exp-badge" id="expBadge">exp: [[1,2,3],[8,9,4],[7,6,5]]</span>
+      <button class="toggle-btn" onclick="toggleProblem()" id="toggleBtn">▲ Hide</button>
+    </span>
+  </div>
+  <div class="pc-body" id="pcBody">
+    <div class="pc-left">
+      <div class="pc-section-title">📝 Problem Statement</div>
+      <div class="pc-text">
+        Given a positive integer <code>n</code>, generate an <code>n × n</code> matrix filled with elements from <code>1</code> to <code>n²</code> in <strong>spiral order</strong> — start at top-left, go right, then down, then left, then up, shrinking the boundary each time.
+      </div>
+      <div class="pc-section-title">🧠 Solving Approach</div>
+      <div class="pc-text">
+        Maintain <strong>4 boundaries</strong>: <code>top, bottom, left, right</code>. Walk along each edge in order (→ ↓ ← ↑), placing numbers <code>1, 2, 3, ...</code>. After completing each edge, shrink that boundary inward. Continue until all boundaries cross.
+      </div>
+      <div class="pc-section-title">🎯 Core Concepts</div>
+      <div class="concept-block"><strong>4 Phases per ring:</strong> Right (top row), Down (right col), Left (bottom row), Up (left col). Each phase shrinks one boundary.</div>
+      <div class="concept-block"><strong>Why guards before Left/Up?</strong> For odd n, the center cell would be filled twice. Check <code>top ≤ bottom</code> and <code>left ≤ right</code> before going Left/Up to avoid double-fill.</div>
+      <div class="concept-block"><strong>Termination:</strong> When <code>top &gt; bottom</code> OR <code>left &gt; right</code> — outer while loop exits. Total cells filled = n².</div>
+      <div class="complexity-row">
+        <span class="cx-chip cx-time">⏱ Time: O(n²)</span>
+        <span class="cx-chip cx-space">💾 Space: O(1) extra</span>
+      </div>
+    </div>
+    <div class="pc-right">
+      <div class="pc-section-title">🧪 Test Cases (click to load)</div>
+      <div class="tc-chip" onclick="loadTest(3,'[[1,2,3],[8,9,4],[7,6,5]]','classic 3x3')">
+        <div class="tc-row1"><span class="pt-tag">DEFAULT</span><span class="tc-label">classic 3×3</span><span class="tc-expected">→ ...9</span></div>
+        <div class="tc-vals"><span class="vk">n=</span><code>3</code></div>
+      </div>
+      <div class="tc-chip" onclick="loadTest(1,'[[1]]','smallest case')">
+        <div class="tc-row1"><span class="pt-tag">EDGE-1</span><span class="tc-label">smallest n=1</span><span class="tc-expected">→ [[1]]</span></div>
+        <div class="tc-vals"><span class="vk">n=</span><code>1</code></div>
+      </div>
+      <div class="tc-chip" onclick="loadTest(2,'[[1,2],[4,3]]','even 2x2')">
+        <div class="tc-row1"><span class="pt-tag">EVEN</span><span class="tc-label">even n=2 (no center)</span><span class="tc-expected">→ ...4</span></div>
+        <div class="tc-vals"><span class="vk">n=</span><code>2</code></div>
+      </div>
+      <div class="tc-chip" onclick="loadTest(4,'[[1,2,3,4],[12,13,14,5],[11,16,15,6],[10,9,8,7]]','two rings')">
+        <div class="tc-row1"><span class="pt-tag">TWO-RINGS</span><span class="tc-label">n=4 (2 full rings)</span><span class="tc-expected">→ ...16</span></div>
+        <div class="tc-vals"><span class="vk">n=</span><code>4</code></div>
+      </div>
+      <div class="tc-chip" onclick="loadTest(5,'[[1,2,3,4,5],[16,17,18,19,6],[15,24,25,20,7],[14,23,22,21,8],[13,12,11,10,9]]','odd center cell')">
+        <div class="tc-row1"><span class="pt-tag">ODD-5</span><span class="tc-label">n=5 (center=25)</span><span class="tc-expected">→ ...25</span></div>
+        <div class="tc-vals"><span class="vk">n=</span><code>5</code></div>
+      </div>
+      <div class="run-row">
+        <button class="btn-run" onclick="resetWithInput()">▶ Run</button>
+        <span class="live-out" id="liveOutput">—</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="main-row">
+  <div class="col col-code" id="col1">
+    <div class="code-header">📜 Python Code</div>
+    <div class="code-panel" id="codePanel"></div>
+  </div>
+  <div class="resize-h" id="resizeH1"></div>
+  <div class="col col-viz">
+    <div class="viz-header">📊 Visualization</div>
+    <div class="viz-panel" id="vizPanel"></div>
+  </div>
+</div>
+
+<div class="footer-bar">
+  <div class="footer-left" id="footerLeft">
+    <span id="stepInfo" class="step-info">0/0</span>
+    <span id="actionBadge" class="action-badge"></span>
+  </div>
+  <div class="footer-right">
+    <kbd>←</kbd><kbd>→</kbd><kbd>R</kbd>
+    <button class="btn" type="button" onclick="resetStep()">↺</button>
+    <button class="btn" type="button" onclick="stepBy(-1)">◀</button>
+    <button class="btn btn-primary" type="button" onclick="stepBy(1)">▶ Next</button>
+    <span class="footer-sep"></span>
+    <button id="logToggleBtn" class="log-toggle-btn" type="button" onclick="toggleLogPreview()">📋 ON</button>
+    <button class="btn-zoom" type="button" onclick="logZoom(-1)">−</button>
+    <span id="logZoomLabel" class="log-zoom-label">100%</span>
+    <button class="btn-zoom" type="button" onclick="logZoom(1)">+</button>
+    <button class="btn-zoom" type="button" onclick="logZoomReset()">↺</button>
+    <span class="footer-sep"></span>
+    <button class="btn" type="button" onclick="toggleFullscreen()">⛶</button>
+  </div>
+</div>
+
+</div>
+
+<div class="log-popup" id="logPopup">
+  <div class="log-popup-body" id="logPopupBody"></div>
+</div>
+
+<script>
+/* =================== CODE LINES =================== */
+var codeLines = [
+  "def generateMatrix(n):",
+  "    M = [[0]*n for _ in range(n)]",
+  "    top, bottom, left, right = 0, n-1, 0, n-1",
+  "    num = 1",
+  "    while top <= bottom and left <= right:",
+  "        for c in range(left, right+1):",
+  "            M[top][c] = num; num += 1",
+  "        top += 1",
+  "        for r in range(top, bottom+1):",
+  "            M[r][right] = num; num += 1",
+  "        right -= 1",
+  "        if top <= bottom:",
+  "            for c in range(right, left-1, -1):",
+  "                M[bottom][c] = num; num += 1",
+  "            bottom -= 1",
+  "        if left <= right:",
+  "            for r in range(bottom, top-1, -1):",
+  "                M[r][left] = num; num += 1",
+  "            left += 1",
+  "    return M"
+];
+
+/* =================== STATE =================== */
+var steps = [];
+var currentStep = 0;
+var codeWidthUserSet = false;
+var curResult = null;
+var logEnabled = true;
+var logZoomLevel = 100;
+
+var LOG_BADGE = {
+  "func-def":"📌 DEF","init":"⚙️ INIT","call":"📞 CALL","return":"🏆 RETURN",
+  "for-check":"🔁 FOR","while-check":"🔁 WHILE","if-check":"🔎 IF",
+  "mark":"✅ MARK","push":"⬆ PUSH","pop":"⬇ POP","restore":"↩ RESTORE","found":"🎉 FOUND",
+  "remove":"✏️ EDIT","prune":"✂️ PRUNE","fail":"❌ FAIL",
+  "exit":"🔚 EXIT","skip":"⏭ SKIP"
+};
+var BADGE_LABEL = {
+  "func-def":"DEF","init":"INIT","call":"CALL","return":"RETURN",
+  "for-check":"FOR","while-check":"WHILE","if-check":"IF",
+  "mark":"MARK","push":"PUSH","pop":"POP","restore":"RESTORE","found":"FOUND",
+  "remove":"EDIT","prune":"PRUNE","fail":"FAIL",
+  "exit":"EXIT","skip":"SKIP"
+};
+
+/* =================== CODE RENDERING =================== */
+function renderCode() {
+  var p = document.getElementById('codePanel');
+  p.innerHTML = codeLines.map(function(raw, i) {
+    var h = raw;
+    h = h.replace(/("[^"]*"|'[^']*')/g, '\x01STR\x02$1\x03');
+    h = h.replace(/\b(def|for|in|if|return|break|continue|and|else|elif|True|False|None|not|or|while|lambda)\b/g, '\x01KW\x02$1\x03');
+    h = h.replace(/\b(len|range|int|str|list|append|pop|sorted|min|max|sum|abs|enumerate|zip|print|set|add)\b/g, '\x01FN\x02$1\x03');
+    h = h.replace(/\b(\d+)\b/g, '\x01NUM\x02$1\x03');
+    h = h.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    h = h.replace(/\x01([A-Z]+)\x02/g, function(_, c){
+      var cls = c==='STR'?'str':c==='KW'?'kw':c==='FN'?'fn':'num';
+      return '<span class="'+cls+'">';
+    }).replace(/\x03/g, '</span>');
+    return '<div class="code-line" data-line="'+i+'"><span class="ln">'+(i+1)+'</span><span>'+h+'</span></div>';
+  }).join('');
+}
+function fitCodeWidth() {
+  if (codeWidthUserSet) return;
+  var col1 = document.getElementById('col1');
+  var maxW = Math.min(col1.offsetWidth, window.innerWidth * 0.45);
+  col1.style.width = maxW + 'px';
+  syncFooterWidth();
+}
+function syncFooterWidth() {
+  document.getElementById('footerLeft').style.width = document.getElementById('col1').offsetWidth + 'px';
+}
+
+/* =================== HLCODE =================== */
+function hlCode(raw) {
+  var h = raw;
+  h = h.replace(/("[^"]*"|'[^']*')/g, '\x01s\x02$1\x03');
+  h = h.replace(/\b(def|for|in|if|return|break|continue|and|else|elif|True|False|None|not|or|while|lambda)\b/g, '\x01k\x02$1\x03');
+  h = h.replace(/\b(len|range|int|str|list|append|pop|sorted|min|max|sum|abs|enumerate|zip|print|set|add)\b/g, '\x01f\x02$1\x03');
+  h = h.replace(/(?<![.\w"\x01\x02\x03])(-?\d+)\b/g, '\x01n\x02$1\x03');
+  h = h.replace(/(#.*$)/gm, '\x01c\x02$1\x03');
+  h = h.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  h = h.replace(/\x01([a-z])\x02/g, function(_, c){ return '<span class="c'+c+'">'; }).replace(/\x03/g, '</span>');
+  return h;
+}
+
+/* =================== RICHLOG =================== */
+function richLog(opts) {
+  var statusMap = {
+    success:"✅ Success", fail:"❌ Failed", skip:"⏭ Skipped",
+    loop:"🔁 Loop iter", prune:"✂️ Pruned", info:"ℹ️ Info"
+  };
+  var status = opts.status || "info";
+  var html = '<div class="log-card log-card--'+opts.action+'">';
+  html += '<div class="log-card-header">';
+  html += '<span class="log-badge log-badge--'+opts.action+'">'+(LOG_BADGE[opts.action]||opts.action)+'</span>';
+  html += '<span class="log-line-ref">L'+(opts.line+1)+'</span>';
+  html += '<span class="log-status-pill log-status--'+status+'">'+statusMap[status]+'</span>';
+  html += '</div>';
+  if (opts.code) {
+    html += '<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">📜</span>Code Executing</div>';
+    html += '<code class="log-code-snippet">'+hlCode(opts.code)+'</code></div>';
+  }
+  if (opts.inputs && opts.inputs.length) {
+    html += '<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">📥</span>Input Values</div>';
+    html += '<div class="log-kv-row">';
+    opts.inputs.forEach(function(kv){
+      html += '<span class="log-kv log-kv--in"><span class="log-kv-key">'+kv.k+'</span>=<span class="log-kv-val">'+kv.v+'</span></span>';
+    });
+    html += '</div></div>';
+  }
+  if (opts.outputs && opts.outputs.length) {
+    html += '<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">📤</span>Output / State After Line</div>';
+    html += '<div class="log-kv-row">';
+    opts.outputs.forEach(function(kv){
+      var cls = kv.changed ? 'log-kv--changed' : 'log-kv--out';
+      html += '<span class="log-kv '+cls+'"><span class="log-kv-key">'+kv.k+'</span>=<span class="log-kv-val">'+kv.v+'</span></span>';
+    });
+    html += '</div></div>';
+  }
+  if (opts.verdict) {
+    var vCls = opts.verdictTrue===true?'log-verdict--true':(opts.verdictTrue===false?'log-verdict--false':'');
+    var vIcon = opts.verdictTrue===true?'✓':(opts.verdictTrue===false?'✗':'•');
+    html += '<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">⚖️</span>Verdict / Decision</div>';
+    html += '<div class="log-verdict '+vCls+'">'+vIcon+' '+opts.verdict+'</div></div>';
+  }
+  if (opts.why) {
+    html += '<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">💡</span>Why This Happens</div>';
+    html += '<div class="log-why">'+opts.why+'</div></div>';
+  }
+  if (opts.analogy) {
+    html += '<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">🎭</span>Real-Life Analogy</div>';
+    html += '<div class="log-analogy">'+opts.analogy+'</div></div>';
+  }
+  html += '</div>';
+  return html;
+}
+
+/* =================== BUILD STEPS =================== */
+function buildSteps(n) {
+  var st = [];
+  var MAX_STEPS = 5000;
+  var M = [];
+  var top=null, bottom=null, left=null, right=null, num=null;
+  var c=null, r=null;
+  var direction = null; // 'right' | 'down' | 'left' | 'up' | null
+  var currCell = null;  // [r, c] just placed
+  var visitedSet = []; // [[r,c], ...] in placement order
+  var changed = {}; // boundary highlights
+
+  function snap(extra) {
+    return Object.assign({
+      n: n,
+      M: M.map(function(row){ return row.slice(); }),
+      top: top, bottom: bottom, left: left, right: right, num: num,
+      c: c, r: r,
+      direction: direction,
+      currCell: currCell ? currCell.slice() : null,
+      visitedSet: visitedSet.map(function(p){ return p.slice(); }),
+      changed: Object.assign({}, changed)
+    }, extra || {});
+  }
+  function pushStep(o) {
+    if (st.length >= MAX_STEPS) return;
+    st.push(Object.assign({ line:0, action:"init", logHTML:"" }, snap(o)));
+  }
+
+  // L0 — function entry
+  pushStep({
+    line:0, action:"func-def",
+    logHTML: richLog({
+      line:0, action:"func-def", status:"info",
+      code:"def generateMatrix(n):  # n = "+n,
+      inputs:[{k:"n",v:n}],
+      why:"Function shuru hua. Hume <code>"+n+"×"+n+"</code> ka matrix banana hai jisme <code>1</code> se <code>"+(n*n)+"</code> tak ke numbers <strong>spiral order</strong> mein ho.",
+      analogy:"Jaise <strong>shaadi ke mandap mein chairs</strong> spiral pattern mein lagani hai — bahar se shuru, ghoomte ghoomte center tak."
+    })
+  });
+
+  // L1 — M = [[0]*n for _ in range(n)]
+  for (var i=0; i<n; i++) {
+    var row = [];
+    for (var j=0; j<n; j++) row.push(0);
+    M.push(row);
+  }
+  pushStep({
+    line:1, action:"init",
+    logHTML: richLog({
+      line:1, action:"init", status:"success",
+      code:"M = [[0]*"+n+" for _ in range("+n+")]  # blank "+n+"×"+n+" matrix",
+      inputs:[{k:"n",v:n}],
+      outputs:[{k:"M",v:n+"×"+n+" zeros",changed:true}],
+      why:"<strong>Empty matrix initialize</strong> kar diya — saari "+(n*n)+" cells abhi <code>0</code> hain. Ab inhe spiral order mein 1 se "+(n*n)+" tak fill karenge.",
+      analogy:"Jaise <strong>blank graph paper</strong> nikal liya — ab pen lekar spiral pattern banayenge."
+    })
+  });
+
+  // L2 — top, bottom, left, right = 0, n-1, 0, n-1
+  top = 0; bottom = n-1; left = 0; right = n-1;
+  changed = {top:true, bottom:true, left:true, right:true};
+  pushStep({
+    line:2, action:"init",
+    logHTML: richLog({
+      line:2, action:"init", status:"success",
+      code:"top, bottom, left, right = 0, "+(n-1)+", 0, "+(n-1),
+      inputs:[{k:"n",v:n}],
+      outputs:[
+        {k:"top",v:0,changed:true},
+        {k:"bottom",v:n-1,changed:true},
+        {k:"left",v:0,changed:true},
+        {k:"right",v:n-1,changed:true}
+      ],
+      why:"<strong>4 boundary pointers</strong> setup kiye — yeh matrix ka outer ring define karte hain. Har ring complete hone pe inhe shrink karenge inward.",
+      analogy:"Jaise <strong>cricket ground ka boundary rope</strong> — top/bottom/left/right markers laga diye. Players (numbers) inke andar khelenge, aur har over ke baad rope andar khinchti jayegi."
+    })
+  });
+  changed = {};
+
+  // L3 — num = 1
+  num = 1;
+  pushStep({
+    line:3, action:"init",
+    logHTML: richLog({
+      line:3, action:"init", status:"success",
+      code:"num = 1",
+      outputs:[{k:"num",v:1,changed:true}],
+      why:"<strong>Counter initialize</strong> kar diya. Yeh number har cell mein place hoga aur har placement ke baad <code>+1</code> badhta jayega — last value <code>"+(n*n)+"</code> hogi.",
+      analogy:"Jaise <strong>token counter</strong> shuru ho gaya — pehla token <code>1</code>, phir <code>2</code>, <code>3</code>... aakhri token <code>"+(n*n)+"</code> tak."
+    })
+  });
+
+  // L4 — while loop
+  var safety = 0;
+  while (top <= bottom && left <= right) {
+    safety++; if (safety > 200) break;
+    // While check (TRUE)
+    pushStep({
+      line:4, action:"while-check",
+      logHTML: richLog({
+        line:4, action:"while-check", status:"loop",
+        code:"while top <= bottom and left <= right:  # "+top+"<="+bottom+" and "+left+"<="+right,
+        inputs:[{k:"top",v:top},{k:"bottom",v:bottom},{k:"left",v:left},{k:"right",v:right}],
+        verdict:"top("+top+")≤bottom("+bottom+") AND left("+left+")≤right("+right+") → True",
+        verdictTrue:true,
+        why:"<strong>Boundaries valid hain</strong> — abhi ek aur ring fill karna hai. Loop continue.",
+        analogy:"Jaise <strong>boundary rope ke andar abhi jagah hai</strong> — naye players ko field pe utaro!"
+      })
+    });
+
+    /* ===== Phase 1: GO RIGHT (top row, left → right) ===== */
+    direction = 'right';
+    for (c = left; c <= right; c++) {
+      // for-check
+      pushStep({
+        line:5, action:"for-check",
+        logHTML: richLog({
+          line:5, action:"for-check", status:"loop",
+          code:"for c in range("+left+", "+(right+1)+"):  # c = "+c,
+          inputs:[{k:"left",v:left},{k:"right",v:right},{k:"c",v:c}],
+          outputs:[{k:"c",v:c,changed:true}],
+          verdict:"c("+c+") < right+1("+(right+1)+") → continue",
+          verdictTrue:true,
+          why:"<strong>→ RIGHT phase</strong> — top row pe left se right walk kar rahe hain. Column c="+c+" pe abhi.",
+          analogy:"Jaise <strong>train top track pe right direction</strong> mein chal rahi hai — har station (column) pe rukti hai."
+        })
+      });
+      // Place value
+      M[top][c] = num;
+      currCell = [top, c];
+      visitedSet.push([top, c]);
+      var prevNum = num;
+      num++;
+      pushStep({
+        line:6, action:"mark",
+        logHTML: richLog({
+          line:6, action:"mark", status:"success",
+          code:"M["+top+"]["+c+"] = "+prevNum+"; num = "+num,
+          inputs:[{k:"top",v:top},{k:"c",v:c},{k:"num (prev)",v:prevNum}],
+          outputs:[
+            {k:"M["+top+"]["+c+"]",v:prevNum,changed:true},
+            {k:"num",v:num,changed:true}
+          ],
+          why:"Cell <code>("+top+","+c+")</code> mein <strong>"+prevNum+"</strong> place kiya. Counter ab <code>"+num+"</code>.",
+          analogy:"Jaise <strong>cinema seat "+top+"-"+c+" pe ticket #"+prevNum+"</strong> chipka diya. Agla customer ke liye counter aage."
+        })
+      });
+    }
+    // for-exit
+    pushStep({
+      line:5, action:"exit",
+      logHTML: richLog({
+        line:5, action:"exit", status:"info",
+        code:"# RIGHT phase done — top row complete",
+        inputs:[{k:"c (final)",v:right+1},{k:"right+1",v:right+1}],
+        verdict:"c reached right+1 — loop exhausted",
+        verdictTrue:false,
+        why:"<strong>Top row complete!</strong> Saari cells ("+top+","+left+") se ("+top+","+right+") tak fill ho gayi.",
+        analogy:"Jaise <strong>train ne top track ka aakhri station</strong> chhoo liya — ab neeche jaane ka time."
+      })
+    });
+
+    // L7 — top += 1
+    var prevTop = top;
+    top += 1;
+    changed = {top:true};
+    pushStep({
+      line:7, action:"init",
+      logHTML: richLog({
+        line:7, action:"init", status:"success",
+        code:"top += 1  # "+prevTop+" → "+top,
+        inputs:[{k:"top (prev)",v:prevTop}],
+        outputs:[{k:"top",v:top,changed:true}],
+        why:"<strong>Top boundary shrink</strong> ho gayi — ab top row used ho chuki, isliye boundary ek row neeche khisak gayi.",
+        analogy:"Jaise <strong>cricket boundary rope upar ki taraf andar khinchli</strong> — top ka area chhota ho gaya."
+      })
+    });
+    changed = {};
+
+    /* ===== Phase 2: GO DOWN (right col, top → bottom) ===== */
+    direction = 'down';
+    for (r = top; r <= bottom; r++) {
+      pushStep({
+        line:8, action:"for-check",
+        logHTML: richLog({
+          line:8, action:"for-check", status:"loop",
+          code:"for r in range("+top+", "+(bottom+1)+"):  # r = "+r,
+          inputs:[{k:"top",v:top},{k:"bottom",v:bottom},{k:"r",v:r}],
+          outputs:[{k:"r",v:r,changed:true}],
+          verdict:"r("+r+") < bottom+1("+(bottom+1)+") → continue",
+          verdictTrue:true,
+          why:"<strong>↓ DOWN phase</strong> — right column pe top se bottom walk kar rahe hain. Row r="+r+" pe abhi.",
+          analogy:"Jaise <strong>elevator right side pe neeche utar raha hai</strong> — har floor (row) pe rukta hai."
+        })
+      });
+      M[r][right] = num;
+      currCell = [r, right];
+      visitedSet.push([r, right]);
+      var pn = num; num++;
+      pushStep({
+        line:9, action:"mark",
+        logHTML: richLog({
+          line:9, action:"mark", status:"success",
+          code:"M["+r+"]["+right+"] = "+pn+"; num = "+num,
+          inputs:[{k:"r",v:r},{k:"right",v:right},{k:"num (prev)",v:pn}],
+          outputs:[
+            {k:"M["+r+"]["+right+"]",v:pn,changed:true},
+            {k:"num",v:num,changed:true}
+          ],
+          why:"Cell <code>("+r+","+right+")</code> mein <strong>"+pn+"</strong> place kiya.",
+          analogy:"Jaise <strong>seat "+r+"-"+right+" pe ticket #"+pn+"</strong> chipka diya."
+        })
+      });
+    }
+    pushStep({
+      line:8, action:"exit",
+      logHTML: richLog({
+        line:8, action:"exit", status:"info",
+        code:"# DOWN phase done — right column complete",
+        inputs:[{k:"r (final)",v:bottom+1},{k:"bottom+1",v:bottom+1}],
+        verdict:"r reached bottom+1 — loop exhausted",
+        verdictTrue:false,
+        why:"<strong>Right column complete!</strong> Cells ("+top+","+right+") se ("+bottom+","+right+") tak fill ho gayi.",
+        analogy:"Jaise <strong>elevator ground floor pe pahunch gaya</strong> — ab left direction mein move karna hai."
+      })
+    });
+
+    // L10 — right -= 1
+    var prevRight = right;
+    right -= 1;
+    changed = {right:true};
+    pushStep({
+      line:10, action:"init",
+      logHTML: richLog({
+        line:10, action:"init", status:"success",
+        code:"right -= 1  # "+prevRight+" → "+right,
+        inputs:[{k:"right (prev)",v:prevRight}],
+        outputs:[{k:"right",v:right,changed:true}],
+        why:"<strong>Right boundary shrink</strong> — right column ab use ho chuki, boundary ek column andar.",
+        analogy:"Jaise <strong>boundary rope right side se andar khichi</strong> — right side ka area chhota."
+      })
+    });
+    changed = {};
+
+    /* ===== Phase 3: GO LEFT (bottom row, right → left) — guarded ===== */
+    var leftPhaseValid = (top <= bottom);
+    pushStep({
+      line:11, action:"if-check",
+      logHTML: richLog({
+        line:11, action:"if-check", status: leftPhaseValid?"success":"skip",
+        code:"if top <= bottom:  # "+top+" <= "+bottom+" → "+(leftPhaseValid?"True":"False"),
+        inputs:[{k:"top",v:top},{k:"bottom",v:bottom}],
+        verdict:"top("+top+") ≤ bottom("+bottom+") → "+(leftPhaseValid?"True":"False"),
+        verdictTrue:leftPhaseValid,
+        why: leftPhaseValid
+          ? "<strong>Guard PASSED</strong> — abhi bottom row aur top row alag hain, isliye LEFT phase safe hai (no double-fill risk)."
+          : "<strong>Guard FAILED</strong> — top aur bottom cross ho gaye. Bottom row already fill ho chuki ya hai hi nahi. <strong>SKIP LEFT phase</strong> to avoid double-fill.",
+        analogy: leftPhaseValid
+          ? "Jaise <strong>cricket pitch pe abhi 2 alag-alag rows</strong> hain — left run safe."
+          : "Jaise <strong>top aur bottom rope mil gaye</strong> — ek hi line bachi, dobara mat run karo!"
+      })
+    });
+
+    if (leftPhaseValid) {
+      direction = 'left';
+      for (c = right; c >= left; c--) {
+        pushStep({
+          line:12, action:"for-check",
+          logHTML: richLog({
+            line:12, action:"for-check", status:"loop",
+            code:"for c in range("+right+", "+(left-1)+", -1):  # c = "+c,
+            inputs:[{k:"right",v:right},{k:"left",v:left},{k:"c",v:c}],
+            outputs:[{k:"c",v:c,changed:true}],
+            verdict:"c("+c+") ≥ left("+left+") → continue",
+            verdictTrue:true,
+            why:"<strong>← LEFT phase</strong> — bottom row pe right se left walk. Column c="+c+" pe abhi.",
+            analogy:"Jaise <strong>train bottom track pe wapas left direction</strong> mein lout rahi hai."
+          })
+        });
+        M[bottom][c] = num;
+        currCell = [bottom, c];
+        visitedSet.push([bottom, c]);
+        var pn2 = num; num++;
+        pushStep({
+          line:13, action:"mark",
+          logHTML: richLog({
+            line:13, action:"mark", status:"success",
+            code:"M["+bottom+"]["+c+"] = "+pn2+"; num = "+num,
+            inputs:[{k:"bottom",v:bottom},{k:"c",v:c},{k:"num (prev)",v:pn2}],
+            outputs:[
+              {k:"M["+bottom+"]["+c+"]",v:pn2,changed:true},
+              {k:"num",v:num,changed:true}
+            ],
+            why:"Cell <code>("+bottom+","+c+")</code> mein <strong>"+pn2+"</strong> place kiya.",
+            analogy:"Jaise <strong>seat "+bottom+"-"+c+" pe ticket #"+pn2+"</strong> chipka diya."
+          })
+        });
+      }
+      pushStep({
+        line:12, action:"exit",
+        logHTML: richLog({
+          line:12, action:"exit", status:"info",
+          code:"# LEFT phase done — bottom row complete",
+          inputs:[{k:"c (final)",v:left-1},{k:"left-1",v:left-1}],
+          verdict:"c < left → loop exhausted",
+          verdictTrue:false,
+          why:"<strong>Bottom row complete!</strong> Right se left tak saari cells fill ho gayi.",
+          analogy:"Jaise <strong>train ne wapas leftmost station</strong> chhoo liya — ab upar jaane ka time."
+        })
+      });
+      // L14 — bottom -= 1
+      var prevBottom = bottom;
+      bottom -= 1;
+      changed = {bottom:true};
+      pushStep({
+        line:14, action:"init",
+        logHTML: richLog({
+          line:14, action:"init", status:"success",
+          code:"bottom -= 1  # "+prevBottom+" → "+bottom,
+          inputs:[{k:"bottom (prev)",v:prevBottom}],
+          outputs:[{k:"bottom",v:bottom,changed:true}],
+          why:"<strong>Bottom boundary shrink</strong> — bottom row use ho chuki, ek row upar khisak gayi.",
+          analogy:"Jaise <strong>boundary rope neeche se upar khinchi</strong> — bottom area chhota."
+        })
+      });
+      changed = {};
+    }
+
+    /* ===== Phase 4: GO UP (left col, bottom → top) — guarded ===== */
+    var upPhaseValid = (left <= right);
+    pushStep({
+      line:15, action:"if-check",
+      logHTML: richLog({
+        line:15, action:"if-check", status: upPhaseValid?"success":"skip",
+        code:"if left <= right:  # "+left+" <= "+right+" → "+(upPhaseValid?"True":"False"),
+        inputs:[{k:"left",v:left},{k:"right",v:right}],
+        verdict:"left("+left+") ≤ right("+right+") → "+(upPhaseValid?"True":"False"),
+        verdictTrue:upPhaseValid,
+        why: upPhaseValid
+          ? "<strong>Guard PASSED</strong> — left aur right column alag hain, UP phase safe hai."
+          : "<strong>Guard FAILED</strong> — left aur right cross ho gaye. Left column already fill ho chuki. <strong>SKIP UP phase</strong>.",
+        analogy: upPhaseValid
+          ? "Jaise <strong>2 alag pillars hain</strong> — left wala safely climb kar sakte hain."
+          : "Jaise <strong>left aur right pillar mil gaye</strong> — ek hi line bachi, dobara fill mat karo!"
+      })
+    });
+
+    if (upPhaseValid) {
+      direction = 'up';
+      for (r = bottom; r >= top; r--) {
+        pushStep({
+          line:16, action:"for-check",
+          logHTML: richLog({
+            line:16, action:"for-check", status:"loop",
+            code:"for r in range("+bottom+", "+(top-1)+", -1):  # r = "+r,
+            inputs:[{k:"bottom",v:bottom},{k:"top",v:top},{k:"r",v:r}],
+            outputs:[{k:"r",v:r,changed:true}],
+            verdict:"r("+r+") ≥ top("+top+") → continue",
+            verdictTrue:true,
+            why:"<strong>↑ UP phase</strong> — left column pe bottom se top walk. Row r="+r+" pe abhi.",
+            analogy:"Jaise <strong>elevator left side pe wapas upar chadh raha hai</strong> — ring complete karne ke liye."
+          })
+        });
+        M[r][left] = num;
+        currCell = [r, left];
+        visitedSet.push([r, left]);
+        var pn3 = num; num++;
+        pushStep({
+          line:17, action:"mark",
+          logHTML: richLog({
+            line:17, action:"mark", status:"success",
+            code:"M["+r+"]["+left+"] = "+pn3+"; num = "+num,
+            inputs:[{k:"r",v:r},{k:"left",v:left},{k:"num (prev)",v:pn3}],
+            outputs:[
+              {k:"M["+r+"]["+left+"]",v:pn3,changed:true},
+              {k:"num",v:num,changed:true}
+            ],
+            why:"Cell <code>("+r+","+left+")</code> mein <strong>"+pn3+"</strong> place kiya.",
+            analogy:"Jaise <strong>seat "+r+"-"+left+" pe ticket #"+pn3+"</strong> chipka diya."
+          })
+        });
+      }
+      pushStep({
+        line:16, action:"exit",
+        logHTML: richLog({
+          line:16, action:"exit", status:"info",
+          code:"# UP phase done — left column complete; ring DONE",
+          inputs:[{k:"r (final)",v:top-1},{k:"top-1",v:top-1}],
+          verdict:"r < top → loop exhausted",
+          verdictTrue:false,
+          why:"<strong>Left column complete! Outer ring fully filled.</strong> Ab inner ring start karenge (boundaries shrink ho chuki).",
+          analogy:"Jaise <strong>ek poora chakkar complete</strong> ho gaya — ab andar wala chakkar shuru."
+        })
+      });
+      // L18 — left += 1
+      var prevLeft = left;
+      left += 1;
+      changed = {left:true};
+      pushStep({
+        line:18, action:"init",
+        logHTML: richLog({
+          line:18, action:"init", status:"success",
+          code:"left += 1  # "+prevLeft+" → "+left,
+          inputs:[{k:"left (prev)",v:prevLeft}],
+          outputs:[{k:"left",v:left,changed:true}],
+          why:"<strong>Left boundary shrink</strong> — left column use ho chuki, ek column andar khisak gayi. Ring complete!",
+          analogy:"Jaise <strong>boundary rope left side se andar khinchi</strong> — ab inner ring ke liye ready."
+        })
+      });
+      changed = {};
+    }
+    direction = null;
+    currCell = null;
+  }
+
+  // While exit (FALSE)
+  pushStep({
+    line:4, action:"while-check",
+    logHTML: richLog({
+      line:4, action:"while-check", status:"info",
+      code:"while top <= bottom and left <= right:  # "+top+"<="+bottom+" and "+left+"<="+right+" → False",
+      inputs:[{k:"top",v:top},{k:"bottom",v:bottom},{k:"left",v:left},{k:"right",v:right}],
+      verdict:"top("+top+")≤bottom("+bottom+") AND left("+left+")≤right("+right+") → False",
+      verdictTrue:false,
+      why:"<strong>Boundaries cross ho gayi</strong> — saari cells fill ho chuki hain. Loop exit, return karo.",
+      analogy:"Jaise <strong>boundary rope center pe collapse</strong> ho gaya — ab koi jagah nahi bachi."
+    })
+  });
+
+  // L19 — return M
+  curResult = M.map(function(row){ return row.slice(); });
+  pushStep({
+    line:19, action:"return",
+    logHTML: richLog({
+      line:19, action:"return", status:"success",
+      code:"return M  # spiral matrix complete",
+      inputs:[{k:"M",v:n+"×"+n+" filled"}],
+      outputs:[{k:"return",v:"matrix",changed:true}],
+      why:"<strong>🎉 Spiral matrix taiyaar!</strong> Saari "+(n*n)+" cells 1 se "+(n*n)+" tak spiral order mein fill ho gayi. Time: O(n²), Space: O(1) extra.",
+      analogy:"Jaise <strong>shaadi ka mandap pura ho gaya</strong> — har chair pe naam likh gaya, spiral pattern perfect!"
+    })
+  });
+
+  return st;
+}
+
+/* =================== RENDER VIZ =================== */
+function renderViz(s) {
+  var v = document.getElementById('vizPanel');
+  var h = '';
+
+  // Vars strip
+  h += '<div class="vars-strip">';
+  h += '<span class="var-chip"><span class="vk">n</span><span class="vv">'+s.n+'</span></span>';
+  if (s.num !== null) h += '<span class="var-chip vc-active"><span class="vk">num</span><span class="vv">'+s.num+'</span></span>';
+  if (s.top !== null) h += '<span class="var-chip'+(s.changed.top?' vc-amber':'')+'"><span class="vk">top</span><span class="vv">'+s.top+'</span></span>';
+  if (s.bottom !== null) h += '<span class="var-chip'+(s.changed.bottom?' vc-amber':'')+'"><span class="vk">bottom</span><span class="vv">'+s.bottom+'</span></span>';
+  if (s.left !== null) h += '<span class="var-chip'+(s.changed.left?' vc-amber':'')+'"><span class="vk">left</span><span class="vv">'+s.left+'</span></span>';
+  if (s.right !== null) h += '<span class="var-chip'+(s.changed.right?' vc-amber':'')+'"><span class="vk">right</span><span class="vv">'+s.right+'</span></span>';
+  if (s.c !== null) h += '<span class="var-chip vc-flip"><span class="vk">c</span><span class="vv">'+s.c+'</span></span>';
+  if (s.r !== null) h += '<span class="var-chip vc-flip"><span class="vk">r</span><span class="vv">'+s.r+'</span></span>';
+  h += '</div>';
+
+  // viz-row 1: Matrix grid + Side panel (boundaries + direction)
+  h += '<div class="viz-row">';
+
+  // Matrix grid
+  h += '<div class="viz-card"><div class="viz-card-title">🌀 Spiral Matrix</div>';
+  if (s.M.length > 0) {
+    var CELL = 50, GAP = 3, PAD = 14;
+    var totalW = s.n * CELL + (s.n - 1) * GAP;
+    var totalH = s.n * CELL + (s.n - 1) * GAP;
+    h += '<div class="matrix-wrap">';
+    h += '<div class="matrix-grid" style="grid-template-columns:repeat('+s.n+', '+CELL+'px)">';
+    for (var ri = 0; ri < s.n; ri++) {
+      for (var ci = 0; ci < s.n; ci++) {
+        var val = s.M[ri][ci];
+        var cls = 'mat-cell';
+        var inRing = (s.top !== null && (ri === s.top || ri === s.bottom || ci === s.left || ci === s.right) &&
+                      ri >= s.top && ri <= s.bottom && ci >= s.left && ci <= s.right);
+        var isCurr = s.currCell && s.currCell[0] === ri && s.currCell[1] === ci;
+        if (val === 0) cls += ' mat-cell--empty';
+        else if (isCurr) cls += ' mat-cell--curr';
+        else if (inRing) cls += ' mat-cell--ring';
+        else cls += ' mat-cell--visited';
+        h += '<div class="'+cls+'"><span class="mat-cell-coord">'+ri+','+ci+'</span>'+(val === 0 ? '·' : val)+'</div>';
+      }
+    }
+    h += '</div>';
+
+    // SVG flow arrows
+    if (s.visitedSet.length >= 2 || (s.visitedSet.length >= 1 && s.currCell)) {
+      function cx(col){ return col*(CELL+GAP)+CELL/2; }
+      function cy(row){ return row*(CELL+GAP)+CELL/2; }
+      h += '<svg class="flow-svg" width="'+totalW+'" height="'+totalH+'" viewBox="0 0 '+totalW+' '+totalH+'">';
+      h += '<defs>';
+      h += '<marker id="ah-red" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#dc2626"/></marker>';
+      h += '<marker id="ah-amber" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#f59e0b"/></marker>';
+      h += '<marker id="ah-purple" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#8b5cf6"/></marker>';
+      h += '</defs>';
+
+      // Determine direction of each segment to detect TURNS
+      function segDir(a, b) {
+        if (a[0] === b[0]) return b[1] > a[1] ? 'R' : 'L';
+        if (a[1] === b[1]) return b[0] > a[0] ? 'D' : 'U';
+        return '?';
+      }
+
+var visits = s.visitedSet;
+      var prevDir = null;
+      for (var pi = 0; pi < visits.length - 1; pi++) {
+        var a = visits[pi], b = visits[pi+1];
+        var x1 = cx(a[1]), y1 = cy(a[0]);
+        var x2 = cx(b[1]), y2 = cy(b[0]);
+        var dir = segDir(a, b);
+        var isTurn = (prevDir !== null && prevDir !== dir);
+        var cls = isTurn ? 'flow-line flow-line--turn' : 'flow-line';
+        var marker = isTurn ? 'ah-purple' : 'ah-red';
+        var dx = x2-x1, dy = y2-y1, len = Math.sqrt(dx*dx + dy*dy);
+        if (len > 0) {
+          var shrink = 18, ux = dx/len, uy = dy/len;
+          var sx1 = x1 + ux*shrink, sy1 = y1 + uy*shrink;
+          var sx2 = x2 - ux*shrink, sy2 = y2 - uy*shrink;
+          h += '<line class="'+cls+'" x1="'+sx1+'" y1="'+sy1+'" x2="'+sx2+'" y2="'+sy2+'" marker-end="url(#'+marker+')"/>';
+        }
+        prevDir = dir;
+      }
+      // Highlight current cell with subtle pulse (currCell already styled via class)
+      h += '</svg>';
+    }
+    h += '</div>';
+
+    // Legend
+    h += '<div class="legend">';
+    h += '<span><i style="background:#475569;border-color:#64748b"></i>Empty</span>';
+    h += '<span><i style="background:#EEEDFE;border-color:#534AB7"></i>Current ring</span>';
+    h += '<span><i style="background:#FEF3C7;border-color:#B45309"></i>Active cell</span>';
+    h += '<span><i style="background:#DCFCE7;border-color:#15803D"></i>Filled</span>';
+    h += '<span><i class="legend-flow"></i>Flow</span>';
+    h += '<span><i class="legend-flow-turn"></i>Turn</span>';
+    h += '</div>';
+  } else {
+    h += '<div class="empty-state">Matrix not yet initialized</div>';
+  }
+  h += '</div>';
+
+  // Side panel — boundaries + direction
+  h += '<div class="viz-card" style="min-width:200px"><div class="viz-card-title">🎯 Boundaries & Direction</div>';
+  if (s.top !== null) {
+    h += '<div class="bound-grid">';
+    h += '<span class="bk">top:</span><span class="bv'+(s.changed.top?' bv-changed':'')+'">'+s.top+'</span>';
+    h += '<span class="bk">bottom:</span><span class="bv'+(s.changed.bottom?' bv-changed':'')+'">'+s.bottom+'</span>';
+    h += '<span class="bk">left:</span><span class="bv'+(s.changed.left?' bv-changed':'')+'">'+s.left+'</span>';
+    h += '<span class="bk">right:</span><span class="bv'+(s.changed.right?' bv-changed':'')+'">'+s.right+'</span>';
+    h += '</div>';
+    h += '<div style="margin-top:10px"><div class="viz-card-title" style="margin-bottom:6px">🧭 Direction</div>';
+    h += '<div class="dir-row">';
+    var dirs = [['right','→ Right'],['down','↓ Down'],['left','← Left'],['up','↑ Up']];
+    dirs.forEach(function(d){
+      var active = s.direction === d[0];
+      h += '<span class="dir-pill'+(active?' dir-pill--active':'')+'">'+d[1]+'</span>';
+    });
+    h += '</div></div>';
+    if (s.num !== null) {
+      h += '<div style="margin-top:10px; font:600 11px var(--font-mono); color:var(--text-secondary)">';
+      h += 'Filled: <strong style="color:var(--accent-green-text)">'+(s.num-1)+'</strong> / '+(s.n*s.n);
+      h += '</div>';
+    }
+  } else {
+    h += '<div class="empty-state">Boundaries not initialized</div>';
+  }
+  h += '</div>';
+
+  h += '</div>';
+
+  // Result banner
+  if (curResult !== null && currentStep === steps.length - 1) {
+    h += '<div class="result-banner">';
+    h += '<div class="result-banner-title">🎉 Final Spiral Matrix</div>';
+    h += '<div class="result-banner-val">'+JSON.stringify(curResult)+'</div>';
+    h += '</div>';
+  }
+
+  v.innerHTML = h;
+}
+
+/* =================== RENDER STEP =================== */
+function renderStep(idx) {
+  if (!steps.length) return;
+  var s = steps[idx];
+  currentStep = idx;
+  document.getElementById('stepInfo').textContent = (idx+1)+'/'+steps.length;
+  var bd = document.getElementById('actionBadge');
+  bd.textContent = BADGE_LABEL[s.action] || s.action;
+  bd.className = 'action-badge action-badge--'+s.action;
+  document.querySelectorAll('.code-line').forEach(function(el){ el.classList.remove('active'); });
+  var al = document.querySelector('.code-line[data-line="'+s.line+'"]');
+  if (al) { al.classList.add('active'); al.scrollIntoView({block:'nearest'}); }
+  renderViz(s);
+  showLogPreview(s);
+}
+function showLogPreview(s) {
+  if (!logEnabled) return;
+  document.getElementById('logPopupBody').innerHTML = s.logHTML || '';
+  document.getElementById('logPopup').classList.remove('log-popup--hidden');
+}
+function stepBy(d) {
+  var n = currentStep + d;
+  if (n < 0 || n >= steps.length) return;
+  renderStep(n);
+}
+function resetStep() { renderStep(0); }
+
+/* =================== INPUT & RUN =================== */
+function parseInputs() {
+  var n = parseInt(document.getElementById('inN').value, 10);
+  if (isNaN(n) || n < 1) n = 1;
+  if (n > 8) n = 8; // safety cap for visualizer
+  return { n: n };
+}
+function resetWithInput() {
+  curResult = null;
+  var p = parseInputs();
+  renderCode();
+  fitCodeWidth();
+  steps = buildSteps(p.n);
+  currentStep = 0;
+  renderStep(0);
+  document.getElementById('liveOutput').textContent = curResult !== null ? ('Steps: '+steps.length) : '—';
+}
+function loadTest(n, expected, label) {
+  document.getElementById('inN').value = n;
+  document.getElementById('expBadge').textContent = 'exp: '+expected;
+  resetWithInput();
+}
+
+/* =================== TOGGLES =================== */
+function toggleProblem() {
+  var body = document.getElementById('pcBody');
+  var btn = document.getElementById('toggleBtn');
+  body.classList.toggle('hidden');
+  btn.textContent = body.classList.contains('hidden') ? '▼ Show' : '▲ Hide';
+}
+function toggleLogPreview() {
+  logEnabled = !logEnabled;
+  var btn = document.getElementById('logToggleBtn');
+  btn.textContent = logEnabled ? '📋 ON' : '📋 OFF';
+  btn.classList.toggle('log-toggle-btn--off', !logEnabled);
+  if (!logEnabled) document.getElementById('logPopup').classList.add('log-popup--hidden');
+  else if (steps.length) showLogPreview(steps[currentStep]);
+}
+function logZoom(dir) {
+  logZoomLevel = Math.max(60, Math.min(180, logZoomLevel + dir*20));
+  updateLogZoom();
+}
+function logZoomReset() { logZoomLevel = 100; updateLogZoom(); }
+function updateLogZoom() {
+  document.getElementById('logZoomLabel').textContent = logZoomLevel+'%';
+  document.getElementById('logPopup').style.setProperty('--log-scale', logZoomLevel/100);
+}
+function toggleFullscreen() {
+  var viz = document.querySelector('.col-viz');
+  if (!document.fullscreenElement) viz.requestFullscreen().catch(function(){});
+  else document.exitFullscreen();
+}
+
+/* =================== RESIZE HANDLE =================== */
+(function(){
+  var col1 = document.getElementById('col1');
+  document.getElementById('resizeH1').addEventListener('mousedown', function(e){
+    e.preventDefault();
+    codeWidthUserSet = true;
+    var startX = e.clientX, startW = col1.offsetWidth, h = this;
+    document.body.classList.add('no-select');
+    h.classList.add('active');
+    function mv(e){
+      col1.style.width = Math.max(140, startW + (e.clientX - startX)) + 'px';
+      syncFooterWidth();
+    }
+    function up(){
+      document.removeEventListener('mousemove', mv);
+      document.removeEventListener('mouseup', up);
+      document.body.classList.remove('no-select');
+      h.classList.remove('active');
+    }
+    document.addEventListener('mousemove', mv);
+    document.addEventListener('mouseup', up);
+  });
+})();
+window.addEventListener('resize', function(){
+  if (!codeWidthUserSet) fitCodeWidth();
+  else syncFooterWidth();
+});
+
+/* =================== KEYBOARD =================== */
+document.addEventListener('keydown', function(e){
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
+  if (e.key === 'ArrowRight') { e.preventDefault(); stepBy(1); }
+  else if (e.key === 'ArrowLeft') { e.preventDefault(); stepBy(-1); }
+  else if (e.key === 'r' || e.key === 'R') { e.preventDefault(); resetStep(); }
+});
+
+/* =================== INIT =================== */
+renderCode();
+fitCodeWidth();
+syncFooterWidth();
+resetWithInput();
+</script>
+</body>
+</html>

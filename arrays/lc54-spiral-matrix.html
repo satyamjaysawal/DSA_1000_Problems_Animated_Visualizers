@@ -1,0 +1,1236 @@
+﻿
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LC #54 — Spiral Matrix | DSA Dry-Run Visualizer</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+:root {
+  --bg-primary:#FAFAF8; --bg-secondary:#F1EFE8; --bg-tertiary:#E2E0D8; --bg-card:#FFFFFF;
+  --text-primary:#2C2C2A; --text-secondary:#5F5E5A; --text-tertiary:#888780;
+  --border-color:rgba(0,0,0,0.11); --border-light:rgba(0,0,0,0.06); --border-focus:#534AB7;
+  --accent-indigo:#534AB7; --accent-indigo-bg:#EEEDFE; --accent-indigo-text:#3C3489; --accent-indigo-hover:#4740A0;
+  --accent-teal:#0F6E56; --accent-teal-bg:#E1F5EE; --accent-teal-text:#085041;
+  --accent-red:#E24B4A; --accent-red-bg:#FCEBEB; --accent-red-text:#791F1F;
+  --accent-amber:#B45309; --accent-amber-bg:#FEF3C7; --accent-amber-text:#78350F;
+  --accent-green:#15803D; --accent-green-bg:#DCFCE7; --accent-green-text:#14532D;
+  --syn-keyword:#534AB7; --syn-function:#185FA5; --syn-number:#993C1D; --syn-string:#0F6E56;
+  --active-line-bg:#EEEDFE;
+  --radius-sm:4px; --radius-md:6px; --radius-lg:10px; --radius-xl:14px;
+  --sp-2:8px; --sp-3:12px; --sp-5:20px;
+  --font-sans:'DM Sans', system-ui, sans-serif;
+  --font-mono:'JetBrains Mono','Fira Code',monospace;
+  --fs-xs:11px; --fs-sm:12px; --fs-base:14px; --fs-md:15px; --fs-lg:18px;
+  --fw-medium:500; --fw-semibold:600; --fw-bold:700;
+  --lh-normal:1.6; --lh-code:1.9; --ease:.18s ease;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:var(--font-sans);background:var(--bg-primary);color:var(--text-primary);font-size:var(--fs-base);line-height:var(--lh-normal);overflow:hidden}
+.no-select{user-select:none}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border-color);border-radius:3px}
+
+.app-shell{display:flex;flex-direction:column;height:100vh;overflow:hidden;background:var(--bg-primary)}
+
+/* PROBLEM CARD */
+.problem-card{flex-shrink:0;border-bottom:1px solid var(--border-color);background:var(--bg-card)}
+.prob-header{display:flex;align-items:center;justify-content:space-between;padding:8px 14px;border-bottom:1px solid var(--border-light);gap:12px;flex-wrap:wrap}
+.prob-header-left{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.prob-header-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.gt-home-btn{font-family:var(--font-sans);font-size:11px;font-weight:700;padding:5px 11px;border-radius:99px;background:var(--accent-indigo);color:#fff;border:none;cursor:pointer;letter-spacing:.05em}
+.gt-home-btn:hover{background:var(--accent-indigo-hover)}
+.prob-num{font:700 13px var(--font-mono);color:var(--accent-indigo)}
+.prob-name{font-weight:700;font-size:15px}
+.prob-diff--medium{font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;background:#FEF3C7;color:#78350F;border:1px solid #B45309}
+.prob-tag{font-size:10px;padding:2px 8px;border-radius:99px;background:var(--accent-indigo-bg);color:var(--accent-indigo-text);border:1px solid var(--accent-indigo);font-weight:600}
+.top-label{font:600 11px var(--font-mono);color:var(--text-secondary)}
+.input{font:500 12px var(--font-mono);padding:4px 8px;border:1px solid var(--border-color);border-radius:var(--radius-sm);background:var(--bg-card);width:200px}
+.input:focus{outline:none;border-color:var(--border-focus)}
+.top-expected{font:500 10px var(--font-mono);padding:3px 8px;border-radius:var(--radius-sm);background:var(--accent-green-bg);color:var(--accent-green-text);border:1px solid var(--accent-green);max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.prob-toggle-btn{font-family:system-ui,"Segoe UI Emoji",var(--font-sans);font-size:11px;padding:4px 9px;border-radius:var(--radius-sm);background:var(--bg-secondary);color:var(--text-primary);border:1px solid var(--border-color);cursor:pointer;font-weight:600}
+.prob-toggle-btn:hover{background:var(--bg-tertiary)}
+
+.prob-body{display:grid;grid-template-columns:3fr 2fr;gap:14px;padding:12px 14px}
+.prob-body--hidden{display:none}
+.prob-statement{font-size:12px;line-height:1.55;color:var(--text-secondary)}
+.prob-statement h4{font-size:11px;font-weight:700;color:var(--text-primary);margin-top:8px;margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em}
+.prob-statement h4:first-child{margin-top:0}
+.prob-statement code{font:600 11px var(--font-mono);background:var(--bg-secondary);padding:1px 4px;border-radius:3px;color:var(--accent-indigo-text)}
+.prob-statement strong{color:var(--text-primary);font-weight:700}
+.concept-block{display:inline-block;background:var(--bg-secondary);border:1px solid var(--border-color);border-radius:var(--radius-sm);padding:5px 8px;margin:3px 4px 0 0;font-size:11px}
+.concept-block strong{color:var(--accent-indigo-text)}
+.complexity-row{display:flex;gap:6px;margin-top:6px}
+.complexity-chip{font:600 10px var(--font-mono);padding:3px 8px;border-radius:var(--radius-sm);background:var(--accent-indigo-bg);color:var(--accent-indigo-text);border:1px solid var(--accent-indigo)}
+
+.tc-list{display:flex;flex-direction:column;gap:5px}
+.tc-chip{cursor:pointer;background:var(--bg-secondary);border:1px solid var(--border-color);border-radius:var(--radius-md);padding:6px 9px;font-size:11px;transition:var(--ease)}
+.tc-chip:hover{border-color:var(--accent-indigo);background:var(--accent-indigo-bg)}
+.tc-chip-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.pt-tag{font:700 9px var(--font-mono);padding:1px 6px;border-radius:99px;background:var(--accent-indigo-bg);color:var(--accent-indigo-text);text-transform:uppercase}
+.tc-label{font-weight:600;color:var(--text-primary)}
+.tc-expected{margin-left:auto;font:600 10px var(--font-mono);color:var(--accent-green-text);background:var(--accent-green-bg);padding:1px 6px;border-radius:3px;border:1px solid var(--accent-green)}
+.tc-vals{display:flex;gap:4px;flex-wrap:wrap;margin-top:4px}
+.tc-vals code{font:600 10px var(--font-mono);background:var(--bg-card);padding:1px 5px;border-radius:3px;border:1px solid var(--border-light);color:var(--text-primary)}
+.run-row{display:flex;gap:8px;align-items:center;margin-top:7px}
+.btn-run{font-family:system-ui,"Segoe UI Emoji",var(--font-sans);font-size:12px;font-weight:700;padding:6px 14px;border-radius:var(--radius-sm);background:var(--accent-green);color:#fff;border:none;cursor:pointer}
+.btn-run:hover{background:#0c6b32}
+.live-out{font:600 11px var(--font-mono);color:var(--text-secondary);padding:4px 8px;background:var(--bg-secondary);border-radius:var(--radius-sm);border:1px solid var(--border-color);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* MAIN ROW */
+.main-row{flex:1;display:flex;overflow:hidden;min-height:0}
+.col{display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.col-code{width:33%;min-width:140px;max-width:45vw}
+.col-viz{flex:1;min-width:0}
+.section-label{font-family:system-ui,"Segoe UI Emoji",var(--font-sans);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-tertiary);padding:7px 12px;background:var(--bg-secondary);border-bottom:1px solid var(--border-light)}
+.code-panel{flex:1;overflow:auto;padding:10px 0;background:var(--bg-card);font-family:var(--font-mono);font-size:12px;line-height:var(--lh-code)}
+.code-line{display:flex;padding:1px 12px;cursor:default;transition:background var(--ease)}
+.code-line:hover{background:var(--bg-secondary)}
+.code-line.active{background:var(--active-line-bg);border-left:3px solid var(--accent-indigo);padding-left:9px}
+.ln{display:inline-block;min-width:24px;color:var(--text-tertiary);user-select:none;text-align:right;margin-right:8px}
+.code-content{flex:1;white-space:pre}
+.kw{color:var(--syn-keyword);font-weight:600}
+.fn{color:var(--syn-function);font-weight:600}
+.num{color:var(--syn-number);font-weight:600}
+.str{color:var(--syn-string)}
+
+.resize-h{width:5px;cursor:col-resize;background:transparent;border-left:1px solid var(--border-color);transition:background var(--ease);flex-shrink:0}
+.resize-h:hover,.resize-h.active{background:var(--accent-indigo-bg);border-color:var(--accent-indigo)}
+
+/* VIZ */
+.viz-panel{flex:1;overflow:auto;padding:14px;background:var(--bg-primary)}
+.vars-strip{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.var-chip{font:600 11px var(--font-mono);padding:3px 9px;border-radius:99px;background:var(--bg-card);border:1px solid var(--border-color);color:var(--text-primary)}
+.var-chip strong{color:var(--text-tertiary);font-weight:500;margin-right:4px}
+.vc-active{background:var(--accent-indigo-bg);border-color:var(--accent-indigo);color:var(--accent-indigo-text)}
+.vc-safe{background:var(--accent-green-bg);border-color:var(--accent-green);color:var(--accent-green-text)}
+.vc-flip{background:var(--accent-red-bg);border-color:var(--accent-red);color:var(--accent-red-text)}
+.vc-warn{background:var(--accent-amber-bg);border-color:var(--accent-amber);color:var(--accent-amber-text)}
+
+.viz-row{display:flex;gap:12px;align-items:flex-start;flex-wrap:wrap}
+.viz-card{background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius-md);padding:10px}
+.viz-title{font:700 10px var(--font-mono);text-transform:uppercase;letter-spacing:.06em;color:var(--text-tertiary);margin-bottom:7px}
+
+/* MATRIX GRID + SVG arrows (V9) */
+.matrix-wrap{display:inline-block;padding:14px;background:#1e293b;border-radius:8px;border:2px solid #334155;position:relative}
+.matrix-grid{display:grid;gap:3px;border-radius:3px;position:relative}
+.mat-cell{width:50px;height:50px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:var(--font-mono);font-size:18px;font-weight:700;border-radius:6px;background:#fff;color:#1e293b;border:2px solid transparent;position:relative;transition:all .25s}
+.mat-cell-coord{font-size:8px;color:#64748b;font-weight:500;position:absolute;top:2px;left:3px;opacity:.6}
+.mat-cell--curr{background:#FEF3C7!important;border-color:#B45309!important;animation:pulse-node 1.1s infinite;transform:scale(1.06);z-index:2}
+.mat-cell--visited{background:#DCFCE7;color:#14532D;border-color:#15803D}
+.mat-cell--inbound{background:#EEEDFE;border-color:#534AB7}
+.mat-cell--outbound{opacity:.45;background:#f1f5f9}
+
+@keyframes pulse-node{0%,100%{box-shadow:0 0 4px var(--accent-indigo)}50%{box-shadow:0 0 12px var(--accent-indigo)}}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-3px)}75%{transform:translateX(3px)}}
+@keyframes win-pulse{0%,100%{box-shadow:0 0 3px rgba(234,179,8,.5)}50%{box-shadow:0 0 8px rgba(234,179,8,.9)}}
+@keyframes flow-dash{to{stroke-dashoffset:-18}}
+@keyframes flow-pulse{0%,100%{opacity:.85}50%{opacity:1}}
+
+.flow-svg{position:absolute;top:14px;left:14px;pointer-events:none;z-index:6;overflow:visible}
+.flow-line{stroke:#dc2626;stroke-width:2.5;stroke-dasharray:5,4;fill:none;animation:flow-dash 1s linear infinite,flow-pulse 1.4s ease-in-out infinite;filter:drop-shadow(0 0 2px rgba(220,38,38,.5))}
+.flow-line--current{stroke:#f59e0b;stroke-width:3;stroke-dasharray:4,3;animation:flow-dash .6s linear infinite;filter:drop-shadow(0 0 3px rgba(245,158,11,.7))}
+.flow-line--phase-jump{stroke:#8b5cf6;stroke-width:2.2;stroke-dasharray:2,3;opacity:.85}
+
+.legend{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px}
+.legend span{display:inline-flex;align-items:center;gap:5px;font-size:10px;color:var(--text-secondary)}
+.legend i{display:inline-block;width:14px;height:14px;border-radius:3px;border:1px solid var(--border-color)}
+.legend i.legend-flow{width:22px;height:0;border:0;border-top:2.5px dashed #dc2626}
+.legend i.legend-flow-curr{width:22px;height:0;border:0;border-top:3px dashed #f59e0b}
+.legend i.legend-flow-jump{width:22px;height:0;border:0;border-top:2.2px dashed #8b5cf6}
+
+/* RESULT chips */
+.chips{display:flex;gap:4px;flex-wrap:wrap;align-items:center;min-height:30px}
+.chip{font:600 12px var(--font-mono);padding:4px 9px;border-radius:99px;background:var(--accent-green-bg);border:1px solid var(--accent-green);color:var(--accent-green-text)}
+.chip--last{background:var(--accent-amber-bg);border-color:var(--accent-amber);color:var(--accent-amber-text);animation:pulse-node 1.1s infinite}
+.empty-state{font-size:11px;color:var(--text-tertiary);font-style:italic}
+
+/* Boundary panel */
+.boundary-row{display:flex;flex-direction:column;gap:6px;font:600 11px var(--font-mono)}
+.boundary-row .blab{color:var(--text-tertiary);font-weight:500;margin-right:6px}
+.bound-pill{display:inline-block;padding:2px 8px;border-radius:4px;background:var(--bg-secondary);border:1px solid var(--border-color)}
+.bound-pill--top{background:#FEE2E2;border-color:#dc2626;color:#7f1d1d}
+.bound-pill--bot{background:#DBEAFE;border-color:#2563eb;color:#1e3a8a}
+.bound-pill--lf{background:#DCFCE7;border-color:#15803D;color:#14532D}
+.bound-pill--rt{background:#FEF3C7;border-color:#B45309;color:#78350F}
+
+.phase-banner{display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:var(--radius-md);background:var(--accent-indigo-bg);border:1px solid var(--accent-indigo);color:var(--accent-indigo-text);font:700 12px var(--font-mono);margin-bottom:8px}
+
+.result-banner{margin-top:10px;padding:9px 12px;border-radius:var(--radius-md);background:var(--accent-green-bg);border:1px solid var(--accent-green);color:var(--accent-green-text);font:700 13px var(--font-mono);animation:win-pulse 1.4s infinite}
+
+/* LOG POPUP */
+.log-popup{--log-scale:1;position:fixed;bottom:52px;right:14px;width:calc(480px * var(--log-scale));max-width:92vw;max-height:75vh;border-radius:var(--radius-lg);box-shadow:0 10px 32px rgba(0,0,0,.14);border:1px solid var(--border-color);background:var(--bg-card);overflow:hidden;display:flex;flex-direction:column;z-index:100;transition:opacity .15s,transform .15s;transform-origin:bottom right}
+.log-popup--hidden{opacity:0;transform:scale(.92);pointer-events:none}
+.log-popup-body{flex:1;overflow:auto;padding:0}
+.log-popup-body>.log-card{border-radius:0;border:none;border-left:0}
+
+.log-card{border-radius:var(--radius-md);overflow:hidden;border:1px solid var(--border-color);border-left-width:4px;font-size:var(--fs-xs);background:var(--bg-card)}
+.log-card--func-def,.log-card--init,.log-card--call,.log-card--return{border-left-color:#8250ff}
+.log-card--for-check,.log-card--while-check,.log-card--if-check{border-left-color:#388bfd}
+.log-card--mark,.log-card--push,.log-card--pop,.log-card--restore,.log-card--found{border-left-color:#3fb950}
+.log-card--remove,.log-card--prune,.log-card--fail{border-left-color:#f85149}
+.log-card--exit,.log-card--skip{border-left-color:#555450}
+
+.log-card-header{display:flex;align-items:center;gap:6px;padding:8px 10px 6px;background:var(--bg-secondary);border-bottom:1px solid var(--border-light)}
+.log-badge{font-family:system-ui,"Segoe UI Emoji",var(--font-sans);font:700 10px var(--font-mono);padding:2px 7px;border-radius:4px;background:var(--bg-card);border:1px solid var(--border-color)}
+.log-line-ref{font:700 10px var(--font-mono);color:var(--accent-indigo);background:var(--accent-indigo-bg);padding:1px 6px;border-radius:4px;border:1px solid var(--accent-indigo)}
+.log-status-pill{font-family:system-ui,"Segoe UI Emoji",sans-serif;font-size:9px;font-weight:700;padding:2px 7px;border-radius:99px;text-transform:uppercase;margin-left:auto}
+.log-status--success{background:var(--accent-green-bg);color:var(--accent-green-text);border:1px solid var(--accent-green)}
+.log-status--fail{background:var(--accent-red-bg);color:var(--accent-red-text);border:1px solid var(--accent-red)}
+.log-status--skip{background:var(--bg-tertiary);color:var(--text-tertiary);border:1px solid var(--border-color)}
+.log-status--loop{background:rgba(56,139,253,.14);color:#185FA5;border:1px solid #388bfd}
+.log-status--prune{background:var(--accent-red-bg);color:var(--accent-red-text);border:1px solid var(--accent-red)}
+.log-status--info{background:rgba(130,80,255,.14);color:#3C3489;border:1px solid #8250ff}
+
+.log-section{padding:7px 10px;border-bottom:1px dashed var(--border-light)}
+.log-section:last-child{border-bottom:none}
+.log-section-title{font:700 8px var(--font-mono);text-transform:uppercase;letter-spacing:.06em;color:var(--text-tertiary);margin-bottom:3px;display:flex;align-items:center;gap:4px}
+.log-section-title-icon{font-family:system-ui,"Segoe UI Emoji",sans-serif;font-size:11px}
+
+.log-code-snippet{font:600 11px var(--font-mono);background:#0d1117;color:#e6edf3;padding:6px 9px;border-radius:4px;display:block;overflow-x:auto;white-space:pre;border:1px solid #30363d}
+.log-code-snippet .ck{color:#ff7b72}
+.log-code-snippet .cs{color:#a5d6ff}
+.log-code-snippet .cn{color:#79c0ff}
+.log-code-snippet .cf{color:#d2a8ff}
+.log-code-snippet .cc{color:#8b949e;font-style:italic}
+
+.log-kv-row{display:flex;flex-wrap:wrap;gap:4px}
+.log-kv{display:inline-flex;align-items:center;gap:3px;font:11px var(--font-mono);padding:2px 7px;border-radius:4px;background:var(--bg-secondary);border:1px solid var(--border-light)}
+.log-kv-key{color:var(--text-tertiary);font-weight:500}
+.log-kv-val{color:var(--text-primary);font-weight:700}
+.log-kv--in{background:rgba(56,139,253,.08);border-color:rgba(56,139,253,.3)}
+.log-kv--out{background:rgba(63,185,80,.08);border-color:rgba(63,185,80,.4)}
+.log-kv--out .log-kv-val{color:#15803D}
+.log-kv--changed{background:rgba(180,83,9,.10);border-color:rgba(180,83,9,.4)}
+.log-kv--changed .log-kv-val{color:#78350F}
+
+.log-verdict{display:flex;align-items:center;gap:6px;font:600 11px var(--font-mono);padding:5px 8px;border-radius:5px;background:var(--bg-secondary);border:1px solid var(--border-light)}
+.log-verdict--true{background:var(--accent-green-bg);border-color:var(--accent-green);color:var(--accent-green-text)}
+.log-verdict--false{background:var(--accent-red-bg);border-color:var(--accent-red);color:var(--accent-red-text)}
+
+.log-analogy{font:italic 11px var(--font-sans);color:var(--text-secondary);background:#FFF8E7;border:1px solid #FBE8A6;border-left:3px solid var(--accent-amber);padding:6px 9px;border-radius:4px;line-height:1.55}
+.log-analogy strong{color:var(--accent-amber-text);font-style:normal;font-weight:700}
+
+.log-why{font-size:11px;line-height:1.55;color:var(--text-primary);padding:4px 0}
+.log-why strong{color:var(--accent-indigo-text)}
+.log-why code{font:600 10px var(--font-mono);background:var(--bg-secondary);padding:1px 4px;border-radius:3px;color:var(--accent-indigo-text)}
+
+/* FOOTER */
+.footer-bar{display:flex;flex-shrink:0;border-top:1px solid var(--border-color);background:var(--bg-card)}
+.footer-left{width:33%;min-width:140px;max-width:45vw;display:flex;align-items:center;gap:8px;padding:7px 12px;border-right:1px solid var(--border-light)}
+.footer-right{flex:1;display:flex;align-items:center;gap:8px;padding:7px 16px;flex-wrap:wrap}
+.step-info{font:700 12px var(--font-mono);color:var(--text-primary);background:var(--bg-secondary);padding:3px 9px;border-radius:var(--radius-sm);border:1px solid var(--border-color)}
+.action-badge{font-family:system-ui,"Segoe UI Emoji",var(--font-sans);font:700 10px var(--font-mono);padding:3px 8px;border-radius:99px;background:var(--bg-secondary);color:var(--text-secondary);border:1px solid var(--border-color);text-transform:uppercase}
+.action-badge--func-def,.action-badge--init,.action-badge--call,.action-badge--return{background:rgba(130,80,255,.15);color:#3C3489;border-color:#8250ff}
+.action-badge--for-check,.action-badge--while-check,.action-badge--if-check{background:rgba(56,139,253,.15);color:#185FA5;border-color:#388bfd}
+.action-badge--mark,.action-badge--push,.action-badge--pop,.action-badge--restore,.action-badge--found{background:var(--accent-green-bg);color:var(--accent-green-text);border-color:var(--accent-green)}
+.action-badge--remove,.action-badge--prune,.action-badge--fail{background:var(--accent-red-bg);color:var(--accent-red-text);border-color:var(--accent-red)}
+.action-badge--exit,.action-badge--skip{background:var(--bg-tertiary);color:var(--text-tertiary)}
+
+kbd{font-family:system-ui,"Segoe UI Emoji",var(--font-mono);font-size:10px;padding:1px 6px;background:var(--bg-secondary);border:1px solid var(--border-color);border-bottom-width:2px;border-radius:3px;color:var(--text-secondary)}
+.btn{font-family:system-ui,"Segoe UI Emoji",var(--font-sans);font-size:12px;padding:5px 11px;border-radius:var(--radius-sm);background:var(--bg-secondary);color:var(--text-primary);border:1px solid var(--border-color);cursor:pointer;font-weight:600}
+.btn:hover{background:var(--bg-tertiary)}
+.btn-primary{background:var(--accent-indigo);color:#fff;border-color:var(--accent-indigo)}
+.btn-primary:hover{background:var(--accent-indigo-hover)}
+.btn-fullscreen{margin-left:auto}
+.footer-sep{width:1px;height:18px;background:var(--border-color);margin:0 4px}
+.log-toggle-btn{font-family:system-ui,"Segoe UI Emoji",var(--font-sans);font-size:11px;padding:5px 10px;border-radius:var(--radius-sm);background:var(--accent-indigo-bg);color:var(--accent-indigo-text);border:1px solid var(--accent-indigo);cursor:pointer;font-weight:700}
+.log-toggle-btn--off{background:var(--bg-secondary);color:var(--text-tertiary);border-color:var(--border-color)}
+.btn-zoom{font-family:system-ui,"Segoe UI Emoji",var(--font-sans);font-size:13px;padding:3px 8px;border-radius:var(--radius-sm);background:var(--bg-secondary);color:var(--text-primary);border:1px solid var(--border-color);cursor:pointer;font-weight:700;min-width:24px}
+.log-zoom-label{font:700 10px var(--font-mono);color:var(--text-secondary);min-width:36px;text-align:center}
+</style>
+</head>
+<body>
+<div class="app-shell">
+  <!-- ================ PROBLEM CARD ================ -->
+  <section class="problem-card" id="problemCard">
+    <header class="prob-header">
+      <div class="prob-header-left">
+        <a href="../00_HomePage/gt_learn_homepage.html" class="gt-home-btn">GT LEARN</a>
+        <span class="prob-num">#54</span>
+        <span class="prob-name">🌀 Spiral Matrix</span>
+        <span class="prob-diff--medium">MEDIUM</span>
+        <span class="prob-tag">Matrix</span>
+        <span class="prob-tag">Simulation</span>
+      </div>
+      <div class="prob-header-right">
+        <span class="top-label">matrix=</span>
+        <input id="inputMatrix" class="input" value="[[1,2,3],[4,5,6],[7,8,9]]">
+        <span id="expectedBadge" class="top-expected">exp: [1,2,3,6,9,8,7,4,5]</span>
+        <button id="probToggleBtn" class="prob-toggle-btn" type="button" onclick="toggleProblem()">▲ Hide</button>
+      </div>
+    </header>
+    <div class="prob-body" id="probBody">
+      <div class="prob-statement">
+        <h4>📝 Problem Statement</h4>
+        Given an <code>m × n</code> matrix, return <strong>all elements</strong> of the matrix in <strong>spiral order</strong> — starting from top-left, going right, then down, then left, then up, spiraling inward until every cell is visited exactly once.
+        <h4>🧠 Solving Approach</h4>
+        Maintain 4 boundary pointers: <code>top</code>, <code>bottom</code>, <code>left</code>, <code>right</code>. In each spiral layer, traverse 4 directions (→, ↓, ←, ↑) and shrink the corresponding boundary after each pass. Stop when boundaries cross.
+        <h4>🎯 Core Concepts &amp; Base Case</h4>
+        <span class="concept-block"><strong>Boundary:</strong> 4 walls shrinking inward</span>
+        <span class="concept-block"><strong>Order:</strong> right → down → left → up</span>
+        <span class="concept-block"><strong>Stop:</strong> top &gt; bottom OR left &gt; right</span>
+        <span class="concept-block"><strong>Edge case:</strong> single row/col — extra checks before left/up traversal</span>
+        <div class="complexity-row">
+          <span class="complexity-chip">⏱️ Time: O(m·n)</span>
+          <span class="complexity-chip">💾 Space: O(1) extra</span>
+        </div>
+      </div>
+      <div>
+        <h4 style="font-size:11px;font-weight:700;color:var(--text-primary);margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em">🧪 Test Cases</h4>
+        <div class="tc-list" id="tcList">
+          <!-- populated by JS -->
+        </div>
+        <div class="run-row">
+          <button class="btn-run" type="button" onclick="resetWithInput()">▶ Run</button>
+          <span class="live-out" id="liveOutput">—</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================ MAIN ROW ================ -->
+  <div class="main-row">
+    <div class="col col-code" id="col1">
+      <div class="section-label">📜 Python Code</div>
+      <div class="code-panel" id="codePanel"></div>
+    </div>
+    <div class="resize-h" id="resizeH1"></div>
+    <div class="col col-viz">
+      <div class="section-label">📊 Visualization</div>
+      <div class="viz-panel" id="vizPanel"></div>
+    </div>
+  </div>
+
+  <!-- ================ FOOTER ================ -->
+  <div class="footer-bar">
+    <div class="footer-left" id="footerLeft">
+      <span id="stepInfo" class="step-info">0/0</span>
+      <span id="actionBadge" class="action-badge"></span>
+    </div>
+    <div class="footer-right">
+      <kbd>←</kbd><kbd>→</kbd>
+      <button class="btn" type="button" onclick="resetStep()">↺</button>
+      <button class="btn" type="button" onclick="stepBy(-1)">◀</button>
+      <button class="btn btn-primary" type="button" onclick="stepBy(1)">▶ Next</button>
+      <span class="footer-sep"></span>
+      <button id="logToggleBtn" class="log-toggle-btn" type="button" onclick="toggleLogPreview()">📋 ON</button>
+      <button class="btn-zoom" type="button" onclick="logZoom(-1)">−</button>
+      <span id="logZoomLabel" class="log-zoom-label">100%</span>
+      <button class="btn-zoom" type="button" onclick="logZoom(1)">+</button>
+      <button class="btn-zoom" type="button" onclick="logZoomReset()">↺</button>
+      <span class="footer-sep"></span>
+      <button class="btn btn-fullscreen" type="button" onclick="toggleFullscreen()">⛶</button>
+    </div>
+  </div>
+</div>
+
+<!-- LOG POPUP -->
+<div class="log-popup" id="logPopup">
+  <div class="log-popup-body" id="logPopupBody"></div>
+</div>
+
+<script>
+/* ============== CODE LINES ============== */
+var codeLines = [
+  "def spiralOrder(matrix):",
+  "    res = []",
+  "    top, bottom = 0, len(matrix) - 1",
+  "    left, right = 0, len(matrix[0]) - 1",
+  "    while top <= bottom and left <= right:",
+  "        for j in range(left, right + 1):",
+  "            res.append(matrix[top][j])",
+  "                top += 1",
+  "        for i in range(top, bottom + 1):",
+  "            res.append(matrix[i][right])",
+  "        right -= 1",
+  "        if top <= bottom:",
+  "            for j in range(right, left - 1, -1):",
+  "                res.append(matrix[bottom][j])",
+  "            bottom -= 1",
+  "        if left <= right:",
+  "            for i in range(bottom, top - 1, -1):",
+  "                res.append(matrix[i][left])",
+  "            left += 1",
+  "    return res"
+];
+
+/* ============== TEST CASES ============== */
+var TEST_CASES = [
+  { tag: "3x3", label: "Square odd", matrix: [[1,2,3],[4,5,6],[7,8,9]], expected: [1,2,3,6,9,8,7,4,5] },
+  { tag: "3x4", label: "Rectangular wide", matrix: [[1,2,3,4],[5,6,7,8],[9,10,11,12]], expected: [1,2,3,4,8,12,11,10,9,5,6,7] },
+  { tag: "1x4", label: "Single row", matrix: [[1,2,3,4]], expected: [1,2,3,4] },
+  { tag: "4x1", label: "Single column", matrix: [[1],[2],[3],[4]], expected: [1,2,3,4] },
+  { tag: "2x2", label: "Tiny square", matrix: [[1,2],[3,4]], expected: [1,2,4,3] }
+];
+
+/* ============== BADGES ============== */
+var LOG_BADGE = {
+  "func-def":"📌 DEF","init":"⚙️ INIT","call":"📞 CALL","return":"🏆 RETURN",
+  "for-check":"🔁 FOR","while-check":"🔁 WHILE","if-check":"🔎 IF",
+  "mark":"✅ MARK","push":"⬆ PUSH","pop":"⬇ POP","restore":"↩ RESTORE","found":"🎉 FOUND",
+  "remove":"✏️ EDIT","prune":"✂️ PRUNE","fail":"❌ FAIL",
+  "exit":"🔚 EXIT","skip":"⏭ SKIP"
+};
+var BADGE_LABEL = {
+  "func-def":"DEF","init":"INIT","call":"CALL","return":"RETURN",
+  "for-check":"FOR","while-check":"WHILE","if-check":"IF",
+  "mark":"MARK","push":"PUSH","pop":"POP","restore":"RESTORE","found":"FOUND",
+  "remove":"EDIT","prune":"PRUNE","fail":"FAIL",
+  "exit":"EXIT","skip":"SKIP"
+};
+
+/* ============== STATE ============== */
+var steps = [];
+var currentStep = 0;
+var codeWidthUserSet = false;
+var curResult = null;
+var logEnabled = true;
+var logZoomLevel = 100;
+
+/* ============== HIGHLIGHTERS ============== */
+function renderCode() {
+  var p = document.getElementById('codePanel');
+  p.innerHTML = codeLines.map(function(raw, i) {
+    var h = raw;
+    h = h.replace(/("[^"]*"|'[^']*')/g, '\x01STR\x02$1\x03');
+    h = h.replace(/\b(def|for|in|if|return|break|continue|and|else|elif|True|False|None|not|or|while|lambda)\b/g, '\x01KW\x02$1\x03');
+    h = h.replace(/\b(len|range|int|str|list|append|pop|sorted|min|max|sum|abs|enumerate|zip|print|set|add)\b/g, '\x01FN\x02$1\x03');
+    h = h.replace(/(?<![.\w"\x01\x02\x03])(-?\d+)\b/g, '\x01NUM\x02$1\x03');
+    h = h.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    h = h.replace(/\x01([A-Z]+)\x02/g, function(_, c) { return '<span class="' + c.toLowerCase() + '">'; }).replace(/\x03/g, '</span>');
+    return '<div class="code-line" data-line="' + i + '"><span class="ln">' + (i+1) + '</span><span class="code-content">' + h + '</span></div>';
+  }).join('');
+}
+
+function hlCode(raw) {
+  var h = raw;
+  h = h.replace(/("[^"]*"|'[^']*')/g, '\x01s\x02$1\x03');
+  h = h.replace(/\b(def|for|in|if|return|break|continue|and|else|elif|True|False|None|not|or|while|lambda)\b/g, '\x01k\x02$1\x03');
+  h = h.replace(/\b(len|range|int|str|list|append|pop|sorted|min|max|sum|abs|enumerate|zip|print|set|add)\b/g, '\x01f\x02$1\x03');
+  h = h.replace(/(?<![.\w"\x01\x02\x03])(-?\d+)\b/g, '\x01n\x02$1\x03');
+  h = h.replace(/(#.*$)/gm, '\x01c\x02$1\x03');
+  h = h.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  h = h.replace(/\x01([a-z])\x02/g, function(_, c) { return '<span class="c' + c + '">'; }).replace(/\x03/g, '</span>');
+  return h;
+}
+
+/* ============== richLog ============== */
+function richLog(opts) {
+  var statusMap = {
+    success: "✅ Success", fail: "❌ Failed", skip: "⏭ Skipped",
+    loop: "🔁 Loop iter", prune: "✂️ Pruned", info: "ℹ️ Info"
+  };
+  var status = opts.status || "info";
+  var html = '<div class="log-card log-card--' + opts.action + '">';
+
+  html += '<div class="log-card-header">';
+  html += '<span class="log-badge log-badge--' + opts.action + '">' + (LOG_BADGE[opts.action] || opts.action) + '</span>';
+  html += '<span class="log-line-ref">L' + (opts.line + 1) + '</span>';
+  html += '<span class="log-status-pill log-status--' + status + '">' + statusMap[status] + '</span>';
+  html += '</div>';
+
+  if (opts.code) {
+    html += '<div class="log-section">';
+    html += '<div class="log-section-title"><span class="log-section-title-icon">📜</span>Code Executing</div>';
+    html += '<code class="log-code-snippet">' + hlCode(opts.code) + '</code>';
+    html += '</div>';
+  }
+  if (opts.inputs && opts.inputs.length) {
+    html += '<div class="log-section">';
+    html += '<div class="log-section-title"><span class="log-section-title-icon">📥</span>Input Values (line is using these)</div>';
+    html += '<div class="log-kv-row">';
+    opts.inputs.forEach(function(kv) {
+      html += '<span class="log-kv log-kv--in"><span class="log-kv-key">' + kv.k + '</span>=<span class="log-kv-val">' + kv.v + '</span></span>';
+    });
+    html += '</div></div>';
+  }
+  if (opts.outputs && opts.outputs.length) {
+    html += '<div class="log-section">';
+    html += '<div class="log-section-title"><span class="log-section-title-icon">📤</span>Output / State After Line</div>';
+    html += '<div class="log-kv-row">';
+    opts.outputs.forEach(function(kv) {
+      var cls = kv.changed ? 'log-kv--changed' : 'log-kv--out';
+      html += '<span class="log-kv ' + cls + '"><span class="log-kv-key">' + kv.k + '</span>=<span class="log-kv-val">' + kv.v + '</span></span>';
+    });
+    html += '</div></div>';
+  }
+  if (opts.verdict) {
+    var vCls = opts.verdictTrue === true ? 'log-verdict--true' : (opts.verdictTrue === false ? 'log-verdict--false' : '');
+    var vIcon = opts.verdictTrue === true ? '✓' : (opts.verdictTrue === false ? '✗' : '•');
+    html += '<div class="log-section">';
+    html += '<div class="log-section-title"><span class="log-section-title-icon">⚖️</span>Verdict / Decision</div>';
+    html += '<div class="log-verdict ' + vCls + '">' + vIcon + ' ' + opts.verdict + '</div>';
+    html += '</div>';
+  }
+  if (opts.why) {
+    html += '<div class="log-section">';
+    html += '<div class="log-section-title"><span class="log-section-title-icon">💡</span>Why This Happens</div>';
+    html += '<div class="log-why">' + opts.why + '</div>';
+    html += '</div>';
+  }
+  if (opts.analogy) {
+    html += '<div class="log-section">';
+    html += '<div class="log-section-title"><span class="log-section-title-icon">🎭</span>Real-Life Analogy</div>';
+    html += '<div class="log-analogy">' + opts.analogy + '</div>';
+    html += '</div>';
+  }
+  html += '</div>';
+  return html;
+}
+
+/* ============== HELPERS ============== */
+function fmtArr(a) { return '[' + a.join(',') + ']'; }
+function fmtPair(p) { return '(' + p[0] + ',' + p[1] + ')'; }
+function deepCopyMat(m) { return m.map(function(r) { return r.slice(); }); }
+
+/* ============== buildSteps ============== */
+function buildSteps(matrix) {
+  var st = [];
+  var MAX_STEPS = 3000;
+
+  var res = [];
+  var visitedSet = []; // each entry [row, col] in spiral order
+  var top, bottom, left, right;
+  var phase = "init"; // "right" | "down" | "left" | "up" | "init" | "done"
+  var phaseCount = 0; // number of completed phases (for progress)
+  var m = matrix.length;
+  var n = matrix.length > 0 ? matrix[0].length : 0;
+
+  function snap(extra) {
+    return Object.assign({
+      matrix: deepCopyMat(matrix),
+      m: m,
+      n: n,
+      res: res.slice(),
+      visitedSet: visitedSet.map(function(p) { return p.slice(); }),
+      top: top, bottom: bottom, left: left, right: right,
+      phase: phase,
+      phaseCount: phaseCount,
+      hl: extra && extra.hl ? extra.hl : {}
+    }, extra || {});
+  }
+
+  function pushStep(o) {
+    if (st.length >= MAX_STEPS) return;
+    var snapshot = snap(o);
+    snapshot.line = o.line;
+    snapshot.action = o.action;
+    snapshot.logHTML = o.logHTML || "";
+    st.push(snapshot);
+  }
+
+  // L0 — function definition
+  pushStep({
+    line: 0, action: "func-def",
+    logHTML: richLog({
+      line: 0, action: "func-def",
+      code: "def spiralOrder(matrix):",
+      status: "info",
+      inputs: [{k:"matrix", v: JSON.stringify(matrix)}, {k:"m (rows)", v: m}, {k:"n (cols)", v: n}],
+      why: "Function start ho rahi hai. <strong>Spiral Matrix</strong> — matrix ko spiral order mein traverse karna hai: <strong>right → down → left → up</strong>, har layer pe boundaries shrink karte jaate hain.",
+      analogy: "Jaise <strong>jalebi banane ka tarika</strong> — bahar se andar tak ghoom ghoom ke chaap lagaate hain. Pehle outer circle, fir uske andar wala, fir aur andar — center tak."
+    })
+  });
+
+  // L1 — res = []
+  res = [];
+  pushStep({
+    line: 1, action: "init",
+    logHTML: richLog({
+      line: 1, action: "init",
+      code: "res = []",
+      status: "success",
+      inputs: [],
+      outputs: [{k:"res", v:"[]", changed:true}],
+      why: "Empty list <code>res</code> banayi gayi — yahan spiral order mein elements add karte jaayenge.",
+      analogy: "Jaise <strong>khaali shopping bag</strong> uthaya — ab supermarket mein ghoom ke saaman bharte jaayenge."
+    })
+  });
+
+  // L2 — top, bottom = 0, len(matrix) - 1
+  top = 0; bottom = m - 1;
+  pushStep({
+    line: 2, action: "init",
+    logHTML: richLog({
+      line: 2, action: "init",
+      code: "top, bottom = 0, len(matrix) - 1",
+      status: "success",
+      inputs: [{k:"len(matrix)", v: m}],
+      outputs: [{k:"top", v: top, changed:true}, {k:"bottom", v: bottom, changed:true}],
+      why: "Vertical boundaries set ki — <code>top=0</code> (uppermost row) aur <code>bottom=" + bottom + "</code> (lowermost row). Ye 2 walls hain jo upar-neeche se andar shrink karenge.",
+      analogy: "Jaise <strong>bookshelf ke top aur bottom shelves</strong> mark kar liye — ab beech ki rows ko spiral mein read karenge."
+    })
+  });
+
+  // L3 — left, right = 0, len(matrix[0]) - 1
+  left = 0; right = n - 1;
+  pushStep({
+    line: 3, action: "init",
+    logHTML: richLog({
+      line: 3, action: "init",
+      code: "left, right = 0, len(matrix[0]) - 1",
+      status: "success",
+      inputs: [{k:"len(matrix[0])", v: n}],
+      outputs: [{k:"left", v: left, changed:true}, {k:"right", v: right, changed:true}],
+      why: "Horizontal boundaries set ki — <code>left=0</code> aur <code>right=" + right + "</code>. Ab 4 walls ready hain: top, bottom, left, right — ye spiral ki frame banaate hain.",
+      analogy: "Jaise <strong>cricket field ki 4 boundary lines</strong> mark kar di — ab batsman (pointer) bahar se andar tak run karega."
+    })
+  });
+
+  // MAIN WHILE LOOP
+  var iter = 0;
+  while (true) {
+    iter++;
+    if (iter > 200) break; // safety
+
+    // L4 — while condition check
+    var whileTrue = (top <= bottom) && (left <= right);
+    pushStep({
+      line: 4, action: "while-check",
+      logHTML: richLog({
+        line: 4, action: "while-check",
+        code: "while top <= bottom and left <= right:",
+        status: whileTrue ? "loop" : "info",
+        inputs: [{k:"top", v: top}, {k:"bottom", v: bottom}, {k:"left", v: left}, {k:"right", v: right}],
+        verdict: "(top=" + top + " <= bottom=" + bottom + ") AND (left=" + left + " <= right=" + right + ") → " + (whileTrue ? "True" : "False"),
+        verdictTrue: whileTrue,
+        why: whileTrue
+          ? "Boundaries cross nahi hui hain — abhi <strong>ek aur layer</strong> baaki hai spiral mein. Loop body mein jaate hain."
+          : "Ek ya dono boundaries cross ho gayi hain — matlab <strong>spiral complete</strong>! Saari cells visit ho chuki hain. Loop exit.",
+        analogy: whileTrue
+          ? "Jaise <strong>pyaaz ke layers</strong> abhi bachi hain — chhilna jaari rakho."
+          : "Pyaaz ke saare layers chhil gaye — center mil gaya. Ab bas <code>res</code> return karna baaki."
+      })
+    });
+
+    if (!whileTrue) break;
+
+    // ======== PHASE 1: GO RIGHT (top row) ========
+    phase = "right";
+    // L5 — for j in range(left, right + 1)
+    for (var j = left; j <= right; j++) {
+      pushStep({
+        line: 5, action: "for-check",
+        logHTML: richLog({
+          line: 5, action: "for-check",
+          code: "for j in range(left, right + 1): j=" + j + "  # going RIGHT on top row",
+          status: "loop",
+          inputs: [{k:"left", v: left}, {k:"right", v: right}, {k:"j", v: j}, {k:"top", v: top}],
+          outputs: [{k:"j", v: j, changed:true}],
+          verdict: "j=" + j + " in range(" + left + ", " + (right+1) + ") → True (continue)",
+          verdictTrue: true,
+          why: "<strong>Phase: GO RIGHT →</strong> Top row pe column-by-column right direction mein chal rahe hain. Abhi <code>j=" + j + "</code>.",
+          analogy: "Jaise <strong>typing karte waqt</strong> ek line ke har character pe ungli rakhte ho — left se right direction mein."
+        })
+      });
+
+      // L6 — res.append(matrix[top][j])
+      var val = matrix[top][j];
+      res.push(val);
+      visitedSet.push([top, j]);
+      pushStep({
+        line: 6, action: "found",
+        logHTML: richLog({
+          line: 6, action: "found",
+          code: "res.append(matrix[" + top + "][" + j + "]) = " + val,
+          status: "success",
+          inputs: [{k:"matrix["+top+"]["+j+"]", v: val}, {k:"top", v: top}, {k:"j", v: j}],
+          outputs: [{k:"res", v: fmtArr(res), changed:true}, {k:"res.length", v: res.length}],
+          why: "Cell <code>(" + top + "," + j + ") = " + val + "</code> ko <code>res</code> mein append kar diya. Ye spiral order ka <strong>" + res.length + "-th element</strong> hai.",
+          analogy: "Jaise <strong>shopping list pe item tick</strong> kar diya — '" + val + "' bag mein daal diya."
+        })
+      });
+    }
+
+    // L7 — top += 1 (after going right, shrink top)
+    var oldTop = top;
+    top++;
+    phaseCount++;
+    pushStep({
+      line: 7, action: "remove",
+      logHTML: richLog({
+        line: 7, action: "remove",
+        code: "top += 1  # " + oldTop + " → " + top,
+        status: "success",
+        inputs: [{k:"top (before)", v: oldTop}],
+        outputs: [{k:"top", v: top, changed:true}, {k:"bottom", v: bottom}],
+        why: "Top row consume ho gayi — ab usse hata do. <code>top=" + oldTop + "</code> se <code>top=" + top + "</code> ho gaya. Ab effective grid <strong>" + top + " se " + bottom + "</strong> rows tak hai.",
+        analogy: "Jaise <strong>sandwich ki upar wali bread khaa li</strong> — ab agla layer expose ho gaya. Wall andar khisak gayi."
+      })
+    });
+
+    // Check if while still valid before going down (mid-loop check via early exit)
+    if (top > bottom || left > right) {
+      // Loop will fail next iteration but we still need down/left/up logged or skipped... actually no, spec says we proceed
+      // Standard solution: continues to next phase in same iteration — but if we already are out of bounds we'd append wrong
+      // Actually we DO need to skip phases properly. We rely on `if top<=bottom` and `if left<=right` guards
+    }
+
+    // ======== PHASE 2: GO DOWN (right column) ========
+    phase = "down";
+    // L8 — for i in range(top, bottom + 1)
+    for (var i = top; i <= bottom; i++) {
+      pushStep({
+        line: 8, action: "for-check",
+        logHTML: richLog({
+          line: 8, action: "for-check",
+          code: "for i in range(top, bottom + 1): i=" + i + "  # going DOWN on right col",
+          status: "loop",
+          inputs: [{k:"top", v: top}, {k:"bottom", v: bottom}, {k:"i", v: i}, {k:"right", v: right}],
+          outputs: [{k:"i", v: i, changed:true}],
+          verdict: "i=" + i + " in range(" + top + ", " + (bottom+1) + ") → True (continue)",
+          verdictTrue: true,
+          why: "<strong>Phase: GO DOWN ↓</strong> Right column pe row-by-row neeche ki taraf chal rahe hain. Abhi <code>i=" + i + "</code>.",
+          analogy: "Jaise <strong>building ke right-side ki seedhi</strong> se neeche utar rahe ho — har step pe ek floor."
+        })
+      });
+
+      // L9 — res.append(matrix[i][right])
+      var val2 = matrix[i][right];
+      res.push(val2);
+      visitedSet.push([i, right]);
+      pushStep({
+        line: 9, action: "found",
+        logHTML: richLog({
+          line: 9, action: "found",
+          code: "res.append(matrix[" + i + "][" + right + "]) = " + val2,
+          status: "success",
+          inputs: [{k:"matrix["+i+"]["+right+"]", v: val2}, {k:"i", v: i}, {k:"right", v: right}],
+          outputs: [{k:"res", v: fmtArr(res), changed:true}, {k:"res.length", v: res.length}],
+          why: "Cell <code>(" + i + "," + right + ") = " + val2 + "</code> ko <code>res</code> mein add. Spiral ka <strong>" + res.length + "-th element</strong>.",
+          analogy: "Jaise <strong>building ke har floor pe peeche se naam likhna</strong> — top floor se ground tak."
+        })
+      });
+    }
+
+    // L10 — right -= 1
+    var oldRight = right;
+    right--;
+    phaseCount++;
+    pushStep({
+      line: 10, action: "remove",
+      logHTML: richLog({
+        line: 10, action: "remove",
+        code: "right -= 1  # " + oldRight + " → " + right,
+        status: "success",
+        inputs: [{k:"right (before)", v: oldRight}],
+        outputs: [{k:"right", v: right, changed:true}, {k:"left", v: left}],
+        why: "Right column consume ho gayi — wall andar khisak gayi. <code>right=" + oldRight + "</code> se <code>right=" + right + "</code>. Effective columns ab <strong>" + left + " se " + right + "</strong>.",
+        analogy: "Jaise <strong>chocolate ke daahine kone se ek piece tod liya</strong> — ab daahini boundary thodi andar."
+      })
+    });
+
+    // L11 — if top <= bottom (guard for left traversal)
+    var leftGuard = (top <= bottom);
+    pushStep({
+      line: 11, action: "if-check",
+      logHTML: richLog({
+        line: 11, action: "if-check",
+        code: "if top <= bottom:  # safe to go LEFT?",
+        status: leftGuard ? "success" : "skip",
+        inputs: [{k:"top", v: top}, {k:"bottom", v: bottom}],
+        verdict: "top=" + top + " <= bottom=" + bottom + " → " + (leftGuard ? "True" : "False"),
+        verdictTrue: leftGuard,
+        why: leftGuard
+          ? "Bottom row abhi exist karti hai — safe hai left direction mein traverse karna. Cells double-count nahi honge."
+          : "Bottom row already consume ho chuki hai (<code>top > bottom</code>) — agar left jaate to <strong>same cells dobara count</strong> ho jaati! Toh ye phase <strong>SKIP</strong>.",
+        analogy: leftGuard
+          ? "Jaise <strong>circular track pe</strong> abhi neeche wali lane bachi hai — chal sakte ho."
+          : "Single row matrix mein neeche koi lane nahi bachi — wapas mudna matlab same path ko dobara cover karna. Skip!"
+      })
+    });
+
+    if (leftGuard) {
+      // ======== PHASE 3: GO LEFT (bottom row) ========
+      phase = "left";
+      // L12 — for j in range(right, left - 1, -1)
+      for (var j2 = right; j2 >= left; j2--) {
+        pushStep({
+          line: 12, action: "for-check",
+          logHTML: richLog({
+            line: 12, action: "for-check",
+            code: "for j in range(right, left - 1, -1): j=" + j2 + "  # going LEFT on bottom row",
+            status: "loop",
+            inputs: [{k:"right", v: right}, {k:"left", v: left}, {k:"j", v: j2}, {k:"bottom", v: bottom}],
+            outputs: [{k:"j", v: j2, changed:true}],
+            verdict: "j=" + j2 + " in range(" + right + ", " + (left-1) + ", -1) → True (continue)",
+            verdictTrue: true,
+            why: "<strong>Phase: GO LEFT ←</strong> Bottom row pe column-by-column left direction mein. Abhi <code>j=" + j2 + "</code>.",
+            analogy: "Jaise <strong>kitaab padhne ke baad page ke neeche se backwards</strong> finger phera — right se left."
+          })
+        });
+
+        // L13 — res.append(matrix[bottom][j])
+        var val3 = matrix[bottom][j2];
+        res.push(val3);
+        visitedSet.push([bottom, j2]);
+        pushStep({
+          line: 13, action: "found",
+          logHTML: richLog({
+            line: 13, action: "found",
+            code: "res.append(matrix[" + bottom + "][" + j2 + "]) = " + val3,
+            status: "success",
+            inputs: [{k:"matrix["+bottom+"]["+j2+"]", v: val3}, {k:"bottom", v: bottom}, {k:"j", v: j2}],
+            outputs: [{k:"res", v: fmtArr(res), changed:true}, {k:"res.length", v: res.length}],
+            why: "Cell <code>(" + bottom + "," + j2 + ") = " + val3 + "</code> ko <code>res</code> mein add. Spiral ka <strong>" + res.length + "-th element</strong>.",
+            analogy: "Jaise <strong>cricket scoreboard pe runs add</strong> — har ball pe bag mein run gir raha hai."
+          })
+        });
+      }
+
+      // L14 — bottom -= 1
+      var oldBottom = bottom;
+      bottom--;
+      phaseCount++;
+      pushStep({
+        line: 14, action: "remove",
+        logHTML: richLog({
+          line: 14, action: "remove",
+          code: "bottom -= 1  # " + oldBottom + " → " + bottom,
+          status: "success",
+          inputs: [{k:"bottom (before)", v: oldBottom}],
+          outputs: [{k:"bottom", v: bottom, changed:true}, {k:"top", v: top}],
+          why: "Bottom row consume ho gayi — wall upar khisak gayi. <code>bottom=" + oldBottom + "</code> se <code>bottom=" + bottom + "</code>.",
+          analogy: "Jaise <strong>sandwich ki neeche wali bread bhi khaa li</strong> — ab patli si filling hi bachi hai beech mein."
+        })
+      });
+    }
+
+    // L15 — if left <= right (guard for up traversal)
+    var upGuard = (left <= right);
+    pushStep({
+      line: 15, action: "if-check",
+      logHTML: richLog({
+        line: 15, action: "if-check",
+        code: "if left <= right:  # safe to go UP?",
+        status: upGuard ? "success" : "skip",
+        inputs: [{k:"left", v: left}, {k:"right", v: right}],
+        verdict: "left=" + left + " <= right=" + right + " → " + (upGuard ? "True" : "False"),
+        verdictTrue: upGuard,
+        why: upGuard
+          ? "Right column abhi exist karti hai — safe hai up direction mein traverse karna."
+          : "Right column already consume ho chuki hai (<code>left > right</code>) — agar up jaate to <strong>same cells dobara count</strong>! Phase <strong>SKIP</strong>.",
+        analogy: upGuard
+          ? "Jaise <strong>spiral staircase pe</strong> abhi ek aur turn baaki hai — upar chal sakte ho."
+          : "Single column matrix mein left/right same hai — upar jaane ka koi naya rasta nahi. Skip!"
+      })
+    });
+
+    if (upGuard) {
+      // ======== PHASE 4: GO UP (left column) ========
+      phase = "up";
+      // L16 — for i in range(bottom, top - 1, -1)
+      for (var i2 = bottom; i2 >= top; i2--) {
+        pushStep({
+          line: 16, action: "for-check",
+          logHTML: richLog({
+            line: 16, action: "for-check",
+            code: "for i in range(bottom, top - 1, -1): i=" + i2 + "  # going UP on left col",
+            status: "loop",
+            inputs: [{k:"bottom", v: bottom}, {k:"top", v: top}, {k:"i", v: i2}, {k:"left", v: left}],
+            outputs: [{k:"i", v: i2, changed:true}],
+            verdict: "i=" + i2 + " in range(" + bottom + ", " + (top-1) + ", -1) → True (continue)",
+            verdictTrue: true,
+            why: "<strong>Phase: GO UP ↑</strong> Left column pe row-by-row upar ki taraf. Abhi <code>i=" + i2 + "</code>.",
+            analogy: "Jaise <strong>seedhi pe wapas upar</strong> chadh rahe ho — last floor se starting point ki taraf."
+          })
+        });
+
+        // L17 — res.append(matrix[i][left])
+        var val4 = matrix[i2][left];
+        res.push(val4);
+        visitedSet.push([i2, left]);
+        pushStep({
+          line: 17, action: "found",
+          logHTML: richLog({
+            line: 17, action: "found",
+            code: "res.append(matrix[" + i2 + "][" + left + "]) = " + val4,
+            status: "success",
+            inputs: [{k:"matrix["+i2+"]["+left+"]", v: val4}, {k:"i", v: i2}, {k:"left", v: left}],
+            outputs: [{k:"res", v: fmtArr(res), changed:true}, {k:"res.length", v: res.length}],
+            why: "Cell <code>(" + i2 + "," + left + ") = " + val4 + "</code> ko <code>res</code> mein add. Spiral ka <strong>" + res.length + "-th element</strong>.",
+            analogy: "Jaise <strong>climbing rope pe upar chadhte hue</strong> har knot count kar rahe ho."
+          })
+        });
+      }
+
+      // L18 — left += 1
+      var oldLeft = left;
+      left++;
+      phaseCount++;
+      pushStep({
+        line: 18, action: "remove",
+        logHTML: richLog({
+          line: 18, action: "remove",
+          code: "left += 1  # " + oldLeft + " → " + left,
+          status: "success",
+          inputs: [{k:"left (before)", v: oldLeft}],
+          outputs: [{k:"left", v: left, changed:true}, {k:"right", v: right}],
+          why: "Left column consume ho gayi — wall andar khisak gayi. <code>left=" + oldLeft + "</code> se <code>left=" + left + "</code>. Ek pura layer khatam — ab andar ka spiral!",
+          analogy: "Jaise <strong>pyaaz ka pura ek layer chhil gaya</strong> — andar ka chhota pyaaz ab visible. Next iteration mein use chhilenge."
+        })
+      });
+    }
+  }
+
+  phase = "done";
+
+  // L19 — return res
+  curResult = res.slice();
+  pushStep({
+    line: 19, action: "return",
+    logHTML: richLog({
+      line: 19, action: "return",
+      code: "return res  # = " + fmtArr(res),
+      status: "success",
+      inputs: [{k:"res.length", v: res.length}, {k:"total cells", v: m*n}],
+      outputs: [{k:"return value", v: fmtArr(res), changed:true}],
+      verdict: "res.length=" + res.length + " == m*n=" + (m*n) + " → " + (res.length === m*n ? "True ✓" : "False ✗"),
+      verdictTrue: res.length === m*n,
+      why: "Spiral traversal <strong>complete</strong>! Saari <code>" + (m*n) + "</code> cells visit ho gayi hain. Final answer return ho rahi hai: <code>" + fmtArr(res) + "</code>",
+      analogy: "Jaise <strong>jalebi ka pattern complete ho gaya</strong> — ab plate pe serve karne ke liye ready! Bag mein saamaan, return karke kitchen se bahar."
+    })
+  });
+
+  return st;
+}
+
+/* ============== RENDER VIZ ============== */
+function renderViz(s) {
+  var v = document.getElementById('vizPanel');
+  var h = '';
+
+  // Phase banner
+  var phaseEmoji = {init:"🎬", right:"➡️ GO RIGHT", down:"⬇️ GO DOWN", left:"⬅️ GO LEFT", up:"⬆️ GO UP", done:"🏁 DONE"};
+  var phaseLabel = phaseEmoji[s.phase] || s.phase;
+  h += '<div class="phase-banner">' + phaseLabel + ' &nbsp;|&nbsp; Phase #' + s.phaseCount + ' &nbsp;|&nbsp; Visited: ' + s.visitedSet.length + ' / ' + (s.m * s.n) + '</div>';
+
+  // Vars strip
+  h += '<div class="vars-strip">';
+  h += '<span class="var-chip vc-warn"><strong>top</strong>' + s.top + '</span>';
+  h += '<span class="var-chip vc-warn"><strong>bottom</strong>' + s.bottom + '</span>';
+  h += '<span class="var-chip vc-safe"><strong>left</strong>' + s.left + '</span>';
+  h += '<span class="var-chip vc-safe"><strong>right</strong>' + s.right + '</span>';
+  h += '<span class="var-chip vc-active"><strong>res.size</strong>' + s.res.length + '</span>';
+  h += '<span class="var-chip"><strong>m × n</strong>' + s.m + ' × ' + s.n + '</span>';
+  h += '</div>';
+
+  // viz-row
+  h += '<div class="viz-row">';
+
+  // Matrix card
+  h += '<div class="viz-card"><div class="viz-title">🧱 Matrix (Spiral Traversal)</div>';
+  h += '<div class="matrix-wrap"><div class="matrix-grid" style="grid-template-columns:repeat(' + s.n + ',50px)">';
+
+  var lastVisited = s.visitedSet.length > 0 ? s.visitedSet[s.visitedSet.length - 1] : null;
+  for (var r = 0; r < s.m; r++) {
+    for (var c = 0; c < s.n; c++) {
+      var cls = "mat-cell";
+      var inBounds = (r >= s.top && r <= s.bottom && c >= s.left && c <= s.right);
+      var isVisited = s.visitedSet.some(function(p) { return p[0] === r && p[1] === c; });
+      var isCurr = lastVisited && lastVisited[0] === r && lastVisited[1] === c;
+
+      if (isCurr && s.phase !== "done") cls += " mat-cell--curr";
+      else if (isVisited) cls += " mat-cell--visited";
+      else if (inBounds) cls += " mat-cell--inbound";
+      else cls += " mat-cell--outbound";
+
+      h += '<div class="' + cls + '">';
+      h += '<span class="mat-cell-coord">' + r + ',' + c + '</span>';
+      h += s.matrix[r][c];
+      h += '</div>';
+    }
+  }
+  h += '</div>';
+
+  // SVG flow arrows
+  var CELL = 50, GAP = 3, PAD = 14;
+  var totalW = s.n * CELL + (s.n - 1) * GAP;
+  var totalH = s.m * CELL + (s.m - 1) * GAP;
+  function cx(col) { return col * (CELL + GAP) + CELL / 2; }
+  function cy(row) { return row * (CELL + GAP) + CELL / 2; }
+
+  if (s.visitedSet.length >= 2) {
+    h += '<svg class="flow-svg" width="' + totalW + '" height="' + totalH + '" viewBox="0 0 ' + totalW + ' ' + totalH + '">';
+    h += '<defs>';
+    h += '<marker id="ah-red" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#dc2626"/></marker>';
+    h += '<marker id="ah-amber" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#f59e0b"/></marker>';
+    h += '<marker id="ah-purple" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#8b5cf6"/></marker>';
+    h += '</defs>';
+
+    var visits = s.visitedSet;
+    for (var pi = 0; pi < visits.length - 1; pi++) {
+      var a = visits[pi], b = visits[pi + 1];
+      var x1 = cx(a[1]), y1 = cy(a[0]);
+      var x2 = cx(b[1]), y2 = cy(b[0]);
+
+      // Phase jump detection: direction change from previous segment
+      // For spiral: phase jump when going from straight line into a turn
+      var isPhaseJump = false;
+      if (pi > 0) {
+        var prev = visits[pi - 1];
+        var dr1 = a[0] - prev[0], dc1 = a[1] - prev[1];
+        var dr2 = b[0] - a[0], dc2 = b[1] - a[1];
+        // Direction change = phase jump
+        if (dr1 !== dr2 || dc1 !== dc2) isPhaseJump = true;
+      }
+
+      var cls2 = isPhaseJump ? 'flow-line flow-line--phase-jump' : 'flow-line';
+      var marker = isPhaseJump ? 'ah-purple' : 'ah-red';
+
+      var dx = x2 - x1, dy = y2 - y1, len = Math.sqrt(dx * dx + dy * dy);
+      var shrink = 18, ux = dx / len, uy = dy / len;
+      var sx1 = x1 + ux * shrink, sy1 = y1 + uy * shrink;
+      var sx2 = x2 - ux * shrink, sy2 = y2 - uy * shrink;
+      h += '<line class="' + cls2 + '" x1="' + sx1 + '" y1="' + sy1 + '" x2="' + sx2 + '" y2="' + sy2 + '" marker-end="url(#' + marker + ')"/>';
+    }
+    h += '</svg>';
+  }
+
+  h += '</div>'; // matrix-wrap
+
+  // Legend
+  h += '<div class="legend">';
+  h += '<span><i style="background:#fff"></i>Outbound (consumed)</span>';
+  h += '<span><i style="background:#EEEDFE;border-color:#534AB7"></i>Active region</span>';
+  h += '<span><i style="background:#FEF3C7;border-color:#B45309"></i>Current cell</span>';
+  h += '<span><i style="background:#DCFCE7;border-color:#15803D"></i>Visited</span>';
+  h += '<span><i class="legend-flow"></i>Spiral path</span>';
+  h += '<span><i class="legend-flow-jump"></i>Direction turn</span>';
+  h += '</div>';
+  h += '</div>'; // matrix viz-card
+
+  // Boundaries card
+  h += '<div class="viz-card"><div class="viz-title">📐 Boundary Walls</div>';
+  h += '<div class="boundary-row">';
+  h += '<div><span class="blab">⬆ TOP:</span><span class="bound-pill bound-pill--top">row ' + s.top + '</span></div>';
+  h += '<div><span class="blab">⬇ BOTTOM:</span><span class="bound-pill bound-pill--bot">row ' + s.bottom + '</span></div>';
+  h += '<div><span class="blab">⬅ LEFT:</span><span class="bound-pill bound-pill--lf">col ' + s.left + '</span></div>';
+  h += '<div><span class="blab">➡ RIGHT:</span><span class="bound-pill bound-pill--rt">col ' + s.right + '</span></div>';
+  h += '<div style="margin-top:6px;font-size:10px;color:var(--text-tertiary)">Active: rows [' + s.top + '..' + s.bottom + '] × cols [' + s.left + '..' + s.right + ']</div>';
+  h += '</div>';
+  h += '</div>'; // boundaries card
+
+  // Result chips
+  h += '<div class="viz-card"><div class="viz-title">📦 Result (spiral order)</div>';
+  h += '<div class="chips">';
+  if (s.res.length === 0) {
+    h += '<span class="empty-state">empty — abhi koi cell visit nahi hui</span>';
+  } else {
+    for (var ri = 0; ri < s.res.length; ri++) {
+      var chipCls = (ri === s.res.length - 1 && s.phase !== "done") ? "chip chip--last" : "chip";
+      h += '<span class="' + chipCls + '">' + s.res[ri] + '</span>';
+    }
+  }
+  h += '</div></div>';
+
+  h += '</div>'; // viz-row
+
+  // Result banner
+  if (s.phase === "done") {
+    h += '<div class="result-banner">🎉 Spiral complete! Final answer: ' + fmtArr(s.res) + '</div>';
+  }
+
+  v.innerHTML = h;
+}
+
+/* ============== RENDER STEP ============== */
+function renderStep(idx) {
+  if (!steps.length) return;
+  var s = steps[idx];
+  currentStep = idx;
+  document.getElementById('stepInfo').textContent = (idx + 1) + '/' + steps.length;
+  var bd = document.getElementById('actionBadge');
+  bd.textContent = BADGE_LABEL[s.action] || s.action;
+  bd.className = 'action-badge action-badge--' + s.action;
+  document.querySelectorAll('.code-line').forEach(function(el) { el.classList.remove('active'); });
+  var al = document.querySelector('.code-line[data-line="' + s.line + '"]');
+  if (al) { al.classList.add('active'); al.scrollIntoView({block: 'nearest'}); }
+  renderViz(s);
+  showLogPreview(s);
+}
+
+function showLogPreview(s) {
+  if (!logEnabled) return;
+  document.getElementById('logPopupBody').innerHTML = s.logHTML || '';
+  document.getElementById('logPopup').classList.remove('log-popup--hidden');
+}
+
+function hideLogPopup() {
+  document.getElementById('logPopup').classList.add('log-popup--hidden');
+}
+
+/* ============== STEP CONTROLS ============== */
+function stepBy(d) {
+  var ni = currentStep + d;
+  if (ni < 0 || ni >= steps.length) return;
+  renderStep(ni);
+}
+function resetStep() {
+  if (steps.length) renderStep(0);
+}
+
+/* ============== INPUT PARSING ============== */
+function parseMatrix(str) {
+  try {
+    var m = JSON.parse(str);
+    if (!Array.isArray(m) || m.length === 0) return null;
+    if (!Array.isArray(m[0])) return null;
+    var n = m[0].length;
+    for (var i = 0; i < m.length; i++) {
+      if (!Array.isArray(m[i]) || m[i].length !== n) return null;
+    }
+    return m;
+  } catch (e) { return null; }
+}
+
+function resetWithInput() {
+  curResult = null;
+  var matStr = document.getElementById('inputMatrix').value;
+  var matrix = parseMatrix(matStr);
+  if (!matrix) {
+    document.getElementById('liveOutput').textContent = '⚠️ Invalid matrix input';
+    return;
+  }
+  renderCode();
+  fitCodeWidth();
+  steps = buildSteps(matrix);
+  currentStep = 0;
+  renderStep(0);
+  document.getElementById('liveOutput').textContent = curResult !== null ? fmtArr(curResult) : '—';
+}
+
+/* ============== TEST CASES UI ============== */
+function renderTestCases() {
+  var html = TEST_CASES.map(function(tc, idx) {
+    var matStr = JSON.stringify(tc.matrix);
+    return '<div class="tc-chip" onclick="loadTest(' + idx + ')">' +
+      '<div class="tc-chip-row">' +
+        '<span class="pt-tag">' + tc.tag + '</span>' +
+        '<span class="tc-label">' + tc.label + '</span>' +
+        '<span class="tc-expected">→ ' + fmtArr(tc.expected) + '</span>' +
+      '</div>' +
+      '<div class="tc-vals">' +
+        '<code>matrix=' + matStr + '</code>' +
+        '<code>' + tc.matrix.length + '×' + tc.matrix[0].length + '</code>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+  document.getElementById('tcList').innerHTML = html;
+}
+
+function loadTest(idx) {
+  var tc = TEST_CASES[idx];
+  document.getElementById('inputMatrix').value = JSON.stringify(tc.matrix);
+  document.getElementById('expectedBadge').textContent = 'exp: ' + fmtArr(tc.expected);
+  resetWithInput();
+}
+
+/* ============== PROBLEM TOGGLE ============== */
+function toggleProblem() {
+  var b = document.getElementById('probBody');
+  var btn = document.getElementById('probToggleBtn');
+  if (b.classList.contains('prob-body--hidden')) {
+    b.classList.remove('prob-body--hidden');
+    btn.textContent = '▲ Hide';
+  } else {
+    b.classList.add('prob-body--hidden');
+    btn.textContent = '▼ Show';
+  }
+}
+
+/* ============== LOG POPUP CONTROLS ============== */
+function toggleLogPreview() {
+  logEnabled = !logEnabled;
+  var btn = document.getElementById('logToggleBtn');
+  btn.textContent = logEnabled ? '📋 ON' : '📋 OFF';
+  btn.classList.toggle('log-toggle-btn--off', !logEnabled);
+  if (!logEnabled) hideLogPopup();
+  else if (steps.length) showLogPreview(steps[currentStep]);
+}
+
+function logZoom(dir) {
+  logZoomLevel = Math.max(60, Math.min(180, logZoomLevel + dir * 20));
+  updateLogZoom();
+}
+function logZoomReset() { logZoomLevel = 100; updateLogZoom(); }
+function updateLogZoom() {
+  document.getElementById('logZoomLabel').textContent = logZoomLevel + '%';
+  document.getElementById('logPopup').style.setProperty('--log-scale', logZoomLevel / 100);
+}
+
+/* ============== FULLSCREEN ============== */
+function toggleFullscreen() {
+  var viz = document.querySelector('.col-viz');
+  if (!document.fullscreenElement) viz.requestFullscreen().catch(function(){});
+  else document.exitFullscreen();
+}
+
+/* ============== CODE WIDTH FIT ============== */
+function fitCodeWidth() {
+  if (codeWidthUserSet) return;
+  var col1 = document.getElementById('col1');
+  var panel = document.getElementById('codePanel');
+  var maxLen = 0;
+  codeLines.forEach(function(l) { if (l.length > maxLen) maxLen = l.length; });
+  var px = Math.min(maxLen * 7.6 + 60, window.innerWidth * 0.45);
+  col1.style.width = Math.max(220, px) + 'px';
+  syncFooterWidth();
+}
+
+function syncFooterWidth() {
+  document.getElementById('footerLeft').style.width =
+    document.getElementById('col1').offsetWidth + 'px';
+}
+
+/* ============== RESIZE HANDLE ============== */
+(function() {
+  var col1 = document.getElementById('col1');
+  document.getElementById('resizeH1').addEventListener('mousedown', function(e) {
+    e.preventDefault();
+    codeWidthUserSet = true;
+    var startX = e.clientX, startW = col1.offsetWidth, h = this;
+    document.body.classList.add('no-select');
+    h.classList.add('active');
+    function mv(e) {
+      col1.style.width = Math.max(140, startW + (e.clientX - startX)) + 'px';
+      syncFooterWidth();
+    }
+    function up() {
+      document.removeEventListener('mousemove', mv);
+      document.removeEventListener('mouseup', up);
+      document.body.classList.remove('no-select');
+      h.classList.remove('active');
+    }
+    document.addEventListener('mousemove', mv);
+    document.addEventListener('mouseup', up);
+  });
+})();
+
+window.addEventListener('resize', function() {
+  if (!codeWidthUserSet) fitCodeWidth();
+  else syncFooterWidth();
+});
+
+/* ============== KEYBOARD ============== */
+document.addEventListener('keydown', function(e) {
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
+  if (e.key === 'ArrowRight') { e.preventDefault(); stepBy(1); }
+  else if (e.key === 'ArrowLeft') { e.preventDefault(); stepBy(-1); }
+  else if (e.key === 'r' || e.key === 'R') { e.preventDefault(); resetStep(); }
+});
+
+/* ============== INIT ============== */
+renderTestCases();
+renderCode();
+fitCodeWidth();
+resetWithInput();
+</script>
+</body>
+</html>

@@ -1,0 +1,964 @@
+﻿
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LC 194 — Word Frequency (shell pipeline)</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+:root{
+  --bg-primary:#FAFAF8;--bg-secondary:#F1EFE8;--bg-tertiary:#E2E0D8;--bg-card:#FFFFFF;
+  --text-primary:#2C2C2A;--text-secondary:#5F5E5A;--text-tertiary:#888780;
+  --border-color:rgba(0,0,0,0.11);--border-light:rgba(0,0,0,0.06);
+  --accent-indigo:#534AB7;--accent-indigo-bg:#EEEDFE;--accent-indigo-text:#3C3489;--accent-indigo-hover:#4740A0;
+  --accent-teal:#0F6E56;--accent-teal-bg:#E1F5EE;--accent-teal-text:#085041;
+  --accent-red:#E24B4A;--accent-red-bg:#FCEBEB;--accent-red-text:#791F1F;
+  --accent-amber:#B45309;--accent-amber-bg:#FEF3C7;--accent-amber-text:#78350F;
+  --accent-green:#15803D;--accent-green-bg:#DCFCE7;--accent-green-text:#14532D;
+  --syn-keyword:#534AB7;--syn-function:#185FA5;--syn-number:#993C1D;--syn-string:#0F6E56;--syn-builtin:#B45309;
+  --active-line-bg:#EEEDFE;
+  --radius-sm:4px;--radius-md:6px;--radius-lg:10px;
+  --font-sans:'DM Sans',system-ui,sans-serif;--font-mono:'JetBrains Mono','Fira Code',monospace;
+  --fs-xs:11px;--fs-sm:12px;--fs-base:14px;--fs-md:15px;
+  --ease:.18s ease;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans);background:var(--bg-primary);color:var(--text-primary);font-size:var(--fs-base);overflow:hidden}
+.no-select{user-select:none}
+::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border-color);border-radius:3px}
+.app-shell{display:flex;flex-direction:column;height:100vh;overflow:hidden}
+
+.problem-card{flex-shrink:0;border-bottom:1px solid var(--border-color);background:var(--bg-card)}
+.pc-header{display:flex;align-items:center;gap:10px;padding:8px 14px;flex-wrap:wrap}
+.gt-learn{font:700 11px var(--font-sans);background:var(--accent-indigo);color:#fff;padding:5px 11px;border-radius:99px;cursor:pointer;border:none;letter-spacing:.5px;font-family:system-ui,"Segoe UI Emoji",sans-serif}
+.pc-num{font:600 12px var(--font-mono);color:var(--text-tertiary)}
+.pc-title{font-size:var(--fs-md);font-weight:700}
+.pc-diff{font:700 9px var(--font-sans);padding:2px 7px;border-radius:99px;background:var(--accent-amber-bg);color:var(--accent-amber-text);border:1px solid var(--accent-amber)}
+.pc-tag{font:500 10px var(--font-sans);padding:2px 8px;border-radius:99px;background:var(--bg-secondary);color:var(--text-secondary);border:1px solid var(--border-color)}
+.pc-inputs{display:flex;align-items:center;gap:6px;margin-left:auto;flex-wrap:wrap}
+.pc-inputs label{font:600 10px var(--font-mono);color:var(--text-secondary);display:flex;align-items:flex-start;gap:3px}
+.pc-inputs textarea{font:500 11px var(--font-mono);background:var(--bg-secondary);border:1px solid var(--border-color);border-radius:var(--radius-sm);padding:4px 6px;color:var(--text-primary);width:240px;height:60px;resize:vertical}
+.expected-badge{font:600 10px var(--font-mono);background:var(--accent-green-bg);color:var(--accent-green-text);padding:3px 7px;border-radius:var(--radius-sm);border:1px solid var(--accent-green);max-width:240px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.toggle-btn{font-family:system-ui,"Segoe UI Emoji",sans-serif;font:600 11px var(--font-sans);background:var(--bg-secondary);border:1px solid var(--border-color);padding:4px 9px;border-radius:var(--radius-sm);cursor:pointer;color:var(--text-secondary)}
+.pc-body{display:grid;grid-template-columns:1.4fr 1fr;gap:14px;padding:4px 14px 12px;border-top:1px dashed var(--border-light)}
+.pc-body.hidden{display:none}
+.pc-section-title{font:700 11px var(--font-sans);margin-bottom:5px}
+.pc-text{font-size:var(--fs-xs);color:var(--text-secondary);line-height:1.55;margin-bottom:7px}
+.pc-text code{font-family:var(--font-mono);background:var(--bg-secondary);padding:1px 4px;border-radius:3px;font-size:10.5px;color:var(--accent-indigo-text)}
+.pc-text strong{color:var(--text-primary)}
+.concept-block{background:var(--bg-secondary);border-left:3px solid var(--accent-indigo);padding:6px 9px;border-radius:var(--radius-sm);margin-bottom:5px}
+.concept-block-title{font:700 10px var(--font-mono);color:var(--accent-indigo-text);text-transform:uppercase}
+.concept-block-body{font-size:11px;line-height:1.5;margin-top:2px}
+.complexity-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.complexity-chip{font:600 10px var(--font-mono);background:var(--accent-indigo-bg);color:var(--accent-indigo-text);padding:3px 8px;border-radius:99px;border:1px solid var(--accent-indigo)}
+.tc-list{display:flex;flex-direction:column;gap:5px}
+.tc-chip{background:var(--bg-secondary);border:1px solid var(--border-color);border-radius:var(--radius-sm);padding:6px 9px;cursor:pointer;transition:all var(--ease)}
+.tc-chip:hover{border-color:var(--accent-indigo);background:var(--accent-indigo-bg)}
+.tc-chip-input{font:600 10px var(--font-mono);word-break:break-all;white-space:pre-wrap}
+.pt-tag{display:inline-block;font:500 9px var(--font-sans);background:var(--bg-tertiary);color:var(--text-secondary);padding:1px 6px;border-radius:99px;margin-left:4px}
+.tc-chip-expected{font:600 10px var(--font-mono);color:var(--accent-green-text);margin-top:2px;white-space:pre-wrap}
+.run-row{display:flex;align-items:center;gap:8px;margin-top:8px}
+.btn-run{font-family:system-ui,"Segoe UI Emoji",sans-serif;font:700 11px var(--font-sans);background:var(--accent-indigo);color:#fff;border:none;padding:6px 14px;border-radius:var(--radius-sm);cursor:pointer}
+.live-output{font:600 11px var(--font-mono);color:var(--accent-green-text);background:var(--accent-green-bg);padding:4px 10px;border-radius:var(--radius-sm);border:1px solid var(--accent-green);white-space:pre-wrap;max-width:100%;overflow:auto;max-height:80px}
+
+.main-row{flex:1;display:flex;overflow:hidden;min-height:0}
+.col{display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.col-code{width:33%;min-width:140px;max-width:45vw;background:var(--bg-card);border-right:1px solid var(--border-color)}
+.col-viz{flex:1;min-width:0;background:var(--bg-primary)}
+.section-label{font-family:system-ui,"Segoe UI Emoji",sans-serif;font:700 10px var(--font-sans);color:var(--text-secondary);padding:7px 12px;background:var(--bg-secondary);border-bottom:1px solid var(--border-light);display:flex;align-items:center;gap:5px;flex-shrink:0;text-transform:uppercase;letter-spacing:.06em}
+.code-panel{font-family:var(--font-mono);font-size:11.5px;line-height:1.85;padding:8px 0 12px 0;overflow-y:auto;flex:1}
+.code-line{display:flex;padding:0 12px;transition:background var(--ease)}
+.code-line.active{background:var(--active-line-bg);border-left:3px solid var(--accent-indigo);padding-left:9px}
+.code-line .ln{display:inline-block;width:24px;color:var(--text-tertiary);user-select:none;flex-shrink:0;font-size:10.5px}
+.code-line .src{white-space:pre;color:var(--text-primary)}
+.kw{color:var(--syn-keyword);font-weight:600}.fn{color:var(--syn-function)}.num{color:var(--syn-number)}.str{color:var(--syn-string)}.bi{color:var(--syn-builtin);font-weight:600}.cm{color:var(--text-tertiary);font-style:italic}.pp{color:#9333ea;font-weight:700}
+.resize-handle{width:4px;cursor:col-resize;background:transparent;flex-shrink:0;transition:background var(--ease)}
+.resize-handle:hover,.resize-handle.active{background:var(--accent-indigo)}
+
+.viz-panel{padding:10px 14px 14px;overflow:auto;flex:1}
+.vars-strip{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.var-chip{font:600 11px var(--font-mono);padding:4px 9px;border-radius:99px;background:var(--bg-card);border:1px solid var(--border-color);display:inline-flex;align-items:center;gap:4px}
+.var-chip .vk{color:var(--text-tertiary);font-weight:500}
+.var-chip .vv{color:var(--text-primary);font-weight:700}
+.vc-active{background:var(--accent-indigo-bg);border-color:var(--accent-indigo)}.vc-active .vv{color:var(--accent-indigo-text)}
+.vc-safe{background:var(--accent-green-bg);border-color:var(--accent-green)}.vc-safe .vv{color:var(--accent-green-text)}
+.vc-warn{background:var(--accent-amber-bg);border-color:var(--accent-amber)}.vc-warn .vv{color:var(--accent-amber-text)}
+.vc-flip{background:var(--accent-red-bg);border-color:var(--accent-red)}.vc-flip .vv{color:var(--accent-red-text)}
+
+.pipeline{display:flex;gap:6px;align-items:stretch;background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius-md);padding:8px;margin-bottom:12px;overflow-x:auto}
+.pipe-stage{font-family:system-ui,"Segoe UI Emoji",sans-serif;font:700 10px var(--font-sans);padding:6px 10px;border-radius:var(--radius-sm);background:var(--bg-secondary);color:var(--text-secondary);border:2px solid var(--border-color);min-width:88px;text-align:center;display:flex;flex-direction:column;gap:2px;justify-content:center;transition:all .25s;flex-shrink:0}
+.pipe-stage.is-curr{background:var(--accent-amber-bg);border-color:var(--accent-amber);color:var(--accent-amber-text);transform:scale(1.06);animation:pulse-node 1.1s infinite;z-index:2}
+.pipe-stage.is-done{background:var(--accent-green-bg);border-color:var(--accent-green);color:var(--accent-green-text)}
+.pipe-stage .ps-icon{font-size:14px}
+.pipe-stage .ps-label{font-size:10px;font-weight:700}
+.pipe-stage .ps-cmd{font:600 9px var(--font-mono);color:var(--text-tertiary);margin-top:1px}
+.pipe-arrow{display:flex;align-items:center;color:var(--text-tertiary);font:700 14px var(--font-mono);user-select:none}
+.pipe-arrow.is-active{color:var(--accent-amber);animation:pulse-node 1s infinite}
+
+.viz-row{display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap}
+.viz-card{background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius-md);padding:10px;min-width:180px}
+.viz-card.is-curr-stage{border-color:var(--accent-amber);box-shadow:0 0 0 2px var(--accent-amber-bg)}
+.viz-card-title{font:700 11px var(--font-sans);margin-bottom:8px;display:flex;align-items:center;gap:5px}
+.viz-card-subtitle{font:500 9px var(--font-mono);color:var(--text-tertiary);margin-bottom:6px}
+
+.stream-box{font-family:var(--font-mono);font-size:11.5px;background:#0d1117;color:#e6edf3;padding:8px 10px;border-radius:var(--radius-md);border:1px solid #30363d;min-height:90px;max-height:280px;overflow:auto;white-space:pre;min-width:200px}
+.stream-box .empty{color:#6e7681;font-style:italic}
+.stream-box .row{display:block;padding:0 4px;border-radius:2px;line-height:1.6}
+.stream-box .row.is-curr{background:rgba(251,191,36,.22);color:#FBBF24;font-weight:700;animation:fadein .35s}
+.stream-box .row.is-out{color:#7ee787}
+.stream-box .row.is-pending{color:#8b949e}
+.stream-box .row.is-grouped{background:rgba(139,92,246,.15);color:#c4b5fd}
+
+@keyframes fadein{from{opacity:0;transform:translateX(-4px)}to{opacity:1;transform:translateX(0)}}
+
+.banner{background:var(--accent-green-bg);border:1px solid var(--accent-green);border-radius:var(--radius-md);padding:8px 12px;font:700 12px var(--font-sans);color:var(--accent-green-text);margin-bottom:10px}
+
+@keyframes pulse-node{0%,100%{filter:drop-shadow(0 0 2px var(--accent-amber))}50%{filter:drop-shadow(0 0 8px var(--accent-amber))}}
+
+.legend{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px}
+.legend span{display:inline-flex;align-items:center;gap:5px;font-size:10px;color:var(--text-secondary)}
+.legend i{display:inline-block;width:14px;height:14px;border-radius:3px;border:1px solid var(--border-color)}
+
+.footer-bar{display:flex;flex-shrink:0;border-top:1px solid var(--border-color);background:#fff}
+.footer-left{width:33%;min-width:140px;max-width:45vw;display:flex;align-items:center;gap:8px;padding:7px 12px;border-right:1px solid var(--border-light)}
+.footer-right{flex:1;display:flex;align-items:center;gap:8px;padding:7px 20px;flex-wrap:wrap}
+.step-info{font:700 11px var(--font-mono);color:var(--text-secondary);background:var(--bg-secondary);padding:4px 10px;border-radius:var(--radius-sm);border:1px solid var(--border-color)}
+.action-badge{font-family:system-ui,"Segoe UI Emoji",sans-serif;font:700 9px var(--font-sans);padding:3px 8px;border-radius:99px;text-transform:uppercase;background:var(--bg-tertiary);color:var(--text-secondary);border:1px solid var(--border-color)}
+.action-badge--func-def,.action-badge--init,.action-badge--call,.action-badge--return{background:rgba(130,80,255,.14);color:#3C3489;border-color:#8250ff}
+.action-badge--for-check,.action-badge--while-check,.action-badge--if-check{background:rgba(56,139,253,.14);color:#185FA5;border-color:#388bfd}
+.action-badge--mark,.action-badge--push,.action-badge--pop,.action-badge--restore,.action-badge--found{background:var(--accent-green-bg);color:var(--accent-green-text);border-color:var(--accent-green)}
+.action-badge--remove,.action-badge--prune,.action-badge--fail{background:var(--accent-red-bg);color:var(--accent-red-text);border-color:var(--accent-red)}
+.action-badge--exit,.action-badge--skip{background:var(--bg-tertiary);color:var(--text-secondary);border-color:var(--border-color)}
+kbd{font-family:system-ui,"Segoe UI Emoji",sans-serif;font:600 10px var(--font-mono);background:var(--bg-secondary);border:1px solid var(--border-color);border-bottom-width:2px;padding:1px 5px;border-radius:3px;color:var(--text-secondary)}
+.btn{font-family:system-ui,"Segoe UI Emoji",sans-serif;font:600 11px var(--font-sans);background:var(--bg-card);border:1px solid var(--border-color);padding:4px 11px;border-radius:var(--radius-sm);cursor:pointer;color:var(--text-primary);transition:all var(--ease)}
+.btn:hover{background:var(--bg-secondary);border-color:var(--accent-indigo)}
+.btn-primary{background:var(--accent-indigo);color:#fff;border-color:var(--accent-indigo)}
+.btn-primary:hover{background:var(--accent-indigo-hover);color:#fff}
+.btn-fullscreen{font-family:system-ui,"Segoe UI Emoji",sans-serif}
+.footer-sep{width:1px;height:18px;background:var(--border-color)}
+.log-toggle-btn{font-family:system-ui,"Segoe UI Emoji",sans-serif;font:700 10px var(--font-sans);background:var(--accent-green-bg);border:1px solid var(--accent-green);padding:4px 10px;border-radius:var(--radius-sm);cursor:pointer;color:var(--accent-green-text)}
+.log-toggle-btn--off{background:var(--bg-secondary);border-color:var(--border-color);color:var(--text-secondary)}
+.btn-zoom{font-family:system-ui,"Segoe UI Emoji",sans-serif;font:700 12px var(--font-mono);background:var(--bg-card);border:1px solid var(--border-color);width:24px;height:24px;border-radius:var(--radius-sm);cursor:pointer;display:inline-flex;align-items:center;justify-content:center}
+.log-zoom-label{font:600 10px var(--font-mono);color:var(--text-secondary);min-width:36px;text-align:center}
+
+.log-popup{--log-scale:1;position:fixed;bottom:52px;right:14px;width:calc(480px*var(--log-scale));max-width:92vw;max-height:75vh;border-radius:var(--radius-lg);box-shadow:0 10px 32px rgba(0,0,0,.14);border:1px solid var(--border-color);background:var(--bg-card);overflow:hidden;display:flex;flex-direction:column;z-index:100;transition:opacity .15s,transform .15s;transform-origin:bottom right}
+.log-popup--hidden{opacity:0;transform:scale(.92);pointer-events:none}
+.log-popup-body{flex:1;overflow:auto;padding:0}
+.log-popup-body>.log-card{border-radius:0;border:none;border-left:0}
+.log-card{border-radius:var(--radius-md);overflow:hidden;border:1px solid var(--border-color);border-left-width:4px;font-size:var(--fs-xs);background:var(--bg-card)}
+.log-card--func-def,.log-card--init,.log-card--call,.log-card--return{border-left-color:#8250ff}
+.log-card--for-check,.log-card--while-check,.log-card--if-check{border-left-color:#388bfd}
+.log-card--mark,.log-card--push,.log-card--pop,.log-card--restore,.log-card--found{border-left-color:var(--accent-green)}
+.log-card--remove,.log-card--prune,.log-card--fail{border-left-color:var(--accent-red)}
+.log-card--exit,.log-card--skip{border-left-color:var(--text-tertiary)}
+.log-card-header{display:flex;align-items:center;gap:6px;padding:8px 10px 6px;background:var(--bg-secondary);border-bottom:1px solid var(--border-light)}
+.log-badge{font-family:system-ui,"Segoe UI Emoji",sans-serif;font:700 10px var(--font-sans);padding:3px 8px;border-radius:99px;text-transform:uppercase}
+.log-badge--func-def,.log-badge--init,.log-badge--call,.log-badge--return{background:rgba(130,80,255,.14);color:#3C3489}
+.log-badge--for-check,.log-badge--while-check,.log-badge--if-check{background:rgba(56,139,253,.14);color:#185FA5}
+.log-badge--mark,.log-badge--push,.log-badge--pop,.log-badge--restore,.log-badge--found{background:var(--accent-green-bg);color:var(--accent-green-text)}
+.log-badge--remove,.log-badge--prune,.log-badge--fail{background:var(--accent-red-bg);color:var(--accent-red-text)}
+.log-badge--exit,.log-badge--skip{background:var(--bg-tertiary);color:var(--text-secondary)}
+.log-line-ref{font:700 10px var(--font-mono);color:var(--accent-indigo);background:var(--accent-indigo-bg);padding:1px 6px;border-radius:4px;border:1px solid var(--accent-indigo)}
+.log-status-pill{font-family:system-ui,"Segoe UI Emoji",sans-serif;font-size:9px;font-weight:700;padding:2px 7px;border-radius:99px;text-transform:uppercase;margin-left:auto}
+.log-status--success{background:var(--accent-green-bg);color:var(--accent-green-text);border:1px solid var(--accent-green)}
+.log-status--fail{background:var(--accent-red-bg);color:var(--accent-red-text);border:1px solid var(--accent-red)}
+.log-status--skip{background:var(--bg-tertiary);color:var(--text-tertiary);border:1px solid var(--border-color)}
+.log-status--loop{background:rgba(56,139,253,.14);color:#185FA5;border:1px solid #388bfd}
+.log-status--prune{background:var(--accent-red-bg);color:var(--accent-red-text);border:1px solid var(--accent-red)}
+.log-status--info{background:rgba(130,80,255,.14);color:#3C3489;border:1px solid #8250ff}
+.log-section{padding:7px 10px;border-bottom:1px dashed var(--border-light)}
+.log-section:last-child{border-bottom:none}
+.log-section-title{font:700 8px var(--font-mono);text-transform:uppercase;letter-spacing:.06em;color:var(--text-tertiary);margin-bottom:4px;display:flex;align-items:center;gap:4px}
+.log-section-title-icon{font-family:system-ui,"Segoe UI Emoji",sans-serif}
+.log-code-snippet{font:600 11px var(--font-mono);background:#0d1117;color:#e6edf3;padding:6px 9px;border-radius:4px;display:block;overflow-x:auto;white-space:pre;border:1px solid #30363d}
+.log-code-snippet .ck{color:#ff7b72}.log-code-snippet .cs{color:#a5d6ff}.log-code-snippet .cn{color:#79c0ff}.log-code-snippet .cf{color:#d2a8ff}.log-code-snippet .cc{color:#8b949e;font-style:italic}.log-code-snippet .cb{color:#ffa657}.log-code-snippet .cp{color:#f778ba;font-weight:700}
+.log-kv-row{display:flex;gap:5px;flex-wrap:wrap}
+.log-kv{display:inline-flex;align-items:center;gap:3px;font:11px var(--font-mono);padding:2px 7px;border-radius:4px;background:var(--bg-secondary);border:1px solid var(--border-light)}
+.log-kv-key{color:var(--text-tertiary);font-weight:500}
+.log-kv-val{color:var(--text-primary);font-weight:700}
+.log-kv--in{background:rgba(56,139,253,.08);border-color:rgba(56,139,253,.3)}
+.log-kv--out{background:rgba(63,185,80,.08);border-color:rgba(63,185,80,.4)}
+.log-kv--out .log-kv-val{color:#15803D}
+.log-kv--changed{background:rgba(180,83,9,.10);border-color:rgba(180,83,9,.4)}
+.log-verdict{display:flex;align-items:center;gap:6px;font:600 11px var(--font-mono);padding:5px 8px;border-radius:5px;background:var(--bg-secondary);border:1px solid var(--border-light)}
+.log-verdict--true{background:var(--accent-green-bg);border-color:var(--accent-green);color:var(--accent-green-text)}
+.log-verdict--false{background:var(--accent-red-bg);border-color:var(--accent-red);color:var(--accent-red-text)}
+.log-analogy{font:italic 11px var(--font-sans);color:var(--text-secondary);background:#FFF8E7;border:1px solid #FBE8A6;border-left:3px solid var(--accent-amber);padding:6px 9px;border-radius:4px;line-height:1.55}
+.log-analogy strong{color:var(--accent-amber-text);font-style:normal;font-weight:700}
+.log-why{font-size:11px;line-height:1.55;color:var(--text-primary);padding:4px 0}
+.log-why strong{color:var(--accent-indigo-text)}
+.log-why code{font:11px var(--font-mono);background:var(--bg-secondary);padding:0 3px;border-radius:3px}
+</style>
+</head>
+<body>
+<div class="app-shell">
+
+  <div class="problem-card" id="problemCard">
+    <div class="pc-header">
+      <a href="../00_HomePage/gt_learn_homepage.html" class="gt-learn">GT LEARN</a>
+      <span class="pc-num">#194</span>
+      <span class="pc-title">📝 Word Frequency</span>
+      <span class="pc-diff">MEDIUM</span>
+      <span class="pc-tag">Shell</span>
+      <span class="pc-tag">Pipeline</span>
+      <span class="pc-tag">awk/sort/uniq</span>
+      <div class="pc-inputs">
+        <label>words.txt=<textarea id="inFile">the day is sunny the the
+the sunny is is</textarea></label>
+        <span class="expected-badge" id="expectedBadge">exp: the 4 / is 3 / sunny 2 / day 1</span>
+        <button class="toggle-btn" onclick="toggleProblem()" id="toggleProblemBtn">▲ Hide</button>
+      </div>
+    </div>
+    <div class="pc-body" id="pcBody">
+      <div>
+        <div class="pc-section-title">📝 Problem Statement</div>
+        <div class="pc-text">
+          Given <code>words.txt</code> with words separated by spaces (multiple per line), write a shell script to output <strong>each unique word and its frequency</strong>, sorted in <strong>descending</strong> order of frequency.
+        </div>
+        <div class="pc-section-title">🧠 Solving Approach</div>
+        <div class="pc-text">
+          Classic <strong>UNIX pipeline</strong> — chain small tools together: <code>cat</code> → <code>tr</code> → <code>sort</code> → <code>uniq -c</code> → <code>sort -nr</code> → <code>awk</code>. Each stage transforms the stream a little. <code>uniq -c</code> needs sorted input — that's why we sort first.
+        </div>
+        <div class="concept-block">
+          <div class="concept-block-title">🔧 tr -s ' ' '\n'</div>
+          <div class="concept-block-body">Squeeze consecutive spaces and replace each space with newline → <strong>one word per line</strong>.</div>
+        </div>
+        <div class="concept-block">
+          <div class="concept-block-title">📊 sort | uniq -c</div>
+          <div class="concept-block-body"><code>uniq</code> only collapses adjacent duplicates → MUST sort first. Output: <code>"  count word"</code> (count is left-padded).</div>
+        </div>
+        <div class="concept-block">
+          <div class="concept-block-title">🔢 sort -nr</div>
+          <div class="concept-block-body">Numeric (-n) reverse (-r) sort by the leading count column → highest frequency first.</div>
+        </div>
+        <div class="concept-block">
+          <div class="concept-block-title">🎨 awk '{print $2, $1}'</div>
+          <div class="concept-block-body">Swap columns: count became <code>$1</code>, word became <code>$2</code>. Output as <code>"word count"</code>.</div>
+        </div>
+        <div class="complexity-row">
+          <span class="complexity-chip">⏱ Time: O(N log N)</span>
+          <span class="complexity-chip">💾 Space: O(N)</span>
+        </div>
+      </div>
+      <div>
+        <div class="pc-section-title">🧪 Test Cases</div>
+        <div class="tc-list">
+          <div class="tc-chip" onclick="loadTest('the day is sunny the the\nthe sunny is is','the 4\nis 3\nsunny 2\nday 1')">
+            <div class="tc-chip-input">the day is sunny the the / the sunny is is <span class="pt-tag">basic</span></div>
+            <div class="tc-chip-expected">→ the 4 / is 3 / sunny 2 / day 1</div>
+          </div>
+          <div class="tc-chip" onclick="loadTest('hello world','hello 1\nworld 1')">
+            <div class="tc-chip-input">hello world <span class="pt-tag">all unique</span></div>
+            <div class="tc-chip-expected">→ hello 1 / world 1</div>
+          </div>
+          <div class="tc-chip" onclick="loadTest('a','a 1')">
+            <div class="tc-chip-input">a <span class="pt-tag">single word</span></div>
+            <div class="tc-chip-expected">→ a 1</div>
+          </div>
+          <div class="tc-chip" onclick="loadTest('a a a a','a 4')">
+            <div class="tc-chip-input">a a a a <span class="pt-tag">all same</span></div>
+            <div class="tc-chip-expected">→ a 4</div>
+          </div>
+          <div class="tc-chip" onclick="loadTest('cat dog cat\ndog cat fish','cat 3\ndog 2\nfish 1')">
+            <div class="tc-chip-input">cat dog cat / dog cat fish <span class="pt-tag">multi-line</span></div>
+            <div class="tc-chip-expected">→ cat 3 / dog 2 / fish 1</div>
+          </div>
+        </div>
+        <div class="run-row">
+          <button class="btn-run" onclick="resetWithInput()">▶ Run</button>
+          <span class="live-output" id="liveOutput">—</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="main-row">
+    <div class="col col-code" id="col1">
+      <div class="section-label">📜 Shell Pipeline</div>
+      <div class="code-panel" id="codePanel"></div>
+    </div>
+    <div class="resize-handle" id="resizeH1"></div>
+    <div class="col col-viz">
+      <div class="section-label">📊 Visualization</div>
+      <div class="viz-panel" id="vizPanel"></div>
+    </div>
+  </div>
+
+  <div class="log-popup" id="logPopup">
+    <div class="log-popup-body" id="logPopupBody"></div>
+  </div>
+
+  <div class="footer-bar">
+    <div class="footer-left" id="footerLeft">
+      <span id="stepInfo" class="step-info">0/0</span>
+      <span id="actionBadge" class="action-badge"></span>
+    </div>
+    <div class="footer-right">
+      <kbd>←</kbd><kbd>→</kbd><kbd>R</kbd>
+      <button class="btn" type="button" onclick="resetStep()">↺</button>
+      <button class="btn" type="button" onclick="stepBy(-1)">◀</button>
+      <button class="btn btn-primary" type="button" onclick="stepBy(1)">▶ Next</button>
+      <span class="footer-sep"></span>
+      <button id="logToggleBtn" class="log-toggle-btn" type="button" onclick="toggleLogPreview()">📋 ON</button>
+      <button class="btn-zoom" type="button" onclick="logZoom(-1)">−</button>
+      <span id="logZoomLabel" class="log-zoom-label">100%</span>
+      <button class="btn-zoom" type="button" onclick="logZoom(1)">+</button>
+      <button class="btn-zoom" type="button" onclick="logZoomReset()">↺</button>
+      <span class="footer-sep"></span>
+      <button class="btn btn-fullscreen" type="button" onclick="toggleFullscreen()">⛶</button>
+    </div>
+  </div>
+</div>
+
+<script>
+var codeLines = [
+  "#!/bin/bash",
+  "# Read words.txt, count frequencies, sort by count desc",
+  "",
+  "cat words.txt \\",
+  "  | tr -s ' ' '\\n' \\",
+  "  | sort \\",
+  "  | uniq -c \\",
+  "  | sort -nr \\",
+  "  | awk '{print $2, $1}'"
+];
+
+var steps = [], currentStep = 0, codeWidthUserSet = false, curResult = null;
+var logEnabled = true, logZoomLevel = 100;
+
+var LOG_BADGE = {"func-def":"📌 DEF","init":"⚙️ INIT","call":"📞 CALL","return":"🏆 RETURN","for-check":"🔁 FOR","while-check":"🔁 WHILE","if-check":"🔎 IF","mark":"✅ MARK","push":"⬆ PUSH","pop":"⬇ POP","restore":"↩ RESTORE","found":"🎉 FOUND","remove":"✏️ EDIT","prune":"✂️ PRUNE","fail":"❌ FAIL","exit":"🔚 EXIT","skip":"⏭ SKIP"};
+var BADGE_LABEL = {"func-def":"DEF","init":"INIT","call":"CALL","return":"RETURN","for-check":"FOR","while-check":"WHILE","if-check":"IF","mark":"MARK","push":"PUSH","pop":"POP","restore":"RESTORE","found":"FOUND","remove":"EDIT","prune":"PRUNE","fail":"FAIL","exit":"EXIT","skip":"SKIP"};
+
+function escHtml(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function hlCode(raw){
+  var h = raw;
+  h = h.replace(/("[^"]*"|'[^']*')/g, '\x01s\x02$1\x03');
+  h = h.replace(/(#[^\n]*)/g, '\x01c\x02$1\x03');
+  h = h.replace(/\b(cat|tr|sort|uniq|awk|head|tail|grep|sed|wc|cut|paste|echo|print)\b/g, '\x01b\x02$1\x03');
+  h = h.replace(/(\||>|<|\\)/g, '\x01p\x02$1\x03');
+  h = h.replace(/\$\d+|\$\w+/g, function(m){return '\x01b\x02'+m+'\x03';});
+  h = h.replace(/(?<![.\w"\x01\x02\x03])(-?\d+)\b/g, '\x01n\x02$1\x03');
+  h = h.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  h = h.replace(/\x01([a-z])\x02/g, function(_,c){return '<span class="c'+c+'">';}).replace(/\x03/g,'</span>');
+  return h;
+}
+
+function richLog(opts){
+  var statusMap = {success:"✅ Success",fail:"❌ Failed",skip:"⏭ Skipped",loop:"🔁 Loop iter",prune:"✂️ Pruned",info:"ℹ️ Info"};
+  var status = opts.status || "info";
+  var html = '<div class="log-card log-card--'+opts.action+'">';
+  html += '<div class="log-card-header">';
+  html += '<span class="log-badge log-badge--'+opts.action+'">'+(LOG_BADGE[opts.action]||opts.action)+'</span>';
+  html += '<span class="log-line-ref">L'+(opts.line+1)+'</span>';
+  html += '<span class="log-status-pill log-status--'+status+'">'+statusMap[status]+'</span></div>';
+  if (opts.code){ html += '<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">📜</span>Code Executing</div><code class="log-code-snippet">'+hlCode(opts.code)+'</code></div>'; }
+  if (opts.inputs && opts.inputs.length){ html += '<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">📥</span>Input Stream / Values</div><div class="log-kv-row">'; opts.inputs.forEach(function(kv){ html += '<span class="log-kv log-kv--in"><span class="log-kv-key">'+escHtml(kv.k)+'</span>=<span class="log-kv-val">'+escHtml(kv.v)+'</span></span>'; }); html += '</div></div>'; }
+  if (opts.outputs && opts.outputs.length){ html += '<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">📤</span>Output Stream / State After</div><div class="log-kv-row">'; opts.outputs.forEach(function(kv){ var cls = kv.changed?'log-kv--changed':'log-kv--out'; html += '<span class="log-kv '+cls+'"><span class="log-kv-key">'+escHtml(kv.k)+'</span>=<span class="log-kv-val">'+escHtml(kv.v)+'</span></span>'; }); html += '</div></div>'; }
+  if (opts.verdict){ var vCls = opts.verdictTrue===true?'log-verdict--true':(opts.verdictTrue===false?'log-verdict--false':''); var vIcon = opts.verdictTrue===true?'✓':(opts.verdictTrue===false?'✗':'•'); html += '<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">⚖️</span>Verdict / Decision</div><div class="log-verdict '+vCls+'">'+vIcon+' '+escHtml(opts.verdict)+'</div></div>'; }
+  if (opts.why){ html += '<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">💡</span>Why This Happens</div><div class="log-why">'+opts.why+'</div></div>'; }
+  if (opts.analogy){ html += '<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">🎭</span>Real-Life Analogy</div><div class="log-analogy">'+opts.analogy+'</div></div>'; }
+  html += '</div>';
+  return html;
+}
+
+function renderCode(){
+  var p = document.getElementById('codePanel');
+  p.innerHTML = codeLines.map(function(raw,i){
+    var h = raw;
+    h = h.replace(/("[^"]*"|'[^']*')/g, '\x01STR\x02$1\x03');
+    h = h.replace(/(#[^\n]*)/g, '\x01CM\x02$1\x03');
+    h = h.replace(/\b(cat|tr|sort|uniq|awk|head|tail|grep|sed|wc|cut|paste|echo|print)\b/g, '\x01BI\x02$1\x03');
+    h = h.replace(/(\||>|<|\\)/g, '\x01PP\x02$1\x03');
+    h = h.replace(/\$\d+|\$\w+/g, function(m){return '\x01BI\x02'+m+'\x03';});
+    h = h.replace(/(?<![.\w"\x01\x02\x03])(-?\d+)\b/g, '\x01NUM\x02$1\x03');
+    h = h.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    var map = {STR:'str',KW:'kw',BI:'bi',NUM:'num',CM:'cm',PP:'pp'};
+    h = h.replace(/\x01([A-Z]+)\x02/g, function(_,c){return '<span class="'+map[c]+'">';}).replace(/\x03/g,'</span>');
+    if (h === '') h = '&nbsp;';
+    return '<div class="code-line" data-line="'+i+'"><span class="ln">'+(i+1)+'</span><span class="src">'+h+'</span></div>';
+  }).join('');
+}
+function fitCodeWidth(){ if (codeWidthUserSet) return; var col = document.getElementById('col1'); var maxW = Math.min(col.offsetWidth, window.innerWidth*0.45); col.style.width = Math.max(280, maxW*0.9)+'px'; syncFooterWidth(); }
+function syncFooterWidth(){ document.getElementById('footerLeft').style.width = document.getElementById('col1').offsetWidth+'px'; }
+
+// ============== BUILD STEPS ==============
+// Pipeline stages and their code-line indices
+var STAGES = [
+  {key:'cat',   icon:'📄', label:'cat',     line:3},
+  {key:'tr',    icon:'✂️', label:'tr',      line:4},
+  {key:'sort1', icon:'🔤', label:'sort',    line:5},
+  {key:'uniq',  icon:'📊', label:'uniq -c', line:6},
+  {key:'sort2', icon:'🔢', label:'sort -nr',line:7},
+  {key:'awk',   icon:'🎨', label:'awk',     line:8}
+];
+
+function buildSteps(fileText){
+  var st = [];
+  var MAX_STEPS = 4000;
+  // Stage outputs
+  var streams = { input:null, cat:null, tr:null, sort1:null, uniq:null, sort2:null, awk:null };
+  var currStage = null;        // which pipe stage is active
+  var currIdx = -1;            // current item being processed in stage
+  var doneStages = [];         // completed stages
+
+  function snap(extra){
+    var sCopy = {};
+    for (var k in streams) sCopy[k] = streams[k] === null ? null : streams[k].slice();
+    return Object.assign({
+      streams: sCopy,
+      currStage: currStage, currIdx: currIdx,
+      doneStages: doneStages.slice()
+    }, extra||{});
+  }
+  function pushStep(o){ if (st.length >= MAX_STEPS) return; st.push(Object.assign({line:0,action:"init",logHTML:""}, snap(o))); }
+
+  // ===== L0 — shebang =====
+  pushStep({
+    line:0, action:"func-def",
+    logHTML: richLog({
+      line:0, action:"func-def", status:"info",
+      code:"#!/bin/bash # interpreter directive",
+      inputs:[{k:"shell",v:"bash"}],
+      why:"<strong>Shebang line</strong> — operating system ko bata raha hai ki yeh script <code>bash</code> interpreter se chalegi.",
+      analogy:"Jaise <strong>recipe ke top pe likha ho</strong> — 'Yeh recipe Hindi mein hai, Hindi-padhne wala hi banaye'. Tool select karne ka declaration."
+    })
+  });
+
+  // ===== L1 — comment =====
+  pushStep({
+    line:1, action:"init",
+    logHTML: richLog({
+      line:1, action:"init", status:"info",
+      code:"# Read words.txt, count frequencies, sort by count desc",
+      inputs:[{k:"comment",v:"description"}],
+      why:"<strong>Comment line</strong> — bash isko ignore karta hai. Sirf reader ke liye documentation.",
+      analogy:"Jaise <strong>recipe ke pas chhota note</strong> ho — 'Yeh dish Italian-style ki hai'. Cooking pe asar nahi, sirf info."
+    })
+  });
+
+  // ===== L2 — blank =====
+  pushStep({
+    line:2, action:"skip",
+    logHTML: richLog({
+      line:2, action:"skip", status:"skip",
+      code:"# (blank line)",
+      verdict:"empty line — no execution", verdictTrue:false,
+      why:"<strong>Blank line</strong> — readability ke liye. Bash isko bhi ignore karta hai.",
+      analogy:"<strong>Paragraph break</strong> — recipe mein sections ke beech khaali line, kuch karne ko nahi."
+    })
+  });
+
+  // Parse input — what cat will produce
+  var rawLines = fileText.split('\n');
+  while (rawLines.length && rawLines[rawLines.length-1] === '') rawLines.pop();
+  streams.input = rawLines.slice();
+
+  // ===== L3 — cat words.txt =====
+  currStage = 'cat';
+  pushStep({
+    line:3, action:"call",
+    logHTML: richLog({
+      line:3, action:"call", status:"info",
+      code:"cat words.txt \\  # stream contents to stdout",
+      inputs:[{k:"file",v:"words.txt"},{k:"lines",v:rawLines.length}],
+      why:"<code>cat</code> command file ka <strong>poora content stdout pe dump</strong> karta hai. Trailing <code>\\</code> = line continuation, agla command pipe se chain hoga.",
+      analogy:"<strong>Pen drive open karke saari files dikhana</strong> — bas content forward karo, kuch process nahi."
+    })
+  });
+  // Process cat — output each line one by one
+  streams.cat = [];
+  for (var ci = 0; ci < rawLines.length; ci++) {
+    streams.cat.push(rawLines[ci]);
+    currIdx = ci;
+    pushStep({
+      line:3, action:"push",
+      logHTML: richLog({
+        line:3, action:"push", status:"loop",
+        code:'cat: stream line '+(ci+1)+'/'+rawLines.length+' → "'+rawLines[ci]+'"',
+        inputs:[{k:"line #",v:ci+1},{k:"content",v:'"'+rawLines[ci]+'"'}],
+        outputs:[{k:"cat output size",v:streams.cat.length,changed:true}],
+        why:"Line <strong>"+(ci+1)+"</strong> ka content <code>cat</code> apne stdout pe likh raha hai → next stage (<code>tr</code>) ke stdin mein jayega via pipe.",
+        analogy:"<strong>Conveyor belt pe dabba "+(ci+1)+"</strong> rakh diya — agle station ko forward."
+      })
+    });
+  }
+  currIdx = -1;
+  doneStages.push('cat');
+
+  // ===== L4 — tr -s ' ' '\n' =====
+  currStage = 'tr';
+  pushStep({
+    line:4, action:"call",
+    logHTML: richLog({
+      line:4, action:"call", status:"info",
+      code:"  | tr -s ' ' '\\n' \\  # squeeze spaces, replace each with newline",
+      inputs:[{k:"flag",v:"-s (squeeze)"},{k:"from",v:"' '"},{k:"to",v:"'\\n'"}],
+      why:"<code>tr -s ' ' '\\n'</code> — <strong>multiple consecutive spaces ko ek mein squeeze</strong> karke har space ko newline se replace. Output: <strong>one word per line</strong>.",
+      analogy:"<strong>Train ke compartments ko alag-alag platforms pe lagana</strong> — ek line mein chipke huye words ko separate rows mein bichaa do."
+    })
+  });
+  // tr processing — split each cat line into words
+  streams.tr = [];
+  for (var li = 0; li < streams.cat.length; li++) {
+    var lineContent = streams.cat[li];
+    var words = lineContent.split(/\s+/).filter(function(x){return x.length>0;});
+    pushStep({
+      line:4, action:"for-check",
+      logHTML: richLog({
+        line:4, action:"for-check", status:"loop",
+        code:'tr reads input line '+(li+1)+': "'+lineContent+'" → splits into '+words.length+' word(s)',
+        inputs:[{k:"input line",v:'"'+lineContent+'"'},{k:"words found",v:words.length}],
+        verdict:"reading line "+(li+1)+"/"+streams.cat.length, verdictTrue:true,
+        why:"<code>tr</code> stdin se <strong>line "+(li+1)+"</strong> padh raha. Spaces ko newlines se replace karke <strong>"+words.length+" word(s)</strong> emit karega.",
+        analogy:"<strong>Line "+(li+1)+" ki dabba train</strong> — ab har dabba alag platform pe."
+      })
+    });
+    for (var wi = 0; wi < words.length; wi++) {
+      streams.tr.push(words[wi]);
+      currIdx = streams.tr.length - 1;
+      pushStep({
+        line:4, action:"push",
+        logHTML: richLog({
+          line:4, action:"push", status:"success",
+          code:'tr emit: "'+words[wi]+'\\n" # word '+(wi+1)+'/'+words.length+' from line '+(li+1),
+          inputs:[{k:"word",v:'"'+words[wi]+'"'}],
+          outputs:[{k:"tr output size",v:streams.tr.length,changed:true},{k:"latest emit",v:'"'+words[wi]+'"'}],
+          why:"Word <code>\""+escHtml(words[wi])+"\"</code> + newline emit. Yeh <code>sort</code> ke stdin mein jayega.",
+          analogy:"<strong>'"+escHtml(words[wi])+"'</strong> ka apna platform mil gaya — agla station: alphabetically sort."
+        })
+      });
+    }
+  }
+  // tr exit
+  pushStep({
+    line:4, action:"exit",
+    logHTML: richLog({
+      line:4, action:"exit", status:"info",
+      code:"tr EOF: all input consumed → "+streams.tr.length+" word(s) emitted total",
+      inputs:[{k:"total emitted",v:streams.tr.length}],
+      why:"<code>tr</code> stdin EOF detect kiya — kaam complete. Ab pipe close, <code>sort</code> apna kaam shuru karega.",
+      analogy:"<strong>Saari trains ka unloading khatam</strong> — har dabba apne platform pe. Ab next station: sorting!"
+    })
+  });
+  currIdx = -1;
+  doneStages.push('tr');
+
+  // ===== L5 — sort =====
+  currStage = 'sort1';
+  pushStep({
+    line:5, action:"call",
+    logHTML: richLog({
+      line:5, action:"call", status:"info",
+      code:"  | sort \\  # alphabetical sort — REQUIRED before uniq",
+      inputs:[{k:"input words",v:streams.tr.length},{k:"mode",v:"lex ascending"}],
+      why:"<code>sort</code> default <strong>lexicographic ascending</strong>. Critical — <code>uniq</code> sirf <strong>adjacent duplicates</strong> collapse karta hai, isliye pehle sort zaroori.",
+      analogy:"<strong>Library mein books ko ABC order</strong> mein lagana — taaki <strong>same naam wali books</strong> bagal-bagal aa jayein, count karna easy ho."
+    })
+  });
+  // Show input being read
+  pushStep({
+    line:5, action:"for-check",
+    logHTML: richLog({
+      line:5, action:"for-check", status:"loop",
+      code:'sort reads all '+streams.tr.length+' words from stdin → buffering before sort',
+      inputs:[{k:"buffer size",v:streams.tr.length}],
+      verdict:"buffering "+streams.tr.length+" words", verdictTrue:true,
+      why:"<code>sort</code> ko poora input <strong>buffer karna padta</strong> hai (in-memory) — pehle sab padho, fir sort, fir output.",
+      analogy:"<strong>Pehle saari books shelf se utha lo</strong>, fir order mein lagao — ek-ek karke nahi ho sakta."
+    })
+  });
+  // Do the sort
+  streams.sort1 = streams.tr.slice().sort();
+  // Show each output one at a time
+  for (var si = 0; si < streams.sort1.length; si++) {
+    currIdx = si;
+    pushStep({
+      line:5, action:"push",
+      logHTML: richLog({
+        line:5, action:"push", status:"success",
+        code:'sort emit '+(si+1)+'/'+streams.sort1.length+': "'+streams.sort1[si]+'"',
+        inputs:[{k:"position",v:si+1}],
+        outputs:[{k:"emit",v:'"'+streams.sort1[si]+'"',changed:true},{k:"sort output size",v:si+1}],
+        why:"Sorted position <strong>#"+(si+1)+"</strong> emit. Same words ab adjacent hain — <code>uniq</code> easily count kar sakta.",
+        analogy:"<strong>'"+escHtml(streams.sort1[si])+"'</strong> ko ABC order mein "+(si+1)+"-th jagah pe rakha gaya."
+      })
+    });
+  }
+  pushStep({
+    line:5, action:"exit",
+    logHTML: richLog({
+      line:5, action:"exit", status:"info",
+      code:"sort done: all "+streams.sort1.length+" words alphabetically ordered",
+      inputs:[{k:"sorted words",v:streams.sort1.length}],
+      why:"Sort complete. Same words ab consecutive lines pe — <code>uniq -c</code> ka kaam easy.",
+      analogy:"<strong>Alphabetical shelf ready</strong> — same naam wali books ek saath. Counting begins!"
+    })
+  });
+  currIdx = -1;
+  doneStages.push('sort1');
+
+  // ===== L6 — uniq -c =====
+  currStage = 'uniq';
+  pushStep({
+    line:6, action:"call",
+    logHTML: richLog({
+      line:6, action:"call", status:"info",
+      code:"  | uniq -c \\  # count adjacent duplicates",
+      inputs:[{k:"flag",v:"-c (count)"},{k:"input",v:streams.sort1.length+" sorted words"}],
+      why:"<code>uniq -c</code> <strong>adjacent duplicate lines</strong> ko collapse karke har unique line ke aage <strong>count prepend</strong> karta hai. Format: <code>'  COUNT WORD'</code>.",
+      analogy:"<strong>Library shelf pe walk karte hue</strong> — same naam ki books gin lo: 'A 3 copies, B 2 copies, C 1 copy'."
+    })
+  });
+  // Run uniq -c
+  streams.uniq = [];
+  var ui = 0;
+  while (ui < streams.sort1.length) {
+    var word = streams.sort1[ui];
+    var count = 1;
+    var startIdx = ui;
+    while (ui+1 < streams.sort1.length && streams.sort1[ui+1] === word) { count++; ui++; }
+    ui++;
+    var line = '      ' + count + ' ' + word; // mimic uniq -c left-padding
+    streams.uniq.push(line);
+    currIdx = streams.uniq.length - 1;
+    pushStep({
+      line:6, action:"mark",
+      logHTML: richLog({
+        line:6, action:"mark", status:"success",
+        code:'uniq -c: counted "'+word+'" × '+count+' (positions '+(startIdx+1)+'..'+ui+') → emit "'+line.replace(/\s+/g,' ').trim()+'"',
+        inputs:[{k:"word",v:'"'+word+'"'},{k:"adjacent run length",v:count}],
+        outputs:[{k:"emit",v:'"'+line+'"',changed:true},{k:"uniq output size",v:streams.uniq.length}],
+        why:"<code>"+count+"</code> consecutive <code>\""+escHtml(word)+"\"</code> mile — <strong>collapse</strong> into single line with count prefix.",
+        analogy:"<strong>'"+escHtml(word)+"' shelf pe "+count+" copies</strong> — register mein ek hi entry: '"+count+" × "+escHtml(word)+"'."
+      })
+    });
+  }
+  pushStep({
+    line:6, action:"exit",
+    logHTML: richLog({
+      line:6, action:"exit", status:"info",
+      code:"uniq EOF: "+streams.uniq.length+" unique words counted",
+      inputs:[{k:"unique words",v:streams.uniq.length}],
+      why:"Saare unique words counted. Lekin order abhi <strong>alphabetical</strong> hai — humein <strong>frequency-desc</strong> chahiye, isliye dobara sort.",
+      analogy:"<strong>Counting roster ready</strong> — but problem mein 'highest first' chahiye, isliye ek aur sort lagega."
+    })
+  });
+  currIdx = -1;
+  doneStages.push('uniq');
+
+  // ===== L7 — sort -nr =====
+  currStage = 'sort2';
+  pushStep({
+    line:7, action:"call",
+    logHTML: richLog({
+      line:7, action:"call", status:"info",
+      code:"  | sort -nr \\  # numeric reverse sort by leading count",
+      inputs:[{k:"-n",v:"numeric"},{k:"-r",v:"reverse"}],
+      why:"<code>-n</code> = numeric (lexicographic mein '10' < '2', galat). <code>-r</code> = reverse (descending). Leading <strong>count column</strong> pe sort.",
+      analogy:"<strong>Cricket scoreboard</strong> — highest run-scorer top pe. Numbers ko number ki tarah compare karo, string ki tarah nahi."
+    })
+  });
+  // Show buffering
+  pushStep({
+    line:7, action:"for-check",
+    logHTML: richLog({
+      line:7, action:"for-check", status:"loop",
+      code:"sort -nr buffering "+streams.uniq.length+" lines for numeric desc sort",
+      inputs:[{k:"buffer size",v:streams.uniq.length}],
+      verdict:"buffering "+streams.uniq.length+" lines", verdictTrue:true,
+      why:"Sort ko fir se buffer karna padega — sab lines load karke numeric-reverse compare karega.",
+      analogy:"<strong>Saare players ke scores ek board pe</strong> — fir highest se lowest arrange."
+    })
+  });
+  // Sort numeric desc by leading count
+  streams.sort2 = streams.uniq.slice().sort(function(a,b){
+    var ca = parseInt(a.trim().split(/\s+/)[0]);
+    var cb = parseInt(b.trim().split(/\s+/)[0]);
+    return cb - ca;
+  });
+  for (var s2i = 0; s2i < streams.sort2.length; s2i++) {
+    currIdx = s2i;
+    var parts = streams.sort2[s2i].trim().split(/\s+/);
+    pushStep({
+      line:7, action:"push",
+      logHTML: richLog({
+        line:7, action:"push", status:"success",
+        code:'sort -nr emit '+(s2i+1)+'/'+streams.sort2.length+': "'+streams.sort2[s2i]+'"',
+        inputs:[{k:"rank",v:s2i+1},{k:"count",v:parts[0]},{k:"word",v:parts[1]}],
+        outputs:[{k:"emit",v:'"'+streams.sort2[s2i]+'"',changed:true}],
+        why:"Rank <strong>#"+(s2i+1)+"</strong> — count <code>"+parts[0]+"</code>, word <code>\""+escHtml(parts[1])+"\"</code>. Highest counts pehle.",
+        analogy:"<strong>Scoreboard rank "+(s2i+1)+"</strong> — '"+escHtml(parts[1])+"' ne "+parts[0]+" baar appear kiya."
+      })
+    });
+  }
+  pushStep({
+    line:7, action:"exit",
+    logHTML: richLog({
+      line:7, action:"exit", status:"info",
+      code:"sort -nr done: "+streams.sort2.length+" lines ranked desc by count",
+      inputs:[{k:"ranked lines",v:streams.sort2.length}],
+      why:"Reverse-numeric sort complete. Lekin format abhi <code>'count word'</code> hai, problem chahta hai <code>'word count'</code> — last stage <code>awk</code> swap karega.",
+      analogy:"<strong>Scoreboard ready</strong> — but display format change karna baaki: name pehle, score baad mein."
+    })
+  });
+  currIdx = -1;
+  doneStages.push('sort2');
+
+  // ===== L8 — awk '{print $2, $1}' =====
+  currStage = 'awk';
+  pushStep({
+    line:8, action:"call",
+    logHTML: richLog({
+      line:8, action:"call", status:"info",
+      code:"  | awk '{print $2, $1}'  # swap columns: count word → word count",
+      inputs:[{k:"$1",v:"count column"},{k:"$2",v:"word column"}],
+      why:"<code>awk</code> har line ko fields mein split karta hai (default separator: whitespace). <code>$1</code>=first field=count, <code>$2</code>=second field=word. <code>print $2, $1</code> = swap aur space-separated print.",
+      analogy:"<strong>Display format swap</strong> — '4 the' ko '<strong>the 4</strong>' bana do. Comma in awk = space separator output."
+    })
+  });
+  streams.awk = [];
+  for (var ai = 0; ai < streams.sort2.length; ai++) {
+    var awkParts = streams.sort2[ai].trim().split(/\s+/);
+    var f1 = awkParts[0], f2 = awkParts[1];
+    pushStep({
+      line:8, action:"for-check",
+      logHTML: richLog({
+        line:8, action:"for-check", status:"loop",
+        code:'awk reads line '+(ai+1)+': "'+streams.sort2[ai]+'" → $1="'+f1+'", $2="'+f2+'"',
+        inputs:[{k:"NR",v:ai+1},{k:"$1",v:'"'+f1+'"'},{k:"$2",v:'"'+f2+'"'}],
+        verdict:"processing line "+(ai+1)+"/"+streams.sort2.length, verdictTrue:true,
+        why:"awk ne <strong>line "+(ai+1)+"</strong> ko whitespace pe split kiya: 2 fields mile.",
+        analogy:"<strong>Cashier ne customer ka token padha</strong> — pehla number, dusra naam. Ab swap karke print."
+      })
+    });
+    var emitted = f2 + ' ' + f1;
+    streams.awk.push(emitted);
+    currIdx = streams.awk.length - 1;
+    pushStep({
+      line:8, action:"found",
+      logHTML: richLog({
+        line:8, action:"found", status:"success",
+        code:"print $2, $1 → \""+emitted+"\"",
+        inputs:[{k:"$2",v:'"'+f2+'"'},{k:"$1",v:'"'+f1+'"'}],
+        outputs:[{k:"emit",v:'"'+emitted+'"',changed:true},{k:"awk output size",v:streams.awk.length}],
+        why:"🎉 Final formatted line: <code>\""+escHtml(emitted)+"\"</code> stdout pe!",
+        analogy:"<strong>Final scoreboard pe naam</strong> — '"+escHtml(f2)+" "+f1+"' display ho gaya. Crowd cheers!"
+      })
+    });
+  }
+  pushStep({
+    line:8, action:"exit",
+    logHTML: richLog({
+      line:8, action:"exit", status:"info",
+      code:"awk EOF: pipeline complete — "+streams.awk.length+" line(s) on stdout",
+      inputs:[{k:"final lines",v:streams.awk.length}],
+      why:"awk done — pipeline ka <strong>last stage</strong> bhi finish. Final output ready.",
+      analogy:"<strong>Match khatam, scoreboard final</strong> — sab announcements ho gaye."
+    })
+  });
+  doneStages.push('awk');
+  currStage = null;
+  currIdx = -1;
+
+  // Final result
+  curResult = streams.awk.join('\n');
+  pushStep({
+    line:8, action:"return",
+    logHTML: richLog({
+      line:8, action:"return", status:"success",
+      code:"# pipeline returns:\n"+curResult,
+      inputs:[{k:"output lines",v:streams.awk.length}],
+      outputs:[{k:"stdout",v:'"'+curResult.replace(/\n/g,'\\n')+'"',changed:true}],
+      why:"🏆 <strong>Pipeline complete!</strong> Words sorted by frequency desc, formatted as <code>'word count'</code>. Six small Unix tools — ek combined solution!",
+      analogy:"<strong>📋 Final report published</strong> — har department ne apna chhota kaam kiya, milke complete result mil gaya. <strong>Unix philosophy: do one thing well, chain together!</strong>"
+    })
+  });
+
+  return st;
+}
+
+// ============== RENDER VIZ ==============
+function renderViz(s){
+  var p = document.getElementById('vizPanel');
+  var html = '';
+
+  if (s.line === 8 && s.currStage === null) {
+    html += '<div class="banner">🎉 Pipeline complete! '+(s.streams.awk?s.streams.awk.length:0)+' word(s) ranked by frequency.</div>';
+  }
+
+  // Vars strip
+  html += '<div class="vars-strip">';
+  html += '<span class="var-chip vc-active"><span class="vk">stage</span>=<span class="vv">'+(s.currStage||'—')+'</span></span>';
+  if (s.streams.input) html += '<span class="var-chip"><span class="vk">file lines</span>=<span class="vv">'+s.streams.input.length+'</span></span>';
+  if (s.streams.tr) html += '<span class="var-chip vc-warn"><span class="vk">total words</span>=<span class="vv">'+s.streams.tr.length+'</span></span>';
+  if (s.streams.uniq) html += '<span class="var-chip vc-safe"><span class="vk">unique</span>=<span class="vv">'+s.streams.uniq.length+'</span></span>';
+  if (s.streams.awk) html += '<span class="var-chip vc-safe"><span class="vk">final lines</span>=<span class="vv">'+s.streams.awk.length+'</span></span>';
+  html += '</div>';
+
+  // Pipeline diagram
+  html += renderPipeline(s);
+
+  // Streams (input + each stage)
+  html += '<div class="viz-row">';
+  html += renderStreamCard(s, 'input', '📄 words.txt (input)', null, 'Original file content');
+  html += renderStreamCard(s, 'tr', '✂️ after tr (one word per line)', 'tr', 'Spaces → newlines');
+  html += renderStreamCard(s, 'sort1', '🔤 after sort (alphabetical)', 'sort1', 'Lex ascending');
+  html += renderStreamCard(s, 'uniq', '📊 after uniq -c', 'uniq', 'Adjacent dups counted');
+  html += renderStreamCard(s, 'sort2', '🔢 after sort -nr', 'sort2', 'Numeric desc by count');
+  html += renderStreamCard(s, 'awk', '🎨 after awk (final)', 'awk', 'word count format');
+  html += '</div>';
+
+  p.innerHTML = html;
+}
+
+function renderPipeline(s){
+  var h = '<div class="pipeline">';
+  for (var i = 0; i < STAGES.length; i++) {
+    var stg = STAGES[i];
+    var isCurr = s.currStage === stg.key;
+    var isDone = s.doneStages.indexOf(stg.key) >= 0;
+    var cls = 'pipe-stage' + (isCurr?' is-curr':'') + (isDone && !isCurr ?' is-done':'');
+    h += '<div class="'+cls+'">';
+    h += '<div class="ps-icon">'+stg.icon+'</div>';
+    h += '<div class="ps-label">'+stg.label+'</div>';
+    h += '<div class="ps-cmd">L'+(stg.line+1)+'</div>';
+    h += '</div>';
+    if (i < STAGES.length-1) {
+      var arrowActive = (isCurr || (isDone && s.currStage === STAGES[i+1].key));
+      h += '<div class="pipe-arrow'+(arrowActive?' is-active':'')+'">|</div>';
+    }
+  }
+  h += '</div>';
+  return h;
+}
+
+function renderStreamCard(s, key, title, stageKey, subtitle){
+  var stream = s.streams[key];
+  var isCurrCard = stageKey && s.currStage === stageKey;
+  var h = '<div class="viz-card'+(isCurrCard?' is-curr-stage':'')+'">';
+  h += '<div class="viz-card-title">'+title+'</div>';
+  h += '<div class="viz-card-subtitle">'+subtitle+'</div>';
+  h += '<div class="stream-box">';
+  if (stream === null) {
+    h += '<span class="empty">— not yet produced —</span>';
+  } else if (stream.length === 0) {
+    h += '<span class="empty">— empty —</span>';
+  } else {
+    for (var i = 0; i < stream.length; i++) {
+      var rowCls = 'row';
+      if (isCurrCard && s.currIdx === i) rowCls += ' is-curr';
+      else if (stageKey && s.doneStages.indexOf(stageKey) >= 0) rowCls += ' is-out';
+      else rowCls += ' is-pending';
+      h += '<span class="'+rowCls+'">'+escHtml(stream[i])+'</span>\n';
+    }
+  }
+  h += '</div></div>';
+  return h;
+}
+
+// ============== STEP CONTROLS ==============
+function renderStep(idx){
+  if (!steps.length) return;
+  var s = steps[idx];
+  currentStep = idx;
+  document.getElementById('stepInfo').textContent = (idx+1)+'/'+steps.length;
+  var bd = document.getElementById('actionBadge');
+  bd.textContent = BADGE_LABEL[s.action] || s.action;
+  bd.className = 'action-badge action-badge--'+s.action;
+  document.querySelectorAll('.code-line').forEach(function(el){ el.classList.remove('active'); });
+  var al = document.querySelector('.code-line[data-line="'+s.line+'"]');
+  if (al) { al.classList.add('active'); al.scrollIntoView({block:'nearest'}); }
+  renderViz(s);
+  showLogPreview(s);
+}
+function showLogPreview(s){
+  if (!logEnabled) return;
+  document.getElementById('logPopupBody').innerHTML = s.logHTML || '';
+  document.getElementById('logPopup').classList.remove('log-popup--hidden');
+}
+function hideLogPopup(){ document.getElementById('logPopup').classList.add('log-popup--hidden'); }
+function stepBy(d){ var ns = currentStep + d; if (ns < 0 || ns >= steps.length) return; renderStep(ns); }
+function resetStep(){ renderStep(0); }
+function toggleLogPreview(){
+  logEnabled = !logEnabled;
+  var btn = document.getElementById('logToggleBtn');
+  btn.textContent = logEnabled ? '📋 ON' : '📋 OFF';
+  btn.classList.toggle('log-toggle-btn--off', !logEnabled);
+  if (!logEnabled) hideLogPopup();
+  else if (steps.length) showLogPreview(steps[currentStep]);
+}
+function logZoom(dir){ logZoomLevel = Math.max(60, Math.min(180, logZoomLevel + dir*20)); updateLogZoom(); }
+function logZoomReset(){ logZoomLevel = 100; updateLogZoom(); }
+function updateLogZoom(){
+  document.getElementById('logZoomLabel').textContent = logZoomLevel+'%';
+  document.getElementById('logPopup').style.setProperty('--log-scale', logZoomLevel/100);
+}
+function toggleFullscreen(){
+  var viz = document.querySelector('.col-viz');
+  if (!document.fullscreenElement) viz.requestFullscreen().catch(function(){});
+  else document.exitFullscreen();
+}
+function toggleProblem(){
+  var body = document.getElementById('pcBody');
+  var btn = document.getElementById('toggleProblemBtn');
+  body.classList.toggle('hidden');
+  btn.textContent = body.classList.contains('hidden') ? '▼ Show' : '▲ Hide';
+}
+
+// ============== INPUT ==============
+function parseInputs(){ return { fileText: document.getElementById('inFile').value }; }
+function loadTest(fileText, expected){
+  document.getElementById('inFile').value = fileText;
+  document.getElementById('expectedBadge').textContent = 'exp: '+expected.replace(/\n/g,' / ');
+  resetWithInput();
+}
+function resetWithInput(){
+  curResult = null;
+  try {
+    var p = parseInputs();
+    renderCode();
+    fitCodeWidth();
+    steps = buildSteps(p.fileText);
+    currentStep = 0;
+    renderStep(0);
+    document.getElementById('liveOutput').textContent = curResult !== null ? curResult : '—';
+  } catch (err) {
+    document.getElementById('liveOutput').textContent = 'Error: '+err.message;
+  }
+}
+
+// ============== RESIZE ==============
+(function(){
+  var col1 = document.getElementById('col1');
+  var h = document.getElementById('resizeH1');
+  h.addEventListener('mousedown', function(e){
+    e.preventDefault();
+    codeWidthUserSet = true;
+    var startX = e.clientX, startW = col1.offsetWidth;
+    document.body.classList.add('no-select');
+    h.classList.add('active');
+    function mv(e){ col1.style.width = Math.max(140, Math.min(window.innerWidth*0.45, startW + (e.clientX - startX))) + 'px'; syncFooterWidth(); }
+    function up(){ document.removeEventListener('mousemove',mv); document.removeEventListener('mouseup',up); document.body.classList.remove('no-select'); h.classList.remove('active'); }
+    document.addEventListener('mousemove',mv); document.addEventListener('mouseup',up);
+  });
+})();
+window.addEventListener('resize', function(){ if (!codeWidthUserSet) fitCodeWidth(); else syncFooterWidth(); });
+
+// ============== KEYBOARD ==============
+document.addEventListener('keydown', function(e){
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') return;
+  if (e.key === 'ArrowRight') { e.preventDefault(); stepBy(1); }
+  else if (e.key === 'ArrowLeft') { e.preventDefault(); stepBy(-1); }
+  else if (e.key === 'r' || e.key === 'R') { e.preventDefault(); resetStep(); }
+});
+
+// ============== INIT ==============
+renderCode();
+fitCodeWidth();
+syncFooterWidth();
+resetWithInput();
+</script>
+</body>
+</html>

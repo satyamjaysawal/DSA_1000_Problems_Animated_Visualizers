@@ -1,0 +1,989 @@
+﻿<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>LC 193 — Tenth Line</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+:root {
+  --bg-primary:#FAFAF8; --bg-secondary:#F1EFE8; --bg-tertiary:#E2E0D8; --bg-card:#FFFFFF;
+  --text-primary:#2C2C2A; --text-secondary:#5F5E5A; --text-tertiary:#888780;
+  --border-color:rgba(0,0,0,0.11); --border-light:rgba(0,0,0,0.06); --border-focus:#534AB7;
+  --accent-indigo:#534AB7; --accent-indigo-bg:#EEEDFE; --accent-indigo-text:#3C3489; --accent-indigo-hover:#4740A0;
+  --accent-teal:#0F6E56; --accent-teal-bg:#E1F5EE; --accent-teal-text:#085041;
+  --accent-red:#E24B4A; --accent-red-bg:#FCEBEB; --accent-red-text:#791F1F;
+  --accent-amber:#B45309; --accent-amber-bg:#FEF3C7; --accent-amber-text:#78350F;
+  --accent-green:#15803D; --accent-green-bg:#DCFCE7; --accent-green-text:#14532D;
+  --syn-keyword:#534AB7; --syn-function:#185FA5; --syn-number:#993C1D; --syn-string:#0F6E56;
+  --active-line-bg:#EEEDFE;
+  --radius-sm:4px; --radius-md:6px; --radius-lg:10px; --radius-xl:14px;
+  --sp-2:8px; --sp-3:12px; --sp-5:20px;
+  --font-sans:'DM Sans',system-ui,sans-serif;
+  --font-mono:'JetBrains Mono','Fira Code',monospace;
+  --fs-xs:11px; --fs-sm:12px; --fs-base:14px; --fs-md:15px; --fs-lg:18px;
+  --fw-medium:500; --fw-semibold:600; --fw-bold:700;
+  --lh-normal:1.6; --lh-code:1.9;
+  --ease:.18s ease;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden}
+body{font-family:var(--font-sans);font-size:var(--fs-base);color:var(--text-primary);background:var(--bg-primary);line-height:var(--lh-normal)}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border-color);border-radius:99px}
+.no-select{user-select:none}
+
+.app-shell{display:flex;flex-direction:column;height:100vh;overflow:hidden;background:var(--bg-primary)}
+
+/* PROBLEM CARD */
+.problem-card{flex-shrink:0;border-bottom:1px solid var(--border-color);background:var(--bg-card)}
+.problem-header{display:flex;align-items:center;justify-content:space-between;padding:8px 16px;gap:12px;flex-wrap:wrap;border-bottom:1px solid var(--border-light)}
+.ph-left{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.gt-learn-btn{font-family:system-ui,"Segoe UI Emoji",sans-serif;font-size:11px;font-weight:700;padding:5px 11px;border-radius:99px;background:var(--accent-indigo);color:#fff;border:none;cursor:pointer;letter-spacing:.05em}
+.gt-learn-btn:hover{background:var(--accent-indigo-hover)}
+.lc-num{font:700 13px var(--font-mono);color:var(--text-tertiary)}
+.lc-title{font-size:16px;font-weight:700;color:var(--text-primary)}
+.diff-pill{font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;text-transform:uppercase;letter-spacing:.05em}
+.diff-easy{background:var(--accent-green-bg);color:var(--accent-green-text);border:1px solid var(--accent-green)}
+.tag-pill{font-size:10px;font-weight:600;padding:2px 8px;border-radius:99px;background:var(--accent-indigo-bg);color:var(--accent-indigo-text);border:1px solid var(--accent-indigo)}
+.ph-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.input-wrap{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text-secondary)}
+.input-wrap input,.input-wrap select{font:600 11px var(--font-mono);padding:4px 8px;border:1px solid var(--border-color);border-radius:var(--radius-sm);background:var(--bg-card);color:var(--text-primary);width:60px}
+.input-wrap input:focus,.input-wrap select:focus{outline:none;border-color:var(--border-focus)}
+.exp-badge{font:600 11px var(--font-mono);padding:4px 8px;background:var(--accent-amber-bg);color:var(--accent-amber-text);border:1px solid var(--accent-amber);border-radius:var(--radius-sm)}
+.toggle-btn{font-family:system-ui,"Segoe UI Emoji",sans-serif;font-size:11px;font-weight:600;padding:4px 10px;border-radius:var(--radius-sm);background:var(--bg-secondary);color:var(--text-secondary);border:1px solid var(--border-color);cursor:pointer}
+.toggle-btn:hover{background:var(--bg-tertiary)}
+
+.problem-body{display:flex;gap:20px;padding:14px 16px;max-height:35vh;overflow:auto}
+.problem-body--hidden{display:none}
+.pb-left{flex:1.6;min-width:0}
+.pb-right{flex:1;min-width:0;border-left:1px solid var(--border-light);padding-left:20px}
+.pb-section{margin-bottom:12px}
+.pb-section h4{font-size:12px;font-weight:700;color:var(--accent-indigo-text);margin-bottom:5px;text-transform:uppercase;letter-spacing:.04em}
+.pb-section p{font-size:12.5px;line-height:1.6;color:var(--text-primary)}
+.pb-section code{font:600 11px var(--font-mono);background:var(--bg-secondary);padding:1px 5px;border-radius:3px;color:var(--accent-indigo-text)}
+.concept-block{background:var(--bg-secondary);border-left:3px solid var(--accent-indigo);padding:7px 10px;border-radius:4px;margin-top:5px;font-size:12px}
+.concept-block strong{color:var(--accent-indigo-text)}
+.complexity-row{display:flex;gap:6px;margin-top:6px}
+.cx-chip{font:600 11px var(--font-mono);padding:3px 8px;background:var(--accent-teal-bg);color:var(--accent-teal-text);border:1px solid var(--accent-teal);border-radius:99px}
+
+.tc-chip{display:flex;align-items:center;gap:6px;padding:6px 9px;background:var(--bg-secondary);border:1px solid var(--border-color);border-radius:var(--radius-sm);margin-bottom:5px;cursor:pointer;transition:all var(--ease);font-size:11.5px}
+.tc-chip:hover{background:var(--accent-indigo-bg);border-color:var(--accent-indigo)}
+.tc-chip code{font:600 10.5px var(--font-mono);color:var(--text-primary)}
+.pt-tag{font-size:9.5px;font-weight:600;padding:1px 6px;border-radius:99px;background:var(--accent-amber-bg);color:var(--accent-amber-text);border:1px solid var(--accent-amber);text-transform:uppercase;letter-spacing:.04em}
+.tc-arrow{color:var(--text-tertiary)}
+.tc-exp{font:700 11px var(--font-mono);color:var(--accent-green-text)}
+.run-btn{font-family:system-ui,"Segoe UI Emoji",sans-serif;font-size:12px;font-weight:700;padding:6px 14px;border-radius:var(--radius-md);background:var(--accent-green);color:#fff;border:none;cursor:pointer;margin-top:8px}
+.run-btn:hover{background:#11703B}
+.live-output{font:600 11.5px var(--font-mono);padding:6px 9px;background:var(--bg-secondary);border:1px dashed var(--border-color);border-radius:var(--radius-sm);margin-top:6px;color:var(--text-primary)}
+
+/* MAIN */
+.main-row{flex:1;display:flex;overflow:hidden;min-height:0}
+.col{display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.col-code{width:33%;min-width:140px;max-width:45vw;background:var(--bg-card);border-right:1px solid var(--border-color)}
+.col-viz{flex:1;min-width:0;background:var(--bg-primary);position:relative}
+
+.section-label{font-family:system-ui,"Segoe UI Emoji",sans-serif;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-tertiary);padding:8px 12px;border-bottom:1px solid var(--border-light);background:var(--bg-secondary);display:flex;align-items:center;gap:6px}
+
+/* CODE PANEL */
+.code-panel{flex:1;overflow-y:auto;padding:8px 0;font-family:var(--font-mono);font-size:12px;line-height:var(--lh-code)}
+.code-line{display:flex;padding:1px 12px;white-space:pre;transition:background var(--ease)}
+.code-line.active{background:var(--active-line-bg);border-left:3px solid var(--accent-indigo);padding-left:9px}
+.line-num{color:var(--text-tertiary);min-width:24px;text-align:right;margin-right:12px;user-select:none;font-weight:500}
+.code-text{flex:1;color:var(--text-primary)}
+.kw{color:var(--syn-keyword);font-weight:600}
+.fn{color:var(--syn-function);font-weight:600}
+.num{color:var(--syn-number)}
+.str{color:var(--syn-string)}
+
+/* RESIZE */
+.resize-handle{width:5px;background:transparent;cursor:col-resize;flex-shrink:0;transition:background var(--ease)}
+.resize-handle:hover,.resize-handle.active{background:var(--accent-indigo)}
+
+/* VIZ */
+.viz-panel{flex:1;overflow:auto;padding:14px 18px}
+.vars-strip{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.var-chip{font:600 11px var(--font-mono);padding:4px 10px;border-radius:99px;background:var(--bg-card);border:1px solid var(--border-color);color:var(--text-primary)}
+.var-chip .vk{color:var(--text-tertiary);margin-right:4px;font-weight:500}
+.vc-active{background:var(--accent-indigo-bg);border-color:var(--accent-indigo);color:var(--accent-indigo-text)}
+.vc-safe{background:var(--accent-green-bg);border-color:var(--accent-green);color:var(--accent-green-text)}
+.vc-flip{background:var(--accent-red-bg);border-color:var(--accent-red);color:var(--accent-red-text)}
+.vc-warn{background:var(--accent-amber-bg);border-color:var(--accent-amber);color:var(--accent-amber-text)}
+
+.viz-row{display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap;margin-bottom:14px}
+.viz-card{background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius-md);padding:12px;min-width:240px}
+.viz-card-title{font-family:system-ui,"Segoe UI Emoji",sans-serif;font-size:11px;font-weight:700;color:var(--text-secondary);margin-bottom:8px;text-transform:uppercase;letter-spacing:.05em;display:flex;align-items:center;gap:5px}
+
+/* LINES LIST */
+.lines-list{display:flex;flex-direction:column;gap:3px;max-height:340px;overflow-y:auto;padding:6px;background:var(--bg-secondary);border:1px dashed var(--border-color);border-radius:var(--radius-md);min-width:280px}
+.line-row{display:flex;align-items:center;gap:8px;padding:5px 10px;background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius-sm);font-family:var(--font-mono);font-size:11.5px;transition:all .2s}
+.line-row .ln-no{font-weight:700;color:var(--text-tertiary);min-width:28px;text-align:right;font-size:10px}
+.line-row .ln-content{flex:1;color:var(--text-primary)}
+.line-row .ln-mark{font-size:11px}
+.line-row.lr-current{background:var(--accent-indigo-bg);border-color:var(--accent-indigo);transform:translateX(2px);box-shadow:0 0 6px rgba(83,74,183,.25);animation:pulse-node 1.2s infinite}
+.line-row.lr-passed{background:var(--bg-tertiary);opacity:.65}
+.line-row.lr-target{background:var(--accent-green-bg)!important;border-color:var(--accent-green)!important;color:var(--accent-green-text);font-weight:700;animation:win-pulse 1.4s infinite}
+.line-row.lr-future{opacity:.5}
+
+@keyframes pulse-node{0%,100%{box-shadow:0 0 4px var(--accent-indigo)}50%{box-shadow:0 0 12px var(--accent-indigo)}}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-3px)}75%{transform:translateX(3px)}}
+@keyframes win-pulse{0%,100%{box-shadow:0 0 3px rgba(21,128,61,.5)}50%{box-shadow:0 0 12px rgba(21,128,61,.9)}}
+
+/* COUNTER WIDGET */
+.counter-widget{display:flex;flex-direction:column;align-items:center;gap:8px;padding:10px 14px;background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius-md);min-width:140px}
+.counter-num{font:700 32px var(--font-mono);color:var(--accent-indigo);background:var(--accent-indigo-bg);border:2px solid var(--accent-indigo);border-radius:var(--radius-md);padding:6px 18px;min-width:80px;text-align:center}
+.counter-num.cn-target{color:var(--accent-green-text);background:var(--accent-green-bg);border-color:var(--accent-green);animation:win-pulse 1.4s infinite}
+.counter-label{font-size:10px;font-weight:700;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:.05em}
+.counter-target{font:600 11px var(--font-mono);color:var(--text-secondary);padding:3px 8px;background:var(--bg-secondary);border-radius:99px}
+
+/* RESULT BOX */
+.result-box{padding:12px 14px;background:var(--bg-card);border:2px solid var(--border-color);border-radius:var(--radius-md);min-width:240px}
+.result-box.rb-found{border-color:var(--accent-green);background:var(--accent-green-bg)}
+.result-box.rb-empty{border-color:var(--accent-amber);background:var(--accent-amber-bg)}
+.result-label{font-size:10px;font-weight:700;text-transform:uppercase;color:var(--text-tertiary);margin-bottom:6px;letter-spacing:.05em}
+.result-val{font:700 14px var(--font-mono);color:var(--text-primary);word-break:break-all}
+.result-val.empty{color:var(--text-tertiary);font-style:italic}
+
+.empty-state{font-size:11px;color:var(--text-tertiary);font-style:italic;padding:8px}
+
+/* RESULT BANNER */
+.result-banner{margin-top:10px;padding:10px 14px;border-radius:var(--radius-md);background:var(--accent-green-bg);border:2px solid var(--accent-green);color:var(--accent-green-text);font-weight:700;text-align:center;display:none}
+.result-banner.rb-empty-final{background:var(--accent-amber-bg);border-color:var(--accent-amber);color:var(--accent-amber-text)}
+.result-banner.show{display:block;animation:win-pulse 1.4s infinite}
+
+/* LOG POPUP */
+.log-popup{
+  --log-scale:1;
+  position:fixed;bottom:52px;right:14px;
+  width:calc(480px * var(--log-scale));max-width:92vw;max-height:75vh;
+  border-radius:var(--radius-lg);
+  box-shadow:0 10px 32px rgba(0,0,0,.14);
+  border:1px solid var(--border-color);background:var(--bg-card);
+  overflow:hidden;display:flex;flex-direction:column;z-index:100;
+  transition:opacity .15s,transform .15s;transform-origin:bottom right;
+}
+.log-popup--hidden{opacity:0;transform:scale(.92);pointer-events:none}
+.log-popup-body{flex:1;overflow:auto;padding:0}
+.log-popup-body>.log-card{border-radius:0;border:none;border-left:0}
+
+/* LOG CARD */
+.log-card{border-radius:var(--radius-md);overflow:hidden;border:1px solid var(--border-color);border-left-width:4px;font-size:var(--fs-xs);background:var(--bg-card)}
+.log-card-header{display:flex;align-items:center;gap:6px;padding:8px 10px 6px;background:var(--bg-secondary);border-bottom:1px solid var(--border-light)}
+.log-badge{font-family:system-ui,"Segoe UI Emoji",sans-serif;font-size:10px;font-weight:700;padding:2px 7px;border-radius:4px;background:var(--bg-card);border:1px solid var(--border-color)}
+.log-line-ref{font:700 10px var(--font-mono);color:var(--accent-indigo);background:var(--accent-indigo-bg);padding:1px 6px;border-radius:4px;border:1px solid var(--accent-indigo)}
+.log-status-pill{font-family:system-ui,"Segoe UI Emoji",sans-serif;font-size:9px;font-weight:700;padding:2px 7px;border-radius:99px;text-transform:uppercase;margin-left:auto}
+.log-status--success{background:var(--accent-green-bg);color:var(--accent-green-text);border:1px solid var(--accent-green)}
+.log-status--fail{background:var(--accent-red-bg);color:var(--accent-red-text);border:1px solid var(--accent-red)}
+.log-status--skip{background:var(--bg-tertiary);color:var(--text-tertiary);border:1px solid var(--border-color)}
+.log-status--loop{background:rgba(56,139,253,.14);color:#185FA5;border:1px solid #388bfd}
+.log-status--prune{background:var(--accent-red-bg);color:var(--accent-red-text);border:1px solid var(--accent-red)}
+.log-status--info{background:rgba(130,80,255,.14);color:#3C3489;border:1px solid #8250ff}
+
+.log-section{padding:7px 10px;border-bottom:1px dashed var(--border-light)}
+.log-section:last-child{border-bottom:none}
+.log-section-title{font-family:system-ui,"Segoe UI Emoji",sans-serif;font:700 8px var(--font-mono);text-transform:uppercase;letter-spacing:.06em;color:var(--text-tertiary);margin-bottom:4px;display:flex;align-items:center;gap:4px}
+.log-section-title-icon{font-family:system-ui,"Segoe UI Emoji",sans-serif;font-size:11px}
+
+.log-code-snippet{font:600 11px var(--font-mono);background:#0d1117;color:#e6edf3;padding:6px 9px;border-radius:4px;display:block;overflow-x:auto;white-space:pre;border:1px solid #30363d}
+.log-code-snippet .ck{color:#ff7b72}
+.log-code-snippet .cs{color:#a5d6ff}
+.log-code-snippet .cn{color:#79c0ff}
+.log-code-snippet .cf{color:#d2a8ff}
+.log-code-snippet .cc{color:#8b949e;font-style:italic}
+
+.log-kv-row{display:flex;flex-wrap:wrap;gap:4px}
+.log-kv{display:inline-flex;align-items:center;gap:3px;font:11px var(--font-mono);padding:2px 7px;border-radius:4px;background:var(--bg-secondary);border:1px solid var(--border-light)}
+.log-kv-key{color:var(--text-tertiary);font-weight:500}
+.log-kv-val{color:var(--text-primary);font-weight:700}
+.log-kv--in{background:rgba(56,139,253,.08);border-color:rgba(56,139,253,.3)}
+.log-kv--out{background:rgba(63,185,80,.08);border-color:rgba(63,185,80,.4)}
+.log-kv--out .log-kv-val{color:#15803D}
+.log-kv--changed{background:rgba(180,83,9,.10);border-color:rgba(180,83,9,.4)}
+
+.log-verdict{display:flex;align-items:center;gap:6px;font:600 11px var(--font-mono);padding:5px 8px;border-radius:5px;background:var(--bg-secondary);border:1px solid var(--border-light)}
+.log-verdict--true{background:var(--accent-green-bg);border-color:var(--accent-green);color:var(--accent-green-text)}
+.log-verdict--false{background:var(--accent-red-bg);border-color:var(--accent-red);color:var(--accent-red-text)}
+
+.log-why{font-size:11px;line-height:1.55;color:var(--text-primary);padding:2px 0}
+.log-why strong{color:var(--accent-indigo-text)}
+.log-why code{font:600 10.5px var(--font-mono);background:var(--bg-secondary);padding:1px 4px;border-radius:3px;color:var(--accent-indigo-text)}
+
+.log-analogy{font:italic 11px var(--font-sans);color:var(--text-secondary);background:#FFF8E7;border:1px solid #FBE8A6;border-left:3px solid var(--accent-amber);padding:6px 9px;border-radius:4px;line-height:1.55}
+.log-analogy strong{color:var(--accent-amber-text);font-style:normal;font-weight:700}
+
+/* FOOTER */
+.footer-bar{display:flex;flex-shrink:0;border-top:1px solid var(--border-color);background:var(--bg-card);font-family:system-ui,"Segoe UI Emoji",sans-serif}
+.footer-left{width:33%;min-width:140px;max-width:45vw;display:flex;align-items:center;gap:8px;padding:7px 12px;border-right:1px solid var(--border-light)}
+.footer-right{flex:1;display:flex;align-items:center;gap:7px;padding:7px 16px;flex-wrap:wrap}
+.step-info{font:700 12px var(--font-mono);color:var(--text-secondary)}
+.action-badge{font-family:system-ui,"Segoe UI Emoji",sans-serif;font:700 10.5px var(--font-mono);padding:3px 9px;border-radius:99px;text-transform:uppercase;letter-spacing:.04em}
+.action-badge--func-def,.action-badge--init,.action-badge--call,.action-badge--return{background:rgba(130,80,255,.14);color:#3C3489;border:1px solid #8250ff}
+.action-badge--for-check,.action-badge--while-check,.action-badge--if-check{background:rgba(56,139,253,.14);color:#185FA5;border:1px solid #388bfd}
+.action-badge--mark,.action-badge--push,.action-badge--pop,.action-badge--restore,.action-badge--found{background:var(--accent-green-bg);color:var(--accent-green-text);border:1px solid var(--accent-green)}
+.action-badge--remove,.action-badge--prune,.action-badge--fail{background:var(--accent-red-bg);color:var(--accent-red-text);border:1px solid var(--accent-red)}
+.action-badge--exit,.action-badge--skip{background:var(--bg-tertiary);color:var(--text-secondary);border:1px solid var(--border-color)}
+
+.kbd-hints{font-size:10.5px;color:var(--text-tertiary);font-family:var(--font-mono)}
+kbd{font-family:system-ui,"Segoe UI Emoji",var(--font-mono);font-size:10px;padding:1px 5px;background:var(--bg-secondary);border:1px solid var(--border-color);border-radius:3px}
+.btn{font-family:system-ui,"Segoe UI Emoji",sans-serif;font-size:11.5px;font-weight:600;padding:5px 10px;border-radius:var(--radius-sm);background:var(--bg-secondary);color:var(--text-primary);border:1px solid var(--border-color);cursor:pointer;transition:all var(--ease)}
+.btn:hover{background:var(--bg-tertiary);border-color:var(--border-focus)}
+.btn-primary{background:var(--accent-indigo);color:#fff;border-color:var(--accent-indigo)}
+.btn-primary:hover{background:var(--accent-indigo-hover);border-color:var(--accent-indigo-hover)}
+.fb-sep{color:var(--border-color)}
+.log-toggle-btn--off{background:var(--bg-tertiary);opacity:.7}
+.zoom-label{font:600 11px var(--font-mono);min-width:42px;text-align:center;color:var(--text-secondary)}
+
+</style>
+</head>
+<body>
+<div class="app-shell">
+
+<!-- ============ PROBLEM CARD ============ -->
+<div class="problem-card">
+  <div class="problem-header">
+    <div class="ph-left">
+      <a href="../00_HomePage/gt_learn_homepage.html" class="gt-learn-btn">GT LEARN</a>
+      <span class="lc-num">#193</span>
+      <span class="lc-title">📝 Tenth Line</span>
+      <span class="diff-pill diff-easy">EASY</span>
+      <span class="tag-pill">String / Loop</span>
+    </div>
+    <div class="ph-right">
+      <span class="input-wrap">numLines=<input id="inpN" type="number" value="12" min="0" max="20"></span>
+      <span class="exp-badge" id="expBadge">exp: "Line 10"</span>
+      <button class="toggle-btn" id="toggleBtn" onclick="toggleProblem()">▲ Hide</button>
+    </div>
+  </div>
+  <div class="problem-body" id="problemBody">
+    <div class="pb-left">
+      <div class="pb-section">
+        <h4>📝 Problem Statement</h4>
+        <p>Given a text file <code>file.txt</code>, print just the <strong>10th line</strong> of the file. If the file has <strong>fewer than 10 lines</strong>, output should be empty (or no output).</p>
+      </div>
+      <div class="pb-section">
+        <h4>🧠 Solving Approach</h4>
+        <p>Iterate through each line keeping a <code>count</code>. Jab count == 10 ho, us line ko store kar lo aur return kar do. Agar loop khatam ho gaya bina 10 reach kiye, empty string return karo.</p>
+      </div>
+      <div class="pb-section">
+        <h4>🎯 Core Concepts</h4>
+        <div class="concept-block"><strong>Counter Pattern:</strong> <code>count = i + 1</code> — 1-indexed line numbers track karna.</div>
+        <div class="concept-block"><strong>Early Exit:</strong> 10th line milte hi <code>return</code> — baaki lines scan karne ki zaroorat nahi.</div>
+        <div class="concept-block"><strong>Edge Case:</strong> Agar n &lt; 10, loop completes without finding → return <code>""</code>.</div>
+      </div>
+      <div class="complexity-row">
+        <span class="cx-chip">Time: O(min(n, 10))</span>
+        <span class="cx-chip">Space: O(1)</span>
+      </div>
+    </div>
+    <div class="pb-right">
+      <div class="pb-section">
+        <h4>🧪 Test Cases</h4>
+        <div class="tc-chip" onclick="loadTest(12,'Line 10')">
+          <code>n=12</code> <span class="pt-tag">basic</span>
+          <span class="tc-arrow">→</span> <span class="tc-exp">"Line 10"</span>
+        </div>
+        <div class="tc-chip" onclick="loadTest(10,'Line 10')">
+          <code>n=10</code> <span class="pt-tag">exact</span>
+          <span class="tc-arrow">→</span> <span class="tc-exp">"Line 10"</span>
+        </div>
+        <div class="tc-chip" onclick="loadTest(15,'Line 10')">
+          <code>n=15</code> <span class="pt-tag">extra</span>
+          <span class="tc-arrow">→</span> <span class="tc-exp">"Line 10"</span>
+        </div>
+        <div class="tc-chip" onclick="loadTest(5,'')">
+          <code>n=5</code> <span class="pt-tag">too few</span>
+          <span class="tc-arrow">→</span> <span class="tc-exp">""</span>
+        </div>
+        <div class="tc-chip" onclick="loadTest(9,'')">
+          <code>n=9</code> <span class="pt-tag">edge</span>
+          <span class="tc-arrow">→</span> <span class="tc-exp">""</span>
+        </div>
+        <button class="run-btn" onclick="resetWithInput()">▶ Run</button>
+        <div class="live-output">Output: <span id="liveOutput">—</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ MAIN ============ -->
+<div class="main-row">
+  <div class="col col-code" id="col1">
+    <div class="section-label">📜 Python Code</div>
+    <div class="code-panel" id="codePanel"></div>
+  </div>
+  <div class="resize-handle" id="resizeH1"></div>
+  <div class="col col-viz">
+    <div class="section-label">📊 Visualization</div>
+    <div class="viz-panel" id="vizPanel"></div>
+    <!-- LOG POPUP -->
+    <div class="log-popup" id="logPopup">
+      <div class="log-popup-body" id="logPopupBody"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ FOOTER ============ -->
+<div class="footer-bar">
+  <div class="footer-left" id="footerLeft">
+    <span class="step-info" id="stepInfo">0/0</span>
+    <span class="action-badge" id="actionBadge">—</span>
+  </div>
+  <div class="footer-right">
+    <span class="kbd-hints"><kbd>←</kbd><kbd>→</kbd></span>
+    <button class="btn" type="button" onclick="resetStep()" title="Reset (R)">↺</button>
+    <button class="btn" type="button" onclick="stepBy(-1)" title="Prev (←)">◀</button>
+    <button class="btn btn-primary" type="button" onclick="stepBy(1)" title="Next (→)">▶ Next</button>
+    <span class="fb-sep">|</span>
+    <button class="btn" type="button" id="logToggleBtn" onclick="toggleLogPreview()">📋 ON</button>
+    <button class="btn" type="button" onclick="logZoom(-1)">−</button>
+    <span class="zoom-label" id="logZoomLabel">100%</span>
+    <button class="btn" type="button" onclick="logZoom(1)">+</button>
+    <button class="btn" type="button" onclick="logZoomReset()">↺</button>
+    <span class="fb-sep">|</span>
+    <button class="btn" type="button" onclick="toggleFullscreen()" title="Fullscreen">⛶</button>
+  </div>
+</div>
+
+</div>
+
+<script>
+// ============ STATE ============
+var codeLines = [
+  "def tenthLine(lines):",
+  "    count = 0",
+  "    result = \"\"",
+  "    for i in range(len(lines)):",
+  "        count = i + 1",
+  "        if count == 10:",
+  "            result = lines[i]",
+  "            return result",
+  "    return \"\""
+];
+
+var steps = [];
+var currentStep = 0;
+var codeWidthUserSet = false;
+var curResult = null;
+var logEnabled = true;
+var logZoomLevel = 100;
+
+var LOG_BADGE = {
+  "func-def":"📌 DEF","init":"⚙️ INIT","call":"📞 CALL","return":"🏆 RETURN",
+  "for-check":"🔁 FOR","while-check":"🔁 WHILE","if-check":"🔎 IF",
+  "mark":"✅ MARK","push":"⬆ PUSH","pop":"⬇ POP","restore":"↩ RESTORE","found":"🎉 FOUND",
+  "remove":"✏️  EDIT","prune":"✂️ PRUNE","fail":"❌ FAIL",
+  "exit":"🔚 EXIT","skip":"⏭ SKIP"
+};
+var BADGE_LABEL = {
+  "func-def":"DEF","init":"INIT","call":"CALL","return":"RETURN",
+  "for-check":"FOR","while-check":"WHILE","if-check":"IF",
+  "mark":"MARK","push":"PUSH","pop":"POP","restore":"RESTORE","found":"FOUND",
+  "remove":"EDIT","prune":"PRUNE","fail":"FAIL",
+  "exit":"EXIT","skip":"SKIP"
+};
+
+// ============ CODE RENDERER (RULE #3) ============
+function renderCode() {
+  var p = document.getElementById('codePanel');
+  p.innerHTML = codeLines.map(function(raw, i) {
+    var h = raw;
+    h = h.replace(/("[^"]*"|'[^']*')/g, '\x01STR\x02$1\x03');
+    h = h.replace(/\b(def|for|in|if|return|break|continue|and|else|elif|True|False|None|not|or|while|lambda)\b/g, '\x01KW\x02$1\x03');
+    h = h.replace(/\b(len|range|int|str|list|append|pop|sorted|min|max|sum|abs|enumerate|zip|print|set|add)\b/g, '\x01FN\x02$1\x03');
+    h = h.replace(/\b(\d+)\b/g, '\x01NUM\x02$1\x03');
+    h = h.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    h = h.replace(/\x01([A-Z]+)\x02/g, function(_, c){
+      var cls = c==='STR'?'str':(c==='KW'?'kw':(c==='FN'?'fn':'num'));
+      return '<span class="'+cls+'">';
+    }).replace(/\x03/g, '</span>');
+    return '<div class="code-line" data-line="'+i+'"><span class="line-num">'+(i+1)+'</span><span class="code-text">'+h+'</span></div>';
+  }).join('');
+}
+
+function fitCodeWidth() {
+  if (codeWidthUserSet) return;
+  var col = document.getElementById('col1');
+  var maxW = Math.min(col.offsetWidth, window.innerWidth * 0.45);
+  col.style.width = Math.max(220, Math.min(380, maxW)) + 'px';
+  syncFooterWidth();
+}
+
+// ============ MINI PYTHON HIGHLIGHTER FOR LOG SNIPPETS ============
+function hlCode(raw) {
+  var h = raw;
+  h = h.replace(/("[^"]*"|'[^']*')/g, '\x01s\x02$1\x03');
+  h = h.replace(/\b(def|for|in|if|return|break|continue|and|else|elif|True|False|None|not|or|while|lambda)\b/g, '\x01k\x02$1\x03');
+  h = h.replace(/\b(len|range|int|str|list|append|pop|sorted|min|max|sum|abs|enumerate|zip|print|set|add)\b/g, '\x01f\x02$1\x03');
+  h = h.replace(/\b(\d+)\b/g, '\x01n\x02$1\x03');
+  h = h.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  h = h.replace(/\x01([a-z])\x02/g, function(_, c){ return '<span class="c'+c+'">'; }).replace(/\x03/g, '</span>');
+  return h;
+}
+
+// ============ richLog HELPER ============
+function richLog(opts) {
+  var statusMap = {
+    success:"✅ Success", fail:"❌ Failed", skip:"⏭ Skipped",
+    loop:"🔁 Loop iter", prune:"✂️ Pruned", info:"ℹ️ Info"
+  };
+  var status = opts.status || "info";
+  var html = '<div class="log-card">';
+
+  // Header
+  html += '<div class="log-card-header">';
+  html += '<span class="log-badge">'+(LOG_BADGE[opts.action]||opts.action)+'</span>';
+  html += '<span class="log-line-ref">L'+(opts.line+1)+'</span>';
+  html += '<span class="log-status-pill log-status--'+status+'">'+statusMap[status]+'</span>';
+  html += '</div>';
+
+  // Code
+  if (opts.code) {
+    html += '<div class="log-section">';
+    html += '<div class="log-section-title"><span class="log-section-title-icon">📜</span>Code Executing</div>';
+    html += '<code class="log-code-snippet">'+hlCode(opts.code)+'</code>';
+    html += '</div>';
+  }
+
+  // Inputs
+  if (opts.inputs && opts.inputs.length) {
+    html += '<div class="log-section">';
+    html += '<div class="log-section-title"><span class="log-section-title-icon">📥</span>Input Values (line is using these)</div>';
+    html += '<div class="log-kv-row">';
+    opts.inputs.forEach(function(kv){
+      html += '<span class="log-kv log-kv--in"><span class="log-kv-key">'+kv.k+'=</span><span class="log-kv-val">'+kv.v+'</span></span>';
+    });
+    html += '</div></div>';
+  }
+
+  // Outputs
+  if (opts.outputs && opts.outputs.length) {
+    html += '<div class="log-section">';
+    html += '<div class="log-section-title"><span class="log-section-title-icon">📤</span>Output / State After Line</div>';
+    html += '<div class="log-kv-row">';
+    opts.outputs.forEach(function(kv){
+      var cls = kv.changed ? 'log-kv--changed' : 'log-kv--out';
+      html += '<span class="log-kv '+cls+'"><span class="log-kv-key">'+kv.k+'=</span><span class="log-kv-val">'+kv.v+'</span></span>';
+    });
+    html += '</div></div>';
+  }
+
+  // Verdict
+  if (opts.verdict) {
+    var vCls = opts.verdictTrue===true ? 'log-verdict--true' : (opts.verdictTrue===false ? 'log-verdict--false' : '');
+    var vIcon = opts.verdictTrue===true ? '✓' : (opts.verdictTrue===false ? '✗' : '•');
+    html += '<div class="log-section">';
+    html += '<div class="log-section-title"><span class="log-section-title-icon">⚖️</span>Verdict / Decision</div>';
+    html += '<div class="log-verdict '+vCls+'">'+vIcon+' '+opts.verdict+'</div>';
+    html += '</div>';
+  }
+
+  // Why
+  if (opts.why) {
+    html += '<div class="log-section">';
+    html += '<div class="log-section-title"><span class="log-section-title-icon">💡</span>Why This Happens</div>';
+    html += '<div class="log-why">'+opts.why+'</div>';
+    html += '</div>';
+  }
+
+  // Analogy
+  if (opts.analogy) {
+    html += '<div class="log-section">';
+    html += '<div class="log-section-title"><span class="log-section-title-icon">🎭</span>Real-Life Analogy</div>';
+    html += '<div class="log-analogy">'+opts.analogy+'</div>';
+    html += '</div>';
+  }
+
+  html += '</div>';
+  return html;
+}
+
+// ============ buildSteps ============
+function buildSteps(n) {
+  var st = [];
+  var MAX_STEPS = 3000;
+
+  // Live state
+  var lines = [];
+  for (var i=1; i<=n; i++) lines.push("Line "+i);
+  var count = null;       // null = uninitialized
+  var result = null;
+  var loopVar = null;
+  var phase = "init";     // init | loop | found | empty
+  var passedLines = [];   // lines we've iterated through
+  var currentLineIdx = -1;
+
+  function snap(extra) {
+    return Object.assign({
+      lines: lines.slice(),
+      n: n,
+      count: count,
+      result: result,
+      loopVar: loopVar,
+      phase: phase,
+      passedLines: passedLines.slice(),
+      currentLineIdx: currentLineIdx
+    }, extra || {});
+  }
+
+  function pushStep(o) {
+    if (st.length >= MAX_STEPS) return;
+    st.push(Object.assign({line:0, action:"init", logHTML:""}, snap(o)));
+  }
+
+  // === L0: function def ===
+  pushStep({
+    line: 0,
+    action: "func-def",
+    logHTML: richLog({
+      line: 0,
+      action: "func-def",
+      code: "def tenthLine(lines):",
+      status: "info",
+      inputs: [{k:"lines.length", v:n}],
+      why: "Function <code>tenthLine</code> define ho rahi hai. Yeh ek list of lines accept karega aur 10th line return karega (ya empty agar 10 lines nahi hain).",
+      analogy: "Jaise ek <strong>library mein book khojne ja rahe hain</strong> — pehle khud ko ready karte hain, phir page-by-page scan karenge."
+    })
+  });
+
+  // === L1: count = 0 ===
+  count = 0;
+  pushStep({
+    line: 1,
+    action: "init",
+    logHTML: richLog({
+      line: 1,
+      action: "init",
+      code: "count = 0",
+      status: "success",
+      inputs: [],
+      outputs: [{k:"count", v:"0", changed:true}],
+      why: "Counter variable <code>count</code> ko 0 se initialize kiya. Yeh track karega ki abhi tak hum kaunsi line pe pahunche hain.",
+      analogy: "Jaise <strong>cricket scoreboard pe score 0 set kar rahe hain</strong> — match shuru hone se pehle counter zero!"
+    })
+  });
+
+  // === L2: result = "" ===
+  result = "";
+  pushStep({
+    line: 2,
+    action: "init",
+    logHTML: richLog({
+      line: 2,
+      action: "init",
+      code: 'result = ""',
+      status: "success",
+      inputs: [],
+      outputs: [{k:"result", v:'""', changed:true}],
+      why: "Result variable ko empty string se initialize kiya. Agar 10th line milegi toh isme store hogi, warna empty hi rahegi (default fallback).",
+      analogy: "Jaise <strong>khaali parchi ready rakh li</strong> — agar lottery numbers match hue toh isi pe likhenge, warna khaali hi rahegi."
+    })
+  });
+
+  phase = "loop";
+
+  // === L3: for loop start - first check ===
+  // We will iterate through each i
+  for (var i = 0; i < n; i++) {
+    loopVar = i;
+    currentLineIdx = i;
+
+    // L3: for check (TRUE — entering iteration)
+    pushStep({
+      line: 3,
+      action: "for-check",
+      logHTML: richLog({
+        line: 3,
+        action: "for-check",
+        code: "for i in range(len(lines)):  # i="+i+", len(lines)="+n,
+        status: "loop",
+        inputs: [{k:"i", v:i}, {k:"len(lines)", v:n}],
+        outputs: [{k:"i", v:i, changed:true}],
+        verdict: "i ("+i+") < len(lines) ("+n+")",
+        verdictTrue: true,
+        why: "Loop ka <strong>"+(i+1)+"-th chakkar</strong>. <code>i="+i+"</code> aur range "+n+" tak hai, toh continue karte hain. Iss iteration mein <code>lines["+i+"]</code> = <code>\""+lines[i]+"\"</code> ko process karenge.",
+        analogy: "Jaise <strong>kitaab ka page "+(i+1)+" palat rahe hain</strong> — ab dekho yeh wahi page hai jo chahiye?"
+      })
+    });
+
+    // L4: count = i + 1
+    count = i + 1;
+    pushStep({
+      line: 4,
+      action: "init",
+      logHTML: richLog({
+        line: 4,
+        action: "init",
+        code: "count = i + 1  # = "+i+" + 1 = "+count,
+        status: "success",
+        inputs: [{k:"i", v:i}],
+        outputs: [{k:"count", v:count, changed:true}],
+        why: "Counter ko 1-indexed bana rahe hain. Python ka <code>i</code> 0 se start hota hai, but humein <strong>line numbers 1, 2, 3...</strong> chahiye, isliye <code>i+1</code>.",
+        analogy: "Jaise <strong>building mein ground floor = 1st floor</strong> count karte hain — programmer 0 se count karta hai, par log 1 se. Toh adjustment zaroori!"
+      })
+    });
+
+    // L5: if count == 10
+    var isMatch = (count === 10);
+    pushStep({
+      line: 5,
+      action: "if-check",
+      logHTML: richLog({
+        line: 5,
+        action: "if-check",
+        code: "if count == 10:  # "+count+" == 10 -> "+(isMatch?"True":"False"),
+        status: isMatch ? "success" : "skip",
+        inputs: [{k:"count", v:count}],
+        verdict: "count ("+count+") == 10",
+        verdictTrue: isMatch,
+        why: isMatch
+          ? "🎉 <strong>MATCH MIL GAYA!</strong> <code>count == 10</code> hai, matlab yeh wahi 10th line hai jo humein chahiye thi. Ab isko store karke return karenge."
+          : "<code>count = "+count+"</code>, jo 10 ke barabar nahi hai. Toh yeh line humari target nahi hai. <strong>Skip</strong> karke loop continue karenge.",
+        analogy: isMatch
+          ? "Jaise <strong>lottery ticket pe number match ho gaya</strong> — bas yahi to chahiye tha! Ab parchi pe likho aur ghar jao!"
+          : "Jaise <strong>train station check kar rahe ho</strong> — yeh mera station nahi, agla dekho. Train chalti rahe!"
+      })
+    });
+
+    if (isMatch) {
+      // L6: result = lines[i]
+      result = lines[i];
+      pushStep({
+        line: 6,
+        action: "found",
+        logHTML: richLog({
+          line: 6,
+          action: "found",
+          code: 'result = lines[i]  # lines['+i+'] = "'+lines[i]+'"',
+          status: "success",
+          inputs: [{k:"i", v:i}, {k:"lines["+i+"]", v:'"'+lines[i]+'"'}],
+          outputs: [{k:"result", v:'"'+lines[i]+'"', changed:true}],
+          why: "10th line ki value <code>lines["+i+"] = \""+lines[i]+"\"</code> ko <code>result</code> mein store kar liya. Ab hum return ke liye ready hain!",
+          analogy: "Jaise <strong>exam mein right answer mil gaya — pen utha ke parchi pe likh diya</strong>. Ab bas submit karna baaki!"
+        })
+      });
+
+      // L7: return result
+      curResult = result;
+      phase = "found";
+      pushStep({
+        line: 7,
+        action: "return",
+        logHTML: richLog({
+          line: 7,
+          action: "return",
+          code: 'return result  # return "'+result+'"',
+          status: "success",
+          inputs: [{k:"result", v:'"'+result+'"'}],
+          outputs: [{k:"return value", v:'"'+result+'"'}],
+          why: "🏆 <strong>FOUND!</strong> Function ne 10th line return kar di. Ab <code>return</code> ke baad neeche ka code (line 8) <strong>execute hi nahi hoga</strong> — early exit!",
+          analogy: "Jaise <strong>cricket match jeet liya — ab last over khelne ki zaroorat nahi</strong>. Trophy uthao aur celebrate karo! 🏆"
+        })
+      });
+      passedLines.push(i);
+      return st;
+    }
+
+    // Not matched — add to passedLines, continue loop
+    passedLines.push(i);
+  }
+
+  // Loop ended naturally — n < 10 OR n exactly something but no match (only happens if n<10)
+  currentLineIdx = -1;
+  loopVar = n;
+  phase = "empty";
+
+  // L3: for loop EXIT (range exhausted)
+  pushStep({
+    line: 3,
+    action: "exit",
+    logHTML: richLog({
+      line: 3,
+      action: "exit",
+      code: "for i in range(len(lines)):  # i reached "+n+", loop EXIT",
+      status: "info",
+      inputs: [{k:"i", v:n}, {k:"len(lines)", v:n}],
+      verdict: "i ("+n+") >= len(lines) ("+n+")",
+      verdictTrue: false,
+      why: "Loop khatam ho gaya. Saari "+n+" lines scan kar li, par <strong>10th line kabhi nahi mili</strong> kyunki file mein sirf "+n+" line(s) hain. Ab fallback execute karenge.",
+      analogy: "Jaise <strong>poori kitaab padh li par chapter 10 mila hi nahi</strong> — kyunki kitaab mein sirf "+n+" chapters the! Ab khali haath wapas."
+    })
+  });
+
+  // L8: return ""
+  curResult = "";
+  pushStep({
+    line: 8,
+    action: "return",
+    logHTML: richLog({
+      line: 8,
+      action: "return",
+      code: 'return ""',
+      status: "fail",
+      inputs: [{k:"n", v:n}],
+      outputs: [{k:"return value", v:'""'}],
+      why: "Fallback return! File mein "+n+" lines hi the (10 se kam), toh <strong>empty string</strong> return karna padega. Yeh edge case handle kar raha hai.",
+      analogy: "Jaise <strong>10 rupye ka note nahi tha pocket mein — toh khaali haath ghar wapas</strong>. Koi baat nahi, default empty answer hi sahi!"
+    })
+  });
+
+  return st;
+}
+
+// ============ RENDER VIZ ============
+function renderViz(s) {
+  var v = document.getElementById('vizPanel');
+  var h = '';
+
+  // Vars strip (V1)
+  h += '<div class="vars-strip">';
+  h += '<span class="var-chip vc-active"><span class="vk">phase:</span>'+s.phase+'</span>';
+  h += '<span class="var-chip"><span class="vk">n:</span>'+s.n+'</span>';
+  h += '<span class="var-chip '+(s.count!==null?'vc-active':'')+'"><span class="vk">count:</span>'+(s.count===null?'null':s.count)+'</span>';
+  h += '<span class="var-chip '+(s.loopVar!==null?'vc-warn':'')+'"><span class="vk">i:</span>'+(s.loopVar===null?'—':s.loopVar)+'</span>';
+  if (s.result !== null) {
+    var rcls = (s.result === "") ? 'vc-warn' : 'vc-safe';
+    h += '<span class="var-chip '+rcls+'"><span class="vk">result:</span>"'+s.result+'"</span>';
+  }
+  h += '</div>';
+
+  // viz-row: lines list + counter + result box
+  h += '<div class="viz-row">';
+
+  // ===== Lines list =====
+  h += '<div class="viz-card" style="flex:1;min-width:280px">';
+  h += '<div class="viz-card-title">📜 File Lines (1-indexed)</div>';
+  h += '<div class="lines-list">';
+  if (s.n === 0) {
+    h += '<div class="empty-state">📭 File is empty (0 lines)</div>';
+  } else {
+    for (var i = 0; i < s.n; i++) {
+      var lineNum = i + 1;
+      var cls = 'line-row';
+      var mark = '';
+      var isCurrent = (s.currentLineIdx === i);
+      var isPassed = s.passedLines.indexOf(i) >= 0;
+      var isTarget = (lineNum === 10 && s.phase === "found" && s.currentLineIdx === i);
+      var isFuture = (s.currentLineIdx >= 0 && i > s.currentLineIdx) || (s.phase === "init" && i > 0);
+      
+      if (isTarget) { cls += ' lr-target'; mark = '🎉'; }
+      else if (isCurrent) { cls += ' lr-current'; mark = '📍'; }
+      else if (isPassed) { cls += ' lr-passed'; mark = '✓'; }
+      else if (isFuture) { cls += ' lr-future'; mark = ''; }
+      
+      // Highlight line 10 specially when not yet reached
+      if (lineNum === 10 && !isCurrent && !isPassed && s.phase !== "empty") {
+        mark = '🎯';
+      }
+      // Show that 10 was missed in empty phase
+      if (lineNum === 10 && s.phase === "empty" && s.n < 10) {
+        // Won't appear since n<10
+      }
+      
+      h += '<div class="'+cls+'">';
+      h += '<span class="ln-no">'+lineNum+'</span>';
+      h += '<span class="ln-content">'+s.lines[i]+'</span>';
+      h += '<span class="ln-mark">'+mark+'</span>';
+      h += '</div>';
+    }
+  }
+  h += '</div>';
+  // Note about line 10
+  if (s.n < 10 && s.phase === "empty") {
+    h += '<div style="margin-top:8px;padding:6px 10px;background:var(--accent-amber-bg);border:1px solid var(--accent-amber);border-radius:4px;font-size:11px;color:var(--accent-amber-text)"><strong>⚠️ Note:</strong> File mein sirf '+s.n+' lines hain — line 10 exist hi nahi karti!</div>';
+  }
+  h += '</div>';
+
+  // ===== Counter widget =====
+  h += '<div class="viz-card">';
+  h += '<div class="viz-card-title">🔢 Counter</div>';
+  var cnCls = (s.count === 10) ? 'cn-target' : '';
+  h += '<div class="counter-widget">';
+  h += '<div class="counter-num '+cnCls+'">'+(s.count===null?'—':s.count)+'</div>';
+  h += '<div class="counter-label">current count</div>';
+  h += '<div class="counter-target">🎯 target: 10</div>';
+  if (s.count !== null && s.count < 10) {
+    h += '<div style="font-size:10px;color:var(--text-tertiary)">'+(10-s.count)+' to go</div>';
+  } else if (s.count === 10) {
+    h += '<div style="font-size:10px;color:var(--accent-green-text);font-weight:700">🎉 MATCH!</div>';
+  }
+  h += '</div>';
+  h += '</div>';
+
+  // ===== Result box =====
+  h += '<div class="viz-card">';
+  h += '<div class="viz-card-title">📦 Result</div>';
+  var rbCls = '';
+  if (s.phase === "found") rbCls = 'rb-found';
+  else if (s.phase === "empty") rbCls = 'rb-empty';
+  h += '<div class="result-box '+rbCls+'">';
+  h += '<div class="result-label">return value</div>';
+  if (s.result === null) {
+    h += '<div class="result-val empty">(not yet set)</div>';
+  } else if (s.result === "") {
+    h += '<div class="result-val empty">"" (empty string)</div>';
+  } else {
+    h += '<div class="result-val">"'+s.result+'"</div>';
+  }
+  h += '</div>';
+  h += '</div>';
+
+  h += '</div>'; // end viz-row
+
+  // Result banner
+  if (s.phase === "found") {
+    h += '<div class="result-banner show">🎉 SUCCESS! 10th line found: "'+s.result+'"</div>';
+  } else if (s.phase === "empty") {
+    h += '<div class="result-banner show rb-empty-final">⚠️ File has only '+s.n+' line(s) — returning empty string ""</div>';
+  }
+
+  v.innerHTML = h;
+}
+
+// ============ STEP CONTROL ============
+function renderStep(idx) {
+  if (!steps.length) return;
+  var s = steps[idx];
+  currentStep = idx;
+  document.getElementById('stepInfo').textContent = (idx+1)+'/'+steps.length;
+  var bd = document.getElementById('actionBadge');
+  bd.textContent = BADGE_LABEL[s.action] || s.action;
+  bd.className = 'action-badge action-badge--'+s.action;
+  document.querySelectorAll('.code-line').forEach(function(el){ el.classList.remove('active'); });
+  var al = document.querySelector('.code-line[data-line="'+s.line+'"]');
+  if (al) { al.classList.add('active'); al.scrollIntoView({block:'nearest'}); }
+  renderViz(s);
+  showLogPreview(s);
+}
+
+function showLogPreview(s) {
+  if (!logEnabled) return;
+  document.getElementById('logPopupBody').innerHTML = s.logHTML || '';
+  document.getElementById('logPopup').classList.remove('log-popup--hidden');
+}
+
+function stepBy(d) {
+  var n = currentStep + d;
+  if (n < 0 || n >= steps.length) return;
+  renderStep(n);
+}
+
+function resetStep() { renderStep(0); }
+
+function parseInputs() {
+  var n = parseInt(document.getElementById('inpN').value, 10);
+  if (isNaN(n) || n < 0) n = 0;
+  if (n > 20) n = 20;
+  return n;
+}
+
+function resetWithInput() {
+  curResult = null;
+  var n = parseInputs();
+  renderCode();
+  fitCodeWidth();
+  steps = buildSteps(n);
+  currentStep = 0;
+  renderStep(0);
+  document.getElementById('liveOutput').textContent = curResult !== null ? '"'+curResult+'"' : '—';
+}
+
+function loadTest(n, exp) {
+  document.getElementById('inpN').value = n;
+  document.getElementById('expBadge').textContent = 'exp: "'+exp+'"';
+  resetWithInput();
+}
+
+// ============ LOG POPUP CONTROLS ============
+function toggleLogPreview() {
+  logEnabled = !logEnabled;
+  var btn = document.getElementById('logToggleBtn');
+  btn.textContent = logEnabled ? '📋 ON' : '📋 OFF';
+  btn.classList.toggle('log-toggle-btn--off', !logEnabled);
+  if (!logEnabled) hideLogPopup();
+  else if (steps.length) showLogPreview(steps[currentStep]);
+}
+
+function hideLogPopup() {
+  document.getElementById('logPopup').classList.add('log-popup--hidden');
+}
+
+function logZoom(dir) {
+  logZoomLevel = Math.max(60, Math.min(180, logZoomLevel + dir*20));
+  updateLogZoom();
+}
+
+function logZoomReset() { logZoomLevel = 100; updateLogZoom(); }
+
+function updateLogZoom() {
+  document.getElementById('logZoomLabel').textContent = logZoomLevel+'%';
+  document.getElementById('logPopup').style.setProperty('--log-scale', logZoomLevel/100);
+}
+
+function toggleFullscreen() {
+  var viz = document.querySelector('.col-viz');
+  if (!document.fullscreenElement) viz.requestFullscreen().catch(function(){});
+  else document.exitFullscreen();
+}
+
+function toggleProblem() {
+  var body = document.getElementById('problemBody');
+  var btn = document.getElementById('toggleBtn');
+  body.classList.toggle('problem-body--hidden');
+  btn.textContent = body.classList.contains('problem-body--hidden') ? '▼ Show' : '▲ Hide';
+}
+
+// ============ RESIZE HANDLE ============
+(function(){
+  var col1 = document.getElementById('col1');
+  document.getElementById('resizeH1').addEventListener('mousedown', function(e){
+    e.preventDefault();
+    codeWidthUserSet = true;
+    var startX = e.clientX, startW = col1.offsetWidth, h = this;
+    document.body.classList.add('no-select');
+    h.classList.add('active');
+    function mv(e){
+      col1.style.width = Math.max(140, startW + (e.clientX - startX)) + 'px';
+      syncFooterWidth();
+    }
+    function up(){
+      document.removeEventListener('mousemove', mv);
+      document.removeEventListener('mouseup', up);
+      document.body.classList.remove('no-select');
+      h.classList.remove('active');
+    }
+    document.addEventListener('mousemove', mv);
+    document.addEventListener('mouseup', up);
+  });
+})();
+
+function syncFooterWidth() {
+  document.getElementById('footerLeft').style.width =
+    document.getElementById('col1').offsetWidth + 'px';
+}
+
+window.addEventListener('resize', function(){
+  if (!codeWidthUserSet) fitCodeWidth();
+  else syncFooterWidth();
+});
+
+// ============ KEYBOARD ============
+document.addEventListener('keydown', function(e){
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
+  if (e.key === 'ArrowRight') { e.preventDefault(); stepBy(1); }
+  else if (e.key === 'ArrowLeft') { e.preventDefault(); stepBy(-1); }
+  else if (e.key === 'r' || e.key === 'R') { e.preventDefault(); resetStep(); }
+});
+
+// ============ INIT ============
+window.addEventListener('load', function(){
+  renderCode();
+  fitCodeWidth();
+  resetWithInput();
+});
+
+</script>
+</body>
+</html>

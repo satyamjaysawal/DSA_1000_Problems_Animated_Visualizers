@@ -1,0 +1,1183 @@
+﻿
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LC #885 — Spiral Matrix III · DSA Dry-Run Visualizer</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+:root {
+  --bg-primary:#FAFAF8; --bg-secondary:#F1EFE8; --bg-tertiary:#E2E0D8; --bg-card:#FFFFFF;
+  --text-primary:#2C2C2A; --text-secondary:#5F5E5A; --text-tertiary:#888780;
+  --border-color:rgba(0,0,0,0.11); --border-light:rgba(0,0,0,0.06); --border-focus:#534AB7;
+  --accent-indigo:#534AB7; --accent-indigo-bg:#EEEDFE; --accent-indigo-text:#3C3489; --accent-indigo-hover:#4740A0;
+  --accent-teal:#0F6E56; --accent-teal-bg:#E1F5EE; --accent-teal-text:#085041;
+  --accent-red:#E24B4A; --accent-red-bg:#FCEBEB; --accent-red-text:#791F1F;
+  --accent-amber:#B45309; --accent-amber-bg:#FEF3C7; --accent-amber-text:#78350F;
+  --accent-green:#15803D; --accent-green-bg:#DCFCE7; --accent-green-text:#14532D;
+  --syn-keyword:#534AB7; --syn-function:#185FA5; --syn-number:#993C1D; --syn-string:#0F6E56;
+  --active-line-bg:#EEEDFE;
+  --radius-sm:4px; --radius-md:6px; --radius-lg:10px; --radius-xl:14px;
+  --sp-2:8px; --sp-3:12px; --sp-5:20px;
+  --font-sans:'DM Sans',system-ui,sans-serif; --font-mono:'JetBrains Mono','Fira Code',monospace;
+  --fs-xs:11px; --fs-sm:12px; --fs-base:14px; --fs-md:15px; --fs-lg:18px;
+  --fw-medium:500; --fw-semibold:600; --fw-bold:700;
+  --lh-normal:1.6; --lh-code:1.9;
+  --ease:.18s ease;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:var(--font-sans);background:var(--bg-primary);color:var(--text-primary);font-size:var(--fs-base);line-height:var(--lh-normal);overflow:hidden}
+.no-select{user-select:none}
+
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border-color);border-radius:3px}
+
+.app-shell{display:flex;flex-direction:column;height:100vh;overflow:hidden;background:var(--bg-primary)}
+
+/* === PROBLEM CARD === */
+.problem-card{flex-shrink:0;border-bottom:1px solid var(--border-color);background:var(--bg-card)}
+.pc-header{display:flex;align-items:center;gap:10px;padding:8px 16px;background:var(--bg-secondary);border-bottom:1px solid var(--border-light);flex-wrap:wrap}
+.gt-learn{background:var(--accent-indigo);color:#fff;font:700 11px var(--font-mono);padding:5px 12px;border-radius:99px;border:none;cursor:pointer;letter-spacing:.04em}
+.pc-num{font:700 12px var(--font-mono);color:var(--text-tertiary)}
+.pc-title{font:700 16px var(--font-sans);color:var(--text-primary)}
+.pc-diff{font:700 9px var(--font-mono);background:var(--accent-red-bg);color:var(--accent-red-text);padding:2px 7px;border-radius:99px;border:1px solid var(--accent-red);text-transform:uppercase;letter-spacing:.06em}
+.pc-tag{font:600 9px var(--font-mono);background:var(--accent-indigo-bg);color:var(--accent-indigo-text);padding:2px 7px;border-radius:99px;border:1px solid var(--accent-indigo);text-transform:uppercase;letter-spacing:.06em}
+.pc-header-right{display:flex;align-items:center;gap:8px;margin-left:auto;flex-wrap:wrap}
+.pc-input-group{display:inline-flex;align-items:center;gap:4px;font:600 11px var(--font-mono)}
+.pc-input-group input{font:600 11px var(--font-mono);padding:3px 6px;border:1px solid var(--border-color);border-radius:var(--radius-sm);background:#fff;width:46px;text-align:center;color:var(--text-primary)}
+.pc-input-group input:focus{outline:none;border-color:var(--border-focus)}
+.pc-expected{font:600 10px var(--font-mono);background:var(--accent-green-bg);color:var(--accent-green-text);padding:3px 7px;border-radius:var(--radius-sm);border:1px solid var(--accent-green)}
+.pc-toggle{background:transparent;border:1px solid var(--border-color);color:var(--text-secondary);font:600 11px var(--font-mono);padding:3px 8px;border-radius:var(--radius-sm);cursor:pointer;font-family:'DM Sans',system-ui,"Segoe UI Emoji",sans-serif}
+
+.pc-body{display:flex;gap:14px;padding:10px 16px;max-height:240px;overflow-y:auto}
+.pc-body--hidden{display:none}
+.pc-left{flex:1;min-width:0}
+.pc-right{flex:0 0 320px;display:flex;flex-direction:column;gap:6px;border-left:1px solid var(--border-light);padding-left:14px}
+.pc-section-title{font:700 9px var(--font-mono);text-transform:uppercase;letter-spacing:.08em;color:var(--text-tertiary);margin-bottom:4px;display:flex;align-items:center;gap:5px}
+.pc-statement{font-size:12px;line-height:1.55;color:var(--text-secondary);margin-bottom:8px}
+.pc-statement code{font:600 11px var(--font-mono);background:var(--bg-secondary);padding:1px 4px;border-radius:3px;color:var(--accent-indigo-text)}
+.pc-statement strong{color:var(--text-primary)}
+.concept-block{background:var(--bg-secondary);border:1px solid var(--border-light);border-radius:var(--radius-md);padding:6px 10px;margin-bottom:5px;font-size:11px;line-height:1.5;color:var(--text-secondary)}
+.concept-block strong{color:var(--accent-indigo-text);font-weight:700;font-size:10px;text-transform:uppercase;letter-spacing:.04em;display:block;margin-bottom:2px}
+.complexity-row{display:flex;gap:6px;margin-top:6px}
+.cx-chip{font:600 10px var(--font-mono);padding:3px 7px;border-radius:99px;background:var(--accent-teal-bg);color:var(--accent-teal-text);border:1px solid var(--accent-teal)}
+
+.tc-chip{display:flex;flex-direction:column;gap:3px;background:var(--bg-secondary);border:1px solid var(--border-light);border-radius:var(--radius-md);padding:5px 8px;cursor:pointer;transition:all var(--ease)}
+.tc-chip:hover{background:var(--accent-indigo-bg);border-color:var(--accent-indigo)}
+.tc-chip-row1{display:flex;align-items:center;gap:6px;font-size:10px}
+.pt-tag{font:700 9px var(--font-mono);background:var(--accent-amber-bg);color:var(--accent-amber-text);padding:1px 5px;border-radius:3px;border:1px solid var(--accent-amber);text-transform:uppercase;letter-spacing:.04em}
+.tc-label{font-weight:600;color:var(--text-primary);font-size:11px}
+.tc-expected{margin-left:auto;font:700 10px var(--font-mono);color:var(--accent-green-text)}
+.tc-vals{display:flex;flex-wrap:wrap;gap:3px}
+.tc-vals code{font:600 10px var(--font-mono);background:#fff;padding:1px 5px;border-radius:3px;border:1px solid var(--border-color);color:var(--accent-indigo-text)}
+.live-output-row{display:flex;align-items:center;gap:6px;margin-top:4px;padding-top:6px;border-top:1px dashed var(--border-light)}
+.live-output-row .label{font:700 9px var(--font-mono);text-transform:uppercase;color:var(--text-tertiary)}
+.live-output-row .val{font:700 11px var(--font-mono);color:var(--accent-indigo-text);flex:1}
+.btn-run{background:var(--accent-indigo);color:#fff;font:700 11px var(--font-mono);padding:5px 12px;border:none;border-radius:var(--radius-sm);cursor:pointer;font-family:'JetBrains Mono',monospace,"Segoe UI Emoji"}
+.btn-run:hover{background:var(--accent-indigo-hover)}
+
+/* === MAIN ROW === */
+.main-row{flex:1;display:flex;overflow:hidden;min-height:0}
+.col{display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.col-code{width:33%;min-width:140px;max-width:45vw}
+.col-viz{flex:1;min-width:0}
+
+.section-label{font:700 10px var(--font-mono);text-transform:uppercase;letter-spacing:.08em;color:var(--text-tertiary);padding:6px 12px;background:var(--bg-secondary);border-bottom:1px solid var(--border-light);display:flex;align-items:center;gap:6px;font-family:'JetBrains Mono',monospace,"Segoe UI Emoji",sans-serif}
+
+/* === CODE PANEL === */
+.code-panel{flex:1;overflow-y:auto;padding:8px 0;background:var(--bg-card);font:500 12px var(--font-mono);line-height:var(--lh-code)}
+.code-line{display:flex;padding:0 12px;white-space:pre;border-left:2px solid transparent}
+.code-line.active{background:var(--active-line-bg);border-left-color:var(--accent-indigo)}
+.ln{color:var(--text-tertiary);user-select:none;width:24px;text-align:right;margin-right:10px;flex-shrink:0}
+.ct{flex:1}
+.kw{color:var(--syn-keyword);font-weight:600}
+.fn{color:var(--syn-function)}
+.num{color:var(--syn-number)}
+.str{color:var(--syn-string)}
+
+/* === RESIZE HANDLE === */
+.resize-h{width:5px;background:var(--border-light);cursor:col-resize;flex-shrink:0;transition:background var(--ease)}
+.resize-h:hover, .resize-h.active{background:var(--accent-indigo)}
+
+/* === VIZ PANEL === */
+.viz-panel{flex:1;overflow:auto;padding:12px;background:var(--bg-primary)}
+.vars-strip{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.var-chip{font:600 11px var(--font-mono);padding:3px 8px;border-radius:99px;background:var(--bg-card);border:1px solid var(--border-color);color:var(--text-primary);display:inline-flex;align-items:center;gap:4px}
+.var-chip .vk{color:var(--text-tertiary);font-weight:500}
+.var-chip .vv{color:var(--text-primary);font-weight:700}
+.vc-active{background:var(--accent-indigo-bg);border-color:var(--accent-indigo);color:var(--accent-indigo-text)}
+.vc-active .vv{color:var(--accent-indigo-text)}
+.vc-safe{background:var(--accent-green-bg);border-color:var(--accent-green);color:var(--accent-green-text)}
+.vc-safe .vv{color:var(--accent-green-text)}
+.vc-warn{background:var(--accent-amber-bg);border-color:var(--accent-amber);color:var(--accent-amber-text)}
+.vc-warn .vv{color:var(--accent-amber-text)}
+
+.viz-row{display:flex;gap:12px;align-items:flex-start;flex-wrap:wrap;margin-bottom:10px}
+.viz-card{background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius-md);padding:10px}
+.viz-card-title{font:700 9px var(--font-mono);text-transform:uppercase;letter-spacing:.08em;color:var(--text-tertiary);margin-bottom:8px;display:flex;align-items:center;gap:5px}
+
+/* Matrix grid (V9) */
+.matrix-wrap{display:inline-block;padding:14px;background:#1e293b;border-radius:8px;border:2px solid #334155;position:relative}
+.matrix-grid{display:grid;gap:3px;border-radius:3px;position:relative}
+.mat-cell{width:50px;height:50px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:var(--font-mono);font-size:13px;font-weight:700;border-radius:6px;background:#fff;color:#1e293b;border:2px solid transparent;position:relative;transition:all .25s}
+.mat-cell-coord{font-size:8px;color:var(--text-tertiary);font-weight:400;position:absolute;top:2px;left:3px;opacity:.7}
+.mat-cell-order{font-size:9px;color:var(--accent-green-text);font-weight:700;position:absolute;bottom:2px;right:3px}
+.mat-cell--start{background:#FEF3C7!important;border-color:#B45309!important}
+.mat-cell--curr{background:#EEEDFE!important;border-color:#534AB7!important;animation:pulse-node 1.1s infinite;transform:scale(1.06);z-index:2}
+.mat-cell--visited{background:#DCFCE7;color:#14532D}
+
+@keyframes pulse-node{0%,100%{box-shadow:0 0 4px var(--accent-indigo)}50%{box-shadow:0 0 14px var(--accent-indigo)}}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-3px)}75%{transform:translateX(3px)}}
+@keyframes win-pulse{0%,100%{box-shadow:0 0 3px rgba(234,179,8,.5)}50%{box-shadow:0 0 12px rgba(234,179,8,.9)}}
+@keyframes flow-dash{to{stroke-dashoffset:-18}}
+@keyframes flow-pulse{0%,100%{opacity:.85}50%{opacity:1}}
+
+.flow-svg{position:absolute;top:14px;left:14px;pointer-events:none;z-index:6;overflow:visible}
+.flow-line{stroke:#dc2626;stroke-width:2.5;stroke-dasharray:5,4;fill:none;animation:flow-dash 1s linear infinite,flow-pulse 1.4s ease-in-out infinite;filter:drop-shadow(0 0 2px rgba(220,38,38,.5))}
+.flow-line--current{stroke:#f59e0b;stroke-width:3;stroke-dasharray:4,3;animation:flow-dash .6s linear infinite;filter:drop-shadow(0 0 3px rgba(245,158,11,.7))}
+.flow-line--turn{stroke:#8b5cf6;stroke-width:2.2;stroke-dasharray:2,3;opacity:.85}
+
+.legend{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px}
+.legend span{display:inline-flex;align-items:center;gap:5px;font-size:10px;color:var(--text-secondary)}
+.legend i{display:inline-block;width:14px;height:14px;border-radius:3px;border:1px solid var(--border-color)}
+.legend i.legend-flow{width:22px;height:0;border:0;border-top:2.5px dashed #dc2626}
+.legend i.legend-flow-curr{width:22px;height:0;border:0;border-top:3px dashed #f59e0b}
+.legend i.legend-flow-turn{width:22px;height:0;border:0;border-top:2.5px dashed #8b5cf6}
+
+/* Direction compass */
+.compass{width:100px;height:100px;border-radius:50%;border:2px dashed var(--border-color);position:relative;background:var(--bg-secondary);margin:8px auto}
+.compass-arrow{position:absolute;top:50%;left:50%;width:42px;height:6px;background:linear-gradient(90deg,var(--accent-indigo),var(--accent-indigo-hover));transform-origin:0 50%;transform:translate(0,-50%) rotate(0deg);border-radius:3px;transition:transform .3s ease}
+.compass-arrow::after{content:'';position:absolute;right:-6px;top:50%;transform:translateY(-50%);border-left:10px solid var(--accent-indigo-hover);border-top:7px solid transparent;border-bottom:7px solid transparent}
+.compass-label{position:absolute;font:700 11px var(--font-mono);color:var(--text-secondary)}
+.compass-l-N{top:2px;left:50%;transform:translateX(-50%)}
+.compass-l-S{bottom:2px;left:50%;transform:translateX(-50%)}
+.compass-l-E{right:4px;top:50%;transform:translateY(-50%)}
+.compass-l-W{left:4px;top:50%;transform:translateY(-50%)}
+.compass-l-active{color:var(--accent-indigo);font-weight:800;font-size:13px}
+
+/* Result list */
+.chips{display:flex;gap:4px;flex-wrap:wrap;max-width:340px}
+.chip{font:600 10px var(--font-mono);padding:3px 7px;border-radius:99px;background:var(--accent-green-bg);color:var(--accent-green-text);border:1px solid var(--accent-green)}
+.chip-curr{background:var(--accent-indigo-bg);color:var(--accent-indigo-text);border-color:var(--accent-indigo);animation:pulse-node 1.1s infinite}
+.empty-state{font-size:11px;color:var(--text-tertiary);font-style:italic}
+
+/* Out-of-bounds list */
+.oob-chips{display:flex;gap:4px;flex-wrap:wrap;max-width:300px}
+.oob-chip{font:600 10px var(--font-mono);padding:2px 6px;border-radius:4px;background:var(--accent-red-bg);color:var(--accent-red-text);border:1px dashed var(--accent-red);opacity:.85}
+
+/* Steps progress */
+.steps-track{display:flex;align-items:center;gap:6px;font-family:var(--font-mono);font-size:11px}
+.steps-track-bar{flex:1;height:8px;background:var(--bg-secondary);border:1px solid var(--border-color);border-radius:99px;overflow:hidden;min-width:120px}
+.steps-track-fill{height:100%;background:linear-gradient(90deg,var(--accent-teal),var(--accent-indigo));transition:width .3s}
+
+/* Result banner */
+.result-banner{padding:10px 14px;background:linear-gradient(90deg,#FEF3C7,#FFEFD5);border:1.5px solid var(--accent-amber);border-radius:var(--radius-md);font:700 13px var(--font-mono);color:var(--accent-amber-text);margin-top:10px;animation:win-pulse 1.6s infinite;display:flex;align-items:center;gap:8px}
+
+/* === LOG POPUP === */
+.log-popup{--log-scale:1;position:fixed;bottom:52px;right:14px;width:calc(480px*var(--log-scale));max-width:92vw;max-height:75vh;border-radius:var(--radius-lg);box-shadow:0 10px 32px rgba(0,0,0,.14);border:1px solid var(--border-color);background:var(--bg-card);overflow:hidden;display:flex;flex-direction:column;z-index:100;transition:opacity .15s,transform .15s;transform-origin:bottom right}
+.log-popup--hidden{opacity:0;transform:scale(.92);pointer-events:none}
+.log-popup-body{flex:1;overflow:auto;padding:0}
+.log-popup-body > .log-card{border-radius:0;border:none;border-left:0}
+
+.log-card{border-radius:var(--radius-md);overflow:hidden;border:1px solid var(--border-color);border-left-width:4px;font-size:var(--fs-xs);background:var(--bg-card)}
+.log-card--init,.log-card--func-def,.log-card--call,.log-card--return{border-left-color:#8250ff}
+.log-card--for-check,.log-card--while-check,.log-card--if-check{border-left-color:#388bfd}
+.log-card--mark,.log-card--push,.log-card--pop,.log-card--restore,.log-card--found{border-left-color:#3fb950}
+.log-card--remove,.log-card--prune,.log-card--fail{border-left-color:#f85149}
+.log-card--exit,.log-card--skip{border-left-color:#555450}
+
+.log-card-header{display:flex;align-items:center;gap:6px;padding:8px 10px 6px;background:var(--bg-secondary);border-bottom:1px solid var(--border-light)}
+.log-badge{font-family:'JetBrains Mono',monospace,system-ui,"Segoe UI Emoji";font-size:9px;font-weight:700;padding:2px 7px;border-radius:99px;letter-spacing:.05em;text-transform:uppercase;background:var(--accent-indigo-bg);color:var(--accent-indigo-text);border:1px solid var(--accent-indigo)}
+.log-line-ref{font:700 10px var(--font-mono);color:var(--accent-indigo);background:var(--accent-indigo-bg);padding:1px 6px;border-radius:4px;border:1px solid var(--accent-indigo)}
+.log-status-pill{font-family:system-ui,"Segoe UI Emoji",sans-serif;font-size:9px;font-weight:700;padding:2px 7px;border-radius:99px;text-transform:uppercase;margin-left:auto}
+.log-status--success{background:var(--accent-green-bg);color:var(--accent-green-text);border:1px solid var(--accent-green)}
+.log-status--fail{background:var(--accent-red-bg);color:var(--accent-red-text);border:1px solid var(--accent-red)}
+.log-status--skip{background:var(--bg-tertiary);color:var(--text-tertiary);border:1px solid var(--border-color)}
+.log-status--loop{background:rgba(56,139,253,.14);color:#185FA5;border:1px solid #388bfd}
+.log-status--prune{background:var(--accent-red-bg);color:var(--accent-red-text);border:1px solid var(--accent-red)}
+.log-status--info{background:rgba(130,80,255,.14);color:#3C3489;border:1px solid #8250ff}
+
+.log-section{padding:7px 10px;border-bottom:1px dashed var(--border-light)}
+.log-section:last-child{border-bottom:none}
+.log-section-title{font:700 8px var(--font-mono);text-transform:uppercase;letter-spacing:.06em;color:var(--text-tertiary);margin-bottom:4px;display:flex;align-items:center;gap:4px;font-family:'JetBrains Mono',monospace,system-ui,"Segoe UI Emoji"}
+.log-section-title-icon{font-family:system-ui,"Segoe UI Emoji",sans-serif}
+
+.log-code-snippet{font:600 11px var(--font-mono);background:#0d1117;color:#e6edf3;padding:6px 9px;border-radius:4px;display:block;overflow-x:auto;white-space:pre;border:1px solid #30363d}
+.log-code-snippet .ck{color:#ff7b72}
+.log-code-snippet .cs{color:#a5d6ff}
+.log-code-snippet .cn{color:#79c0ff}
+.log-code-snippet .cf{color:#d2a8ff}
+.log-code-snippet .cc{color:#8b949e;font-style:italic}
+
+.log-kv-row{display:flex;flex-wrap:wrap;gap:4px}
+.log-kv{display:inline-flex;align-items:center;gap:3px;font:11px var(--font-mono);padding:2px 7px;border-radius:4px;background:var(--bg-secondary);border:1px solid var(--border-light)}
+.log-kv-key{color:var(--text-tertiary);font-weight:500}
+.log-kv-val{color:var(--text-primary);font-weight:700}
+.log-kv--in{background:rgba(56,139,253,.08);border-color:rgba(56,139,253,.3)}
+.log-kv--out{background:rgba(63,185,80,.08);border-color:rgba(63,185,80,.4)}
+.log-kv--out .log-kv-val{color:#15803D}
+.log-kv--changed{background:rgba(180,83,9,.10);border-color:rgba(180,83,9,.4)}
+
+.log-verdict{display:flex;align-items:center;gap:6px;font:600 11px var(--font-mono);padding:5px 8px;border-radius:5px;background:var(--bg-secondary);border:1px solid var(--border-light)}
+.log-verdict--true{background:var(--accent-green-bg);border-color:var(--accent-green);color:var(--accent-green-text)}
+.log-verdict--false{background:var(--accent-red-bg);border-color:var(--accent-red);color:var(--accent-red-text)}
+
+.log-analogy{font:italic 11px var(--font-sans);color:var(--text-secondary);background:#FFF8E7;border:1px solid #FBE8A6;border-left:3px solid var(--accent-amber);padding:6px 9px;border-radius:4px;line-height:1.55}
+.log-analogy strong{color:var(--accent-amber-text);font-style:normal;font-weight:700}
+.log-why{font-size:11px;line-height:1.55;color:var(--text-primary);padding:4px 0}
+.log-why strong{color:var(--accent-indigo-text)}
+.log-why code{font:600 11px var(--font-mono);background:var(--bg-secondary);padding:1px 4px;border-radius:3px;color:var(--accent-indigo-text)}
+
+/* === FOOTER === */
+.footer-bar{display:flex;flex-shrink:0;border-top:1px solid var(--border-color);background:var(--bg-card)}
+.footer-left{width:33%;min-width:140px;max-width:45vw;display:flex;align-items:center;gap:8px;padding:7px 12px;border-right:1px solid var(--border-light)}
+.footer-right{flex:1;display:flex;align-items:center;gap:8px;padding:7px 20px;flex-wrap:wrap}
+.step-info{font:700 12px var(--font-mono);color:var(--text-secondary)}
+.action-badge{font-family:'JetBrains Mono',monospace,system-ui,"Segoe UI Emoji";font-size:9px;font-weight:700;padding:2px 7px;border-radius:99px;letter-spacing:.05em;text-transform:uppercase;background:var(--accent-indigo-bg);color:var(--accent-indigo-text);border:1px solid var(--accent-indigo)}
+.action-badge--func-def,.action-badge--init,.action-badge--call,.action-badge--return{background:rgba(130,80,255,.14);color:#3C3489;border-color:#8250ff}
+.action-badge--for-check,.action-badge--while-check,.action-badge--if-check{background:rgba(56,139,253,.14);color:#185FA5;border-color:#388bfd}
+.action-badge--mark,.action-badge--push,.action-badge--found{background:var(--accent-green-bg);color:var(--accent-green-text);border-color:var(--accent-green)}
+.action-badge--prune,.action-badge--fail,.action-badge--remove{background:var(--accent-red-bg);color:var(--accent-red-text);border-color:var(--accent-red)}
+.action-badge--exit,.action-badge--skip{background:var(--bg-tertiary);color:var(--text-tertiary);border-color:var(--border-color)}
+
+kbd{font-family:'JetBrains Mono',monospace,system-ui,"Segoe UI Emoji";font-size:10px;background:var(--bg-secondary);border:1px solid var(--border-color);border-radius:3px;padding:1px 5px;color:var(--text-secondary)}
+.btn{font-family:'JetBrains Mono',monospace,system-ui,"Segoe UI Emoji";font-size:11px;font-weight:600;padding:5px 10px;background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius-sm);color:var(--text-primary);cursor:pointer;transition:all var(--ease)}
+.btn:hover{background:var(--bg-secondary);border-color:var(--text-tertiary)}
+.btn-primary{background:var(--accent-indigo);color:#fff;border-color:var(--accent-indigo)}
+.btn-primary:hover{background:var(--accent-indigo-hover);color:#fff}
+.btn-fullscreen{font-size:14px;padding:3px 9px}
+.btn-zoom{font-family:'JetBrains Mono',monospace,system-ui,"Segoe UI Emoji";font-size:12px;font-weight:700;padding:3px 8px;background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius-sm);color:var(--text-primary);cursor:pointer;min-width:28px}
+.btn-zoom:hover{background:var(--bg-secondary)}
+.log-toggle-btn{font-family:'JetBrains Mono',monospace,system-ui,"Segoe UI Emoji";font-size:11px;font-weight:700;padding:5px 10px;background:var(--accent-green-bg);border:1px solid var(--accent-green);border-radius:var(--radius-sm);color:var(--accent-green-text);cursor:pointer}
+.log-toggle-btn--off{background:var(--bg-tertiary);color:var(--text-tertiary);border-color:var(--border-color)}
+.log-zoom-label{font:700 10px var(--font-mono);color:var(--text-secondary);min-width:38px;text-align:center}
+.footer-sep{width:1px;height:18px;background:var(--border-color);margin:0 4px}
+</style>
+</head>
+<body>
+
+<div class="app-shell">
+
+  <!-- ===================== PROBLEM CARD ===================== -->
+  <div class="problem-card" id="problemCard">
+    <div class="pc-header">
+      <a href="../00_HomePage/gt_learn_homepage.html" class="gt-learn">GT LEARN</a>
+      <span class="pc-num">#885</span>
+      <span class="pc-title">🌀 Spiral Matrix III</span>
+      <span class="pc-diff">MEDIUM</span>
+      <span class="pc-tag">Simulation</span>
+      <span class="pc-tag">Matrix</span>
+      <div class="pc-header-right">
+        <span class="pc-input-group">rows=<input id="inRows" type="number" value="3" min="1" max="6"></span>
+        <span class="pc-input-group">cols=<input id="inCols" type="number" value="4" min="1" max="6"></span>
+        <span class="pc-input-group">rStart=<input id="inRStart" type="number" value="0" min="0" max="5"></span>
+        <span class="pc-input-group">cStart=<input id="inCStart" type="number" value="0" min="0" max="5"></span>
+        <span class="pc-expected" id="expectedBadge">expected: 12 cells</span>
+        <button class="pc-toggle" type="button" onclick="toggleProblem()" id="pcToggleBtn">▲ Hide</button>
+      </div>
+    </div>
+    <div class="pc-body" id="pcBody">
+      <div class="pc-left">
+        <div class="pc-section-title">📝 Problem Statement</div>
+        <div class="pc-statement">
+          Tum ek <strong>R × C</strong> grid pe khade ho, starting cell <code>(rStart, cStart)</code>. Tumhe <strong>spiral order</strong> mein chalna hai (East → South → West → North), aur grid ke <strong>har valid cell ko visit</strong> karna hai. Agar koi step grid ke bahar (out-of-bounds) chala jaaye, toh <strong>skip</strong> karo lekin direction aur movement count maintain rakho. Final answer = <code>R*C</code> cells in order of visit.
+        </div>
+        <div class="pc-section-title">🧠 Solving Approach</div>
+        <div class="pc-statement">
+          Simulation karo with a <strong>step-doubling pattern</strong>. Pattern: <code>1 East, 1 South, 2 West, 2 North, 3 East, 3 South, 4 West, 4 North...</code> — har 2 directions ke baad step count <strong>+1</strong> hota hai. Out-of-bounds cells skip ho jaate hain par direction sequence chalti rehti hai.
+        </div>
+        <div class="pc-section-title">🎯 Core Concepts</div>
+        <div class="concept-block"><strong>Direction Cycle</strong>E(0,1) → S(1,0) → W(0,-1) → N(-1,0). After every 2 dirs, steps += 1.</div>
+        <div class="concept-block"><strong>Termination</strong>Loop tab tak chalega jab tak <code>len(result) &lt; R*C</code>. Saari valid cells visit ho jayein.</div>
+        <div class="concept-block"><strong>Bounds Check</strong><code>0 ≤ r &lt; R and 0 ≤ c &lt; C</code> — yeh true hua tabhi cell append hogi.</div>
+        <div class="complexity-row">
+          <span class="cx-chip">⏱ Time: O(max(R,C)²)</span>
+          <span class="cx-chip">💾 Space: O(R·C)</span>
+        </div>
+      </div>
+      <div class="pc-right">
+        <div class="pc-section-title">🧪 Test Cases</div>
+        <div class="tc-chip" onclick="loadTest(3,4,0,0,12)">
+          <div class="tc-chip-row1"><span class="pt-tag">basic</span><span class="tc-label">3×4 from (0,0)</span><span class="tc-expected">→ 12 cells</span></div>
+          <div class="tc-vals"><code>R=3</code><code>C=4</code><code>rStart=0</code><code>cStart=0</code></div>
+        </div>
+        <div class="tc-chip" onclick="loadTest(5,6,1,4,30)">
+          <div class="tc-chip-row1"><span class="pt-tag">interior</span><span class="tc-label">5×6 from (1,4)</span><span class="tc-expected">→ 30 cells</span></div>
+          <div class="tc-vals"><code>R=5</code><code>C=6</code><code>rStart=1</code><code>cStart=4</code></div>
+        </div>
+        <div class="tc-chip" onclick="loadTest(1,4,0,0,4)">
+          <div class="tc-chip-row1"><span class="pt-tag">single-row</span><span class="tc-label">1×4 from (0,0)</span><span class="tc-expected">→ 4 cells</span></div>
+          <div class="tc-vals"><code>R=1</code><code>C=4</code><code>rStart=0</code><code>cStart=0</code></div>
+        </div>
+        <div class="tc-chip" onclick="loadTest(4,3,2,1,12)">
+          <div class="tc-chip-row1"><span class="pt-tag">center-start</span><span class="tc-label">4×3 from (2,1)</span><span class="tc-expected">→ 12 cells</span></div>
+          <div class="tc-vals"><code>R=4</code><code>C=3</code><code>rStart=2</code><code>cStart=1</code></div>
+        </div>
+        <div class="tc-chip" onclick="loadTest(2,2,1,1,4)">
+          <div class="tc-chip-row1"><span class="pt-tag">corner</span><span class="tc-label">2×2 from (1,1)</span><span class="tc-expected">→ 4 cells</span></div>
+          <div class="tc-vals"><code>R=2</code><code>C=2</code><code>rStart=1</code><code>cStart=1</code></div>
+        </div>
+        <div class="live-output-row">
+          <span class="label">output:</span>
+          <span class="val" id="liveOutput">—</span>
+          <button class="btn-run" type="button" onclick="resetWithInput()">▶ Run</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== MAIN ROW ===================== -->
+  <div class="main-row">
+    <div class="col col-code" id="col1">
+      <div class="section-label">📜 Python Code</div>
+      <div class="code-panel" id="codePanel"></div>
+    </div>
+    <div class="resize-h" id="resizeH1"></div>
+    <div class="col col-viz">
+      <div class="section-label">📊 Visualization</div>
+      <div class="viz-panel" id="vizPanel"></div>
+    </div>
+  </div>
+
+  <!-- ===================== LOG POPUP ===================== -->
+  <div class="log-popup" id="logPopup">
+    <div class="log-popup-body" id="logPopupBody"></div>
+  </div>
+
+  <!-- ===================== FOOTER ===================== -->
+  <div class="footer-bar">
+    <div class="footer-left" id="footerLeft">
+      <span id="stepInfo" class="step-info">0/0</span>
+      <span id="actionBadge" class="action-badge">—</span>
+    </div>
+    <div class="footer-right">
+      <kbd>←</kbd><kbd>→</kbd><kbd>R</kbd>
+      <button class="btn" type="button" onclick="resetStep()">↺</button>
+      <button class="btn" type="button" onclick="stepBy(-1)">◀</button>
+      <button class="btn btn-primary" type="button" onclick="stepBy(1)">▶ Next</button>
+      <span class="footer-sep"></span>
+      <button id="logToggleBtn" class="log-toggle-btn" type="button" onclick="toggleLogPreview()">📋 ON</button>
+      <button class="btn-zoom" type="button" onclick="logZoom(-1)">−</button>
+      <span id="logZoomLabel" class="log-zoom-label">100%</span>
+      <button class="btn-zoom" type="button" onclick="logZoom(1)">+</button>
+      <button class="btn-zoom" type="button" onclick="logZoomReset()">↺</button>
+      <span class="footer-sep"></span>
+      <button class="btn btn-fullscreen" type="button" onclick="toggleFullscreen()">⛶</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   STATE
+   ============================================================ */
+var codeLines = [
+  "def spiralMatrixIII(R, C, r0, c0):",
+  "    result = [(r0, c0)]",
+  "    dirs = [(0,1),(1,0),(0,-1),(-1,0)]  # E,S,W,N",
+  "    r, c, di, steps = r0, c0, 0, 1",
+  "    while len(result) < R * C:",
+  "        for _ in range(2):",
+  "            dr, dc = dirs[di]",
+  "            for _ in range(steps):",
+  "                r, c = r + dr, c + dc",
+  "                if 0 <= r < R and 0 <= c < C:",
+  "                    result.append((r, c))",
+  "            di = (di + 1) % 4",
+  "        steps += 1",
+  "    return result"
+];
+
+var DIR_NAMES = ["E","S","W","N"];
+var DIR_EMOJI = ["➡️","⬇️","⬅️","⬆️"];
+var DIR_ANGLE = [0, 90, 180, 270];
+
+var steps = [];
+var currentStep = 0;
+var codeWidthUserSet = false;
+var curResult = null;
+var logEnabled = true;
+var logZoomLevel = 100;
+
+var LOG_BADGE = {
+  "func-def":"📌 DEF","init":"⚙️ INIT","call":"📞 CALL","return":"🏆 RETURN",
+  "for-check":"🔁 FOR","while-check":"🔁 WHILE","if-check":"🔎 IF",
+  "mark":"✅ MARK","push":"⬆ PUSH","pop":"⬇ POP","restore":"↩ RESTORE","found":"🎉 FOUND",
+  "remove":"✏️ EDIT","prune":"✂️ PRUNE","fail":"❌ FAIL","exit":"🔚 EXIT","skip":"⏭ SKIP"
+};
+var BADGE_LABEL = {
+  "func-def":"DEF","init":"INIT","call":"CALL","return":"RETURN",
+  "for-check":"FOR","while-check":"WHILE","if-check":"IF",
+  "mark":"MARK","push":"PUSH","pop":"POP","restore":"RESTORE","found":"FOUND",
+  "remove":"EDIT","prune":"PRUNE","fail":"FAIL","exit":"EXIT","skip":"SKIP"
+};
+
+/* ============================================================
+   CODE RENDERING
+   ============================================================ */
+function renderCode() {
+  var p = document.getElementById('codePanel');
+  p.innerHTML = codeLines.map(function(raw, i) {
+    var h = raw;
+    h = h.replace(/("[^"]*"|'[^']*')/g, '\x01STR\x02$1\x03');
+    h = h.replace(/(#.*$)/gm, '\x01CMT\x02$1\x03');
+    h = h.replace(/\b(def|for|in|if|return|break|continue|and|else|elif|True|False|None|not|or|while|lambda)\b/g, '\x01KW\x02$1\x03');
+    h = h.replace(/\b(len|range|int|str|list|append|pop|sorted|min|max|sum|abs|enumerate|zip|print|set|add)\b/g, '\x01FN\x02$1\x03');
+    h = h.replace(/(?<![.\w"\x01\x02\x03])(-?\d+)\b/g, '\x01NUM\x02$1\x03');
+    h = h.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    h = h.replace(/\x01([A-Z]+)\x02/g, function(_, c) {
+      var cls = c === 'STR' ? 'str' : c === 'KW' ? 'kw' : c === 'FN' ? 'fn' : c === 'NUM' ? 'num' : 'cc';
+      return '<span class="' + cls + '">';
+    }).replace(/\x03/g, '</span>');
+    return '<div class="code-line" data-line="' + i + '"><span class="ln">' + (i+1) + '</span><span class="ct">' + h + '</span></div>';
+  }).join('');
+}
+
+function hlCode(raw) {
+  var h = raw;
+  h = h.replace(/("[^"]*"|'[^']*')/g, '\x01s\x02$1\x03');
+  h = h.replace(/(#.*$)/gm, '\x01c\x02$1\x03');
+  h = h.replace(/\b(def|for|in|if|return|break|continue|and|else|elif|True|False|None|not|or|while|lambda)\b/g, '\x01k\x02$1\x03');
+  h = h.replace(/\b(len|range|int|str|list|append|pop|sorted|min|max|sum|abs|enumerate|zip|print|set|add)\b/g, '\x01f\x02$1\x03');
+  h = h.replace(/(?<![.\w"\x01\x02\x03])(-?\d+)\b/g, '\x01n\x02$1\x03');
+  h = h.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  h = h.replace(/\x01([a-z])\x02/g, function(_, c) { return '<span class="c' + c + '">'; }).replace(/\x03/g, '</span>');
+  return h;
+}
+
+function fitCodeWidth() {
+  if (codeWidthUserSet) return;
+  var col = document.getElementById('col1');
+  var maxW = Math.min(col.offsetWidth, window.innerWidth * 0.45);
+  col.style.width = Math.max(140, Math.min(maxW, window.innerWidth * 0.33)) + 'px';
+  syncFooterWidth();
+}
+
+/* ============================================================
+   richLog HELPER
+   ============================================================ */
+function richLog(opts) {
+  var statusMap = {
+    success:"✅ Success",fail:"❌ Failed",skip:"⏭ Skipped",
+    loop:"🔁 Loop iter",prune:"✂️ Pruned",info:"ℹ️ Info"
+  };
+  var status = opts.status || "info";
+  var html = '<div class="log-card log-card--' + opts.action + '">';
+  html += '<div class="log-card-header">';
+  html += '<span class="log-badge">' + (LOG_BADGE[opts.action] || opts.action) + '</span>';
+  html += '<span class="log-line-ref">L' + (opts.line + 1) + '</span>';
+  html += '<span class="log-status-pill log-status--' + status + '">' + statusMap[status] + '</span>';
+  html += '</div>';
+
+  if (opts.code) {
+    html += '<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">📜</span>Code Executing</div>';
+    html += '<code class="log-code-snippet">' + hlCode(opts.code) + '</code></div>';
+  }
+  if (opts.inputs && opts.inputs.length) {
+    html += '<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">📥</span>Input Values (line is using these)</div><div class="log-kv-row">';
+    opts.inputs.forEach(function(kv) {
+      html += '<span class="log-kv log-kv--in"><span class="log-kv-key">' + kv.k + '</span>=<span class="log-kv-val">' + kv.v + '</span></span>';
+    });
+    html += '</div></div>';
+  }
+  if (opts.outputs && opts.outputs.length) {
+    html += '<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">📤</span>Output / State After Line</div><div class="log-kv-row">';
+    opts.outputs.forEach(function(kv) {
+      var cls = kv.changed ? 'log-kv--changed' : 'log-kv--out';
+      html += '<span class="log-kv ' + cls + '"><span class="log-kv-key">' + kv.k + '</span>=<span class="log-kv-val">' + kv.v + '</span></span>';
+    });
+    html += '</div></div>';
+  }
+  if (opts.verdict) {
+    var vCls = opts.verdictTrue === true ? 'log-verdict--true' : (opts.verdictTrue === false ? 'log-verdict--false' : '');
+    var vIcon = opts.verdictTrue === true ? '✓' : (opts.verdictTrue === false ? '✗' : '•');
+    html += '<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">⚖️</span>Verdict / Decision</div>';
+    html += '<div class="log-verdict ' + vCls + '">' + vIcon + ' ' + opts.verdict + '</div></div>';
+  }
+  if (opts.why) {
+    html += '<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">💡</span>Why This Happens</div>';
+    html += '<div class="log-why">' + opts.why + '</div></div>';
+  }
+  if (opts.analogy) {
+    html += '<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">🎭</span>Real-Life Analogy</div>';
+    html += '<div class="log-analogy">' + opts.analogy + '</div></div>';
+  }
+  html += '</div>';
+  return html;
+}
+
+/* ============================================================
+   buildSteps — THE CORE
+   ============================================================ */
+function buildSteps(R, C, r0, c0) {
+  var st = [];
+  var MAX_STEPS = 4000;
+  var TOTAL = R * C;
+
+  // live state
+  var result = [];
+  var oob = []; // out-of-bounds attempted cells (for viz)
+  var dirs = [[0,1],[1,0],[0,-1],[-1,0]];
+  var r = r0, c = c0, di = 0, stepsCnt = 1;
+  var dr = 0, dc = 0;
+  var currCell = null;       // current target after move
+  var lastStatus = "";       // 'in' or 'oob'
+  var phase = "init";
+
+  function snap(extra) {
+    return Object.assign({
+      R:R, C:C, r0:r0, c0:c0,
+      result: result.map(function(p){return p.slice();}),
+      oob: oob.map(function(p){return p.slice();}),
+      r:r, c:c, di:di, dr:dr, dc:dc, stepsCnt:stepsCnt,
+      currCell: currCell ? currCell.slice() : null,
+      lastStatus: lastStatus,
+      phase: phase,
+      total: TOTAL
+    }, extra || {});
+  }
+
+  function pushStep(o) {
+    if (st.length >= MAX_STEPS) return;
+    st.push(Object.assign({line:0, action:"init", logHTML:""}, snap(o)));
+  }
+
+  // L0 — function definition
+  pushStep({
+    line:0, action:"func-def",
+    logHTML: richLog({
+      line:0, action:"func-def",
+      code:"def spiralMatrixIII(R="+R+", C="+C+", r0="+r0+", c0="+c0+"):",
+      status:"info",
+      inputs:[{k:"R",v:R},{k:"C",v:C},{k:"r0",v:r0},{k:"c0",v:c0}],
+      why:"Function start ho gaya. Hum <strong>R×C grid</strong> ko spiral order mein traverse karenge, starting from <code>("+r0+","+c0+")</code>. Goal: total <strong>"+TOTAL+" cells</strong> visit karna.",
+      analogy:"Jaise drone ko ek building ke uppar ek specific floor pe drop karte hain — ab usse spiral mein puri building scan karni hai!"
+    })
+  });
+
+  // L1 — result = [(r0, c0)]
+  result.push([r0, c0]);
+  currCell = [r0, c0];
+  lastStatus = "in";
+  pushStep({
+    line:1, action:"init",
+    logHTML: richLog({
+      line:1, action:"init",
+      code:"result = [("+r0+", "+c0+")]",
+      status:"success",
+      inputs:[{k:"r0",v:r0},{k:"c0",v:c0}],
+      outputs:[{k:"result",v:"[("+r0+","+c0+")]",changed:true},{k:"len(result)",v:1,changed:true}],
+      why:"<strong>Starting cell</strong> ko result mein add kar diya. Yeh hamesha valid hai (constraint: 0 ≤ r0 &lt; R, 0 ≤ c0 &lt; C).",
+      analogy:"Jaise treasure hunt mein <strong>starting point pe pehla flag</strong> gaad diya — yahan se journey shuru!"
+    })
+  });
+
+  // L2 — dirs = [...]
+  pushStep({
+    line:2, action:"init",
+    logHTML: richLog({
+      line:2, action:"init",
+      code:"dirs = [(0,1),(1,0),(0,-1),(-1,0)]  # E,S,W,N",
+      status:"success",
+      outputs:[{k:"dirs",v:"[E,S,W,N]",changed:true}],
+      why:"<strong>4 directions</strong> ka cycle define kiya — clockwise order mein: <code>East(0,+1)</code>, <code>South(+1,0)</code>, <code>West(0,-1)</code>, <code>North(-1,0)</code>. Spiral hamesha isi order mein turn karega.",
+      analogy:"Jaise compass pe ghadi ki sui — 12 → 3 → 6 → 9 → 12 — spiral bhi clockwise ghoomega!"
+    })
+  });
+
+  // L3 — r, c, di, steps = r0, c0, 0, 1
+  pushStep({
+    line:3, action:"init",
+    logHTML: richLog({
+      line:3, action:"init",
+      code:"r, c, di, steps = "+r0+", "+c0+", 0, 1",
+      status:"success",
+      outputs:[{k:"r",v:r,changed:true},{k:"c",v:c,changed:true},{k:"di",v:0,changed:true},{k:"steps",v:1,changed:true}],
+      why:"Pointers initialize: <code>(r,c)</code> = current position, <code>di=0</code> means <strong>East</strong> first, <code>steps=1</strong> = pehle sirf 1 step move karenge.",
+      analogy:"Jaise game shuru — player position set, facing right, aur first move sirf <strong>1 cell ka</strong>. Bachpan ka snake-and-ladder!"
+    })
+  });
+
+  // ============= main while loop =============
+  var safety = 0;
+  while (result.length < TOTAL && safety++ < 1000) {
+
+    // L4 — while check
+    pushStep({
+      line:4, action:"while-check",
+      logHTML: richLog({
+        line:4, action:"while-check",
+        code:"while len(result) < R * C:  # "+result.length+" < "+TOTAL,
+        status:"loop",
+        inputs:[{k:"len(result)",v:result.length},{k:"R*C",v:TOTAL}],
+        verdict:"len(result) ("+result.length+") < R*C ("+TOTAL+")",
+        verdictTrue:true,
+        why:"Abhi result mein <strong>"+result.length+"/"+TOTAL+"</strong> cells hain — saari valid cells visit nahi hui. Loop continue karega.",
+        analogy:"Jaise checklist mein abhi "+(TOTAL-result.length)+" item baaki — kaam khatam nahi, aage badho!"
+      })
+    });
+
+    // L5 — for _ in range(2)  (two directions per step-size cycle)
+    for (var twice = 0; twice < 2; twice++) {
+
+      pushStep({
+        line:5, action:"for-check",
+        logHTML: richLog({
+          line:5, action:"for-check",
+          code:"for _ in range(2):  # iter "+(twice+1)+"/2",
+          status:"loop",
+          inputs:[{k:"iter",v:twice+1},{k:"of",v:2}],
+          verdict:"loop iteration "+(twice+1)+" of 2",
+          verdictTrue:true,
+          why:"Step-size cycle ke <strong>"+(twice===0?"PEHLA":"DOOSRA")+"</strong> direction. Pattern: every step-size mein <strong>2 directions</strong> chalengi (jaise 1E+1S, then 2W+2N).",
+          analogy:"Jaise har round mein <strong>2 turns</strong> milte hain — pehle ek side, phir aage wali. Snake game ka spiral mode!"
+        })
+      });
+
+      // L6 — dr, dc = dirs[di]
+      dr = dirs[di][0]; dc = dirs[di][1];
+      phase = DIR_NAMES[di];
+      pushStep({
+        line:6, action:"init",
+        logHTML: richLog({
+          line:6, action:"init",
+          code:"dr, dc = dirs["+di+"]  # "+DIR_NAMES[di]+" "+DIR_EMOJI[di],
+          status:"success",
+          inputs:[{k:"di",v:di}],
+          outputs:[{k:"dr",v:dr,changed:true},{k:"dc",v:dc,changed:true},{k:"facing",v:DIR_NAMES[di]+" "+DIR_EMOJI[di],changed:true}],
+          why:"Current direction: <strong>"+DIR_NAMES[di]+"</strong> "+DIR_EMOJI[di]+" — har step pe row "+(dr>=0?"+":"")+dr+" aur col "+(dc>=0?"+":"")+dc+" hoga.",
+          analogy:"Jaise GPS bola: '<strong>"+DIR_NAMES[di]+" ki taraf "+stepsCnt+" "+(stepsCnt===1?"cell":"cells")+" chalo</strong>' — driver ne steering ghuma diya!"
+        })
+      });
+
+      // L7 — for _ in range(steps)
+      for (var k = 0; k < stepsCnt; k++) {
+        pushStep({
+          line:7, action:"for-check",
+          logHTML: richLog({
+            line:7, action:"for-check",
+            code:"for _ in range("+stepsCnt+"):  # step "+(k+1)+"/"+stepsCnt,
+            status:"loop",
+            inputs:[{k:"step",v:k+1},{k:"of",v:stepsCnt}],
+            verdict:"step "+(k+1)+" of "+stepsCnt+" in direction "+DIR_NAMES[di],
+            verdictTrue:true,
+            why:"Iss direction <strong>"+DIR_NAMES[di]+"</strong> mein "+stepsCnt+" cells move karne hain — abhi "+(k+1)+"-th step.",
+            analogy:"Jaise board game mein dice roll = "+stepsCnt+" — ek-ek karke "+stepsCnt+" cells aage badhna hai!"
+          })
+        });
+
+        // L8 — r, c = r + dr, c + dc
+        var prevR = r, prevC = c;
+        r = r + dr; c = c + dc;
+        currCell = [r, c];
+        pushStep({
+          line:8, action:"call",
+          logHTML: richLog({
+            line:8, action:"call",
+            code:"r, c = r + dr, c + dc  # ("+prevR+","+prevC+") → ("+r+","+c+")",
+            status:"success",
+            inputs:[{k:"r(prev)",v:prevR},{k:"c(prev)",v:prevC},{k:"dr",v:dr},{k:"dc",v:dc}],
+            outputs:[{k:"r",v:r,changed:true},{k:"c",v:c,changed:true}],
+            why:"Position update: <code>("+prevR+","+prevC+")</code> + <code>("+dr+","+dc+")</code> = <code>("+r+","+c+")</code>. Abhi yeh cell <strong>"+(r>=0&&r<R&&c>=0&&c<C?"grid ke ANDAR":"grid ke BAHAR")+"</strong> hai.",
+            analogy:"Jaise chess mein piece move kar diya — naye square pe pahunche. Lekin check karna padega: <strong>board pe hai ya gir gaya?</strong>"
+          })
+        });
+
+        // L9 — bounds check
+        var inBounds = (r >= 0 && r < R && c >= 0 && c < C);
+        lastStatus = inBounds ? "in" : "oob";
+        pushStep({
+          line:9, action:"if-check",
+          logHTML: richLog({
+            line:9, action:"if-check",
+            code:"if 0 <= "+r+" < "+R+" and 0 <= "+c+" < "+C+":",
+            status: inBounds ? "success" : "skip",
+            inputs:[{k:"r",v:r},{k:"c",v:c},{k:"R",v:R},{k:"C",v:C}],
+            verdict:"(0 ≤ "+r+" < "+R+") = "+(r>=0&&r<R)+" AND (0 ≤ "+c+" < "+C+") = "+(c>=0&&c<C),
+            verdictTrue: inBounds,
+            why: inBounds
+              ? "<strong>Bounds check PASS</strong> — cell <code>("+r+","+c+")</code> grid ke andar hai. Ab append karenge."
+              : "<strong>Bounds check FAIL</strong> — cell <code>("+r+","+c+")</code> grid ke <strong>BAHAR</strong> hai. Yeh cell skip hogi par direction continue rahegi (movement count hua hai).",
+            analogy: inBounds
+              ? "Jaise football pitch ke andar ball hai — valid play, goal count karo!"
+              : "Jaise ball <strong>boundary ke bahar</strong> chali gayi — point nahi milega par over toh count hoga!"
+          })
+        });
+
+        if (inBounds) {
+          // L10 — append
+          result.push([r, c]);
+          pushStep({
+            line:10, action:"found",
+            logHTML: richLog({
+              line:10, action:"found",
+              code:"result.append(("+r+", "+c+"))",
+              status:"success",
+              inputs:[{k:"r",v:r},{k:"c",v:c}],
+              outputs:[{k:"result.size",v:result.length,changed:true},{k:"latest",v:"("+r+","+c+")",changed:true},{k:"remaining",v:TOTAL-result.length}],
+              why:"🎉 Cell <code>("+r+","+c+")</code> result mein <strong>add ho gayi</strong>. Total visited = <strong>"+result.length+"/"+TOTAL+"</strong>. Abhi <strong>"+(TOTAL-result.length)+"</strong> cells aur baaki hain.",
+              analogy:"Jaise <strong>cricket scorecard</strong> pe ek aur run jud gaya — 'one more in the bag'! Crowd cheers 🎉"
+            })
+          });
+        } else {
+          oob.push([r, c]);
+          // skip step (else not taken — show explicit skip)
+          pushStep({
+            line:10, action:"skip",
+            logHTML: richLog({
+              line:10, action:"skip",
+              code:"# (skipped — cell ("+r+","+c+") out of bounds)",
+              status:"skip",
+              inputs:[{k:"r",v:r},{k:"c",v:c}],
+              outputs:[{k:"result.size",v:result.length},{k:"oob.count",v:oob.length,changed:true}],
+              why:"Append SKIP. Bounds check fail hua tha, toh <strong>append nahi kiya</strong>. Lekin <code>r,c</code> updated rahenge — agle step se bahar bhi traverse continue karega (kabhi grid mein wapas aa sakta hai).",
+              analogy:"Jaise GPS ne galat turn liya aur tu off-road chala gaya — par GPS ka direction tracker chalu hai, jaise hi road wapas milegi, log mein add hogi!"
+            })
+          });
+        }
+      }
+      // for-loop natural exit (steps exhausted in this direction)
+      pushStep({
+        line:7, action:"exit",
+        logHTML: richLog({
+          line:7, action:"exit",
+          code:"# inner for-loop exit — "+stepsCnt+" steps done in "+DIR_NAMES[di]+" direction",
+          status:"info",
+          inputs:[{k:"steps_done",v:stepsCnt},{k:"direction",v:DIR_NAMES[di]}],
+          outputs:[{k:"r",v:r},{k:"c",v:c},{k:"result.size",v:result.length}],
+          why:"<strong>"+DIR_NAMES[di]+"</strong> direction ke saare "+stepsCnt+" steps complete. Ab next direction pe turn karenge.",
+          analogy:"Jaise ek street ka end aa gaya — ab corner pe ghoomna padega! 🔄"
+        })
+      });
+
+      // L11 — di = (di + 1) % 4
+      var prevDi = di;
+      di = (di + 1) % 4;
+      pushStep({
+        line:11, action:"init",
+        logHTML: richLog({
+          line:11, action:"init",
+          code:"di = ("+prevDi+" + 1) % 4  # "+DIR_NAMES[prevDi]+" → "+DIR_NAMES[di],
+          status:"success",
+          inputs:[{k:"di(prev)",v:prevDi}],
+          outputs:[{k:"di",v:di,changed:true},{k:"new direction",v:DIR_NAMES[di]+" "+DIR_EMOJI[di],changed:true}],
+          why:"Direction rotate hua: <strong>"+DIR_NAMES[prevDi]+" → "+DIR_NAMES[di]+"</strong>. Modulo-4 ensure karta hai cycle mein wrap ho jaye (N ke baad wapas E).",
+          analogy:"Jaise compass needle ko 90° clockwise ghuma diya — ab nayi taraf chalna hai!"
+        })
+      });
+    }
+    // outer for-loop natural exit
+    pushStep({
+      line:5, action:"exit",
+      logHTML: richLog({
+        line:5, action:"exit",
+        code:"# outer for-loop exit — 2 direction-iters done at step-size "+stepsCnt,
+        status:"info",
+        outputs:[{k:"steps",v:stepsCnt},{k:"result.size",v:result.length}],
+        why:"Step-size <strong>"+stepsCnt+"</strong> ke dono directions chal gaye. Ab step-size badhega.",
+        analogy:"Jaise spiral ka ek <strong>'L-shape'</strong> complete hua — ab next L bada hoga!"
+      })
+    });
+
+    // L12 — steps += 1
+    var oldSteps = stepsCnt;
+    stepsCnt += 1;
+    pushStep({
+      line:12, action:"init",
+      logHTML: richLog({
+        line:12, action:"init",
+        code:"steps = "+oldSteps+" + 1  # = "+stepsCnt,
+        status:"success",
+        inputs:[{k:"steps(prev)",v:oldSteps}],
+        outputs:[{k:"steps",v:stepsCnt,changed:true}],
+        why:"<strong>Step size +1</strong>. Yeh spiral ka golden rule — har 2 directions ke baad bigger arm! Pattern: 1,1,2,2,3,3,4,4...",
+        analogy:"Jaise rangoli banate waqt har spiral arm thoda <strong>aur lambi</strong> hoti jaati hai — "+oldSteps+" se "+stepsCnt+" cells!"
+      })
+    });
+  }
+
+  // L4 — while exit
+  pushStep({
+    line:4, action:"exit",
+    logHTML: richLog({
+      line:4, action:"exit",
+      code:"# while loop exit — len(result) ("+result.length+") == R*C ("+TOTAL+")",
+      status:"success",
+      inputs:[{k:"len(result)",v:result.length},{k:"R*C",v:TOTAL}],
+      verdict:"len(result) ("+result.length+") < R*C ("+TOTAL+")",
+      verdictTrue:false,
+      why:"🎉 <strong>Saari "+TOTAL+" cells visit ho gayi!</strong> While condition false ho gayi, loop terminate.",
+      analogy:"Jaise puri building ka inspection complete — drone ka mission accomplished! ✅"
+    })
+  });
+
+  // L13 — return
+  curResult = result.length;
+  pushStep({
+    line:13, action:"return",
+    logHTML: richLog({
+      line:13, action:"return",
+      code:"return result  # "+result.length+" cells in spiral order",
+      status:"success",
+      outputs:[{k:"result.size",v:result.length},{k:"first",v:"("+result[0][0]+","+result[0][1]+")"},{k:"last",v:"("+result[result.length-1][0]+","+result[result.length-1][1]+")"}],
+      why:"Final answer return ho raha hai — <strong>"+result.length+" cells</strong> spiral order mein. First: <code>("+result[0][0]+","+result[0][1]+")</code>, Last: <code>("+result[result.length-1][0]+","+result[result.length-1][1]+")</code>.",
+      analogy:"Jaise exam ke baad final result envelope mein seal karke <strong>submit kar diya</strong> — done deal!"
+    })
+  });
+
+  return st;
+}
+
+/* ============================================================
+   RENDER VIZ
+   ============================================================ */
+function renderViz(s) {
+  var v = document.getElementById('vizPanel');
+  var h = '';
+
+  // === Vars strip ===
+  h += '<div class="vars-strip">';
+  h += '<span class="var-chip vc-active"><span class="vk">r,c</span>=<span class="vv">('+s.r+','+s.c+')</span></span>';
+  h += '<span class="var-chip"><span class="vk">di</span>=<span class="vv">'+s.di+' '+DIR_NAMES[s.di]+' '+DIR_EMOJI[s.di]+'</span></span>';
+  h += '<span class="var-chip vc-warn"><span class="vk">steps</span>=<span class="vv">'+s.stepsCnt+'</span></span>';
+  h += '<span class="var-chip vc-safe"><span class="vk">visited</span>=<span class="vv">'+s.result.length+'/'+s.total+'</span></span>';
+  h += '<span class="var-chip"><span class="vk">oob</span>=<span class="vv">'+s.oob.length+'</span></span>';
+  h += '</div>';
+
+  // === Grid + Compass + Result row ===
+  h += '<div class="viz-row">';
+
+  // ----- Matrix grid with SVG flow arrows -----
+  h += '<div class="viz-card"><div class="viz-card-title">🧱 Grid ('+s.R+'×'+s.C+')</div>';
+  var CELL = 50, GAP = 3, PAD = 14;
+  var totalW = s.C * CELL + (s.C - 1) * GAP;
+  var totalH = s.R * CELL + (s.R - 1) * GAP;
+
+  // visited map: cell -> visit order
+  var visitMap = {};
+  s.result.forEach(function(p, idx) { visitMap[p[0]+','+p[1]] = idx + 1; });
+
+  h += '<div class="matrix-wrap"><div class="matrix-grid" style="grid-template-columns:repeat('+s.C+',50px);grid-template-rows:repeat('+s.R+',50px)">';
+  for (var rr = 0; rr < s.R; rr++) {
+    for (var cc = 0; cc < s.C; cc++) {
+      var key = rr+','+cc;
+      var classes = ['mat-cell'];
+      var isStart = (rr === s.r0 && cc === s.c0);
+      var isCurr = (s.currCell && s.currCell[0] === rr && s.currCell[1] === cc);
+      var visitOrder = visitMap[key];
+      if (isStart) classes.push('mat-cell--start');
+      if (visitOrder) classes.push('mat-cell--visited');
+      if (isCurr && rr >= 0 && rr < s.R && cc >= 0 && cc < s.C) classes.push('mat-cell--curr');
+      h += '<div class="'+classes.join(' ')+'">';
+      h += '<span class="mat-cell-coord">'+rr+','+cc+'</span>';
+      if (visitOrder) h += '<span class="mat-cell-order">#'+visitOrder+'</span>';
+      h += isStart ? '🏁' : (visitOrder ? '✓' : '·');
+      h += '</div>';
+    }
+  }
+  h += '</div>'; // matrix-grid
+
+  // SVG flow arrows
+  function cx(col) { return col * (CELL + GAP) + CELL / 2; }
+  function cy(row) { return row * (CELL + GAP) + CELL / 2; }
+
+  if (s.result.length >= 2 || (s.result.length >= 1 && s.currCell)) {
+    h += '<svg class="flow-svg" width="'+totalW+'" height="'+totalH+'" viewBox="0 0 '+totalW+' '+totalH+'">';
+    h += '<defs>';
+    h += '<marker id="ah-red" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#dc2626"/></marker>';
+    h += '<marker id="ah-purple" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#8b5cf6"/></marker>';
+    h += '<marker id="ah-amber" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#f59e0b"/></marker>';
+    h += '</defs>';
+
+    // Arrows between consecutive visited cells
+    var visits = s.result;
+    for (var pi = 0; pi < visits.length - 1; pi++) {
+      var a = visits[pi], b = visits[pi + 1];
+      var x1 = cx(a[1]), y1 = cy(a[0]);
+      var x2 = cx(b[1]), y2 = cy(b[0]);
+      // Detect "turn jump" — when cells aren't adjacent (oob skipped between them)
+      var manhattan = Math.abs(a[0]-b[0]) + Math.abs(a[1]-b[1]);
+      var isTurnJump = manhattan > 1;
+      var cls = isTurnJump ? 'flow-line flow-line--turn' : 'flow-line';
+      var marker = isTurnJump ? 'ah-purple' : 'ah-red';
+      var dx = x2 - x1, dy = y2 - y1, len = Math.sqrt(dx*dx + dy*dy);
+      if (len > 0) {
+        var shrink = 18, ux = dx/len, uy = dy/len;
+        var sx1 = x1 + ux*shrink, sy1 = y1 + uy*shrink;
+        var sx2 = x2 - ux*shrink, sy2 = y2 - uy*shrink;
+        h += '<line class="'+cls+'" x1="'+sx1+'" y1="'+sy1+'" x2="'+sx2+'" y2="'+sy2+'" marker-end="url(#'+marker+')"/>';
+      }
+    }
+    // Amber "next move" arrow from last visited → currCell (if currCell is in-bounds and different)
+    if (s.currCell && visits.length > 0) {
+      var last = visits[visits.length - 1], cur = s.currCell;
+      var curInBounds = (cur[0] >= 0 && cur[0] < s.R && cur[1] >= 0 && cur[1] < s.C);
+      if (curInBounds && (last[0] !== cur[0] || last[1] !== cur[1])) {
+        var x1c = cx(last[1]), y1c = cy(last[0]);
+        var x2c = cx(cur[1]), y2c = cy(cur[0]);
+        var dxc = x2c - x1c, dyc = y2c - y1c, lenc = Math.sqrt(dxc*dxc + dyc*dyc);
+        if (lenc > 0) {
+          var uxc = dxc/lenc, uyc = dyc/lenc, shrinkC = 18;
+          var sx1c = x1c + uxc*shrinkC, sy1c = y1c + uyc*shrinkC;
+          var sx2c = x2c - uxc*shrinkC, sy2c = y2c - uyc*shrinkC;
+          h += '<line class="flow-line flow-line--current" x1="'+sx1c+'" y1="'+sy1c+'" x2="'+sx2c+'" y2="'+sy2c+'" marker-end="url(#ah-amber)"/>';
+        }
+      }
+    }
+    h += '</svg>';
+  }
+  h += '</div>'; // matrix-wrap
+
+  h += '<div class="legend">';
+  h += '<span><i style="background:#FEF3C7;border-color:#B45309"></i>Start 🏁</span>';
+  h += '<span><i style="background:#EEEDFE;border-color:#534AB7"></i>Current</span>';
+  h += '<span><i style="background:#DCFCE7;border-color:#15803D"></i>Visited</span>';
+  h += '<span><i class="legend-flow"></i>Flow</span>';
+  h += '<span><i class="legend-flow-turn" style="border-top-color:#8b5cf6"></i>Turn / OOB skip</span>';
+  h += '<span><i class="legend-flow-curr"></i>Next move</span>';
+  h += '</div>';
+  h += '</div>'; // viz-card grid
+
+  // ----- Compass card -----
+  h += '<div class="viz-card"><div class="viz-card-title">🧭 Direction Compass</div>';
+  h += '<div class="compass">';
+  h += '<div class="compass-arrow" style="transform:translate(0,-50%) rotate('+DIR_ANGLE[s.di]+'deg)"></div>';
+  h += '<span class="compass-label compass-l-N '+(s.di===3?'compass-l-active':'')+'">N</span>';
+  h += '<span class="compass-label compass-l-E '+(s.di===0?'compass-l-active':'')+'">E</span>';
+  h += '<span class="compass-label compass-l-S '+(s.di===1?'compass-l-active':'')+'">S</span>';
+  h += '<span class="compass-label compass-l-W '+(s.di===2?'compass-l-active':'')+'">W</span>';
+  h += '</div>';
+  h += '<div style="text-align:center;font:700 11px var(--font-mono);color:var(--accent-indigo-text);margin-top:4px">'+DIR_NAMES[s.di]+' '+DIR_EMOJI[s.di]+'</div>';
+  h += '<div style="text-align:center;font:600 10px var(--font-mono);color:var(--text-tertiary);margin-top:2px">step '+s.stepsCnt+'</div>';
+  h += '</div>'; // compass card
+
+  // ----- Result list card -----
+  h += '<div class="viz-card" style="flex:1;min-width:240px"><div class="viz-card-title">📋 Result (visit order, '+s.result.length+'/'+s.total+')</div>';
+  h += '<div class="chips">';
+  if (s.result.length === 0) {
+    h += '<span class="empty-state">— empty —</span>';
+  } else {
+    s.result.forEach(function(p, i) {
+      var isLast = (i === s.result.length - 1);
+      h += '<span class="chip '+(isLast?'chip-curr':'')+'">#'+(i+1)+' ('+p[0]+','+p[1]+')</span>';
+    });
+  }
+  h += '</div>';
+  // Steps progress bar
+  var pct = Math.round((s.result.length / s.total) * 100);
+  h += '<div style="margin-top:10px"><div class="steps-track">';
+  h += '<span style="color:var(--text-tertiary)">progress</span>';
+  h += '<div class="steps-track-bar"><div class="steps-track-fill" style="width:'+pct+'%"></div></div>';
+  h += '<span style="color:var(--accent-indigo-text);font-weight:700">'+pct+'%</span>';
+  h += '</div></div>';
+  h += '</div>'; // result card
+
+  h += '</div>'; // viz-row 1
+
+  // ----- Out-of-bounds card -----
+  if (s.oob.length > 0) {
+    h += '<div class="viz-row"><div class="viz-card" style="flex:1"><div class="viz-card-title">🚫 Out-of-Bounds Skipped ('+s.oob.length+')</div>';
+    h += '<div class="oob-chips">';
+    s.oob.forEach(function(p, i) {
+      h += '<span class="oob-chip">('+p[0]+','+p[1]+')</span>';
+    });
+    h += '</div>';
+    h += '<div style="margin-top:6px;font-size:10px;color:var(--text-tertiary);font-style:italic">Yeh cells grid ke bahar gayi thi — direction continue rahi par append nahi hua.</div>';
+    h += '</div></div>';
+  }
+
+  // ----- Pattern info card -----
+  h += '<div class="viz-row"><div class="viz-card" style="flex:1"><div class="viz-card-title">🔢 Step-Size Pattern</div>';
+  h += '<div style="font:600 11px var(--font-mono);color:var(--text-secondary);line-height:1.7">';
+  h += '<strong style="color:var(--accent-indigo-text)">1E</strong> → <strong style="color:var(--accent-indigo-text)">1S</strong> → <strong style="color:var(--accent-indigo-text)">2W</strong> → <strong style="color:var(--accent-indigo-text)">2N</strong> → <strong style="color:var(--accent-indigo-text)">3E</strong> → <strong style="color:var(--accent-indigo-text)">3S</strong> → <strong style="color:var(--accent-indigo-text)">4W</strong> → <strong style="color:var(--accent-indigo-text)">4N</strong> ...';
+  h += '<br><span style="color:var(--text-tertiary);font-size:10px">Har 2 directions ke baad step-size +1. Current step-size: <strong style="color:var(--accent-amber-text)">'+s.stepsCnt+'</strong></span>';
+  h += '</div></div></div>';
+
+  // ----- Result banner -----
+  if (s.result.length === s.total && s.phase !== "init") {
+    h += '<div class="result-banner">🎉 Spiral complete! '+s.total+' cells visited in order. ✅</div>';
+  }
+
+  v.innerHTML = h;
+}
+
+/* ============================================================
+   STEP CONTROL
+   ============================================================ */
+function renderStep(idx) {
+  if (!steps.length) return;
+  var s = steps[idx];
+  currentStep = idx;
+  document.getElementById('stepInfo').textContent = (idx + 1) + '/' + steps.length;
+  var bd = document.getElementById('actionBadge');
+  bd.textContent = BADGE_LABEL[s.action] || s.action;
+  bd.className = 'action-badge action-badge--' + s.action;
+  document.querySelectorAll('.code-line').forEach(function(el) { el.classList.remove('active'); });
+  var al = document.querySelector('.code-line[data-line="' + s.line + '"]');
+  if (al) { al.classList.add('active'); al.scrollIntoView({block:'nearest'}); }
+  renderViz(s);
+  showLogPreview(s);
+}
+
+function showLogPreview(s) {
+  if (!logEnabled) return;
+  document.getElementById('logPopupBody').innerHTML = s.logHTML || '';
+  document.getElementById('logPopup').classList.remove('log-popup--hidden');
+}
+
+function stepBy(d) {
+  var n = currentStep + d;
+  if (n < 0 || n >= steps.length) return;
+  renderStep(n);
+}
+
+function resetStep() {
+  if (steps.length) renderStep(0);
+}
+
+/* ============================================================
+   INPUT / RUN
+   ============================================================ */
+function parseInputs() {
+  return {
+    R: Math.max(1, parseInt(document.getElementById('inRows').value) || 3),
+    C: Math.max(1, parseInt(document.getElementById('inCols').value) || 4),
+    r0: Math.max(0, parseInt(document.getElementById('inRStart').value) || 0),
+    c0: Math.max(0, parseInt(document.getElementById('inCStart').value) || 0)
+  };
+}
+
+function loadTest(R, C, r0, c0, expected) {
+  document.getElementById('inRows').value = R;
+  document.getElementById('inCols').value = C;
+  document.getElementById('inRStart').value = r0;
+  document.getElementById('inCStart').value = c0;
+  document.getElementById('expectedBadge').textContent = 'expected: ' + expected + ' cells';
+  resetWithInput();
+}
+
+function resetWithInput() {
+  curResult = null;
+  var p = parseInputs();
+  // clamp starting cell to bounds
+  p.r0 = Math.min(p.r0, p.R - 1);
+  p.c0 = Math.min(p.c0, p.C - 1);
+  document.getElementById('inRStart').value = p.r0;
+  document.getElementById('inCStart').value = p.c0;
+  renderCode();
+  fitCodeWidth();
+  steps = buildSteps(p.R, p.C, p.r0, p.c0);
+  currentStep = 0;
+  renderStep(0);
+  document.getElementById('liveOutput').textContent = curResult !== null ? (curResult + ' cells') : '—';
+}
+
+/* ============================================================
+   PROBLEM CARD TOGGLE
+   ============================================================ */
+function toggleProblem() {
+  var body = document.getElementById('pcBody');
+  var btn = document.getElementById('pcToggleBtn');
+  if (body.classList.contains('pc-body--hidden')) {
+    body.classList.remove('pc-body--hidden');
+    btn.textContent = '▲ Hide';
+  } else {
+    body.classList.add('pc-body--hidden');
+    btn.textContent = '▼ Show';
+  }
+}
+
+/* ============================================================
+   LOG POPUP CONTROLS
+   ============================================================ */
+function toggleLogPreview() {
+  logEnabled = !logEnabled;
+  var btn = document.getElementById('logToggleBtn');
+  btn.textContent = logEnabled ? '📋 ON' : '📋 OFF';
+  btn.classList.toggle('log-toggle-btn--off', !logEnabled);
+  if (!logEnabled) hideLogPopup();
+  else if (steps.length) showLogPreview(steps[currentStep]);
+}
+
+function hideLogPopup() {
+  document.getElementById('logPopup').classList.add('log-popup--hidden');
+}
+
+function logZoom(dir) {
+  logZoomLevel = Math.max(60, Math.min(180, logZoomLevel + dir * 20));
+  updateLogZoom();
+}
+function logZoomReset() { logZoomLevel = 100; updateLogZoom(); }
+function updateLogZoom() {
+  document.getElementById('logZoomLabel').textContent = logZoomLevel + '%';
+  document.getElementById('logPopup').style.setProperty('--log-scale', logZoomLevel / 100);
+}
+
+function toggleFullscreen() {
+  var viz = document.querySelector('.col-viz');
+  if (!document.fullscreenElement) viz.requestFullscreen().catch(function(){});
+  else document.exitFullscreen();
+}
+
+/* ============================================================
+   RESIZE HANDLE + FOOTER SYNC
+   ============================================================ */
+function syncFooterWidth() {
+  document.getElementById('footerLeft').style.width =
+    document.getElementById('col1').offsetWidth + 'px';
+}
+
+(function() {
+  var col1 = document.getElementById('col1');
+  document.getElementById('resizeH1').addEventListener('mousedown', function(e) {
+    e.preventDefault();
+    codeWidthUserSet = true;
+    var startX = e.clientX, startW = col1.offsetWidth, h = this;
+    document.body.classList.add('no-select');
+    h.classList.add('active');
+    function mv(e) {
+      col1.style.width = Math.max(140, startW + (e.clientX - startX)) + 'px';
+      syncFooterWidth();
+    }
+    function up() {
+      document.removeEventListener('mousemove', mv);
+      document.removeEventListener('mouseup', up);
+      document.body.classList.remove('no-select');
+      h.classList.remove('active');
+    }
+    document.addEventListener('mousemove', mv);
+    document.addEventListener('mouseup', up);
+  });
+})();
+
+window.addEventListener('resize', function() {
+  if (!codeWidthUserSet) fitCodeWidth();
+  else syncFooterWidth();
+});
+
+/* ============================================================
+   KEYBOARD
+   ============================================================ */
+document.addEventListener('keydown', function(e) {
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
+  if (e.key === 'ArrowRight') { e.preventDefault(); stepBy(1); }
+  else if (e.key === 'ArrowLeft') { e.preventDefault(); stepBy(-1); }
+  else if (e.key === 'r' || e.key === 'R') { e.preventDefault(); resetStep(); }
+});
+
+/* ============================================================
+   INIT
+   ============================================================ */
+renderCode();
+fitCodeWidth();
+steps = buildSteps(3, 4, 0, 0);
+renderStep(0);
+document.getElementById('liveOutput').textContent = curResult !== null ? (curResult + ' cells') : '—';
+</script>
+</body>
+</html>

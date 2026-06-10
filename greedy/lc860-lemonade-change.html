@@ -1,0 +1,1281 @@
+﻿
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>LC 860 — Lemonade Change · DSA Dry-Run Visualizer</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+:root {
+  --bg-primary:#FAFAF8; --bg-secondary:#F1EFE8; --bg-tertiary:#E2E0D8; --bg-card:#FFFFFF;
+  --text-primary:#2C2C2A; --text-secondary:#5F5E5A; --text-tertiary:#888780;
+  --border-color:rgba(0,0,0,0.11); --border-light:rgba(0,0,0,0.06); --border-focus:#534AB7;
+  --accent-indigo:#534AB7; --accent-indigo-bg:#EEEDFE; --accent-indigo-text:#3C3489; --accent-indigo-hover:#4740A0;
+  --accent-teal:#0F6E56; --accent-teal-bg:#E1F5EE; --accent-teal-text:#085041;
+  --accent-red:#E24B4A; --accent-red-bg:#FCEBEB; --accent-red-text:#791F1F;
+  --accent-amber:#B45309; --accent-amber-bg:#FEF3C7; --accent-amber-text:#78350F;
+  --accent-green:#15803D; --accent-green-bg:#DCFCE7; --accent-green-text:#14532D;
+  --syn-keyword:#534AB7; --syn-function:#185FA5; --syn-number:#993C1D; --syn-string:#0F6E56;
+  --active-line-bg:#EEEDFE;
+  --radius-sm:4px; --radius-md:6px; --radius-lg:10px; --radius-xl:14px;
+  --sp-2:8px; --sp-3:12px; --sp-5:20px;
+  --font-sans:'DM Sans',system-ui,sans-serif; --font-mono:'JetBrains Mono','Fira Code',monospace;
+  --fs-xs:11px; --fs-sm:12px; --fs-base:14px; --fs-md:15px; --fs-lg:18px;
+  --fw-medium:500; --fw-semibold:600; --fw-bold:700;
+  --lh-normal:1.6; --lh-code:1.9; --ease:.18s ease;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:var(--font-sans);font-size:var(--fs-base);color:var(--text-primary);background:var(--bg-primary);line-height:var(--lh-normal);-webkit-font-smoothing:antialiased}
+body.no-select{user-select:none;cursor:col-resize}
+
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border-color);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:var(--text-tertiary)}
+
+@keyframes pulse-node{0%,100%{box-shadow:0 0 4px var(--accent-indigo)}50%{box-shadow:0 0 12px var(--accent-indigo)}}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-3px)}75%{transform:translateX(3px)}}
+@keyframes win-pulse{0%,100%{box-shadow:0 0 3px rgba(234,179,8,.5)}50%{box-shadow:0 0 8px rgba(234,179,8,.9)}}
+@keyframes coin-spin{0%,100%{transform:rotateY(0)}50%{transform:rotateY(180deg)}}
+
+.app-shell{display:flex;flex-direction:column;height:100vh;overflow:hidden;background:var(--bg-primary)}
+
+/* PROBLEM CARD */
+.problem-card{flex-shrink:0;border-bottom:1px solid var(--border-color);background:var(--bg-card)}
+.prob-header{display:flex;align-items:center;justify-content:space-between;padding:8px 14px;border-bottom:1px solid var(--border-light);gap:10px;flex-wrap:wrap}
+.prob-header-left{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+.prob-header-right{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.gt-home-btn{font-family:var(--font-sans);font-weight:700;font-size:11px;letter-spacing:.08em;background:var(--accent-indigo);color:#fff;border:none;padding:5px 10px;border-radius:99px;cursor:pointer;transition:background var(--ease)}
+.gt-home-btn:hover{background:var(--accent-indigo-hover)}
+.prob-num{font:700 13px var(--font-mono);color:var(--text-tertiary)}
+.prob-name{font-weight:700;font-size:15px}
+.prob-diff--easy{font-size:10px;font-weight:700;background:var(--accent-green-bg);color:var(--accent-green-text);padding:2px 7px;border-radius:99px;border:1px solid var(--accent-green)}
+.prob-tag{font-size:10px;font-weight:600;background:var(--accent-indigo-bg);color:var(--accent-indigo-text);padding:2px 7px;border-radius:99px;border:1px solid var(--accent-indigo)}
+.top-label{font:600 11px var(--font-mono);color:var(--text-tertiary)}
+.input{font:600 12px var(--font-mono);padding:4px 8px;border:1px solid var(--border-color);border-radius:5px;background:var(--bg-card);width:200px;color:var(--text-primary)}
+.input:focus{outline:none;border-color:var(--border-focus)}
+.top-expected{font:600 11px var(--font-mono);background:var(--accent-amber-bg);color:var(--accent-amber-text);padding:3px 8px;border-radius:99px;border:1px solid var(--accent-amber)}
+.prob-toggle-btn{font-family:system-ui,"Segoe UI Emoji",sans-serif;font-size:11px;font-weight:600;background:var(--bg-secondary);border:1px solid var(--border-color);padding:4px 9px;border-radius:5px;cursor:pointer;color:var(--text-secondary)}
+.prob-toggle-btn:hover{background:var(--bg-tertiary)}
+
+.prob-body{display:flex;gap:14px;padding:12px 14px}
+.prob-body--hidden{display:none}
+.prob-left{flex:1.2;min-width:0;display:flex;flex-direction:column;gap:8px}
+.prob-right{flex:1;min-width:0;display:flex;flex-direction:column;gap:7px}
+.section-label{font-family:system-ui,"Segoe UI Emoji",sans-serif;font:700 10px var(--font-mono);text-transform:uppercase;letter-spacing:.07em;color:var(--text-tertiary);margin-bottom:2px}
+.prob-stmt{font-size:12px;color:var(--text-secondary);line-height:1.55}
+.prob-stmt code{background:var(--bg-secondary);padding:1px 5px;border-radius:3px;font:600 11px var(--font-mono);color:var(--accent-indigo-text)}
+.prob-stmt strong{color:var(--text-primary);font-weight:700}
+.concept-block{background:var(--bg-secondary);border-left:3px solid var(--accent-indigo);padding:6px 9px;border-radius:4px;font-size:11px;color:var(--text-secondary);line-height:1.5}
+.concept-block strong{color:var(--text-primary)}
+.complexity-row{display:flex;gap:6px;flex-wrap:wrap}
+.complexity-chip{font:600 11px var(--font-mono);background:var(--accent-teal-bg);color:var(--accent-teal-text);padding:3px 8px;border-radius:5px;border:1px solid var(--accent-teal)}
+
+.tc-chip{background:var(--bg-secondary);border:1px solid var(--border-color);border-radius:6px;padding:6px 9px;cursor:pointer;transition:all var(--ease);display:flex;flex-direction:column;gap:4px}
+.tc-chip:hover{border-color:var(--accent-indigo);background:var(--accent-indigo-bg)}
+.tc-chip-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.pt-tag{font:700 9px var(--font-mono);background:var(--accent-indigo);color:#fff;padding:1px 5px;border-radius:3px}
+.tc-label{font:600 11px var(--font-sans);color:var(--text-primary);flex:1}
+.tc-expected{font:700 11px var(--font-mono);color:var(--accent-green-text)}
+.tc-expected--false{color:var(--accent-red-text)}
+.tc-vals{display:flex;align-items:center;gap:4px;flex-wrap:wrap}
+.tc-vals code{font:600 10px var(--font-mono);background:var(--bg-card);padding:1px 5px;border-radius:3px;color:var(--accent-indigo-text);border:1px solid var(--border-light)}
+.tc-vals .tc-arrow{font-size:9px;color:var(--text-tertiary)}
+
+.run-row{display:flex;align-items:center;gap:8px;margin-top:4px}
+.btn-run{font-family:system-ui,"Segoe UI Emoji",sans-serif;background:var(--accent-indigo);color:#fff;border:none;padding:5px 12px;border-radius:5px;font-weight:700;font-size:12px;cursor:pointer;transition:background var(--ease)}
+.btn-run:hover{background:var(--accent-indigo-hover)}
+.live-output-wrap{display:flex;align-items:center;gap:6px;font-size:11px}
+.live-output-label{color:var(--text-tertiary);font-weight:600}
+#liveOutput{font:700 12px var(--font-mono);background:var(--bg-secondary);padding:3px 8px;border-radius:4px;color:var(--accent-indigo-text);border:1px solid var(--border-color)}
+
+/* MAIN ROW */
+.main-row{flex:1;display:flex;overflow:hidden;min-height:0}
+.col{display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.col-code{width:33%;min-width:140px;max-width:45vw}
+.col-viz{flex:1;min-width:0}
+.col-header{flex-shrink:0;padding:7px 12px;background:var(--bg-card);border-bottom:1px solid var(--border-color);font-family:system-ui,"Segoe UI Emoji",sans-serif;font:700 11px var(--font-mono);color:var(--text-secondary);text-transform:uppercase;letter-spacing:.06em}
+
+/* RESIZE HANDLE */
+.resize-h{width:5px;background:var(--bg-secondary);border-left:1px solid var(--border-color);border-right:1px solid var(--border-color);cursor:col-resize;flex-shrink:0;transition:background var(--ease)}
+.resize-h:hover,.resize-h.active{background:var(--accent-indigo)}
+
+/* CODE PANEL */
+.code-panel{flex:1;overflow-y:auto;padding:8px 0;background:var(--bg-card);font-family:var(--font-mono);font-size:12px;line-height:var(--lh-code)}
+.code-line{display:flex;padding:0 12px;transition:background var(--ease)}
+.code-line.active{background:var(--active-line-bg);border-left:3px solid var(--accent-indigo);padding-left:9px}
+.ln{color:var(--text-tertiary);width:24px;text-align:right;margin-right:10px;flex-shrink:0;font-weight:500;user-select:none}
+.code-content{white-space:pre;color:var(--text-primary)}
+.code-line .kw{color:var(--syn-keyword);font-weight:700}
+.code-line .fn{color:var(--syn-function);font-weight:600}
+.code-line .num{color:var(--syn-number);font-weight:600}
+.code-line .str{color:var(--syn-string)}
+
+/* VIZ PANEL */
+.viz-panel{flex:1;overflow:auto;padding:14px;background:var(--bg-primary);position:relative}
+.vars-strip{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;padding:8px;background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius-md)}
+.var-chip{font:600 11px var(--font-mono);background:var(--bg-secondary);padding:3px 8px;border-radius:99px;border:1px solid var(--border-color);display:inline-flex;align-items:center;gap:4px}
+.var-chip-key{color:var(--text-tertiary);font-weight:500}
+.var-chip-val{color:var(--text-primary);font-weight:700}
+.vc-active{background:var(--accent-indigo-bg);border-color:var(--accent-indigo);color:var(--accent-indigo-text)}
+.vc-active .var-chip-val{color:var(--accent-indigo-text)}
+.vc-safe{background:var(--accent-green-bg);border-color:var(--accent-green)}
+.vc-safe .var-chip-val{color:var(--accent-green-text)}
+.vc-flip{background:var(--accent-red-bg);border-color:var(--accent-red);animation:shake .3s}
+.vc-flip .var-chip-val{color:var(--accent-red-text)}
+.vc-warn{background:var(--accent-amber-bg);border-color:var(--accent-amber)}
+.vc-warn .var-chip-val{color:var(--accent-amber-text)}
+
+.viz-row{display:flex;gap:12px;align-items:flex-start;flex-wrap:wrap;margin-bottom:12px}
+.viz-card{background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius-md);padding:10px;min-width:180px}
+.viz-title{font-family:system-ui,"Segoe UI Emoji",sans-serif;font:700 11px var(--font-mono);color:var(--text-secondary);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;display:flex;align-items:center;gap:5px}
+
+/* BILLS QUEUE */
+.bills-queue{display:flex;gap:6px;flex-wrap:wrap;padding:8px;background:var(--bg-secondary);border-radius:var(--radius-md);min-height:60px;align-items:center}
+.bill-tile{position:relative;width:48px;height:34px;border-radius:6px;border:2px solid;display:flex;align-items:center;justify-content:center;font-family:var(--font-mono);font-size:14px;font-weight:700;transition:all .25s;flex-shrink:0}
+.bill-5{background:#DCFCE7;border-color:#15803D;color:#14532D}
+.bill-10{background:#DBEAFE;border-color:#1D4ED8;color:#1E3A8A}
+.bill-20{background:#FEF3C7;border-color:#B45309;color:#78350F}
+.bill-tile--processed{opacity:.4;filter:grayscale(.6)}
+.bill-tile--current{transform:scale(1.18);animation:pulse-node 1.1s infinite;z-index:2;box-shadow:0 4px 12px rgba(83,74,183,.35)}
+.bill-tile--rejected{animation:shake .35s;border-color:var(--accent-red)!important;background:var(--accent-red-bg)!important;color:var(--accent-red-text)!important}
+.bill-idx{position:absolute;top:-7px;left:-5px;font-size:8px;background:var(--text-tertiary);color:#fff;padding:1px 4px;border-radius:99px;font-weight:700}
+
+/* CASH REGISTER */
+.register-wrap{display:flex;gap:14px;justify-content:flex-start;align-items:flex-end}
+.cash-stack{display:flex;flex-direction:column;align-items:center;gap:5px}
+.cash-stack-label{font:700 10px var(--font-mono);color:var(--text-tertiary)}
+.stack-col{display:flex;flex-direction:column-reverse;gap:3px;min-height:130px;min-width:70px;padding:8px;background:var(--bg-secondary);border-radius:var(--radius-md);border:1px dashed var(--border-color);align-items:center;justify-content:flex-start}
+.stack-col--five{border-color:#15803D;background:#F0FDF4}
+.stack-col--ten{border-color:#1D4ED8;background:#EFF6FF}
+.cash-bill{width:54px;height:24px;border-radius:4px;border:1.5px solid;display:flex;align-items:center;justify-content:center;font-family:var(--font-mono);font-size:11px;font-weight:700;flex-shrink:0;transition:all .2s}
+.cash-bill--just-added{animation:win-pulse 1s ease-out 1}
+.cash-count-badge{font:700 11px var(--font-mono);background:var(--bg-card);padding:2px 8px;border-radius:99px;border:1px solid var(--border-color);min-width:30px;text-align:center}
+.empty-state{font-size:10px;color:var(--text-tertiary);font-style:italic;padding:20px 4px;text-align:center}
+
+/* CHANGE GIVEN HIGHLIGHT */
+.change-display{margin-top:10px;padding:8px 10px;background:var(--bg-secondary);border-radius:var(--radius-md);border:1px solid var(--border-color);font-size:11px;color:var(--text-secondary);min-height:34px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.change-display strong{color:var(--text-primary);font-weight:700}
+.change-bill{display:inline-flex;align-items:center;gap:3px;background:var(--bg-card);padding:2px 7px;border-radius:99px;border:1px solid var(--border-color);font:700 10px var(--font-mono)}
+.change-bill--out{background:var(--accent-red-bg);border-color:var(--accent-red);color:var(--accent-red-text)}
+.change-bill--in{background:var(--accent-green-bg);border-color:var(--accent-green);color:var(--accent-green-text)}
+
+/* RESULT BANNER */
+.result-banner{margin-top:12px;padding:12px 16px;border-radius:var(--radius-md);font-weight:700;font-size:14px;display:flex;align-items:center;gap:8px;font-family:system-ui,"Segoe UI Emoji",sans-serif}
+.result-banner--success{background:var(--accent-green-bg);color:var(--accent-green-text);border:2px solid var(--accent-green);animation:win-pulse 1.5s infinite}
+.result-banner--fail{background:var(--accent-red-bg);color:var(--accent-red-text);border:2px solid var(--accent-red)}
+
+/* LEGEND */
+.legend{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px;padding:6px 10px;background:var(--bg-card);border:1px solid var(--border-light);border-radius:var(--radius-md)}
+.legend span{display:inline-flex;align-items:center;gap:5px;font-size:10px;color:var(--text-secondary)}
+.legend i{display:inline-block;width:14px;height:14px;border-radius:3px;border:1px solid var(--border-color)}
+
+/* LOG POPUP */
+.log-popup{--log-scale:1;position:fixed;bottom:52px;right:14px;width:calc(480px * var(--log-scale));max-width:92vw;max-height:75vh;border-radius:var(--radius-lg);box-shadow:0 10px 32px rgba(0,0,0,.14);border:1px solid var(--border-color);background:var(--bg-card);overflow:hidden;display:flex;flex-direction:column;z-index:100;transition:opacity .15s,transform .15s;transform-origin:bottom right}
+.log-popup--hidden{opacity:0;transform:scale(.92);pointer-events:none}
+.log-popup-body{flex:1;overflow:auto;padding:0}
+.log-popup-body > .log-card{border-radius:0;border:none;border-left:0}
+
+/* LOG CARD */
+.log-card{border-radius:var(--radius-md);overflow:hidden;border:1px solid var(--border-color);border-left-width:4px;font-size:var(--fs-xs);background:var(--bg-card)}
+.log-card--func-def,.log-card--init,.log-card--call,.log-card--return{border-left-color:#8250ff}
+.log-card--for-check,.log-card--while-check,.log-card--if-check{border-left-color:#388bfd}
+.log-card--mark,.log-card--push,.log-card--pop,.log-card--restore,.log-card--found{border-left-color:#3fb950}
+.log-card--remove,.log-card--prune,.log-card--fail{border-left-color:#f85149}
+.log-card--exit,.log-card--skip{border-left-color:#555450}
+.log-card-header{display:flex;align-items:center;gap:6px;padding:8px 10px 6px;background:var(--bg-secondary);border-bottom:1px solid var(--border-light)}
+.log-badge{font-family:system-ui,"Segoe UI Emoji",sans-serif;font:700 10px var(--font-mono);padding:2px 7px;border-radius:4px;letter-spacing:.04em}
+.log-badge--func-def,.log-badge--init,.log-badge--call,.log-badge--return{background:rgba(130,80,255,.14);color:#3C3489;border:1px solid #8250ff}
+.log-badge--for-check,.log-badge--while-check,.log-badge--if-check{background:rgba(56,139,253,.14);color:#185FA5;border:1px solid #388bfd}
+.log-badge--mark,.log-badge--push,.log-badge--pop,.log-badge--restore,.log-badge--found{background:var(--accent-green-bg);color:var(--accent-green-text);border:1px solid #3fb950}
+.log-badge--remove,.log-badge--prune,.log-badge--fail{background:var(--accent-red-bg);color:var(--accent-red-text);border:1px solid #f85149}
+.log-badge--exit,.log-badge--skip{background:var(--bg-tertiary);color:var(--text-tertiary);border:1px solid #555450}
+.log-line-ref{font:700 10px var(--font-mono);color:var(--accent-indigo);background:var(--accent-indigo-bg);padding:1px 6px;border-radius:4px;border:1px solid var(--accent-indigo)}
+.log-status-pill{font-family:system-ui,"Segoe UI Emoji",sans-serif;font-size:9px;font-weight:700;padding:2px 7px;border-radius:99px;text-transform:uppercase;margin-left:auto}
+.log-status--success{background:var(--accent-green-bg);color:var(--accent-green-text);border:1px solid var(--accent-green)}
+.log-status--fail{background:var(--accent-red-bg);color:var(--accent-red-text);border:1px solid var(--accent-red)}
+.log-status--skip{background:var(--bg-tertiary);color:var(--text-tertiary);border:1px solid var(--border-color)}
+.log-status--loop{background:rgba(56,139,253,.14);color:#185FA5;border:1px solid #388bfd}
+.log-status--prune{background:var(--accent-red-bg);color:var(--accent-red-text);border:1px solid var(--accent-red)}
+.log-status--info{background:rgba(130,80,255,.14);color:#3C3489;border:1px solid #8250ff}
+.log-section{padding:7px 10px;border-bottom:1px dashed var(--border-light)}
+.log-section:last-child{border-bottom:none}
+.log-section-title{font-family:system-ui,"Segoe UI Emoji",sans-serif;font:700 8px var(--font-mono);text-transform:uppercase;letter-spacing:.06em;color:var(--text-tertiary);margin-bottom:3px;display:flex;align-items:center;gap:4px}
+.log-section-title-icon{font-family:system-ui,"Segoe UI Emoji",sans-serif;font-size:11px}
+.log-code-snippet{font:600 11px var(--font-mono);background:#0d1117;color:#e6edf3;padding:6px 9px;border-radius:4px;display:block;overflow-x:auto;white-space:pre;border:1px solid #30363d}
+.log-code-snippet .ck{color:#ff7b72}
+.log-code-snippet .cs{color:#a5d6ff}
+.log-code-snippet .cn{color:#79c0ff}
+.log-code-snippet .cf{color:#d2a8ff}
+.log-code-snippet .cc{color:#8b949e;font-style:italic}
+.log-kv-row{display:flex;flex-wrap:wrap;gap:4px}
+.log-kv{display:inline-flex;align-items:center;gap:3px;font:11px var(--font-mono);padding:2px 7px;border-radius:4px;background:var(--bg-secondary);border:1px solid var(--border-light)}
+.log-kv-key{color:var(--text-tertiary);font-weight:500}
+.log-kv-val{color:var(--text-primary);font-weight:700}
+.log-kv--in{background:rgba(56,139,253,.08);border-color:rgba(56,139,253,.3)}
+.log-kv--out{background:rgba(63,185,80,.08);border-color:rgba(63,185,80,.4)}
+.log-kv--out .log-kv-val{color:#15803D}
+.log-kv--changed{background:rgba(180,83,9,.10);border-color:rgba(180,83,9,.4)}
+.log-kv--changed .log-kv-val{color:#78350F}
+.log-verdict{display:flex;align-items:center;gap:6px;font:600 11px var(--font-mono);padding:5px 8px;border-radius:5px;background:var(--bg-secondary);border:1px solid var(--border-light)}
+.log-verdict--true{background:var(--accent-green-bg);border-color:var(--accent-green);color:var(--accent-green-text)}
+.log-verdict--false{background:var(--accent-red-bg);border-color:var(--accent-red);color:var(--accent-red-text)}
+.log-why{font-size:11px;line-height:1.55;color:var(--text-primary);padding:4px 0}
+.log-why strong{color:var(--accent-indigo-text)}
+.log-why code{background:var(--bg-secondary);padding:1px 4px;border-radius:3px;font:600 10px var(--font-mono)}
+.log-analogy{font:italic 11px var(--font-sans);color:var(--text-secondary);background:#FFF8E7;border:1px solid #FBE8A6;border-left:3px solid var(--accent-amber);padding:6px 9px;border-radius:4px;line-height:1.55}
+.log-analogy strong{color:var(--accent-amber-text);font-style:normal;font-weight:700}
+
+/* FOOTER */
+.footer-bar{display:flex;flex-shrink:0;border-top:1px solid var(--border-color);background:var(--bg-card)}
+.footer-left{width:33%;min-width:140px;max-width:45vw;display:flex;align-items:center;gap:8px;padding:7px 12px;border-right:1px solid var(--border-light)}
+.footer-right{flex:1;display:flex;align-items:center;gap:6px;padding:7px 14px;flex-wrap:wrap}
+.step-info{font:700 12px var(--font-mono);background:var(--bg-secondary);padding:3px 8px;border-radius:5px;color:var(--text-primary)}
+.action-badge{font-family:system-ui,"Segoe UI Emoji",sans-serif;font:700 10px var(--font-mono);padding:3px 8px;border-radius:4px;background:var(--bg-tertiary);color:var(--text-secondary)}
+.action-badge--func-def,.action-badge--init,.action-badge--call,.action-badge--return{background:rgba(130,80,255,.14);color:#3C3489}
+.action-badge--for-check,.action-badge--while-check,.action-badge--if-check{background:rgba(56,139,253,.14);color:#185FA5}
+.action-badge--mark,.action-badge--push,.action-badge--pop,.action-badge--restore,.action-badge--found{background:var(--accent-green-bg);color:var(--accent-green-text)}
+.action-badge--remove,.action-badge--prune,.action-badge--fail{background:var(--accent-red-bg);color:var(--accent-red-text)}
+.action-badge--exit,.action-badge--skip{background:var(--bg-tertiary);color:var(--text-tertiary)}
+kbd{font-family:system-ui,"Segoe UI Emoji",sans-serif;font:600 10px var(--font-mono);background:var(--bg-secondary);border:1px solid var(--border-color);border-bottom-width:2px;padding:1px 5px;border-radius:3px;color:var(--text-secondary)}
+.btn{font-family:system-ui,"Segoe UI Emoji",sans-serif;font-size:12px;font-weight:600;background:var(--bg-secondary);border:1px solid var(--border-color);padding:4px 9px;border-radius:5px;cursor:pointer;color:var(--text-primary);transition:all var(--ease)}
+.btn:hover{background:var(--bg-tertiary);border-color:var(--text-tertiary)}
+.btn-primary{background:var(--accent-indigo);color:#fff;border-color:var(--accent-indigo)}
+.btn-primary:hover{background:var(--accent-indigo-hover);border-color:var(--accent-indigo-hover)}
+.btn-fullscreen{font-family:system-ui,"Segoe UI Emoji",sans-serif}
+.footer-sep{width:1px;height:20px;background:var(--border-color)}
+.log-toggle-btn{font-family:system-ui,"Segoe UI Emoji",sans-serif;font-size:11px;font-weight:700;background:var(--accent-indigo);color:#fff;border:none;padding:4px 10px;border-radius:5px;cursor:pointer;transition:background var(--ease)}
+.log-toggle-btn:hover{background:var(--accent-indigo-hover)}
+.log-toggle-btn--off{background:var(--text-tertiary)}
+.btn-zoom{font-family:system-ui,"Segoe UI Emoji",sans-serif;font:700 12px var(--font-mono);background:var(--bg-secondary);border:1px solid var(--border-color);padding:3px 8px;border-radius:4px;cursor:pointer;color:var(--text-primary);min-width:28px}
+.btn-zoom:hover{background:var(--bg-tertiary)}
+.log-zoom-label{font:700 10px var(--font-mono);color:var(--text-secondary);min-width:38px;text-align:center}
+
+/* FULLSCREEN */
+.col-viz:fullscreen{background:var(--bg-primary);padding:14px;overflow:auto}
+</style>
+</head>
+<body>
+<div class="app-shell">
+
+  <!-- ============= PROBLEM CARD ============= -->
+  <div class="problem-card" id="problemCard">
+    <header class="prob-header">
+      <div class="prob-header-left">
+        <a href="../00_HomePage/gt_learn_homepage.html" class="gt-home-btn">GT LEARN</a>
+        <span class="prob-num">#860</span>
+        <span class="prob-name">🍋 Lemonade Change</span>
+        <span class="prob-diff--easy">EASY</span>
+        <span class="prob-tag">Greedy</span>
+        <span class="prob-tag">Simulation</span>
+      </div>
+      <div class="prob-header-right">
+        <span class="top-label">bills=</span>
+        <input id="inputBills" class="input" value="[5,5,5,10,20]">
+        <span id="expectedBadge" class="top-expected">exp: True</span>
+        <button id="probToggleBtn" class="prob-toggle-btn" type="button" onclick="toggleProblem()">▲ Hide</button>
+      </div>
+    </header>
+
+    <div class="prob-body" id="probBody">
+      <div class="prob-left">
+        <div>
+          <div class="section-label">📝 Problem Statement</div>
+          <p class="prob-stmt">At a lemonade stand, each lemonade costs <code>$5</code>. Customers stand in queue paying with <code>$5</code>, <code>$10</code>, or <code>$20</code> bills (one lemonade each). You start with <strong>NO change</strong>. Return <code>True</code> if you can give every customer correct change in order, else <code>False</code>.</p>
+        </div>
+        <div>
+          <div class="section-label">🧠 Solving Approach (Greedy)</div>
+          <p class="prob-stmt">Maintain counts of <code>$5</code> and <code>$10</code> bills. For each customer, deterministically give change. <strong>Key greedy insight:</strong> when paying back $15 (for $20), prefer giving <code>$10 + $5</code> over <code>3×$5</code> — save the $5s for future $10 customers!</p>
+        </div>
+        <div class="concept-block">
+          <strong>🎯 Three cases:</strong> (1) <code>$5</code> → just keep it. (2) <code>$10</code> → must return <code>$5</code> as change. (3) <code>$20</code> → return <code>$15</code> as change: ideally <code>$10+$5</code>, fallback <code>3×$5</code>.
+        </div>
+        <div class="concept-block">
+          <strong>🪙 Why greedy works:</strong> $20 bills are useless as change (no one pays $25). $10 bills only help with $20 customers. $5 bills are most flexible — hoard them. So always burn $10s first when possible.
+        </div>
+        <div class="complexity-row">
+          <span class="complexity-chip">⏱ Time: O(n)</span>
+          <span class="complexity-chip">💾 Space: O(1)</span>
+        </div>
+      </div>
+
+      <div class="prob-right">
+        <div class="section-label">🧪 Test Cases (click to load)</div>
+        <div class="tc-chip" onclick="loadTest('[5,5,5,10,20]', true)">
+          <div class="tc-chip-row">
+            <span class="pt-tag">T1</span>
+            <span class="tc-label">Classic happy path</span>
+            <span class="tc-expected">→ True</span>
+          </div>
+          <div class="tc-vals">
+            <code>bills</code><span class="tc-arrow">=</span><code>[5,5,5,10,20]</code>
+          </div>
+        </div>
+        <div class="tc-chip" onclick="loadTest('[5,5,10,10,20]', false)">
+          <div class="tc-chip-row">
+            <span class="pt-tag">T2</span>
+            <span class="tc-label">Out of $5s for the $20</span>
+            <span class="tc-expected tc-expected--false">→ False</span>
+          </div>
+          <div class="tc-vals">
+            <code>bills</code><span class="tc-arrow">=</span><code>[5,5,10,10,20]</code>
+          </div>
+        </div>
+        <div class="tc-chip" onclick="loadTest('[10,10]', false)">
+          <div class="tc-chip-row">
+            <span class="pt-tag">T3</span>
+            <span class="tc-label">First customer fails</span>
+            <span class="tc-expected tc-expected--false">→ False</span>
+          </div>
+          <div class="tc-vals">
+            <code>bills</code><span class="tc-arrow">=</span><code>[10,10]</code>
+          </div>
+        </div>
+        <div class="tc-chip" onclick="loadTest('[5,5,5,5,20]', true)">
+          <div class="tc-chip-row">
+            <span class="pt-tag">T4</span>
+            <span class="tc-label">3×$5 fallback path</span>
+            <span class="tc-expected">→ True</span>
+          </div>
+          <div class="tc-vals">
+            <code>bills</code><span class="tc-arrow">=</span><code>[5,5,5,5,20]</code>
+          </div>
+        </div>
+        <div class="tc-chip" onclick="loadTest('[5,5,10,20,20]', false)">
+          <div class="tc-chip-row">
+            <span class="pt-tag">T5</span>
+            <span class="tc-label">Two $20s, only one $10</span>
+            <span class="tc-expected tc-expected--false">→ False</span>
+          </div>
+          <div class="tc-vals">
+            <code>bills</code><span class="tc-arrow">=</span><code>[5,5,10,20,20]</code>
+        </div>
+        </div>
+
+        <div class="run-row">
+          <button class="btn-run" type="button" onclick="resetWithInput()">▶ Run</button>
+          <div class="live-output-wrap">
+            <span class="live-output-label">Output:</span>
+            <span id="liveOutput">—</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============= MAIN ROW ============= -->
+  <div class="main-row">
+    <div class="col col-code" id="col1">
+      <div class="col-header">📜 Python Solution</div>
+      <div class="code-panel" id="codePanel"></div>
+    </div>
+    <div class="resize-h" id="resizeH1"></div>
+    <div class="col col-viz">
+      <div class="col-header">📊 Visualization — Cash Register Simulation</div>
+      <div class="viz-panel" id="vizPanel"></div>
+    </div>
+  </div>
+
+  <!-- ============= LOG POPUP ============= -->
+  <div class="log-popup" id="logPopup">
+    <div class="log-popup-body" id="logPopupBody"></div>
+  </div>
+
+  <!-- ============= FOOTER ============= -->
+  <div class="footer-bar">
+    <div class="footer-left" id="footerLeft">
+      <span id="stepInfo" class="step-info">0/0</span>
+      <span id="actionBadge" class="action-badge"></span>
+    </div>
+    <div class="footer-right">
+      <kbd>←</kbd><kbd>→</kbd><kbd>R</kbd>
+      <button class="btn" type="button" onclick="resetStep()">↺</button>
+      <button class="btn" type="button" onclick="stepBy(-1)">◀</button>
+      <button class="btn btn-primary" type="button" onclick="stepBy(1)">▶ Next</button>
+      <span class="footer-sep"></span>
+      <button id="logToggleBtn" class="log-toggle-btn" type="button" onclick="toggleLogPreview()">📋 ON</button>
+      <button class="btn-zoom" type="button" onclick="logZoom(-1)">−</button>
+      <span id="logZoomLabel" class="log-zoom-label">100%</span>
+      <button class="btn-zoom" type="button" onclick="logZoom(1)">+</button>
+      <button class="btn-zoom" type="button" onclick="logZoomReset()">↺</button>
+      <span class="footer-sep"></span>
+      <button class="btn btn-fullscreen" type="button" onclick="toggleFullscreen()">⛶</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+/* ============================================================
+   CODE LINES
+============================================================ */
+var codeLines = [
+  "def lemonadeChange(bills):",
+  "    five = 0",
+  "    ten = 0",
+  "    for bill in bills:",
+  "        if bill == 5:",
+  "            five += 1",
+  "        elif bill == 10:",
+  "            if five == 0:",
+  "                return False",
+  "            five -= 1",
+  "            ten += 1",
+  "        else:",
+  "            if ten > 0 and five > 0:",
+  "                ten -= 1",
+  "                five -= 1",
+  "            elif five >= 3:",
+  "                five -= 3",
+  "            else:",
+  "                return False",
+  "    return True"
+];
+
+/* ============================================================
+   STATE
+============================================================ */
+var steps = [];
+var currentStep = 0;
+var codeWidthUserSet = false;
+var curResult = null;
+var logEnabled = true;
+var logZoomLevel = 100;
+
+var LOG_BADGE = {
+  "func-def":"📌 DEF","init":"⚙️ INIT","call":"📞 CALL","return":"🏆 RETURN",
+  "for-check":"🔁 FOR","while-check":"🔁 WHILE","if-check":"🔎 IF",
+  "mark":"✅ MARK","push":"⬆ PUSH","pop":"⬇ POP","restore":"↩ RESTORE","found":"🎉 FOUND",
+  "remove":"✏️ EDIT","prune":"✂️ PRUNE","fail":"❌ FAIL","exit":"🔚 EXIT","skip":"⏭ SKIP"
+};
+var BADGE_LABEL = {
+  "func-def":"DEF","init":"INIT","call":"CALL","return":"RETURN",
+  "for-check":"FOR","while-check":"WHILE","if-check":"IF",
+  "mark":"MARK","push":"PUSH","pop":"POP","restore":"RESTORE","found":"FOUND",
+  "remove":"EDIT","prune":"PRUNE","fail":"FAIL","exit":"EXIT","skip":"SKIP"
+};
+
+/* ============================================================
+   SYNTAX HIGHLIGHTERS
+============================================================ */
+function renderCode() {
+  var p = document.getElementById('codePanel');
+  p.innerHTML = codeLines.map(function(raw, i) {
+    var h = raw;
+    h = h.replace(/("[^"]*"|'[^']*')/g, '\x01STR\x02$1\x03');
+    h = h.replace(/\b(def|for|in|if|return|break|continue|and|else|elif|True|False|None|not|or|while|lambda)\b/g, '\x01KW\x02$1\x03');
+    h = h.replace(/\b(len|range|int|str|list|append|pop|sorted|min|max|sum|abs|enumerate|zip|print|set|add)\b/g, '\x01FN\x02$1\x03');
+    h = h.replace(/(?<![.\w"\x01\x02\x03])(-?\d+)\b/g, '\x01NUM\x02$1\x03');
+    h = h.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    h = h.replace(/\x01([A-Z]+)\x02/g, function(_, c){return '<span class="' + c.toLowerCase() + '">';}).replace(/\x03/g, '</span>');
+    return '<div class="code-line" data-line="' + i + '"><span class="ln">' + (i+1) + '</span><span class="code-content">' + h + '</span></div>';
+  }).join('');
+}
+
+function hlCode(raw) {
+  var h = raw;
+  h = h.replace(/("[^"]*"|'[^']*')/g, '\x01s\x02$1\x03');
+  h = h.replace(/\b(def|for|in|if|return|break|continue|and|else|elif|True|False|None|not|or|while|lambda)\b/g, '\x01k\x02$1\x03');
+  h = h.replace(/\b(len|range|int|str|list|append|pop|sorted|min|max|sum|abs|enumerate|zip|print|set|add)\b/g, '\x01f\x02$1\x03');
+  h = h.replace(/(?<![.\w"\x01\x02\x03])(-?\d+)\b/g, '\x01n\x02$1\x03');
+  h = h.replace(/(#.*$)/gm, '\x01c\x02$1\x03');
+  h = h.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  h = h.replace(/\x01([a-z])\x02/g, function(_,c){return '<span class="c'+c+'">';}).replace(/\x03/g, '</span>');
+  return h;
+}
+
+/* ============================================================
+   RICHLOG HELPER
+============================================================ */
+function richLog(opts) {
+  var statusMap = {
+    success:"✅ Success", fail:"❌ Failed", skip:"⏭ Skipped",
+    loop:"🔁 Loop iter", prune:"✂️ Pruned", info:"ℹ️ Info"
+  };
+  var status = opts.status || "info";
+  var html = '<div class="log-card log-card--' + opts.action + '">';
+
+  html += '<div class="log-card-header">';
+  html += '<span class="log-badge log-badge--' + opts.action + '">' + (LOG_BADGE[opts.action] || opts.action) + '</span>';
+  html += '<span class="log-line-ref">L' + (opts.line + 1) + '</span>';
+  html += '<span class="log-status-pill log-status--' + status + '">' + statusMap[status] + '</span>';
+  html += '</div>';
+
+  if (opts.code) {
+    html += '<div class="log-section">';
+    html += '<div class="log-section-title"><span class="log-section-title-icon">📜</span>Code Executing</div>';
+    html += '<code class="log-code-snippet">' + hlCode(opts.code) + '</code>';
+    html += '</div>';
+  }
+  if (opts.inputs && opts.inputs.length) {
+    html += '<div class="log-section">';
+    html += '<div class="log-section-title"><span class="log-section-title-icon">📥</span>Input Values (line is using these)</div>';
+    html += '<div class="log-kv-row">';
+    opts.inputs.forEach(function(kv){
+      html += '<span class="log-kv log-kv--in"><span class="log-kv-key">' + kv.k + '</span>=<span class="log-kv-val">' + kv.v + '</span></span>';
+    });
+    html += '</div></div>';
+  }
+  if (opts.outputs && opts.outputs.length) {
+    html += '<div class="log-section">';
+    html += '<div class="log-section-title"><span class="log-section-title-icon">📤</span>Output / State After Line</div>';
+    html += '<div class="log-kv-row">';
+    opts.outputs.forEach(function(kv){
+      var cls = kv.changed ? 'log-kv--changed' : 'log-kv--out';
+      html += '<span class="log-kv ' + cls + '"><span class="log-kv-key">' + kv.k + '</span>=<span class="log-kv-val">' + kv.v + '</span></span>';
+    });
+    html += '</div></div>';
+  }
+  if (opts.verdict) {
+    var vCls = opts.verdictTrue === true ? 'log-verdict--true' : (opts.verdictTrue === false ? 'log-verdict--false' : '');
+    var vIcon = opts.verdictTrue === true ? '✓' : (opts.verdictTrue === false ? '✗' : '•');
+    html += '<div class="log-section">';
+    html += '<div class="log-section-title"><span class="log-section-title-icon">⚖️</span>Verdict / Decision</div>';
+    html += '<div class="log-verdict ' + vCls + '">' + vIcon + ' ' + opts.verdict + '</div>';
+    html += '</div>';
+  }
+  if (opts.why) {
+    html += '<div class="log-section">';
+    html += '<div class="log-section-title"><span class="log-section-title-icon">💡</span>Why This Happens</div>';
+    html += '<div class="log-why">' + opts.why + '</div>';
+    html += '</div>';
+  }
+  if (opts.analogy) {
+    html += '<div class="log-section">';
+    html += '<div class="log-section-title"><span class="log-section-title-icon">🎭</span>Real-Life Analogy</div>';
+    html += '<div class="log-analogy">' + opts.analogy + '</div>';
+    html += '</div>';
+  }
+  html += '</div>';
+  return html;
+}
+
+/* ============================================================
+   BUILD STEPS  (the heart — every line, every execution)
+============================================================ */
+function buildSteps(bills) {
+  var st = [];
+  var MAX_STEPS = 3000;
+
+  var five = 0, ten = 0;
+  var i = -1;        // index into bills
+  var bill = null;   // current bill
+  var processed = []; // bills handled so far
+  var rejected = false;
+  var lastChange = null; // {out:[], in:[]}
+
+  function snap(extra) {
+    return Object.assign({
+      bills: bills.slice(),
+      five: five,
+      ten: ten,
+      i: i,
+      bill: bill,
+      processed: processed.slice(),
+      rejected: rejected,
+      lastChange: lastChange ? {out: lastChange.out.slice(), in: lastChange.in.slice()} : null,
+      finished: false,
+      verdict: null
+    }, extra || {});
+  }
+
+  function pushStep(o) {
+    if (st.length >= MAX_STEPS) return;
+    st.push(Object.assign({line:0, action:"init", logHTML:""}, snap(o)));
+  }
+
+  // L0 — function def
+  pushStep({
+    line: 0, action: "func-def",
+    logHTML: richLog({
+      line: 0, action: "func-def",
+      code: "def lemonadeChange(bills):",
+      status: "info",
+      inputs: [{k:"bills", v: JSON.stringify(bills)}],
+      why: "Function start ho gaya. <strong>bills</strong> array mil gaya — yeh queue mein customers ke bills hain. Ab humein simulate karna hai cash register kaise chalegi.",
+      analogy: "Jaise lemonade ki dukaan kholi — counter pe baith gaye, ab customers aane lagenge ek-ek karke. Cash box bilkul khali hai!"
+    })
+  });
+
+  // L1 — five = 0
+  pushStep({
+    line: 1, action: "init",
+    logHTML: richLog({
+      line: 1, action: "init",
+      code: "five = 0",
+      status: "success",
+      outputs: [{k:"five", v:"0", changed:true}],
+      why: "<code>five</code> counter <strong>0</strong> set kiya — abhi tak ek bhi $5 ka bill nahi hai cash register mein.",
+      analogy: "Cash drawer ka pehla khaana — '$5 wala' — abhi bilkul khali hai. Empty drawer!"
+    })
+  });
+
+  // L2 — ten = 0
+  pushStep({
+    line: 2, action: "init",
+    logHTML: richLog({
+      line: 2, action: "init",
+      code: "ten = 0",
+      status: "success",
+      inputs: [{k:"five", v:"0"}],
+      outputs: [{k:"ten", v:"0", changed:true}],
+      why: "<code>ten</code> counter bhi <strong>0</strong> — $10 wala khaana bhi khali hai. Dono counters initialize ho gaye.",
+      analogy: "Cash drawer ka doosra khaana — '$10 wala' — yeh bhi khali. Dukaan abhi nayi-nayi khuli hai, paise kahaan se aayenge!"
+    })
+  });
+
+  // ===== MAIN LOOP =====
+  for (var idx = 0; idx < bills.length; idx++) {
+    i = idx;
+    bill = bills[idx];
+
+    // L3 — for bill in bills (iteration entry)
+    pushStep({
+      line: 3, action: "for-check",
+      logHTML: richLog({
+        line: 3, action: "for-check",
+        code: "for bill in bills:  # iter " + (idx+1) + "/" + bills.length + "  bill=" + bill,
+        status: "loop",
+        inputs: [{k:"i", v: idx}, {k:"bills.length", v: bills.length}],
+        outputs: [{k:"bill", v: "$"+bill, changed:true}],
+        verdict: "i (" + idx + ") < len(bills) (" + bills.length + ")",
+        verdictTrue: true,
+        why: "Loop ka <strong>" + (idx+1) + "-th chakkar</strong>. Customer #" + (idx+1) + " aaya hai with <code>$" + bill + "</code> bill. Ab iska handle karna hai.",
+        analogy: "Queue mein agla customer aa gaya counter pe — usne <strong>$" + bill + "</strong> ka note nikaala. Dekho kya scene banta hai!"
+      })
+    });
+
+    // L4 — if bill == 5
+    var is5 = (bill === 5);
+    pushStep({
+      line: 4, action: "if-check",
+      logHTML: richLog({
+        line: 4, action: "if-check",
+        code: "if bill == 5:  # bill=" + bill,
+        status: is5 ? "success" : "skip",
+        inputs: [{k:"bill", v:"$"+bill}],
+        verdict: "bill (" + bill + ") == 5",
+        verdictTrue: is5,
+        why: is5
+          ? "Customer ne <strong>$5</strong> diya — sabse aasaan case! Lemonade ki keemat hi $5 hai, toh koi change return nahi karna."
+          : "Customer ne $5 nahi diya (diya <code>$" + bill + "</code>). <strong>elif</strong> branches check karenge.",
+        analogy: is5
+          ? "Customer ne exact change diya — kitna pyaara! Bas note pocket mein dalo aur lemonade do."
+          : "Yeh customer bada note laaya — change dena padega. Aage check karte hain."
+      })
+    });
+
+    if (is5) {
+      // L5 — five += 1
+      var oldFive = five;
+      five += 1;
+      lastChange = {out: [], in: ["$5"]};
+      processed.push({val: bill, idx: idx, status: "ok"});
+      pushStep({
+        line: 5, action: "push",
+        logHTML: richLog({
+          line: 5, action: "push",
+          code: "five += 1  # " + oldFive + " -> " + five,
+          status: "success",
+          inputs: [{k:"five (old)", v: oldFive}, {k:"bill", v:"$5"}],
+          outputs: [{k:"five", v: five, changed:true}, {k:"ten", v: ten}],
+          why: "<code>five</code> counter <strong>" + oldFive + " → " + five + "</strong>. Ek aur $5 register mein. No change required!",
+          analogy: "Cash drawer ke '$5 wale khaane' mein ek aur note daal diya. <strong>" + five + " notes</strong> ho gaye ab. Easy money!"
+        })
+      });
+      continue;
+    }
+
+    // L6 — elif bill == 10
+    var is10 = (bill === 10);
+    pushStep({
+      line: 6, action: "if-check",
+      logHTML: richLog({
+        line: 6, action: "if-check",
+        code: "elif bill == 10:  # bill=" + bill,
+        status: is10 ? "success" : "skip",
+        inputs: [{k:"bill", v:"$"+bill}],
+        verdict: "bill (" + bill + ") == 10",
+        verdictTrue: is10,
+        why: is10
+          ? "Customer ne <strong>$10</strong> diya. Mujhe <code>$10 - $5 = $5</code> wapas dena hoga. Toh ek <strong>$5 chahiye</strong> register mein."
+          : "$10 bhi nahi (it's <code>$" + bill + "</code>). Toh yeh <strong>$20</strong> hi hoga — else branch jayenge.",
+        analogy: is10
+          ? "Mid-size note. Ab dekhna hai cash drawer mein ek $5 hai ya nahi — warna change kahaan se doonga?"
+          : "Sabse bada note ($20) — yeh sabse mushkil case hai. Aage poora plan banana hoga."
+      })
+    });
+
+    if (is10) {
+      // L7 — if five == 0
+      var noFive = (five === 0);
+      pushStep({
+        line: 7, action: "if-check",
+        logHTML: richLog({
+          line: 7, action: "if-check",
+          code: "if five == 0:  # five=" + five,
+          status: noFive ? "fail" : "skip",
+          inputs: [{k:"five", v: five}],
+          verdict: "five (" + five + ") == 0",
+          verdictTrue: noFive,
+          why: noFive
+            ? "<strong>Disaster!</strong> Register mein ek bhi $5 nahi hai. Customer ko $5 wapas kaise doon? <strong>Fail!</strong>"
+            : "Register mein <strong>" + five + " ka $5</strong> available hai. Change diya ja sakta hai. Aage badho.",
+          analogy: noFive
+            ? "Customer ne $10 diya, $5 maanga wapas — par cash drawer khali! Bhaago, customer naraaz ho jayega!"
+            : "Cash drawer mein <strong>" + five + " note(s)</strong> ka $5 chamak rahe hain. Ek nikaalo aur de do."
+        })
+      });
+
+      if (noFive) {
+        // L8 — return False
+        rejected = true;
+        processed.push({val: bill, idx: idx, status: "fail"});
+        pushStep({
+          line: 8, action: "return",
+          logHTML: richLog({
+            line: 8, action: "return",
+            code: "return False",
+            status: "fail",
+            inputs: [{k:"five", v: five}, {k:"bill", v:"$10"}],
+            outputs: [{k:"return", v:"False", changed:true}],
+            why: "<strong>Function terminate</strong> ho gaya with <code>False</code>. Yeh customer ko serve hi nahi kar paye, baaki sab cancel.",
+            analogy: "Dukaan band! Customer ko 'Sorry sir, change nahi hai' bolna pada. Reputation gone — exit karo turant."
+          })
+        });
+        curResult = false;
+        pushStep({
+          line: 8, action: "return",
+          logHTML: richLog({
+            line: 8, action: "return",
+            code: "# Final result: False",
+            status: "fail",
+            outputs: [{k:"result", v:"False", changed:true}],
+            why: "Final answer: <strong>False</strong>. Customer #" + (idx+1) + " pe simulation crash ho gayi.",
+            analogy: "Game over screen — '$5 nahi tha jab $10 aaya'. Better luck next time bhai!"
+          }),
+          finished: true, verdict: false
+        });
+        return st;
+      }
+
+      // L9 — five -= 1
+      var fiveBefore = five;
+      five -= 1;
+      lastChange = {out: ["$5"], in: ["$10"]};
+      pushStep({
+        line: 9, action: "pop",
+        logHTML: richLog({
+          line: 9, action: "pop",
+          code: "five -= 1  # " + fiveBefore + " -> " + five,
+          status: "success",
+          inputs: [{k:"five (old)", v: fiveBefore}],
+          outputs: [{k:"five", v: five, changed:true}],
+          why: "Ek $5 nikaal liya register se to give as change. Counter <strong>" + fiveBefore + " → " + five + "</strong>.",
+          analogy: "Cash drawer se ek <strong>$5 ka note nikaala</strong> aur customer ke haath mein rakha. 'Yeh lijiye change!'"
+        })
+      });
+
+      // L10 — ten += 1
+      var tenBefore = ten;
+      ten += 1;
+      processed.push({val: bill, idx: idx, status: "ok"});
+      pushStep({
+        line: 10, action: "push",
+        logHTML: richLog({
+          line: 10, action: "push",
+          code: "ten += 1  # " + tenBefore + " -> " + ten,
+          status: "success",
+          inputs: [{k:"ten (old)", v: tenBefore}, {k:"bill", v:"$10"}],
+          outputs: [{k:"ten", v: ten, changed:true}, {k:"five", v: five}],
+          why: "Customer ka <strong>$10</strong> register mein daal diya. <code>ten</code>: <strong>" + tenBefore + " → " + ten + "</strong>. Transaction complete!",
+          analogy: "$10 ka note <strong>'$10 wale khaane'</strong> mein parked. Ab is $10 ka use future $20 customer ke liye hoga (greedy plan!)."
+        })
+      });
+      continue;
+    }
+
+    // ===== ELSE branch (bill == 20) =====
+    // L11 — else (skip step — entered else)
+    pushStep({
+      line: 11, action: "skip",
+      logHTML: richLog({
+        line: 11, action: "skip",
+        code: "else:  # bill=20",
+        status: "info",
+        inputs: [{k:"bill", v:"$20"}],
+        why: "<strong>Else branch</strong> mein aaye — confirm hua bill <code>$20</code> hai. Ab change <strong>$15</strong> dena hoga (greedy plan banao).",
+        analogy: "Sabse mehenga note customer laaya — ab cash drawer ka full audit karna padega. <strong>$15 change</strong> chahiye — kaise dega?"
+      })
+    });
+
+    // L12 — if ten > 0 and five > 0
+    var greedyOk = (ten > 0 && five > 0);
+    pushStep({
+      line: 12, action: "if-check",
+      logHTML: richLog({
+        line: 12, action: "if-check",
+        code: "if ten > 0 and five > 0:  # ten=" + ten + ", five=" + five,
+        status: greedyOk ? "success" : "skip",
+        inputs: [{k:"ten", v: ten}, {k:"five", v: five}],
+        verdict: "ten (" + ten + ") > 0 AND five (" + five + ") > 0",
+        verdictTrue: greedyOk,
+        why: greedyOk
+          ? "<strong>Greedy win!</strong> Ek $10 + ek $5 = $15 change. Yeh sabse <strong>optimal way</strong> hai — $5 ko bachao for future!"
+          : "Greedy combo possible nahi (ten=" + ten + ", five=" + five + "). <code>elif</code> fallback try karenge — <strong>3×$5</strong>.",
+        analogy: greedyOk
+          ? "Cash drawer dekha — ek $10 aur ek $5 dono available! Perfect combo, dono nikaalo aur de do."
+          : "Ideal combo nahi mil raha. Plan B activate — teen $5 wale notes try karte hain."
+      })
+    });
+
+    if (greedyOk) {
+      // L13 — ten -= 1
+      var tenB = ten;
+      ten -= 1;
+      pushStep({
+        line: 13, action: "pop",
+        logHTML: richLog({
+          line: 13, action: "pop",
+          code: "ten -= 1  # " + tenB + " -> " + ten,
+          status: "success",
+          inputs: [{k:"ten (old)", v: tenB}],
+          outputs: [{k:"ten", v: ten, changed:true}],
+          why: "Ek <code>$10</code> nikaal liya. Counter <strong>" + tenB + " → " + ten + "</strong>. Half change ready!",
+          analogy: "$10 wale khaane se ek note nikaal liya — pehla half of $15 change. Counter pe rakh diya."
+        })
+      });
+      // L14 — five -= 1
+      var fB = five;
+      five -= 1;
+      lastChange = {out: ["$10","$5"], in: ["$20"]};
+      processed.push({val: bill, idx: idx, status: "ok"});
+      pushStep({
+        line: 14, action: "pop",
+        logHTML: richLog({
+          line: 14, action: "pop",
+          code: "five -= 1  # " + fB + " -> " + five,
+          status: "success",
+          inputs: [{k:"five (old)", v: fB}],
+          outputs: [{k:"five", v: five, changed:true}, {k:"ten", v: ten}],
+          why: "Ek <code>$5</code> bhi nikaal liya. Total change = <strong>$10 + $5 = $15</strong> ✓. Customer khush!",
+          analogy: "Doosra half! $5 wale khaane se ek note. Customer ko <strong>'$10 + $5 = $15'</strong> ka change handover. Note: $20 cash drawer mein nahi rakha kyunki $20 ka koi use nahi (no $25 customer)!"
+        })
+      });
+      continue;
+    }
+
+    // L15 — elif five >= 3
+    var threeFives = (five >= 3);
+    pushStep({
+      line: 15, action: "if-check",
+      logHTML: richLog({
+        line: 15, action: "if-check",
+        code: "elif five >= 3:  # five=" + five,
+        status: threeFives ? "success" : "skip",
+        inputs: [{k:"five", v: five}],
+        verdict: "five (" + five + ") >= 3",
+        verdictTrue: threeFives,
+        why: threeFives
+          ? "<strong>Plan B success!</strong> Cash drawer mein <code>" + five + "</code> $5 notes hain — teen nikaalo, $15 ban gaya."
+          : "Sirf <code>" + five + "</code> $5 hain — 3 chahiye the. Plan B bhi fail. Ab toh <strong>return False</strong> hi option hai.",
+        analogy: threeFives
+          ? "$10 nahi tha, but 3 ya zyada $5 milgaye! Phir bhi customer happy — $15 = 5+5+5."
+          : "Drawer mein bas " + five + " note hain — 3 nahi hue. Game over — sorry customer."
+      })
+    });
+
+    if (threeFives) {
+      // L16 — five -= 3
+      var fThr = five;
+      five -= 3;
+      lastChange = {out: ["$5","$5","$5"], in: ["$20"]};
+      processed.push({val: bill, idx: idx, status: "ok"});
+      pushStep({
+        line: 16, action: "pop",
+        logHTML: richLog({
+          line: 16, action: "pop",
+          code: "five -= 3  # " + fThr + " -> " + five,
+          status: "success",
+          inputs: [{k:"five (old)", v: fThr}],
+          outputs: [{k:"five", v: five, changed:true}, {k:"ten", v: ten}],
+          why: "Teen $5 ek saath nikaal liye: <strong>" + fThr + " → " + five + "</strong>. Change = <code>5+5+5=$15</code> ✓.",
+          analogy: "$5 wale khaane se ek-ek karke <strong>3 notes nikaal ke</strong> customer ko diya. 'Sorry beta, chhota change hai!'"
+        })
+      });
+      continue;
+    }
+
+    // L17 — else (final fail branch)
+    pushStep({
+      line: 17, action: "skip",
+      logHTML: richLog({
+        line: 17, action: "skip",
+        code: "else:  # change not possible",
+        status: "info",
+        inputs: [{k:"ten", v: ten}, {k:"five", v: five}],
+        why: "Saare options exhausted. Naa $10+$5 hai, naa 3×$5. <strong>Change dena impossible</strong>.",
+        analogy: "Cash drawer ki sari combinations check kar li — koi banaya hi nahi $15. Game over inevitable."
+      })
+    });
+
+    // L18 — return False
+    rejected = true;
+    processed.push({val: bill, idx: idx, status: "fail"});
+    pushStep({
+      line: 18, action: "return",
+      logHTML: richLog({
+        line: 18, action: "return",
+        code: "return False",
+        status: "fail",
+        inputs: [{k:"ten", v: ten}, {k:"five", v: five}, {k:"bill", v:"$20"}],
+        outputs: [{k:"return", v:"False", changed:true}],
+        why: "<strong>Function exit</strong> with <code>False</code>. Customer #" + (idx+1) + " ($20) ko $15 change nahi de paaye.",
+        analogy: "Customer naraaz hoke chala gaya — 'Itni badi note ka change bhi nahi!' Dukaan ki izzat khaak!"
+      })
+    });
+    curResult = false;
+    pushStep({
+      line: 18, action: "return",
+      logHTML: richLog({
+        line: 18, action: "return",
+        code: "# Final result: False",
+        status: "fail",
+        outputs: [{k:"result", v:"False", changed:true}],
+        why: "Final answer: <strong>False</strong>. Greedy strategy fail at index " + idx + ".",
+        analogy: "Cash register ki kahaani khatam — bad ending. Aage ke customers ka turn hi nahi aaya."
+      }),
+      finished: true, verdict: false
+    });
+    return st;
+  }
+
+  // L3 — for loop natural exit
+  pushStep({
+    line: 3, action: "exit",
+    logHTML: richLog({
+      line: 3, action: "exit",
+      code: "# for loop exhausted: i reached " + bills.length,
+      status: "info",
+      inputs: [{k:"i", v: bills.length}, {k:"bills.length", v: bills.length}],
+      verdict: "i (" + bills.length + ") < len(bills) (" + bills.length + ")",
+      verdictTrue: false,
+      why: "Loop khatam — saare <strong>" + bills.length + " customers</strong> serve ho gaye successfully. No fail in between!",
+      analogy: "Queue khatam, dukaan band karne ka time. Sab customers ko sahi change mila — 5-star review milne wala hai!"
+    })
+  });
+
+  // L19 — return True
+  pushStep({
+    line: 19, action: "return",
+    logHTML: richLog({
+      line: 19, action: "return",
+      code: "return True",
+      status: "success",
+      inputs: [{k:"five", v: five}, {k:"ten", v: ten}],
+      outputs: [{k:"return", v:"True", changed:true}],
+      why: "<strong>🎉 Mil gaya bhai!</strong> Saare customers ko sahi change mila. Function returns <code>True</code>.",
+      analogy: "Dukaan ki shaam ki closing — drawer mein <strong>" + five + " ka $5</strong> aur <strong>" + ten + " ka $10</strong> bach gaya. Profit + reputation, dono safe!"
+    })
+  });
+  curResult = true;
+  pushStep({
+    line: 19, action: "found",
+    logHTML: richLog({
+      line: 19, action: "found",
+      code: "# Final result: True",
+      status: "success",
+      outputs: [{k:"result", v:"True", changed:true}, {k:"final.five", v: five}, {k:"final.ten", v: ten}],
+      why: "Final answer: <strong>True</strong>. Greedy strategy successful — har $20 customer ko first-priority $10+$5, fallback 3×$5 se handle kiya.",
+      analogy: "Aaj ka business successful! Cash drawer balanced, customers happy, lemonade khatam. <strong>Win-win-win!</strong> 🍋"
+    }),
+    finished: true, verdict: true
+  });
+
+  return st;
+}
+
+/* ============================================================
+   RENDER VIZ
+============================================================ */
+function renderViz(s) {
+  var p = document.getElementById('vizPanel');
+  var h = '';
+
+  // Vars strip
+  h += '<div class="vars-strip">';
+  h += '<span class="var-chip vc-active"><span class="var-chip-key">i</span>=<span class="var-chip-val">' + (s.i < 0 ? '-' : s.i) + '</span></span>';
+  h += '<span class="var-chip ' + (s.bill ? 'vc-warn' : '') + '"><span class="var-chip-key">bill</span>=<span class="var-chip-val">' + (s.bill ? '$'+s.bill : '—') + '</span></span>';
+  h += '<span class="var-chip vc-safe"><span class="var-chip-key">five</span>=<span class="var-chip-val">' + s.five + '</span></span>';
+  h += '<span class="var-chip vc-safe"><span class="var-chip-key">ten</span>=<span class="var-chip-val">' + s.ten + '</span></span>';
+  h += '<span class="var-chip"><span class="var-chip-key">register</span>=<span class="var-chip-val">$' + (s.five*5 + s.ten*10) + '</span></span>';
+  h += '<span class="var-chip"><span class="var-chip-key">served</span>=<span class="var-chip-val">' + s.processed.length + '/' + s.bills.length + '</span></span>';
+  h += '</div>';
+
+  // Bills queue card
+  h += '<div class="viz-card" style="width:100%">';
+  h += '<div class="viz-title">🧾 Customer Queue (bills)</div>';
+  h += '<div class="bills-queue">';
+  s.bills.forEach(function(b, idx) {
+    var cls = 'bill-tile bill-' + b;
+    if (idx < s.i) {
+      // already processed
+      var rec = null;
+      for (var k = 0; k < s.processed.length; k++) {
+        if (s.processed[k].idx === idx) { rec = s.processed[k]; break; }
+      }
+      if (rec && rec.status === 'fail') cls += ' bill-tile--rejected';
+      else cls += ' bill-tile--processed';
+    } else if (idx === s.i) {
+      cls += ' bill-tile--current';
+      if (s.rejected) cls += ' bill-tile--rejected';
+    }
+    h += '<div class="' + cls + '"><span class="bill-idx">' + (idx+1) + '</span>$' + b + '</div>';
+  });
+  if (!s.bills.length) h += '<span class="empty-state">No bills</span>';
+  h += '</div></div>';
+
+  // Cash register row
+  h += '<div class="viz-row">';
+  h += '<div class="viz-card" style="flex:1;min-width:280px">';
+  h += '<div class="viz-title">💰 Cash Register (Greedy Hoarding)</div>';
+  h += '<div class="register-wrap">';
+  // $5 stack
+  h += '<div class="cash-stack"><div class="cash-stack-label">$5 NOTES</div>';
+  h += '<div class="stack-col stack-col--five">';
+  if (s.five === 0) h += '<span class="empty-state">empty</span>';
+  for (var f = 0; f < s.five; f++) h += '<div class="cash-bill bill-5">$5</div>';
+  h += '</div><span class="cash-count-badge">×' + s.five + '</span></div>';
+  // $10 stack
+  h += '<div class="cash-stack"><div class="cash-stack-label">$10 NOTES</div>';
+  h += '<div class="stack-col stack-col--ten">';
+  if (s.ten === 0) h += '<span class="empty-state">empty</span>';
+  for (var t = 0; t < s.ten; t++) h += '<div class="cash-bill bill-10">$10</div>';
+  h += '</div><span class="cash-count-badge">×' + s.ten + '</span></div>';
+  // $20 note: $20 not stored
+  h += '<div class="cash-stack"><div class="cash-stack-label">$20 NOTES</div>';
+  h += '<div class="stack-col" style="border-color:#B45309;background:#FFFBEB">';
+  h += '<span class="empty-state" style="font-style:italic;color:#78350F">never stored<br>(no $25 customer)</span>';
+  h += '</div><span class="cash-count-badge" style="background:#FEF3C7">×0</span></div>';
+  h += '</div>'; // register-wrap
+
+  // Last change display
+  if (s.lastChange) {
+    h += '<div class="change-display">';
+    h += '<strong>Last txn:</strong>';
+    if (s.lastChange.in.length) {
+      s.lastChange.in.forEach(function(b){ h += '<span class="change-bill change-bill--in">+' + b + '</span>'; });
+    }
+    if (s.lastChange.out.length) {
+      h += '<span style="font-size:11px;color:var(--text-tertiary);margin:0 2px">→ change:</span>';
+      s.lastChange.out.forEach(function(b){ h += '<span class="change-bill change-bill--out">−' + b + '</span>'; });
+    } else {
+      h += '<span style="font-size:11px;color:var(--text-tertiary);margin:0 2px">→ no change needed</span>';
+    }
+    h += '</div>';
+  }
+  h += '</div>'; // viz-card
+
+  // Strategy reminder card
+  h += '<div class="viz-card" style="min-width:240px;max-width:300px">';
+  h += '<div class="viz-title">🎯 Greedy Strategy</div>';
+  h += '<div style="font-size:11px;color:var(--text-secondary);line-height:1.7">';
+  h += '<div style="padding:4px 0;border-bottom:1px dashed var(--border-light)"><strong>$5 →</strong> just keep ✅</div>';
+  h += '<div style="padding:4px 0;border-bottom:1px dashed var(--border-light)"><strong>$10 →</strong> give $5 back</div>';
+  h += '<div style="padding:4px 0;border-bottom:1px dashed var(--border-light)"><strong>$20 →</strong> $10+$5 (preferred)</div>';
+  h += '<div style="padding:4px 0"><strong>$20 →</strong> 5+5+5 (fallback)</div>';
+  h += '</div></div>';
+  h += '</div>'; // viz-row
+
+  // Legend
+  h += '<div class="legend">';
+  h += '<span><i style="background:#DCFCE7;border-color:#15803D"></i>$5 bill</span>';
+  h += '<span><i style="background:#DBEAFE;border-color:#1D4ED8"></i>$10 bill</span>';
+  h += '<span><i style="background:#FEF3C7;border-color:#B45309"></i>$20 bill</span>';
+  h += '<span><i style="background:#EEEDFE;border-color:#534AB7"></i>Current customer</span>';
+  h += '<span><i style="background:#FCEBEB;border-color:#E24B4A"></i>Rejected</span>';
+  h += '<span><i style="background:#fff;opacity:.4"></i>Already served</span>';
+  h += '</div>';
+
+  // Result banner when finished
+  if (s.finished) {
+    if (s.verdict === true) {
+      h += '<div class="result-banner result-banner--success">🎉 SUCCESS — Returned <code style="background:#fff;padding:2px 6px;border-radius:3px">True</code> · All ' + s.bills.length + ' customers served · Final register: ' + s.five + '×$5, ' + s.ten + '×$10</div>';
+    } else {
+      h += '<div class="result-banner result-banner--fail">❌ FAILED — Returned <code style="background:#fff;padding:2px 6px;border-radius:3px">False</code> · Stuck at customer #' + (s.i + 1) + ' ($' + s.bill + ') · No valid change combo</div>';
+    }
+  }
+
+  p.innerHTML = h;
+}
+
+/* ============================================================
+   STEP CONTROL
+============================================================ */
+function renderStep(idx) {
+  if (!steps.length) return;
+  var s = steps[idx];
+  currentStep = idx;
+  document.getElementById('stepInfo').textContent = (idx + 1) + '/' + steps.length;
+  var bd = document.getElementById('actionBadge');
+  bd.textContent = BADGE_LABEL[s.action] || s.action;
+  bd.className = 'action-badge action-badge--' + s.action;
+  document.querySelectorAll('.code-line').forEach(function(el){ el.classList.remove('active'); });
+  var al = document.querySelector('.code-line[data-line="' + s.line + '"]');
+  if (al) { al.classList.add('active'); al.scrollIntoView({block:'nearest'}); }
+  renderViz(s);
+  showLogPreview(s);
+}
+
+function stepBy(d) {
+  var ni = currentStep + d;
+  if (ni < 0 || ni >= steps.length) return;
+  renderStep(ni);
+}
+
+function resetStep() { if (steps.length) renderStep(0); }
+
+function showLogPreview(s) {
+  if (!logEnabled) return;
+  document.getElementById('logPopupBody').innerHTML = s.logHTML || '';
+  document.getElementById('logPopup').classList.remove('log-popup--hidden');
+}
+
+function hideLogPopup() {
+  document.getElementById('logPopup').classList.add('log-popup--hidden');
+}
+
+function toggleLogPreview() {
+  logEnabled = !logEnabled;
+  var btn = document.getElementById('logToggleBtn');
+  btn.textContent = logEnabled ? '📋 ON' : '📋 OFF';
+  btn.classList.toggle('log-toggle-btn--off', !logEnabled);
+  if (!logEnabled) hideLogPopup();
+  else if (steps.length) showLogPreview(steps[currentStep]);
+}
+
+function logZoom(dir) {
+  logZoomLevel = Math.max(60, Math.min(180, logZoomLevel + dir * 20));
+  updateLogZoom();
+}
+function logZoomReset() { logZoomLevel = 100; updateLogZoom(); }
+function updateLogZoom() {
+  document.getElementById('logZoomLabel').textContent = logZoomLevel + '%';
+  document.getElementById('logPopup').style.setProperty('--log-scale', logZoomLevel / 100);
+}
+
+function toggleFullscreen() {
+  var viz = document.querySelector('.col-viz');
+  if (!document.fullscreenElement) viz.requestFullscreen().catch(function(){});
+  else document.exitFullscreen();
+}
+
+function toggleProblem() {
+  var body = document.getElementById('probBody');
+  var btn = document.getElementById('probToggleBtn');
+  body.classList.toggle('prob-body--hidden');
+  btn.textContent = body.classList.contains('prob-body--hidden') ? '▼ Show' : '▲ Hide';
+}
+
+/* ============================================================
+   INPUT PARSING / RUN
+============================================================ */
+function parseBills(raw) {
+  try {
+    var arr = JSON.parse(raw);
+    if (!Array.isArray(arr)) return [];
+    return arr.filter(function(x){ return x === 5 || x === 10 || x === 20; });
+  } catch(e) { return []; }
+}
+
+function loadTest(billsStr, expected) {
+  document.getElementById('inputBills').value = billsStr;
+  document.getElementById('expectedBadge').textContent = 'exp: ' + (expected ? 'True' : 'False');
+  resetWithInput();
+}
+
+function resetWithInput() {
+  curResult = null;
+  var bills = parseBills(document.getElementById('inputBills').value);
+  if (!bills.length) {
+    document.getElementById('liveOutput').textContent = 'invalid input';
+    return;
+  }
+  renderCode();
+  fitCodeWidth();
+  steps = buildSteps(bills);
+  currentStep = 0;
+  renderStep(0);
+  document.getElementById('liveOutput').textContent = curResult === null ? '—' : (curResult ? 'True ✓' : 'False ✗');
+}
+
+/* ============================================================
+   LAYOUT — code width fit + footer sync + resize
+============================================================ */
+function fitCodeWidth() {
+  if (codeWidthUserSet) { syncFooterWidth(); return; }
+  var col = document.getElementById('col1');
+  var panel = document.getElementById('codePanel');
+  // estimate widest line
+  var maxLen = 0;
+  codeLines.forEach(function(l){ if (l.length > maxLen) maxLen = l.length; });
+  var px = Math.min(maxLen * 7.6 + 60, window.innerWidth * 0.45);
+  px = Math.max(px, 220);
+  col.style.width = px + 'px';
+  syncFooterWidth();
+}
+
+function syncFooterWidth() {
+  document.getElementById('footerLeft').style.width =
+    document.getElementById('col1').offsetWidth + 'px';
+}
+
+(function() {
+  var col1 = document.getElementById('col1');
+  document.getElementById('resizeH1').addEventListener('mousedown', function(e) {
+    e.preventDefault();
+    codeWidthUserSet = true;
+    var startX = e.clientX, startW = col1.offsetWidth, h = this;
+    document.body.classList.add('no-select');
+    h.classList.add('active');
+    function mv(e) {
+      col1.style.width = Math.max(140, Math.min(window.innerWidth * 0.45, startW + (e.clientX - startX))) + 'px';
+      syncFooterWidth();
+    }
+    function up() {
+      document.removeEventListener('mousemove', mv);
+      document.removeEventListener('mouseup', up);
+      document.body.classList.remove('no-select');
+      h.classList.remove('active');
+    }
+    document.addEventListener('mousemove', mv);
+    document.addEventListener('mouseup', up);
+  });
+})();
+
+window.addEventListener('resize', function() {
+  if (!codeWidthUserSet) fitCodeWidth();
+  else syncFooterWidth();
+});
+
+/* ============================================================
+   KEYBOARD
+============================================================ */
+document.addEventListener('keydown', function(e) {
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
+  if (e.key === 'ArrowRight') { e.preventDefault(); stepBy(1); }
+  else if (e.key === 'ArrowLeft') { e.preventDefault(); stepBy(-1); }
+  else if (e.key === 'r' || e.key === 'R') { e.preventDefault(); resetStep(); }
+});
+
+/* ============================================================
+   BOOT
+============================================================ */
+resetWithInput();
+</script>
+</body>
+</html>
