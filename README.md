@@ -2,6 +2,10 @@
 
 > **GT Learn** — Interactive DSA visualizers + LeetCode / coding problems tracker with progress, filters, paradigms, and platform links. Built as self-contained HTML files.
 
+**🚀 Live Demo:** [https://dsa-1000-visualizers.vercel.app](https://dsa-1000-visualizers.vercel.app)
+
+PR preview deployments are enabled via Vercel (connect Git in dashboard for auto previews on every PR).
+
 **1243+ problems** tracked across 15+ categories, multiple platforms (LeetCode, GFG, HackerRank, Codeforces, InterviewBit, and custom).
 
 ## 🚀 Quick Start (Clean Home)

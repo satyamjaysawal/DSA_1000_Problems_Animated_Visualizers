@@ -40,3 +40,5 @@ build/
 *.tmp
 ~$*.*
 *.bak
+
+.vercel
