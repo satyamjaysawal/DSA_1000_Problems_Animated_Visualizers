@@ -1645,7 +1645,7 @@
                          "lcNum":  44,
                          "plat":  "lc",
                          "url":  "https://leetcode.com/problems/wildcard-matching/",
-                         "viz":  null
+                         "viz":  "../dp/lc044-wildcard-matching.html"
                      },
                      {
                          "id":  103,

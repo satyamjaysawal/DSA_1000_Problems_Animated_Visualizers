@@ -1,0 +1,1705 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GT LEARN • LC44 Wildcard Matching</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+:root {
+  --bg-primary: #FAFAF8;
+  --bg-secondary: #F1EFE8;
+  --bg-tertiary: #E2E0D8;
+  --bg-card: #FFFFFF;
+  --text-primary: #2C2C2A;
+  --text-secondary: #5F5E5A;
+  --text-tertiary: #888780;
+  --border-color: rgba(0,0,0,0.11);
+  --border-light: rgba(0,0,0,0.06);
+  --border-focus: #534AB7;
+  --accent-indigo: #534AB7;
+  --accent-indigo-bg: #EEEDFE;
+  --accent-indigo-text: #3C3489;
+  --accent-indigo-hover: #4740A0;
+  --accent-teal: #0F6E56;
+  --accent-teal-bg: #E1F5EE;
+  --accent-teal-text: #085041;
+  --accent-red: #E24B4A;
+  --accent-red-bg: #FCEBEB;
+  --accent-red-text: #791F1F;
+  --accent-amber: #B45309;
+  --accent-amber-bg: #FEF3C7;
+  --accent-amber-text: #78350F;
+  --accent-green: #15803D;
+  --accent-green-bg: #DCFCE7;
+  --accent-green-text: #14532D;
+  --syn-keyword: #534AB7;
+  --syn-function: #185FA5;
+  --syn-number: #993C1D;
+  --syn-string: #0F6E56;
+  --active-line-bg: #EEEDFE;
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 10px;
+  --radius-xl: 14px;
+  --font-sans: 'DM Sans', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+  --fs-xs: 11px;
+  --fs-sm: 12px;
+  --fs-base: 14px;
+  --fs-md: 15px;
+  --fs-lg: 18px;
+  --fw-medium: 500;
+  --fw-semibold: 600;
+  --fw-bold: 700;
+  --lh-normal: 1.6;
+  --lh-code: 1.9;
+  --ease: .18s ease;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--font-sans); background: var(--bg-primary); color: var(--text-primary); line-height: 1.6; }
+.app-shell { display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+
+/* === PROBLEM CARD === */
+.problem-card { flex-shrink: 0; border-bottom: 1px solid var(--border-color); background: var(--bg-card); }
+.pc-header { 
+  display: flex; align-items: center; justify-content: space-between; 
+  padding: 8px 14px; background: var(--bg-secondary); border-bottom: 1px solid var(--border-light); 
+}
+.pc-header-left { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.gt-btn { 
+  font: 700 11px var(--font-sans); padding: 5px 10px; 
+  background: var(--accent-indigo); color: #fff; border: none; border-radius: 99px; cursor: pointer; 
+}
+.gt-btn:hover { background: var(--accent-indigo-hover); }
+.lc-num { font: 700 12px var(--font-mono); color: var(--text-tertiary); }
+.lc-title { font: 700 15px var(--font-sans); color: var(--text-primary); }
+.lc-diff { 
+  font: 700 9px var(--font-mono); padding: 2px 8px; border-radius: 99px; letter-spacing: .06em; 
+}
+.lc-diff--hard { background: #FEE2E2; color: #991B1B; border: 1px solid #fecaca; }
+.lc-tag { 
+  font: 600 10px var(--font-mono); padding: 2px 8px; border-radius: 99px; 
+  background: var(--bg-secondary); color: var(--text-secondary); border: 1px solid var(--border-color); 
+}
+
+.pc-header-right { margin-left: auto; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.input-wrap { display: flex; align-items: center; gap: 4px; }
+.input-wrap label { font: 600 10px var(--font-mono); color: var(--text-tertiary); }
+.input-wrap input { 
+  font: 600 11px var(--font-mono); padding: 3px 6px; border: 1px solid var(--border-color); 
+  border-radius: 4px; background: var(--bg-card); color: var(--text-primary); width: 140px; 
+}
+.input-wrap input:focus { outline: none; border-color: var(--border-focus); }
+.expected-badge { 
+  font: 600 10px var(--font-mono); padding: 3px 8px; border-radius: 4px; 
+  background: var(--accent-teal-bg); color: var(--accent-teal-text); border: 1px solid var(--accent-teal); 
+}
+.toggle-btn { 
+  font-family: system-ui,"Segoe UI Emoji",sans-serif; font: 600 10px var(--font-mono); 
+  padding: 3px 8px; border-radius: 4px; background: var(--bg-secondary); 
+  border: 1px solid var(--border-color); color: var(--text-secondary); cursor: pointer; 
+}
+
+.pc-body { 
+  display: flex; gap: 16px; padding: 10px 14px; 
+  max-height: 34vh; overflow: auto; 
+}
+.pc-left { flex: 2; min-width: 0; }
+.pc-right { flex: 1; min-width: 0; border-left: 1px solid var(--border-light); padding-left: 14px; }
+
+.pc-section { margin-bottom: 8px; }
+.pc-section h4 { 
+  font: 700 11px var(--font-sans); text-transform: uppercase; letter-spacing: .06em; 
+  color: var(--text-tertiary); margin-bottom: 4px; 
+}
+.pc-section p { font-size: 12px; line-height: 1.55; color: var(--text-secondary); }
+.pc-section code { 
+  font: 600 11px var(--font-mono); background: var(--bg-secondary); padding: 1px 5px; 
+  border-radius: 3px; color: var(--accent-indigo-text); 
+}
+.pc-section strong { color: var(--text-primary); }
+
+.concept-card { 
+  flex: 1; min-width: 140px; padding: 6px 8px; background: var(--bg-secondary); 
+  border-radius: 5px; border-left: 3px solid var(--accent-indigo); font-size: 11px; line-height: 1.5; 
+}
+.concept-card strong { 
+  display: block; color: var(--accent-indigo-text); margin-bottom: 2px; font-size: 10px; text-transform: uppercase; 
+}
+
+.complexity-row { display: flex; gap: 6px; margin-top: 4px; }
+.cx-chip { 
+  font: 600 11px var(--font-mono); padding: 3px 8px; border-radius: 99px; 
+  background: var(--accent-indigo-bg); color: var(--accent-indigo-text); border: 1px solid var(--accent-indigo); 
+}
+
+.test-chip { 
+  display: flex; flex-direction: column; gap: 3px; padding: 6px 8px; margin-bottom: 5px; 
+  background: var(--bg-secondary); border-radius: 5px; border: 1px solid var(--border-color); 
+  cursor: pointer; transition: all var(--ease); 
+}
+.test-chip:hover { border-color: var(--accent-indigo); background: var(--accent-indigo-bg); }
+.test-chip.active { border-color: var(--accent-indigo); background: var(--accent-indigo-bg); }
+
+.tc-row { display: flex; align-items: center; gap: 5px; flex-wrap: wrap; }
+.tc-vals { 
+  display: flex; align-items: center; gap: 4px; flex-wrap: wrap; margin-top: 2px; 
+}
+.tc-vals code { 
+  font: 600 10px var(--font-mono); background: var(--bg-card); color: var(--accent-indigo-text); 
+  padding: 1px 5px; border-radius: 3px; border: 1px solid var(--border-light); 
+}
+.pt-tag { 
+  font: 600 9px var(--font-mono); padding: 1px 5px; border-radius: 3px; 
+  background: var(--accent-indigo); color: #fff; text-transform: uppercase; 
+}
+.tc-exp { font: 600 10px var(--font-mono); color: var(--accent-teal-text); margin-left: auto; }
+
+.run-row { display: flex; align-items: center; gap: 8px; margin-top: 6px; }
+.btn-run { 
+  font-family: system-ui,"Segoe UI Emoji",sans-serif; font: 700 11px var(--font-sans); 
+  padding: 5px 12px; background: var(--accent-indigo); color: #fff; border: none; border-radius: 5px; cursor: pointer; 
+}
+.live-output { 
+  font: 700 12px var(--font-mono); padding: 4px 10px; background: var(--accent-green-bg); 
+  color: var(--accent-green-text); border-radius: 4px; border: 1px solid var(--accent-green); 
+}
+
+.main-row { flex: 1; display: flex; overflow: hidden; min-height: 0; position: relative; }
+.col { display: flex; flex-direction: column; overflow: hidden; min-width: 0; }
+.col-code { width: 33%; min-width: 260px; max-width: 42vw; border-right: 1px solid var(--border-color); background: var(--bg-card); }
+.col-viz { flex: 1; min-width: 0; background: var(--bg-primary); padding: 14px 18px; overflow-y: auto; }
+
+.code-panel { padding: 12px 0; overflow-y: auto; height: 100%; }
+.code-line { display: flex; font-family: var(--font-mono); font-size: 13px; line-height: var(--lh-code); padding: 1px 14px; }
+.code-line.active { background: var(--accent-indigo-bg); }
+.section-label { font:700 10px var(--font-sans); text-transform:uppercase; letter-spacing:.08em; color:var(--text-tertiary); padding:8px 12px; border-bottom:1px solid var(--border-light); background:var(--bg-card); }
+.ln { width: 32px; color: var(--text-tertiary); text-align: right; padding-right: 10px; user-select: none; flex-shrink: 0; }
+.code-content { flex: 1; white-space: pre; }
+.kw { color: var(--accent-indigo); font-weight: 600; }
+.fn { color: #185FA5; }
+.num { color: #993C1D; }
+.str { color: var(--accent-teal); }
+
+.vars-strip { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; width:100%; max-width:820px; }
+.var-chip { font-family: var(--font-mono); font-size: 12px; padding: 3px 9px; background: var(--bg-secondary); border: 1px solid var(--border-light); border-radius: 999px; }
+.var-chip.vc-active { background: var(--accent-indigo-bg); border-color: var(--accent-indigo); color: var(--accent-indigo-text); font-weight: 600; }
+
+.viz-row { display:flex; gap:12px; align-items:flex-start; flex-wrap:wrap; }
+.viz-card { background:var(--bg-card); border:1px solid var(--border-color); border-radius:var(--radius-md); padding:10px; flex:1; min-width:240px; }
+.viz-title { font-weight:700; font-size:12px; margin-bottom:6px; display:flex; align-items:center; gap:6px; color:var(--text-secondary); }
+
+/* ========== VISUALIZATION STYLES (DP GRID) ========== */
+.viz-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  max-width: 820px;
+}
+
+.viz-sec {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 10px 12px;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+.viz-sec-head {
+  font: 700 11px var(--font-sans);
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  letter-spacing: .3px;
+}
+
+/* DP Grid Container - polished modern look */
+.dp-container {
+  position: relative;
+  display: inline-block;
+  padding: 16px;
+  background: linear-gradient(145deg, #0f172a 0%, #1e293b 100%);
+  border-radius: 12px;
+  border: 2px solid #475569;
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.3), 0 4px 6px -4px rgb(0 0 0 / 0.3);
+  overflow: auto;
+  max-width: 100%;
+}
+
+.dp-grid {
+  display: grid;
+  gap: 4px;
+  position: relative;
+  background: #0b1120;
+  padding: 6px;
+  border-radius: 8px;
+}
+
+.dp-cell {
+  width: 54px;
+  height: 54px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 18px;
+  font-weight: 800;
+  border-radius: 8px;
+  background: #1e293b;
+  color: #64748b;
+  border: 2px solid #334155;
+  position: relative;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
+  overflow: hidden;
+}
+
+.dp-cell .dp-idx {
+  position: absolute;
+  top: 1px;
+  left: 2px;
+  font-size: 7px;
+  font-weight: 600;
+  color: #64748b;
+  opacity: 0.75;
+  line-height: 1;
+  pointer-events: none;
+  background: rgba(15, 23, 42, 0.6);
+  padding: 0 2px;
+  border-radius: 2px;
+}
+
+.dp-cell .dp-val {
+  font-size: 18px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+/* Headers - cleaner */
+.dp-cell.header-row,
+.dp-cell.header-col {
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  font-size: 13px;
+  font-weight: 700;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+}
+
+.dp-cell.header-row {
+  justify-content: flex-end;
+  padding-bottom: 4px;
+}
+
+.dp-cell.header-col {
+  justify-content: center;
+  text-align: right;
+  padding-right: 6px;
+}
+
+/* States - more premium */
+.dp-cell--true {
+  background: linear-gradient(145deg, #166534 0%, #14532d 100%);
+  color: #86efac;
+  border-color: #22c55e;
+  box-shadow: 0 0 0 1px rgba(34,197,94,0.3);
+}
+
+.dp-cell--false {
+  background: #1e293b;
+  color: #475569;
+  border-color: #334155;
+}
+
+.dp-cell--current {
+  background: linear-gradient(145deg, #b45309 0%, #92400e 100%) !important;
+  border-color: #f59e0b !important;
+  color: #fef3c7 !important;
+  box-shadow: 0 0 0 3px rgba(245,158,11,0.4), 0 4px 6px -1px rgb(0 0 0 / 0.3) !important;
+  animation: pulse-node 1.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  transform: scale(1.08);
+  z-index: 3;
+}
+
+.dp-cell--source {
+  background: linear-gradient(145deg, #4338ca 0%, #3730a3 100%) !important;
+  border-color: #6366f1 !important;
+  color: #c7d2fe !important;
+  box-shadow: 0 0 0 2px rgba(99,102,241,0.5);
+  animation: source-glow 1.8s ease-in-out infinite;
+  z-index: 2;
+}
+
+/* SVG Flow Arrows - more visible and thematic */
+.flow-svg {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  pointer-events: none;
+  z-index: 10;
+  overflow: visible;
+}
+
+.flow-line {
+  stroke: #f59e0b;
+  stroke-width: 3;
+  stroke-dasharray: 6 3;
+  fill: none;
+  animation: flow-dash 1.2s linear infinite, flow-pulse 1.6s ease-in-out infinite;
+  filter: drop-shadow(0 2px 4px rgba(245,158,11,0.4));
+}
+
+.flow-line--diag {
+  stroke: #8b5cf6;
+  stroke-width: 2.5;
+  stroke-dasharray: 3 2;
+  opacity: 0.9;
+  filter: drop-shadow(0 1px 3px rgba(139,92,246,0.4));
+}
+
+.flow-line--current {
+  stroke: #f59e0b;
+  stroke-width: 3.5;
+  stroke-dasharray: none;
+  animation: flow-dash 0.8s linear infinite, flow-pulse 1.2s ease-in-out infinite;
+  filter: drop-shadow(0 2px 6px rgba(245,158,11,0.6));
+}
+
+@keyframes flow-dash { to { stroke-dashoffset: -22; } }
+@keyframes flow-pulse { 0%,100% { opacity: 0.85; } 50% { opacity: 1; } }
+@keyframes source-glow { 0%,100% { box-shadow: 0 0 0 2px rgba(99,102,241,0.3); } 50% { box-shadow: 0 0 0 4px rgba(99,102,241,0.6); } }
+@keyframes diagonal-glow { 0%,100% { box-shadow: 0 0 0 2px rgba(83,74,183,0.4); } 50% { box-shadow: 0 0 0 6px rgba(83,74,183,0.7); } }
+
+/* Legend */
+.legend {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+  font-size: 10px;
+  color: var(--text-tertiary);
+}
+.legend span { display: inline-flex; align-items: center; gap: 5px; }
+.legend i {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  border: 1px solid var(--border-color);
+}
+.legend i.legend-flow { width: 22px; height: 0; border: 0; border-top: 2.5px dashed #dc2626; }
+.legend i.legend-flow-diag { width: 22px; height: 0; border: 0; border-top: 2.2px dashed #8b5cf6; }
+.legend i.legend-flow-curr { width: 22px; height: 0; border: 0; border-top: 3px dashed #f59e0b; }
+
+/* String Display - nicer, aligned with DP */
+.string-display {
+  display: flex;
+  gap: 5px;
+  margin-bottom: 2px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 700;
+}
+.char-box {
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #1e293b;
+  border: 2px solid #334155;
+  border-radius: 8px;
+  color: #64748b;
+  transition: all 0.2s;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+}
+.char-box.active {
+  background: linear-gradient(145deg, #b45309, #92400e);
+  border-color: #f59e0b;
+  color: #fef3c7;
+  transform: scale(1.05);
+  box-shadow: 0 0 0 3px rgba(245,158,11,0.3);
+}
+
+/* === LOG PREVIEW === */
+.log-popup {
+  --log-scale: 1;
+  position: fixed; bottom: 52px; right: 14px;
+  width: 480px;
+  max-width: 92vw; max-height: 75vh;
+  border-radius: var(--radius-lg);
+  box-shadow: 0 10px 32px rgba(0,0,0,.14);
+  border: 1px solid var(--border-color);
+  background: var(--bg-card);
+  overflow: hidden;
+  display: flex; flex-direction: column;
+  z-index: 100;
+  transition: opacity .15s, transform .15s;
+  transform: scale(var(--log-scale));
+  transform-origin: bottom right;
+}
+.log-popup--hidden { opacity: 0; pointer-events: none; }
+.log-popup-body { flex: 1; overflow: auto; padding: 0; width: 100%; }
+.log-popup-body > .log-card { border-radius: 0; border: none; border-left: 0; }
+
+.log-card {
+  border-radius: var(--radius-md); overflow: hidden;
+  border: 1px solid var(--border-color); border-left-width: 4px;
+  font-size: var(--fs-xs); background: var(--bg-card);
+}
+.log-card-header {
+  display: flex; align-items: center; gap: 6px;
+  padding: 8px 10px 6px; background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-light);
+}
+.log-badge {
+  font-size: 10px; font-weight: 700; padding: 1px 7px; border-radius: 3px;
+  background: var(--accent-indigo-bg); color: var(--accent-indigo-text);
+}
+.log-line-ref {
+  font: 700 10px var(--font-mono); color: var(--accent-indigo);
+  background: var(--accent-indigo-bg); padding: 1px 6px; border-radius: 4px;
+  border: 1px solid var(--accent-indigo);
+}
+.log-status-pill {
+  font-family: system-ui,"Segoe UI Emoji",sans-serif;
+  font-size: 9px; font-weight: 700; padding: 2px 7px; border-radius: 99px;
+  text-transform: uppercase; margin-left: auto; border: 1px solid;
+}
+.log-status--success { background: var(--accent-green-bg); color: var(--accent-green-text); border-color: var(--accent-green); }
+.log-status--fail    { background: var(--accent-red-bg); color: var(--accent-red-text); border-color: var(--accent-red); }
+.log-status--skip    { background: var(--bg-tertiary); color: var(--text-tertiary); border-color: var(--border-color); }
+.log-status--loop    { background: rgba(56,139,253,.14); color: #185FA5; border-color: #388bfd; }
+.log-status--prune   { background: var(--accent-red-bg); color: var(--accent-red-text); border-color: var(--accent-red); }
+.log-status--info    { background: rgba(130,80,255,.14); color: #3C3489; border-color: #8250ff; }
+
+.log-section { padding: 7px 10px; border-bottom: 1px dashed var(--border-light); }
+.log-section:last-child { border-bottom: none; }
+.log-section-title {
+  font: 700 8px var(--font-mono); text-transform: uppercase; letter-spacing: .06em;
+  color: var(--text-tertiary); margin-bottom: 3px; display: flex; align-items: center; gap: 4px;
+}
+.log-section-title-icon { font-family: system-ui,"Segoe UI Emoji",sans-serif; }
+
+.log-code-snippet {
+  font: 600 11px var(--font-mono); background: #0d1117; color: #e6edf3;
+  padding: 6px 9px; border-radius: 4px; display: block; overflow-x: auto; white-space: pre;
+  border: 1px solid #30363d;
+}
+.log-code-snippet .ck { color: #ff7b72; }
+.log-code-snippet .cs { color: #a5d6ff; }
+.log-code-snippet .cn { color: #79c0ff; }
+.log-code-snippet .cf { color: #d2a8ff; }
+.log-code-snippet .cc { color: #8b949e; font-style: italic; }
+
+.log-kv-row { display: flex; flex-wrap: wrap; gap: 5px; }
+.log-kv {
+  font: 11px var(--font-mono); padding: 2px 7px; border-radius: 4px;
+  background: var(--bg-secondary); border: 1px solid var(--border-light);
+}
+.log-kv-key { color: var(--text-tertiary); font-weight: 500; }
+.log-kv-val { color: var(--text-primary); font-weight: 700; }
+.log-kv--in { background: rgba(56,139,253,.08); border-color: rgba(56,139,253,.3); }
+.log-kv--out { background: rgba(63,185,80,.08); border-color: rgba(63,185,80,.4); }
+.log-kv--out .log-kv-val { color: #15803D; }
+.log-kv--changed { background: rgba(180,83,9,.10); border-color: rgba(180,83,9,.4); }
+
+.log-verdict {
+  display: flex; align-items: center; gap: 6px;
+  font: 600 11px var(--font-mono); padding: 5px 8px; border-radius: 5px;
+  background: var(--bg-secondary); border: 1px solid var(--border-light);
+}
+.log-verdict--true { background: var(--accent-green-bg); border-color: var(--accent-green); color: var(--accent-green-text); }
+.log-verdict--false { background: var(--accent-red-bg); border-color: var(--accent-red); color: var(--accent-red-text); }
+
+.log-why { font-size: 11px; line-height: 1.55; color: var(--text-primary); padding: 4px 0; }
+.log-why strong { color: var(--accent-indigo-text); }
+.log-analogy {
+  font: italic 11px var(--font-sans); color: var(--text-secondary);
+  background: #FFF8E7; border: 1px solid #FBE8A6; border-left: 3px solid var(--accent-amber);
+  padding: 6px 9px; border-radius: 4px; line-height: 1.55;
+}
+.log-analogy strong { color: var(--accent-amber-text); font-style: normal; font-weight: 700; }
+
+.footer-bar { flex-shrink: 0; display: flex; border-top: 1px solid var(--border-color); background: white; }
+.footer-left { width: 33%; min-width: 260px; max-width: 42vw; padding: 8px 14px; display: flex; align-items: center; gap: 10px; border-right: 1px solid var(--border-light); }
+.footer-right { flex: 1; padding: 8px 18px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+
+.btn { font-size: 13px; padding: 5px 12px; border: 1px solid var(--border-color); background: white; border-radius: 6px; cursor: pointer; font-weight: 600; }
+.btn:hover { background: var(--bg-secondary); }
+.btn-primary { background: var(--accent-indigo); color: white; border-color: var(--accent-indigo); }
+.btn-primary:hover { background: var(--accent-indigo-hover, #4740A0); }
+
+.step-info { font-family: var(--font-mono); font-weight: 700; font-size: 13px; }
+.action-badge { font-size: 10px; font-weight: 700; padding: 2px 9px; border-radius: 999px; background: var(--bg-tertiary); }
+
+.log-toggle-btn { font-size: 12px; padding: 4px 10px; border-radius: 6px; cursor: pointer; }
+.log-toggle-btn--off { opacity: .6; }
+
+kbd { font-family: var(--font-mono); font-size: 11px; padding: 2px 6px; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 4px; }
+
+body.no-select { user-select: none; }
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 3px; }
+
+.resize-handle {
+  position: absolute; top: 0; bottom: 0; width: 6px; cursor: col-resize; z-index: 30;
+  background: transparent; transition: background .1s;
+  margin-left: -3px;
+}
+.resize-handle:hover, .resize-handle.active { 
+  background: var(--accent-indigo); 
+  opacity: .35; 
+  box-shadow: 0 0 0 1px var(--accent-indigo);
+}
+
+.action-badge { font-size: 10px; font-weight: 700; padding: 2px 9px; border-radius: 999px; background: var(--bg-tertiary); }
+.action-badge--func-def, .action-badge--call, .action-badge--return, .action-badge--init { background: var(--accent-indigo-bg); color: var(--accent-indigo-text); border:1px solid var(--accent-indigo); }
+.action-badge--for-check, .action-badge--if-check, .action-badge--while-check { background: rgba(56,139,253,.14); color:#185FA5; border:1px solid #388bfd; }
+.action-badge--found, .action-badge--assign, .action-badge--mark { background: var(--accent-green-bg); color: var(--accent-green-text); border:1px solid var(--accent-green); }
+.action-badge--pop { background: var(--accent-red-bg); color: var(--accent-red-text); border:1px solid var(--accent-red); }
+.action-badge--push { background: var(--accent-green-bg); color: var(--accent-green-text); border:1px solid var(--accent-green); }
+.action-badge--exit { background: var(--bg-tertiary); color: var(--text-tertiary); border:1px solid var(--border-color); }
+
+.footer-sep { width:1px; height:18px; background:var(--border-light); margin:0 4px; }
+.btn-zoom { padding:3px 7px; }
+.log-zoom-label { font-size:11px; width:38px; text-align:center; display:inline-block; vertical-align:middle; }
+
+@keyframes pulse-node {
+  0%,100% { box-shadow: 0 0 4px var(--accent-indigo); }
+  50% { box-shadow: 0 0 12px var(--accent-indigo); }
+}
+</style>
+</head>
+<body>
+<div class="app-shell">
+  <!-- PROBLEM CARD -->
+  <div class="problem-card">
+    <header class="pc-header">
+      <div class="pc-header-left">
+        <a href="../00_HomePage/gt_learn_homepage.html" class="gt-home-btn">GT LEARN</a>
+        <span class="lc-num">#44</span>
+        <span class="lc-title">🃏 Wildcard Matching</span>
+        <span class="lc-diff lc-diff--hard">HARD</span>
+        <span class="lc-tag">Dynamic Programming</span>
+      </div>
+      <div class="pc-header-right">
+        <div class="input-wrap">
+          <label>s =</label>
+          <input id="inputS" value="adceb">
+        </div>
+        <div class="input-wrap">
+          <label>p =</label>
+          <input id="inputP" value="*a*b">
+        </div>
+        <span id="expectedBadge" class="expected-badge">exp: true</span>
+        <button id="probToggleBtn" class="toggle-btn" onclick="toggleProblem()">▲ Hide</button>
+      </div>
+    </header>
+    
+    <div class="pc-body" id="probBody">
+      <div class="pc-left">
+        <div class="pc-section">
+          <h4>📝 Problem Statement</h4>
+          <p>Given an input string <code>s</code> and a pattern <code>p</code>, implement wildcard pattern matching with support for <code>'?'</code> and <code>'*'</code>. <code>'?'</code> matches any single character. <code>'*'</code> matches any sequence of characters (including the empty sequence). The matching should cover the <strong>entire</strong> input string.</p>
+        </div>
+        
+        <div class="pc-section">
+          <h4>🧠 Solving Approach</h4>
+          <p>We use a <strong>2D DP Table</strong> where <code>dp[i][j]</code> is true if the first <code>i</code> characters of <code>s</code> match the first <code>j</code> characters of <code>p</code>. We fill this table row by row. If we see a <code>*</code>, it can either match nothing (look left) or match one more char (look up).</p>
+        </div>
+        
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+          <div class="concept-card"><strong>Base Case</strong> Empty string matches empty pattern. <code>*</code> can match empty prefix.</div>
+          <div class="concept-card"><strong>Recurrence</strong> If chars match or <code>?</code>, look diagonal. If <code>*</code>, look left or up.</div>
+          <div class="concept-card"><strong>Result</strong> Bottom-right cell tells us if full string matches full pattern.</div>
+        </div>
+        
+        <div class="complexity-row">
+          <span class="cx-chip">Time: O(M*N)</span>
+          <span class="cx-chip">Space: O(M*N)</span>
+        </div>
+      </div>
+      
+      <div class="pc-right">
+        <div class="pc-section" style="margin-bottom:4px">
+          <h4>🧪 Test Cases (click to load)</h4>
+        </div>
+        
+        <div class="test-chip" onclick="loadTest(0)">
+          <div class="tc-row">
+            <span class="pt-tag">T1</span>
+            <span>Star Match</span>
+            <span class="tc-exp">exp:true</span>
+          </div>
+          <div class="tc-vals">
+            <code>s="adceb"</code>
+            <code>p="*a*b"</code>
+          </div>
+        </div>
+        
+        <div class="test-chip" onclick="loadTest(1)">
+          <div class="tc-row">
+            <span class="pt-tag">T2</span>
+            <span>No Match</span>
+            <span class="tc-exp">exp:false</span>
+          </div>
+          <div class="tc-vals">
+            <code>s="acdcb"</code>
+            <code>p="a*c?b"</code>
+          </div>
+        </div>
+        
+        <div class="test-chip" onclick="loadTest(2)">
+          <div class="tc-row">
+            <span class="pt-tag">T3</span>
+            <span>Empty + Star</span>
+            <span class="tc-exp">exp:true</span>
+          </div>
+          <div class="tc-vals">
+            <code>s=""</code>
+            <code>p="*"</code>
+          </div>
+        </div>
+
+        <div class="test-chip" onclick="loadTest(3)">
+          <div class="tc-row">
+            <span class="pt-tag">T4</span>
+            <span>Simple No</span>
+            <span class="tc-exp">exp:false</span>
+          </div>
+          <div class="tc-vals">
+            <code>s="aa"</code>
+            <code>p="a"</code>
+          </div>
+        </div>
+
+        <div class="test-chip" onclick="loadTest(4)">
+          <div class="tc-row">
+            <span class="pt-tag">T5</span>
+            <span>Any with Star</span>
+            <span class="tc-exp">exp:true</span>
+          </div>
+          <div class="tc-vals">
+            <code>s="aa"</code>
+            <code>p="*"</code>
+          </div>
+        </div>
+        
+        <div class="run-row">
+          <button class="btn-run" onclick="resetWithInput()">▶ Run</button>
+          <span id="liveOutput" class="live-output">—</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div class="main-row">
+    <!-- CODE PANEL -->
+    <div class="col col-code" id="col1">
+      <div class="section-label">📜 Python Code</div>
+      <div class="code-panel" id="codePanel"></div>
+    </div>
+
+    <!-- RESIZE HANDLE -->
+    <div id="resizeH1" class="resize-handle" title="Drag to resize code panel"></div>
+
+    <!-- VISUALIZATION PANEL -->
+    <div class="col col-viz">
+      <div class="section-label">📊 Visualization — DP Table (2D Matching)</div>
+      <div class="vars-strip" id="varsStrip"></div>
+      
+      <div class="viz-wrap">
+        <!-- Current Decision -->
+        <div class="viz-sec">
+          <div class="viz-sec-head">📍 Current Cell Decision</div>
+          <div id="currentDecision" style="font-size:12px; line-height:1.35; min-height:52px; padding:8px 10px; background:#0f172a; border-radius:8px; border:1px solid #334155; color:#e2e8f0;">
+            Step through to see the rule and dependencies for the active dp cell.
+          </div>
+        </div>
+
+        <!-- Strings Display -->
+        <div class="viz-sec">
+          <div class="viz-sec-head">🔤 Input Strings</div>
+          <div style="display:flex; gap:20px; flex-wrap:wrap;">
+            <div>
+              <div style="font-size:10px; color:var(--text-tertiary); margin-bottom:4px;">String s (Rows)</div>
+              <div id="stringS" class="string-display"></div>
+            </div>
+            <div>
+              <div style="font-size:10px; color:var(--text-tertiary); margin-bottom:4px;">Pattern p (Cols)</div>
+              <div id="stringP" class="string-display"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- DP Grid -->
+        <div class="viz-sec">
+          <div class="viz-sec-head">🧮 DP Table (dp[i][j])</div>
+          <div id="dpContainer" class="dp-container">
+            <div id="dpGrid" class="dp-grid"></div>
+            <!-- SVG Overlay for Arrows -->
+            <svg id="flowSvg" class="flow-svg" style="display:none;"></svg>
+          </div>
+          <div class="legend" style="gap:8px; font-size:10px; background:#0f172a; padding:8px 10px; border-radius:6px; border:1px solid #334155;">
+            <span><i style="background:#1e293b; border:1px solid #334155;"></i> False</span>
+            <span><i style="background:#166534; border:1px solid #22c55e;"></i> True / Match</span>
+            <span><i style="background:#b45309;"></i> Current computing</span>
+            <span><i style="background:#4338ca;"></i> Source cell (dependency)</span>
+            <span style="color:#f59e0b; font-weight:600;">— Amber arrow = active choice</span>
+            <span style="color:#8b5cf6; font-weight:600;">- - Purple dashed = other candidate</span>
+          </div>
+          <div style="font-size:9.5px; color:#64748b; margin-top:4px; line-height:1.3;">
+            Arrows point <strong>from</strong> the source cells that determine the current dp[i][j] value. For <code>*</code>: left = use 0 chars from *, up = consume one more char with *. For char or <code>?</code>: always the diagonal (prefix before this pair).
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer-bar">
+    <div class="footer-left" id="footerLeft">
+      <span id="stepInfo" class="step-info">0/0</span>
+      <span id="actionBadge" class="action-badge">INIT</span>
+    </div>
+    <div class="footer-right">
+      <kbd>←</kbd><kbd>→</kbd>
+      <button class="btn" type="button" onclick="resetStep()">↺</button>
+      <button class="btn" type="button" onclick="stepBy(-1)">◀</button>
+      <button class="btn btn-primary" type="button" onclick="stepBy(1)">▶ Next</button>
+      <span class="footer-sep"></span>
+      <button id="logToggleBtn" class="log-toggle-btn" type="button" onclick="toggleLogPreview()">📋 ON</button>
+      <button class="btn-zoom" type="button" onclick="logZoom(-1)">−</button>
+      <span id="logZoomLabel" class="log-zoom-label">100%</span>
+      <button class="btn-zoom" type="button" onclick="logZoom(1)">+</button>
+      <button class="btn-zoom" type="button" onclick="logZoomReset()">↺</button>
+      <span class="footer-sep"></span>
+      <button class="btn btn-fullscreen" type="button" onclick="toggleFullscreen()">⛶</button>
+    </div>
+  </div>
+</div>
+
+<!-- LOG POPUP -->
+<div class="log-popup" id="logPopup">
+  <div class="log-popup-body" id="logPopupBody"></div>
+</div>
+
+<script>
+// ==================== DATA & STATE ====================
+const codeLines = [
+  "def isMatch(s, p):",
+  "    m, n = len(s), len(p)",
+  "    dp = [[False] * (n + 1) for _ in range(m + 1)]",
+  "    dp[0][0] = True",
+  "    for j in range(1, n + 1):",
+  "        if p[j-1] == '*':",
+  "            dp[0][j] = dp[0][j-1]",
+  "    for i in range(1, m + 1):",
+  "        for j in range(1, n + 1):",
+  "            if p[j-1] == '*':",
+  "                dp[i][j] = dp[i][j-1] or dp[i-1][j]",
+  "            elif p[j-1] == '?' or p[j-1] == s[i-1]:",
+  "                dp[i][j] = dp[i-1][j-1]",
+  "    return dp[m][n]"
+];
+
+let steps = [];
+let currentStep = 0;
+let logEnabled = true;
+let logZoomLevel = 100;
+let codeWidthUserSet = false;
+let curResult = null;
+
+// ==================== RICH LOG HELPER (v2) ====================
+const LOG_BADGE = {
+  "func-def": "📌 DEF", "init": "⚙️ INIT", "call": "📞 CALL", "return": "🏆 RETURN",
+  "for-check": "🔁 FOR", "while-check": "🔁 WHILE", "if-check": "🔎 IF", "assign": "✏️ ASSIGN",
+  "found": "🎉 FOUND", "prune": "✂️ PRUNE", "fail": "❌ FAIL", "exit": "🔚 EXIT", "skip": "⏭ SKIP", "info": "ℹ️ INFO"
+};
+
+const BADGE_LABEL = {
+  "func-def": "DEF", "init": "INIT", "call": "CALL", "return": "RETURN",
+  "for-check": "FOR", "while-check": "WHILE", "if-check": "IF", "assign": "ASSIGN",
+  "found": "FOUND", "prune": "PRUNE", "fail": "FAIL", "exit": "EXIT", "skip": "SKIP", "info": "INFO"
+};
+
+function hlCode(raw) {
+  let h = raw;
+  h = h.replace(/("[^"]*"|'[^']*')/g, '\x01s\x02$1\x03');
+  h = h.replace(/\b(def|for|in|if|return|break|continue|and|else|elif|True|False|None|not|or|while|lambda)\b/g, '\x01k\x02$1\x03');
+  h = h.replace(/\b(len|range|int|str|list|append|pop|sorted|min|max|sum|abs|enumerate|zip|print|set|add)\b/g, '\x01f\x02$1\x03');
+  h = h.replace(/(?<![.\w"\x01\x02\x03])(-?\d+)\b/g, '\x01n\x02$1\x03');
+  h = h.replace(/(#.*$)/gm, '\x01c\x02$1\x03');
+  h = h.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  h = h.replace(/\x01([a-z])\x02/g, (_, c) => `<span class="c${c}">`).replace(/\x03/g, '</span>');
+  return h;
+}
+
+function richLog(opts) {
+  const statusMap = {
+    success: "✅ Success", fail: "❌ Failed", skip: "⏭ Skipped",
+    loop: "🔁 Loop iter", prune: "✂️ Pruned", info: "ℹ️ Info"
+  };
+  const status = opts.status || "info";
+  let html = `<div class="log-card log-card--${opts.action || 'info'}">`;
+
+  // Header
+  html += `<div class="log-card-header">`;
+  html += `<span class="log-badge log-badge--${opts.action || ''}">${LOG_BADGE[opts.action] || opts.action}</span>`;
+  html += `<span class="log-line-ref">L${opts.line + 1}</span>`;
+  html += `<span class="log-status-pill log-status--${status}">${statusMap[status]}</span>`;
+  html += `</div>`;
+
+  // Code Executing
+  if (opts.code) {
+    html += `<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">📜</span>Code Executing</div>`;
+    html += `<code class="log-code-snippet">${hlCode(opts.code)}</code></div>`;
+  }
+
+  // Input Values
+  if (opts.inputs && opts.inputs.length) {
+    html += `<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">📥</span>Input Values (line is using these)</div><div class="log-kv-row">`;
+    opts.inputs.forEach(kv => {
+      html += `<span class="log-kv log-kv--in"><span class="log-kv-key">${kv.k}</span>=<span class="log-kv-val">${kv.v}</span></span>`;
+    });
+    html += `</div></div>`;
+  }
+
+  // Output / State After Line
+  if (opts.outputs && opts.outputs.length) {
+    html += `<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">📤</span>Output / State After Line</div><div class="log-kv-row">`;
+    opts.outputs.forEach(kv => {
+      const cls = kv.changed ? 'log-kv--changed' : 'log-kv--out';
+      html += `<span class="log-kv ${cls}"><span class="log-kv-key">${kv.k}</span>=<span class="log-kv-val">${kv.v}</span></span>`;
+    });
+    html += `</div></div>`;
+  }
+
+  // Verdict / Decision
+  if (opts.verdict) {
+    const vCls = opts.verdictTrue === true ? 'log-verdict--true' : (opts.verdictTrue === false ? 'log-verdict--false' : '');
+    const vIcon = opts.verdictTrue === true ? '✓' : (opts.verdictTrue === false ? '✗' : '•');
+    html += `<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">⚖️</span>Verdict / Decision</div>`;
+    html += `<div class="log-verdict ${vCls}">${vIcon} ${opts.verdict}</div></div>`;
+  }
+
+  // Why This Happens (Hinglish)
+  if (opts.why) {
+    html += `<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">💡</span>Why This Happens</div>`;
+    html += `<div class="log-why">${opts.why}</div></div>`;
+  }
+
+  // Real-Life Analogy (Hinglish)
+  if (opts.analogy) {
+    html += `<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">🎭</span>Real-Life Analogy</div>`;
+    html += `<div class="log-analogy">${opts.analogy}</div></div>`;
+  }
+
+  html += `</div>`;
+  return html;
+}
+
+// ==================== BUILD STEPS ====================
+function buildSteps(sStr, pStr) {
+  const st = [];
+  const MAX_STEPS = 5000;
+  const s = sStr;
+  const p = pStr;
+  const m = s.length;
+  const n = p.length;
+  
+  // Initialize DP table - exactly as in the Python code
+  let dp = Array(m + 1).fill().map(() => Array(n + 1).fill(false));
+  
+  function snap(extra) {
+    const dpCopy = dp.map(row => [...row]);
+    return Object.assign({ 
+      s: s, p: p, m: m, n: n, dp: dpCopy 
+    }, extra || {});
+  }
+  
+  function pushStep(o) {
+    if (st.length >= MAX_STEPS) return;
+    st.push(Object.assign({ line: 0, action: "info", logHTML: "" }, o, snap(o)));
+  }
+  
+  // Line 0: Def
+  pushStep({
+    line: 0, action: "func-def",
+    logHTML: richLog({
+      line: 0, action: "func-def", code: "def isMatch(s, p):",
+      status: "info",
+      inputs: [{k:"s",v:`"${s}"`}, {k:"p",v:`"${p}"`}],
+      why: "<strong>Function</strong> shuru. 2D DP table se wildcard matching karenge. Har cell <code>dp[i][j]</code> decide karega ki prefix match hai ya nahi.",
+      analogy: "Do strings ko compare karna hai jaise ek pattern ko text se match karna ho — har possible pair check karna padta hai."
+    })
+  });
+  
+  // Line 1: m, n
+  pushStep({
+    line: 1, action: "init",
+    logHTML: richLog({
+      line: 1, action: "init", code: "m, n = len(s), len(p)",
+      status: "success",
+      inputs: [{k:"s",v:s}, {k:"p",v:p}],
+      outputs: [{k:"m",v:m, changed:true}, {k:"n",v:n, changed:true}],
+      why: "Table ka size decide: rows = m+1 (s ke liye + empty), cols = n+1.",
+      analogy: "Ek grid banaya jisme har possible prefix combination ke liye ek cell hai."
+    })
+  });
+  
+  // Line 2: dp init
+  pushStep({
+    line: 2, action: "init",
+    logHTML: richLog({
+      line: 2, action: "init", code: "dp = [[False] * (n + 1) for _ in range(m + 1)]",
+      status: "success",
+      outputs: [{k:"dp",v:"(m+1) x (n+1) grid of False", changed:true}],
+      why: "Saare cells False se shuru. Ab hum base cases aur rules se True set karenge.",
+      analogy: "Blank spreadsheet — ab rules laga ke sahi cells ko 'Match' mark karenge."
+    })
+  });
+  
+  // Line 3: dp[0][0] = True
+  dp[0][0] = true;
+  pushStep({
+    line: 3, action: "assign",
+    logHTML: richLog({
+      line: 3, action: "assign", code: "dp[0][0] = True",
+      status: "success",
+      outputs: [{k:"dp[0][0]",v:"True", changed:true}],
+      why: "<strong>Base case:</strong> Khali string (i=0) khali pattern (j=0) se match karti hai.",
+      analogy: "Dono taraf se kuch nahi hai — automatically match!"
+    }),
+    currI: 0, currJ: 0
+  });
+  
+  // First row: leading * handling (lines 4-6 in codeLines)
+  for (let j = 1; j <= n; j++) {
+    pushStep({
+      line: 4, action: "for-check",
+      logHTML: richLog({
+        line: 4, action: "for-check", code: `for j in range(1, ${n+1}):  # j=${j}`,
+        status: "loop",
+        inputs: [{k:"j",v:j}],
+        verdict: `True`,
+        verdictTrue: true,
+        why: "First row: empty s ke liye pattern ke leading * check kar rahe hain.",
+        analogy: "Khali text ko pattern ke shuru ke hisse se match karna — sirf * hi kar sakte hain."
+      }),
+      currI: 0, currJ: j
+    });
+    
+    if (p[j-1] === '*') {
+      pushStep({
+        line: 5, action: "if-check",
+        logHTML: richLog({
+          line: 5, action: "if-check", code: `if p[${j-1}] == '*':`,
+          status: "success",
+          inputs: [{k:"p[j-1]",v:p[j-1]}],
+          verdict: `True`,
+          verdictTrue: true,
+          why: "Leading * mila. Iska matlab empty s is * tak match kar sakti hai (agar pichla bhi * tha).",
+          analogy: "Star khali sequence ko bhi 'kha' sakta hai."
+        }),
+        currI: 0, currJ: j
+      });
+      
+      const prev = dp[0][j-1];
+      dp[0][j] = prev;
+      
+      pushStep({
+        line: 6, action: "assign",
+        logHTML: richLog({
+          line: 6, action: "assign", code: `dp[0][${j}] = dp[0][${j-1}]`,
+          status: "success",
+          inputs: [{k:"dp[0][j-1]",v:prev}],
+          outputs: [{k:`dp[0][${j}]`,v:prev, changed:true}],
+          why: `* can match zero characters, isliye previous column ka result copy.`
+        }),
+        currI: 0, currJ: j
+      });
+    } else {
+      pushStep({
+        line: 5, action: "if-check",
+        logHTML: richLog({
+          line: 5, action: "if-check", code: `if p[${j-1}] == '*':`,
+          status: "skip",
+          inputs: [{k:"p[j-1]",v:p[j-1]}],
+          verdict: `False`,
+          verdictTrue: false,
+          why: "Non-* character mila empty s ke liye → yeh prefix match nahi kar sakta.",
+          analogy: "Normal letter khali text se match nahi kar sakta."
+        }),
+        currI: 0, currJ: j
+      });
+      // dp[0][j] remains false
+    }
+  }
+  
+  // First row exit
+  pushStep({
+    line: 4, action: "exit",
+    logHTML: richLog({
+      line: 4, action: "exit", code: "first row for j exit",
+      status: "info",
+      why: "Empty s ke liye pattern ke leading * wale prefixes set ho gaye."
+    }),
+    currI: 0, currJ: n+1
+  });
+
+  // Main DP fill
+  for (let i = 1; i <= m; i++) {
+    pushStep({
+      line: 7, action: "for-check",
+      logHTML: richLog({
+        line: 7, action: "for-check", code: `for i in range(1, ${m+1}):  # i=${i}`,
+        status: "loop",
+        inputs: [{k:"i",v:i}, {k:"s[i-1]",v:s[i-1]}],
+        verdict: `True`,
+        verdictTrue: true,
+        why: `Ab s ke ${i}th character tak ke prefixes ke liye columns fill kar rahe hain.`
+      }),
+      currI: i, currJ: 0
+    });
+
+    for (let j = 1; j <= n; j++) {
+      pushStep({
+        line: 8, action: "for-check",
+        logHTML: richLog({
+          line: 8, action: "for-check", code: `for j in range(1, ${n+1}):  # j=${j}`,
+          status: "loop",
+          inputs: [{k:"j",v:j}, {k:"p[j-1]",v:p[j-1]}],
+          verdict: `True`,
+          verdictTrue: true,
+          why: `Cell dp[${i}][${j}] decide kar rahe hain.`
+        }),
+        currI: i, currJ: j
+      });
+
+      if (p[j-1] === '*') {
+        pushStep({
+          line: 9, action: "if-check",
+          logHTML: richLog({
+            line: 9, action: "if-check", code: `if p[${j-1}] == '*':`,
+            status: "success",
+            verdict: `True`,
+            verdictTrue: true,
+            why: "Star mila. * ya toh zero chars match kare (left) ya ek aur char consume kare (up).",
+            analogy: "Joker card — ignore bhi kar sakta hai ya extra letter bhi le sakta hai."
+          }),
+          currI: i, currJ: j
+        });
+
+        const leftVal = dp[i][j-1];
+        const upVal = dp[i-1][j];
+        const newVal = leftVal || upVal;
+        dp[i][j] = newVal;
+
+        pushStep({
+          line: 10, action: "assign",
+          logHTML: richLog({
+            line: 10, action: "assign", code: `dp[${i}][${j}] = dp[${i}][${j-1}] or dp[${i-1}][${j}]`,
+            status: "success",
+            inputs: [{k:"left (dp[i][j-1])",v:leftVal}, {k:"up (dp[i-1][j])",v:upVal}],
+            outputs: [{k:`dp[${i}][${j}]`,v:newVal, changed:true}],
+            verdict: `${leftVal} OR ${upVal} → ${newVal}`,
+            why: `Star ke do options: left ya up. Koi ek bhi True toh yeh bhi True.`
+          }),
+          currI: i, currJ: j,
+          sourceCells: newVal ? (leftVal ? [[i,j-1]] : [[i-1,j]]) : []
+        });
+
+      } else {
+        pushStep({
+          line: 9, action: "if-check",
+          logHTML: richLog({
+            line: 9, action: "if-check", code: `if p[${j-1}] == '*':`,
+            status: "skip",
+            verdict: `False`,
+            verdictTrue: false,
+            why: "Star nahi. Normal character ya ? check karna hoga."
+          }),
+          currI: i, currJ: j
+        });
+
+        const charMatch = (p[j-1] === '?' || p[j-1] === s[i-1]);
+        pushStep({
+          line: 11, action: "if-check",
+          logHTML: richLog({
+            line: 11, action: "if-check", code: `elif p[${j-1}] == '?' or p[${j-1}] == s[${i-1}]:`,
+            status: charMatch ? "success" : "skip",
+            inputs: [{k:"p char",v:p[j-1]}, {k:"s char",v:s[i-1]}],
+            verdict: charMatch ? "True (match)" : "False (no match)",
+            verdictTrue: charMatch,
+            why: charMatch ? "Current chars match (ya ? ne cover kar liya)." : "Chars alag hain."
+          }),
+          currI: i, currJ: j
+        });
+
+        if (charMatch) {
+          const diagVal = dp[i-1][j-1];
+          dp[i][j] = diagVal;
+
+          pushStep({
+            line: 12, action: "assign",
+            logHTML: richLog({
+              line: 12, action: "assign", code: `dp[${i}][${j}] = dp[${i-1}][${j-1}]`,
+              status: "success",
+              inputs: [{k:"diag",v:diagVal}],
+              outputs: [{k:`dp[${i}][${j}]`,v:diagVal, changed:true}],
+              why: "Previous prefix match tha + current char match → yeh bhi match."
+            }),
+            currI: i, currJ: j,
+            sourceCells: [[i-1, j-1]]
+          });
+        } else {
+          // remains false, we still log the decision
+          pushStep({
+            line: 11, action: "if-check",
+            logHTML: richLog({
+              line: 11, action: "if-check", code: `elif ...`,
+              status: "skip",
+              verdict: `False`,
+              verdictTrue: false,
+              why: "No character match. Cell False rahega."
+            }),
+            currI: i, currJ: j
+          });
+        }
+      }
+    }
+
+    // inner for exit
+    pushStep({
+      line: 8, action: "exit",
+      logHTML: richLog({
+        line: 8, action: "exit", code: "inner for j exit",
+        status: "info",
+        why: `Row ${i} ka DP fill complete.`
+      }),
+      currI: i, currJ: n+1
+    });
+  }
+
+  // outer for exit
+  pushStep({
+    line: 7, action: "exit",
+    logHTML: richLog({
+      line: 7, action: "exit", code: "outer for i exit",
+      status: "info",
+      why: "Saare rows fill ho gayi."
+    }),
+    currI: m+1, currJ: n+1
+  });
+
+  // return
+  const finalRes = dp[m][n];
+  pushStep({
+    line: 13, action: "return",
+    logHTML: richLog({
+      line: 13, action: "return", code: `return dp[${m}][${n}]`,
+      status: "success",
+      inputs: [{k:`dp[${m}][${n}]`,v:finalRes}],
+      outputs: [{k:"result",v:finalRes, changed:true}],
+      why: `Final result: <strong>${finalRes}</strong>. Bottom-right cell hi decide karta hai ki pura match hua ya nahi.`
+    }),
+    currI: m, currJ: n
+  });
+
+  curResult = finalRes;
+  return st;
+}
+
+// ==================== RENDER FUNCTIONS ====================
+function renderCode() {
+  const panel = document.getElementById('codePanel');
+  panel.innerHTML = codeLines.map((raw, i) => {
+    let h = raw;
+    h = h.replace(/("[^"]*"|'[^']*')/g, '\x01STR\x02$1\x03');
+    h = h.replace(/\b(def|for|in|if|return|break|continue|and|else|elif|True|False|None|not|or|while|lambda)\b/g, '\x01KW\x02$1\x03');
+    h = h.replace(/\b(len|range|int|str|list|append|pop|sorted|min|max|sum|abs|enumerate|zip|print|set|add)\b/g, '\x01FN\x02$1\x03');
+    h = h.replace(/(?<![.\w"\x01\x02\x03])(-?\d+)\b/g, '\x01NUM\x02$1\x03');
+    h = h.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    h = h.replace(/\x01([A-Z]+)\x02/g, function(_, c) { return '<span class="' + c.toLowerCase() + '">'; }).replace(/\x03/g, '</span>');
+    return `<div class="code-line" data-line="${i}"><span class="ln">${i+1}</span><span class="code-content">${h}</span></div>`;
+  }).join('');
+}
+
+function fitCodeWidth() {
+  const col = document.getElementById('col1');
+  if (!codeWidthUserSet) {
+    col.style.width = Math.min(col.offsetWidth, window.innerWidth * 0.42) + 'px';
+  }
+  syncFooterWidth();
+  positionResizeHandle();
+}
+
+function syncFooterWidth() {
+  document.getElementById('footerLeft').style.width = document.getElementById('col1').offsetWidth + 'px';
+}
+
+function positionResizeHandle() {
+  var col1 = document.getElementById('col1');
+  var h = document.getElementById('resizeH1');
+  if (col1 && h) {
+    h.style.left = (col1.offsetWidth - 3) + 'px';
+  }
+}
+
+// Resize handle
+(function() {
+  var col1 = document.getElementById('col1');
+  var h = document.getElementById('resizeH1');
+  if (!col1 || !h) return;
+  positionResizeHandle();
+  h.addEventListener('mousedown', function(e) {
+    e.preventDefault();
+    codeWidthUserSet = true;
+    var startX = e.clientX, startW = col1.offsetWidth;
+    document.body.classList.add('no-select');
+    h.classList.add('active');
+    function mv(ev) {
+      var newW = Math.max(140, Math.min(520, startW + (ev.clientX - startX)));
+      col1.style.width = newW + 'px';
+      syncFooterWidth();
+      positionResizeHandle();
+    }
+    function up() {
+      document.removeEventListener('mousemove', mv);
+      document.removeEventListener('mouseup', up);
+      document.body.classList.remove('no-select');
+      h.classList.remove('active');
+    }
+    document.addEventListener('mousemove', mv);
+    document.addEventListener('mouseup', up);
+  });
+})();
+
+function renderVarsStrip(snap) {
+  const el = document.getElementById('varsStrip');
+  const i = (snap.currI != null ? snap.currI : '-');
+  const j = (snap.currJ != null ? snap.currJ : '-');
+  const si = (snap.currI > 0 && snap.s) ? snap.s[snap.currI-1] : '-';
+  const pj = (snap.currJ > 0 && snap.p) ? snap.p[snap.currJ-1] : '-';
+  el.innerHTML = `
+    <span class="var-chip">m=<strong>${snap.m}</strong></span>
+    <span class="var-chip">n=<strong>${snap.n}</strong></span>
+    <span class="var-chip vc-active">i=<strong>${i}</strong> (s[${i-1} or '-']='${si}')</span>
+    <span class="var-chip vc-active">j=<strong>${j}</strong> (p[${j-1} or '-']='${pj}')</span>
+  `;
+}
+
+function renderStrings(snap) {
+  const sEl = document.getElementById('stringS');
+  const pEl = document.getElementById('stringP');
+  sEl.innerHTML = '';
+  pEl.innerHTML = '';
+  
+  // S
+  for(let i=0; i<snap.m; i++) {
+    const div = document.createElement('div');
+    div.className = 'char-box' + (i+1 === snap.currI ? ' active' : '');
+    div.textContent = snap.s[i];
+    sEl.appendChild(div);
+  }
+  // P
+  for(let j=0; j<snap.n; j++) {
+    const div = document.createElement('div');
+    div.className = 'char-box' + (j+1 === snap.currJ ? ' active' : '');
+    div.textContent = snap.p[j];
+    pEl.appendChild(div);
+  }
+}
+
+function renderDPGrid(snap) {
+  const grid = document.getElementById('dpGrid');
+  const svg = document.getElementById('flowSvg');
+  grid.innerHTML = '';
+  svg.innerHTML = '';
+  svg.style.display = 'none';
+
+  const m = snap.m;
+  const n = snap.n;
+  const dp = snap.dp;
+  
+  // Cell dimensions for SVG calculation (match CSS)
+  const CELL = 54;  // slightly larger for better i,j + value space
+  const GAP = 3;
+  const PAD = 16;  // match .dp-container padding and .flow-svg top/left
+
+  // Make grid a bit more visible
+  grid.style.background = '#0b1120';
+  grid.style.padding = '4px';
+  grid.style.borderRadius = '6px';
+  
+  // Set grid template - make header column fixed width too for perfect alignment
+  grid.style.gridTemplateColumns = `${CELL}px repeat(${n+1}, ${CELL}px)`;
+  
+  // Helper to get center coordinates.
+  // Account for header row (top) and header col (left) which are both CELL wide now.
+  // dataI/dataJ are 0-based for the actual dp table (0,0 is top-left data cell under ∅∅)
+  function cx(dataJ) {
+    const gridCol = dataJ + 1; // skip left header column
+    return PAD + gridCol * (CELL + GAP) + CELL / 2;
+  }
+  function cy(dataI) {
+    const gridRow = dataI + 1; // skip top header row
+    return PAD + gridRow * (CELL + GAP) + CELL / 2;
+  }
+
+  // Render Headers
+  // Top-Left Corner
+  const corner = document.createElement('div');
+  corner.className = 'dp-cell header-row';
+  corner.textContent = 'dp';
+  grid.appendChild(corner);
+
+  // Top Header (Pattern)
+  for(let j=0; j<=n; j++) {
+    const div = document.createElement('div');
+    div.className = 'dp-cell header-row';
+    div.textContent = j===0 ? '∅' : snap.p[j-1];
+    grid.appendChild(div);
+  }
+
+  // Rows
+  for(let i=0; i<=m; i++) {
+    // Left Header (String)
+    const hDiv = document.createElement('div');
+    hDiv.className = 'dp-cell header-col';
+    hDiv.textContent = i===0 ? '∅' : snap.s[i-1];
+    grid.appendChild(hDiv);
+
+    // Cells
+    for(let j=0; j<=n; j++) {
+      const div = document.createElement('div');
+      div.className = 'dp-cell';
+
+      // Small index i,j in top-left
+      const idxSpan = document.createElement('span');
+      idxSpan.className = 'dp-idx';
+      idxSpan.textContent = `${i},${j}`;
+
+      const valSpan = document.createElement('span');
+      valSpan.className = 'dp-val';
+      valSpan.textContent = dp[i][j] ? 'T' : 'F';
+
+      div.appendChild(idxSpan);
+      div.appendChild(valSpan);
+      
+      if (dp[i][j]) div.classList.add('dp-cell--true');
+      else div.classList.add('dp-cell--false');
+
+      // Highlight Current
+      if (i === snap.currI && j === snap.currJ) {
+        div.classList.add('dp-cell--current');
+      }
+
+      // Highlight the source cells for the current decision (when this step is calculating curr cell)
+      if (snap.currI !== null && snap.currJ !== null && snap.sourceCells && snap.sourceCells.length > 0) {
+        snap.sourceCells.forEach(src => {
+          if (i === src[0] && j === src[1]) {
+            div.classList.add('dp-cell--source');
+          }
+        });
+      }
+
+      grid.appendChild(div);
+    }
+  }
+
+  // Draw Arrows if we have source cells and a current cell
+  if (snap.currI !== null && snap.currJ !== null && snap.sourceCells && snap.sourceCells.length > 0) {
+    svg.style.display = 'block';
+    // Full grid size including header row + header col
+    const totalW = (n + 2) * (CELL + GAP) + PAD;
+    const totalH = (m + 2) * (CELL + GAP) + PAD;
+    svg.setAttribute('width', totalW);
+    svg.setAttribute('height', totalH);
+    svg.setAttribute('viewBox', `0 0 ${totalW} ${totalH}`);
+
+    // Defs for markers
+    const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+    defs.innerHTML = `
+      <marker id="ah-amber" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#f59e0b"/></marker>
+      <marker id="ah-purple" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#8b5cf6"/></marker>
+    `;
+    svg.appendChild(defs);
+
+    const targetX = cx(snap.currJ);
+    const targetY = cy(snap.currI);
+
+    snap.sourceCells.forEach(src => {
+      const srcX = cx(src[1]);
+      const srcY = cy(src[0]);
+      
+      // Determine type
+      // left (same row) or up (same col) for *  →  amber solid "current"
+      // diagonal (both differ) for char/? match → purple dashed
+      const isDiag = (src[0] !== snap.currI && src[1] !== snap.currJ);
+      const cls = isDiag ? 'flow-line flow-line--diag' : 'flow-line flow-line--current';
+      const marker = isDiag ? 'ah-purple' : 'ah-amber';
+
+      // Shorten line so arrowhead doesn't overlap cell border
+      const dx = targetX - srcX;
+      const dy = targetY - srcY;
+      const len = Math.sqrt(dx*dx + dy*dy);
+      const shrink = 14;  // tuned for 54px cells
+      const ux = dx/len;
+      const uy = dy/len;
+      
+      const sx1 = srcX + ux*shrink;
+      const sy1 = srcY + uy*shrink;
+      const sx2 = targetX - ux*shrink;
+      const sy2 = targetY - uy*shrink;
+
+      const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+      line.setAttribute('x1', sx1);
+      line.setAttribute('y1', sy1);
+      line.setAttribute('x2', sx2);
+      line.setAttribute('y2', sy2);
+      line.setAttribute('class', cls);
+      line.setAttribute('marker-end', `url(#${marker})`);
+      
+      svg.appendChild(line);
+    });
+  }
+}
+
+function renderViz(snap) {
+  renderVarsStrip(snap);
+  renderStrings(snap);
+  renderCurrentDecision(snap);
+  renderDPGrid(snap);
+}
+
+function renderCurrentDecision(snap) {
+  const el = document.getElementById('currentDecision');
+  if (!el) return;
+
+  const i = snap.currI ?? '-';
+  const j = snap.currJ ?? '-';
+  const si = (i > 0 && snap.s) ? snap.s[i-1] : '∅';
+  const pj = (j > 0 && snap.p) ? snap.p[j-1] : '∅';
+
+  let content = `
+    <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+      <div>
+        <div style="font-size:10px; color:var(--text-tertiary); margin-bottom:2px;">Current Cell</div>
+        <div style="font-family:var(--font-mono); font-size:15px; font-weight:700; color:var(--accent-amber);">dp[${i}][${j}]</div>
+      </div>
+      <div style="font-size:12px; line-height:1.3; color:#64748b;">
+        s[${i-1 || '-'}] = <strong style="color:#e2e8f0;">'${si}'</strong><br>
+        p[${j-1 || '-'}] = <strong style="color:#e2e8f0;">'${pj}'</strong>
+      </div>
+  `;
+
+  if (snap.action === 'assign') {
+    const rule = (pj === '*') ? '★ Star: left (zero chars) OR up (one more char)' : '→ Match: take diagonal (previous prefix + this char)';
+    content += `<div style="flex:1; min-width:180px; font-size:12px; background:#1e293b; padding:6px 10px; border-radius:6px; border-left:3px solid #f59e0b;"><strong>Rule:</strong> ${rule}</div>`;
+  } else if (snap.action === 'return') {
+    const res = snap.dp ? (snap.dp[snap.m] ? snap.dp[snap.m][snap.n] : null) : null;
+    content += `<div style="flex:1; font-size:13px; font-weight:700; color:${res ? '#86efac' : '#f87171'}; background:#1e293b; padding:4px 10px; border-radius:6px;">Final Result: <strong>${res ? 'TRUE ✓' : 'FALSE ✗'}</strong> — Full match!</div>`;
+  } else if (snap.action && snap.action.includes('if')) {
+    content += `<div style="flex:1; font-size:12px; color:#94a3b8;">Evaluating <code style="background:#334155; padding:1px 4px; border-radius:3px;">${pj === '*' ? 'if p[j-1] == "*"' : 'elif match or ?'}</code></div>`;
+  } else {
+    content += `<div style="flex:1; font-size:12px; color:#64748b;">Processing dp cell...</div>`;
+  }
+
+  content += `</div>`;
+  el.innerHTML = content;
+}
+
+function showLogPreview(s) {
+  if (!logEnabled) return;
+  const body = document.getElementById('logPopupBody');
+  body.innerHTML = s.logHTML || '';
+  document.getElementById('logPopup').classList.remove('log-popup--hidden');
+  updateLogZoom();
+}
+
+function hideLogPopup() {
+  document.getElementById('logPopup').classList.add('log-popup--hidden');
+}
+
+function renderStep(idx) {
+  if (!steps.length) return;
+  const s = steps[idx];
+  currentStep = idx;
+  
+  document.getElementById('stepInfo').textContent = `${idx + 1}/${steps.length}`;
+  
+  const badge = document.getElementById('actionBadge');
+  badge.textContent = BADGE_LABEL[s.action] || s.action;
+  badge.className = `action-badge action-badge--${s.action}`;
+  
+  // highlight active code line
+  document.querySelectorAll('.code-line').forEach(el => el.classList.remove('active'));
+  const activeLine = document.querySelector(`.code-line[data-line="${s.line}"]`);
+  if (activeLine) {
+    activeLine.classList.add('active');
+    activeLine.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+  }
+  
+  renderViz(s);
+  showLogPreview(s);
+}
+
+// ==================== CONTROLS ====================
+function stepBy(delta) {
+  const next = Math.max(0, Math.min(steps.length - 1, currentStep + delta));
+  renderStep(next);
+}
+
+function resetStep() {
+  renderStep(0);
+}
+
+function toggleLogPreview() {
+  logEnabled = !logEnabled;
+  const btn = document.getElementById('logToggleBtn');
+  btn.textContent = logEnabled ? '📋 ON' : '📋 OFF';
+  btn.classList.toggle('log-toggle-btn--off', !logEnabled);
+  if (!logEnabled) hideLogPopup();
+  else if (steps.length) showLogPreview(steps[currentStep]);
+}
+
+function logZoom(dir) {
+  logZoomLevel = Math.max(60, Math.min(180, logZoomLevel + dir * 20));
+  updateLogZoom();
+}
+function logZoomReset() { logZoomLevel = 100; updateLogZoom(); }
+function updateLogZoom() {
+  document.getElementById('logZoomLabel').textContent = logZoomLevel + '%';
+  document.getElementById('logPopup').style.setProperty('--log-scale', logZoomLevel / 100);
+}
+
+function toggleFullscreen() {
+  const viz = document.querySelector('.col-viz');
+  if (!document.fullscreenElement) {
+    viz.requestFullscreen().catch(() => {});
+  } else {
+    document.exitFullscreen();
+  }
+}
+
+function toggleProblem() {
+  const body = document.getElementById('probBody');
+  const btn = document.getElementById('probToggleBtn');
+  if (body.style.display === 'none') {
+    body.style.display = 'flex';
+    btn.textContent = '▲ Hide';
+  } else {
+    body.style.display = 'none';
+    btn.textContent = '▼ Show';
+  }
+}
+
+// ==================== INPUT HANDLING ====================
+function parseInputs() {
+  const s = document.getElementById('inputS').value.trim();
+  const p = document.getElementById('inputP').value.trim();
+  return { s, p };
+}
+
+function resetWithInput() {
+  const { s, p } = parseInputs();
+  if (!s && !p) {
+    alert("Please enter s and p");
+    return;
+  }
+  
+  renderCode();
+  fitCodeWidth();
+  
+  steps = buildSteps(s, p);
+  currentStep = 0;
+  renderStep(0);
+  
+  const out = document.getElementById('liveOutput');
+  out.textContent = (curResult !== null) ? curResult : '—';
+  out.style.background = curResult ? 'var(--accent-green-bg)' : 'var(--accent-red-bg)';
+  out.style.color = curResult ? 'var(--accent-green-text)' : 'var(--accent-red-text)';
+}
+
+function loadTest(caseNum) {
+  const tests = [
+    { s: "adceb", p: "*a*b", exp: "true" },
+    { s: "acdcb", p: "a*c?b", exp: "false" },
+    { s: "", p: "*", exp: "true" },
+    { s: "aa", p: "a", exp: "false" },
+    { s: "aa", p: "*", exp: "true" }
+  ];
+  const t = tests[caseNum];
+  document.getElementById('inputS').value = t.s;
+  document.getElementById('inputP').value = t.p;
+  document.getElementById('expectedBadge').textContent = `exp: ${t.exp}`;
+  
+  setTimeout(() => {
+    resetWithInput();
+  }, 80);
+}
+
+// ==================== KEYBOARD ====================
+document.addEventListener('keydown', function(e) {
+  if (e.target.tagName === 'INPUT') return;
+  if (e.key === 'ArrowRight') { e.preventDefault(); stepBy(1); }
+  else if (e.key === 'ArrowLeft') { e.preventDefault(); stepBy(-1); }
+  else if (e.key.toLowerCase() === 'r') { e.preventDefault(); resetStep(); }
+});
+
+// ==================== INIT ====================
+function init() {
+  renderCode();
+  
+  const defaultS = "adceb";
+  const defaultP = "*a*b";
+  document.getElementById('inputS').value = defaultS;
+  document.getElementById('inputP').value = defaultP;
+  document.getElementById('expectedBadge').textContent = 'exp: true';
+  
+  steps = buildSteps(defaultS, defaultP);
+  currentStep = 0;
+  renderStep(0);
+  
+  const out = document.getElementById('liveOutput');
+  out.textContent = (curResult !== null) ? curResult : '—';
+  out.style.background = curResult ? 'var(--accent-green-bg)' : 'var(--accent-red-bg)';
+  out.style.color = curResult ? 'var(--accent-green-text)' : 'var(--accent-red-text)';
+  
+  fitCodeWidth();
+  syncFooterWidth();
+  positionResizeHandle();
+  
+  window.addEventListener('resize', () => {
+    if (!codeWidthUserSet) fitCodeWidth();
+    else {
+      syncFooterWidth();
+      positionResizeHandle();
+    }
+  });
+  
+  document.querySelectorAll('.test-chip').forEach((chip, idx) => {
+    chip.addEventListener('click', () => {
+      document.querySelectorAll('.test-chip').forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+    });
+  });
+}
+
+window.onload = init;
+</script>
+</body>
+</html>
