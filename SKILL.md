@@ -1,8 +1,8 @@
 ---
 name: dsa-dryrun-visualizer
 description: Build a single self-contained HTML file that interactively dry-runs ANY DSA problem step-by-step with Hinglish (Hindi+English) teacher-voice explanations. PRIMARY TRIGGER is the slash command `/dsa-dryrun-visualizer`. The visualizer shows EVERY code line's EVERY execution with Hinglish logs explaining WHY each step happens AND a real-life analogy. Produces a clean 4-section HTML (problem | code | visualization | log preview) with step controls.
-version: 2.3
-last_updated: 2026-06-07
+version: 2.5
+last_updated: 2026-06-13
 ---
 
 # DSA Dry-Run HTML Visualizer — The Definitive Skill
@@ -413,7 +413,7 @@ Left column (1/3 width). Syntax-highlighted with active line tracking.
 | **V6** | Multiple viz-cards side by side (`.viz-row` flex layout) |
 | **V7** | Stack/Queue/Set as proper visual containers (column-reverse, chips, empty states) |
 | **V8** | Footer-left syncs with code column width (init + drag + window resize) |
-| **V9** | Grid/Matrix problems MUST have SVG flow-arrow overlay inside the grid showing traversal path |
+| **V9** | Grid/Matrix problems MUST have SVG flow-arrow overlay (traversal path **or** DP recurrence/dependency arrows for current cell) |
 
 ### Visual design — state color system
 
@@ -636,6 +636,44 @@ visitedSet.push([r, c]);
 
 ---
 
+## 🔹 DP Table Recurrence / Dependency Arrows (new pattern — lc72 reference)
+
+For **DP problems on grids/tables** (edit distance, LCS, 2D knapsack, matrix chain, etc.) the visualization should overlay **recurrence arrows** that make the "why this value?" decision visible for the current cell.
+
+### Core idea
+- When a cell becomes "current" (`hiI`, `hiJ`), draw arrows **from its 3 (or N) possible predecessors** according to the recurrence.
+- **Small & compact arrows** (marker 5–6 units) so they never overpower the numbers in the cells.
+- **Dashed yellow/orange** (subtle) = the candidate sources (all legal previous cells).
+- **Solid green + soft halo** (prominent) = the actual chosen / min predecessor.
+- Always computed **live from `snap.dp`** + current cell coordinates → works perfectly even when viewing the fully filled table on the final return step.
+
+### Small arrow + visibility best practices (lc72)
+- Use very small, clean markers:
+  ```html
+  <!-- subtle chevron for candidates -->
+  <marker id="ah-cand" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="5" markerHeight="5">
+    <path d="M1,1 L7,4 L1,7" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round"/>
+  </marker>
+  <!-- compact filled + outline for chosen -->
+  <marker id="ah-chosen" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6">
+    <path d="M1,1.5 L8,5 L1,8.5 L2.5,5 Z" fill="#22c55e" stroke="#166534" stroke-width="1.2"/>
+  </marker>
+  ```
+- Line weights kept deliberately small (candidates ~2–2.5px dashed, chosen ~4px solid).
+- For the chosen arrow, prepend a **soft halo** (slightly thicker, low-opacity same path, no marker) — gives excellent visual pop and emphasis.
+- **Critical visibility rules**:
+  - `s += candLines + chosenHalo + chosenLine;` (candidates first, chosen last in SVG DOM).
+  - `.flow-svg { z-index: 100; }` (much higher than any `.current` z-index:5 or `.win`).
+  - `shrink = 12` (tighter than traversal arrows) so the small head sits cleanly near the target cell.
+- Dark high-contrast container (`#0f172a`) + subtle inner frame.
+- Always provide an integrated caption right under the grid (highly recommended):
+  > Small arrows: dashed = 3 candidate predecessors, green + halo = chosen min cost source
+
+### When to apply
+Use this pattern for any 2D DP whose recurrence has a small fixed number of sources (up/left/diag, above/left, etc.). It is one of the most powerful ways to make the DP recurrence "click" for learners.
+
+---
+
 ## 🔹 LOG PREVIEW — Floating Popup (bottom-right corner)
 
 Floating card at right corner of viz area. **NO toolbar inside popup** — controls in footer.
@@ -652,7 +690,7 @@ Floating card at right corner of viz area. **NO toolbar inside popup** — contr
 .log-popup {
   --log-scale: 1;
   position: fixed; bottom: 52px; right: 14px;
-  width: calc(480px * var(--log-scale));
+  width: 480px;   /* base; visual size via transform */
   max-width: 92vw; max-height: 75vh;
   border-radius: var(--radius-lg);
   box-shadow: 0 10px 32px rgba(0,0,0,.14);
@@ -662,17 +700,19 @@ Floating card at right corner of viz area. **NO toolbar inside popup** — contr
   display: flex; flex-direction: column;
   z-index: 100;
   transition: opacity .15s, transform .15s;
+  transform: scale(var(--log-scale));
   transform-origin: bottom right;
 }
-.log-popup--hidden { opacity: 0; transform: scale(.92); pointer-events: none; }
-.log-popup-body { flex: 1; overflow: auto; padding: 0 }
+.log-popup--hidden { opacity: 0; pointer-events: none; }
+.log-popup-body { flex: 1; overflow: auto; padding: 0; width: 100%; }
 .log-popup-body > .log-card { border-radius: 0; border: none; border-left: 0 }
 ```
 
-- [ ] Width **480px** default (wider than v1's 420px to fit 6 sections)
+- [ ] Width **480px** default (wider than v1's 420px to fit 6 sections); visual size (width + height + all content) controlled via `transform: scale(var(--log-scale))` on `.log-popup` with `transform-origin: bottom right`
 - [ ] Max-height **75vh** (taller than v1's 65vh)
 - [ ] NO padding on body (sections have their own)
-- [ ] Zoom via `--log-scale` CSS variable (60%–180%)
+- [ ] Zoom via `--log-scale` CSS variable (60%–180%, 20% steps). Buttons in footer use `.btn-zoom` class for − / + / ↺, `.log-zoom-label` for the % span. Full visual scaling of box + fonts + "and so on" via the transform (internal elements can use `calc(XXpx * var(--log-scale))` for fonts if needed). Call `updateLogZoom()` inside `showLogPreview()`.
+- [ ] Fullscreen (`⛶`) button uses `.btn btn-fullscreen` class and targets `.col-viz` for `requestFullscreen` / `exitFullscreen`
 
 ---
 
@@ -1053,6 +1093,7 @@ function showLogPreview(s) {
   if (!logEnabled) return;
   document.getElementById('logPopupBody').innerHTML = s.logHTML || '';
   document.getElementById('logPopup').classList.remove('log-popup--hidden');
+  updateLogZoom();   // re-apply current --log-scale (fonts + full box transform)
 }
 ```
 
@@ -1140,6 +1181,12 @@ function toggleFullscreen() {
   else document.exitFullscreen();
 }
 ```
+
+**Important for full scaling effect (width + height + font size + all content):**
+- Footer zoom buttons use `.btn-zoom` (for − + ↺) and `.log-zoom-label` (for the % span).
+- Fullscreen uses `.btn btn-fullscreen`.
+- `showLogPreview` must call `updateLogZoom()` to re-apply the scale.
+- On `.log-popup` use `transform: scale(var(--log-scale)); transform-origin: bottom right;` (plus base width/height) so the whole popup visually grows/shrinks uniformly from its bottom-right anchor. This makes width, height, fonts, paddings, cards etc. all increase/decrease together. The label shows the current % (60–180).
 
 
 ---
@@ -1298,11 +1345,11 @@ Every `why` and `analogy` field MUST be in conversational Hinglish.
 
 ### ✅ Good examples
 
-> **why:** "Base case HIT! Saari digits consume ho gayi. Ab check karna hai ki current expression target ke barabar evaluate hua ya nahi."
+> **why:** "<strong>Base case</strong> HIT! Saari digits <strong>consume</strong> ho gayi. Ab check karna hai ki current <code>expression</code> <code>target</code> ke barabar evaluate hua ya nahi."
 >
 > **analogy:** "Jaise cricket match mein last ball pe required runs ban gaye — match jeet liya, board pe naam likho!"
 
-> **why:** "Leading zero detected! Multi-digit operand jo '0' se start hota hai (jaise '01', '012') invalid hai. Loop break karenge."
+> **why:** "<strong>Leading zero</strong> detected! Multi-digit operand jo '0' se start hota hai (jaise '01', '012') invalid hai. <strong>Loop break</strong> karenge."
 >
 > **analogy:** "Bank cheque pe '0123' likhna invalid hai — leading zero allowed nahi. Cheque reject!"
 
@@ -1323,6 +1370,12 @@ Every `why` and `analogy` field MUST be in conversational Hinglish.
 | Emojis sparingly | 1–2 per section, semantic only (🎉 for found, ✂️ for prune) |
 | Concise but complete | 1–3 sentences per section |
 | Conversational tone | "Dekho", "Socho", "Jaise", "Bilkul", "Toh ab..." |
+
+### Log-specific rules
+
+- Keep `why` and `analogy` explanations concise (short, tight 1-2 sentences) but always complete — every decision and formula must be explained.
+- **Every important word, logic step, and formula is highlighted:** Wrap key concepts and operations in `<strong>` (e.g. <strong>base case</strong>, <strong>recurrence</strong>, <strong>minimum operations</strong>, <strong>insert / delete / replace</strong>) and use `<code>` for every formula, cell, variable and math expression (e.g. <code>dp[i][j]</code>, <code>1 + min(...)</code>, <code>i-1, j</code>, <code>prefix</code>). This is now mandatory in all richLog why + analogy content for scannability and teaching value (refined from lc72).
+- See lc72-edit-distance.html as the reference: every log uses bold + code markup even in the shortened explanations.
 
 ### Hinglish vocabulary cheat-sheet
 
@@ -1360,6 +1413,10 @@ Every `why` and `analogy` field MUST be in conversational Hinglish.
 - [ ] Body left: problem statement + approach + core concepts + base case + complexity
 - [ ] Body left: NO code logic, NO pseudocode
 - [ ] Body right: 3–5 test case chips with full input + pt-tag + expected
+- [ ] **Strict two-row test chips** (follow lc239/lc691 exactly per SKILL): 
+  - Top row: `.pt-tag` + **descriptive label** (e.g. "Standard", "Impossible") + `.tc-exp` ("exp: 3" or "exp: -1")
+  - Bottom row: `.tc-vals` showing the **actual input values** as `<code>` pills (e.g. `stickers=[...]` and `target="..."` or raw array). 
+  - Never put the expected value as the middle label. Always show real values. lc239 is the reference.
 - [ ] **🔴 Test chips MUST show ACTUAL parameter values** — never abstract labels like `"mixed"`, `"all valid"` — always show real values (e.g. `lines=["987-123-4567", "123 456 7890"]`) so the user knows exactly what data is being tested
 - [ ] Body right: live output + ▶ Run button
 - [ ] `loadTest()` fills ALL inputs + expected badge + runs
@@ -1382,7 +1439,13 @@ Every `why` and `analogy` field MUST be in conversational Hinglish.
 - [ ] Multiple viz-cards in `.viz-row` flex layout (V6)
 - [ ] Stack/Queue/Set as proper visual containers (V7)
 - [ ] Footer-left syncs with code column width (V8)
-- [ ] Grid/Matrix problems: SVG flow-arrow overlay with 3-color arrows + legend (V9)
+- [ ] Grid/Matrix problems: SVG flow-arrow overlay (traversal or DP recurrence arrows) with clear candidate vs chosen distinction + legend/caption (V9)
+- [ ] **UI Layout & 750px constraint (lc239/lc691)**: All visualization sections wrapped in `.viz-wrap { max-width:750px }` + `.vars-strip { max-width:750px }`. Use stacked `.viz-sec` for each logical part. No overflow.
+- [ ] **UI Layout & Width (lc239/lc691 canonical)**: Wrap visualization content in `.viz-wrap {width:100%; max-width:750px}`. Apply `max-width:750px` to `.vars-strip`. Use `.viz-sec` (with `.viz-sec-head`) for **each logical section**, stacked vertically inside the wrap (no side-by-side cramping at 750px). All sections must stay contained with no horizontal overflow. lc239 is the reference for this pattern.
+- [ ] **Output section heading + no pre-show final result (lc239/lc691 canonical)**: Heading inside `.viz-sec-head` for the output area must be plain text **without any green tick ✅ emoji** — e.g. exactly `Output (Max of each window)` or `Output (Min Stickers)`. Never use "✅ Output", "✅ Final Result", or tick-prefixed headings (this was explicitly removed per user feedback). 
+  For the actual result value: when the final answer (scalar or list) is only known after full run, show placeholder in the detailed viz output card until the *very last step*:
+  `Waiting for full computation to complete… Step ▶ to the end`
+  Reveal the real result display (cards/chips) **only** when `currentStep === steps.length - 1`. The small liveOutput summary bar above Run may update early, but the main viz Output panel must stay placeholder until end. lc239 (progressive) + lc691 (scalar final) are the references. Never pre-show final answer in the Output viz section.
 - [ ] State colors: active=indigo, done=green, visiting=amber, failed=red, future=grey
 - [ ] CSS animations: `pulse-node`, `shake`, `win-pulse`
 - [ ] Result banner when complete
@@ -1401,6 +1464,7 @@ Every `why` and `analogy` field MUST be in conversational Hinglish.
 - [ ] Status pill matches step type (success/fail/skip/loop/prune/info)
 - [ ] All `why` and `analogy` text in Hinglish (NEVER pure English)
 - [ ] Bold key terms with `<strong>`, code with `<code>`
+- [ ] **Every important word, logic step, and formula** in why + analogy is wrapped: `<strong>concept / logic</strong>` (bold + highlight) and `<code>formula / dp[i][j]</code>` (for all cells, math, key expressions) — this is now mandatory for scannability and teaching value (refined from lc72)
 
 ### Log Preview popup
 
@@ -1409,16 +1473,20 @@ Every `why` and `analogy` field MUST be in conversational Hinglish.
 - [ ] Max-height 75vh
 - [ ] NO toolbar in popup — controls in footer only
 - [ ] Shows ONLY current step's card
-- [ ] Zoom via `--log-scale` (60%–180%, 20% steps)
+- [ ] Zoom via `--log-scale` (60%–180%, 20% steps). **Use `transform: scale(var(--log-scale)); transform-origin: bottom right;` on `.log-popup`** (base width/height) so the **entire popup box + width + height + font size + all internal content ("and so on") scale uniformly** together from the bottom-right corner. Footer zoom buttons must use `.btn-zoom` class (for − / + / ↺) and `.log-zoom-label` class on the percentage `<span>`. Fullscreen button uses `.btn btn-fullscreen`. Always call `updateLogZoom()` inside `showLogPreview()` to re-apply the scale when a new log appears.
 - [ ] `.log-popup--hidden` for opacity+scale transition
+- [ ] Fullscreen (`⛶`) uses `.btn btn-fullscreen` and targets `.col-viz` for request/exitFullscreen
+- [ ] (lc72 is the reference implementation for correct log-preview zoom behavior.)
 
 ### Footer Bar
 
 - [ ] Split layout: left 1/3 (under code) + right 2/3 (under viz)
 - [ ] Left: step counter + action badge
 - [ ] Right (in order): kbd hints + ↺ + ◀ + ▶ Next + sep + 📋 ON/OFF + − + 100% + + + ↺ + sep + ⛶
+- [ ] Log zoom controls (− / + / ↺) use `.btn-zoom` class; the percentage uses `.log-zoom-label` class. Fullscreen (⛶) uses `.btn btn-fullscreen` class.
 - [ ] All buttons `type="button"`
 - [ ] ❌ NO Play, NO speed selector, NO progress bar
+- [ ] (See Log Preview popup section for full zoom implementation details using --log-scale + transform.)
 
 ### Theme
 
@@ -1564,11 +1632,16 @@ Every `why` and `analogy` field MUST be in conversational Hinglish.
 |---|---|---|
 | 42 | Trapping Rain Water | Two pointers, water-area shaded regions, height array |
 | 130 | Surrounded Regions | DFS iterative stack, board grid + stack + safe set viz-row |
+| 239 | Sliding Window Maximum | **UI / width / section layout + output handling reference** (lc239 canonical): 750px .viz-wrap + .viz-sec stacking, deque front (left) / back (right) split, plain `Output (Max of each window)` heading **without ✅ tick**, progressive output list + placeholder messages where applicable. Never pre-show final answer in the Output viz panel. |
 | 282 | Expression Add Operators | Backtracking + recursion stack viz + 6-section logs |
-| 498 | Diagonal Traverse | **V9 reference** — dark matrix grid + SVG flow arrows (red/purple/amber) + diagonal progress track |
+| 498 | Diagonal Traverse | **V9 traversal reference** — dark matrix grid + SVG flow arrows (red/purple/amber) |
+| 691 | Stickers to Spell Word | Backtracking + memoization with recursion stack viz; follows lc239 UI patterns (750px .viz-wrap + stacked .viz-sec, plain `Output (Min Stickers)` heading **without ✅ tick**, placeholder until last step, correct test chips per strict two-row rule). Never use "Final Result" or tick-prefixed heading for the output viz section. |
+| 72  | Edit Distance | **DP recurrence arrows reference** — small clean arrows (dashed candidates + solid green chosen with halo), live computation from snap.dp, high z-index + draw order, integrated caption. Also **log preview zoom reference** (full box + content scaling via transform + --log-scale, correct button classes + update call in showLogPreview). |
 | 1568 | Min Days to Disconnect Island | Nested DFS, grid + helper-call counter, multi-phase |
 
 *Add more as built.*
+
+lc72 is the canonical example for **DP recurrence arrows** (showing the 3 predecessors + chosen min with small, high-visibility arrows + halo).
 
 ---
 
@@ -1587,11 +1660,29 @@ Every `why` and `analogy` field MUST be in conversational Hinglish.
 
 ---
 
+## 🆕 What's new in v2.5 (vs v2.4)
+
+| Section | Change |
+|---|---|
+| **Hinglish Writing Style** 🆕 | Added "Log-specific rules" subsection (under Hinglish Writing Style) that captures: concise (short but complete) why/analogy text + **mandatory** per-term highlighting using `<strong>` for every key logic/concept/operation and `<code>` for every formula, cell ref, variable, math (e.g. <code>dp[i][j]</code>, min, +1, insert/delete/replace). The requested Hindi phrase directing shorter logs was removed (per user instruction) but **all other guidance on conciseness + full highlighting rules + examples were preserved/restored exactly**. Good examples in the section now demonstrate the required `<strong>`/`<code>` markup. |
+| **Pre-delivery Master Checklist** | Reinforced the Log Card v2 bullet: "Every important word, logic step, and formula in why + analogy is wrapped..." (already present; now cross-linked to the new log-specific rules). |
+| **Changelog + version** | New v2.5 entry + frontmatter already at 2.5. lc72 remains the reference for highlighted concise logs + DP arrows + log-popup zoom. |
+| **Viz Output heading rule (user feedback)** | Clarified in Pre-delivery checklist + Reference table: Output section `.viz-sec-head` must use **plain "Output (…)" text with zero ✅ green tick emoji** (never "✅ Output", "✅ Final Result"). lc239 and lc691 updated to match (lc239 heading fixed to plain version). Placeholder-until-last-step rule for final scalar results also reinforced. |
+
+## 🆕 What's new in v2.4 (vs v2.3)
+
+| Section | Change |
+|---|---|
+| **V9 + new DP Recurrence Arrows** 🆕 | Added detailed best practices for DP table recurrence/dependency arrows (small compact markers, candidate vs chosen + halo, live computation from snap.dp, z-index 100 + draw order, integrated explanatory caption). lc72 is now the canonical reference. |
+| **Log Preview zoom** 🆕 | Full uniform scaling (width + height + font size + all content) of the log popup via `transform: scale(var(--log-scale))` + `transform-origin: bottom right` on `.log-popup` (base width/height kept). Footer buttons use `.btn-zoom` / `.log-zoom-label` / `.btn btn-fullscreen`. `showLogPreview` must call `updateLogZoom()`. Internal fonts can use `calc()` with the var. (See updated Log Preview + Footer + JS sections.) lc72 demonstrates the correct implementation for both DP arrows and log zoom. |
+
 ## 🆕 What's new in v2.3 (vs v2.2)
 
 | Section | Change |
 |---|---|
-| **Test Chip Values Rule** 🆕🔴 | Test case chips MUST show actual parameter values (real numbers/strings/arrays), never abstract labels. Two-row chip pattern: top = tag+label+expected, bottom = `.tc-vals` with actual values as `<code>` pills |
+| **Test Chip Values Rule** 🆕🔴 | Test case chips MUST show actual parameter values (real numbers/strings/arrays), never abstract labels. Strict two-row chip pattern (exactly as in lc239/lc691):
+- Top row: `.pt-tag` + **descriptive label** (e.g. "Standard", "Impossible", "Trivial") + `.tc-exp` containing `exp: value` (never put the exp value in the middle label).
+- Bottom row (`.tc-vals`): actual input values as `<code>` pills (e.g. `<code>stickers=[...]</code> <code>target="..."</code>` or raw array for simple cases). For arrays, prefer clean representation matching lc239. |
 
 ## 🆕 What's new in v2.2 (vs v2.1)
 
@@ -1621,7 +1712,7 @@ Every `why` and `analogy` field MUST be in conversational Hinglish.
 
 ---
 
-*End of Skill Document v2.1. This is a living document — update Reference Implementations and Roadmap as new visualizers are built and patterns emerge.*
+*End of Skill Document v2.5. This is a living document — update Reference Implementations and Roadmap as new visualizers are built and patterns emerge.*
 
 ---
 

@@ -1293,7 +1293,7 @@
       "lcNum": 239,
       "plat": "lc",
       "url": "https://leetcode.com/problems/sliding-window-maximum/",
-      "viz": null
+      "viz": "../arrays/lc239-sliding-window-maximum.html"
     },
     {
       "id": 71,
@@ -1590,7 +1590,7 @@
       "lcNum": 140,
       "plat": "lc",
       "url": "https://leetcode.com/problems/word-break-ii/",
-      "viz": null
+      "viz": "../dp/lc140-word-break-ii.html"
     },
     {
       "id": 98,
@@ -1623,7 +1623,7 @@
       "lcNum": 72,
       "plat": "lc",
       "url": "https://leetcode.com/problems/edit-distance/",
-      "viz": null
+      "viz": "../dp/lc72-edit-distance.html"
     },
     {
       "id": 101,
@@ -3702,7 +3702,7 @@
       "lcNum": 936,
       "plat": "lc",
       "url": "https://leetcode.com/problems/stamping-the-sequence/",
-      "viz": null
+      "viz": "../stacks/lc936-stamping-the-sequence.html"
     },
     {
       "id": 290,
@@ -4900,8 +4900,8 @@
       "paradigm": "Dynamic Programming",
       "lcNum": 72,
       "plat": "lc",
-      "url": "https://leetcode.com/problems/edit-distance-dp/",
-      "viz": null
+      "url": "https://leetcode.com/problems/edit-distance/",
+      "viz": "../dp/lc72-edit-distance.html"
     },
     {
       "id": 399,
@@ -6034,7 +6034,7 @@
       "lcNum": 691,
       "plat": "lc",
       "url": "https://leetcode.com/problems/stickers-to-spell-word/",
-      "viz": null
+      "viz": "../backtrack/lc691-stickers-to-spell-word.html"
     },
     {
       "id": 519,
