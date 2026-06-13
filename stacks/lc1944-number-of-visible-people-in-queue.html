@@ -1,0 +1,1920 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GT LEARN • LC1944 Number of Visible People in Queue</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+:root {
+  --bg-primary: #FAFAF8;
+  --bg-secondary: #F1EFE8;
+  --bg-tertiary: #E2E0D8;
+  --bg-card: #FFFFFF;
+  --text-primary: #2C2C2A;
+  --text-secondary: #5F5E5A;
+  --text-tertiary: #888780;
+  --border-color: rgba(0,0,0,0.11);
+  --border-light: rgba(0,0,0,0.06);
+  --border-focus: #534AB7;
+  --accent-indigo: #534AB7;
+  --accent-indigo-bg: #EEEDFE;
+  --accent-indigo-text: #3C3489;
+  --accent-indigo-hover: #4740A0;
+  --accent-teal: #0F6E56;
+  --accent-teal-bg: #E1F5EE;
+  --accent-teal-text: #085041;
+  --accent-red: #E24B4A;
+  --accent-red-bg: #FCEBEB;
+  --accent-red-text: #791F1F;
+  --accent-amber: #B45309;
+  --accent-amber-bg: #FEF3C7;
+  --accent-amber-text: #78350F;
+  --accent-green: #15803D;
+  --accent-green-bg: #DCFCE7;
+  --accent-green-text: #14532D;
+  --syn-keyword: #534AB7;
+  --syn-function: #185FA5;
+  --syn-number: #993C1D;
+  --syn-string: #0F6E56;
+  --active-line-bg: #EEEDFE;
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 10px;
+  --radius-xl: 14px;
+  --font-sans: 'DM Sans', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+  --fs-xs: 11px;
+  --fs-sm: 12px;
+  --fs-base: 14px;
+  --fs-md: 15px;
+  --fs-lg: 18px;
+  --fw-medium: 500;
+  --fw-semibold: 600;
+  --fw-bold: 700;
+  --lh-normal: 1.6;
+  --lh-code: 1.9;
+  --ease: .18s ease;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--font-sans); background: var(--bg-primary); color: var(--text-primary); line-height: 1.6; }
+.app-shell { display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+
+/* === PROBLEM CARD === */
+.problem-card { flex-shrink: 0; border-bottom: 1px solid var(--border-color); background: var(--bg-card); }
+.pc-header { 
+  display: flex; align-items: center; justify-content: space-between; 
+  padding: 8px 14px; background: var(--bg-secondary); border-bottom: 1px solid var(--border-light); 
+}
+.pc-header-left { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.gt-btn { 
+  font: 700 11px var(--font-sans); padding: 5px 10px; 
+  background: var(--accent-indigo); color: #fff; border: none; border-radius: 99px; cursor: pointer; 
+}
+.gt-btn:hover { background: var(--accent-indigo-hover); }
+.lc-num { font: 700 12px var(--font-mono); color: var(--text-tertiary); }
+.lc-title { font: 700 15px var(--font-sans); color: var(--text-primary); }
+.lc-diff { 
+  font: 700 9px var(--font-mono); padding: 2px 8px; border-radius: 99px; letter-spacing: .06em; 
+}
+.lc-diff--hard { background: #FEE2E2; color: #991B1B; border: 1px solid #fecaca; }
+.lc-tag { 
+  font: 600 10px var(--font-mono); padding: 2px 8px; border-radius: 99px; 
+  background: var(--bg-secondary); color: var(--text-secondary); border: 1px solid var(--border-color); 
+}
+
+.pc-header-right { margin-left: auto; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.input-wrap { display: flex; align-items: center; gap: 4px; }
+.input-wrap label { font: 600 10px var(--font-mono); color: var(--text-tertiary); }
+.input-wrap input { 
+  font: 600 11px var(--font-mono); padding: 3px 6px; border: 1px solid var(--border-color); 
+  border-radius: 4px; background: var(--bg-card); color: var(--text-primary); width: 140px; 
+}
+.input-wrap input:focus { outline: none; border-color: var(--border-focus); }
+.expected-badge { 
+  font: 600 10px var(--font-mono); padding: 3px 8px; border-radius: 4px; 
+  background: var(--accent-teal-bg); color: var(--accent-teal-text); border: 1px solid var(--accent-teal); 
+}
+.toggle-btn { 
+  font-family: system-ui,"Segoe UI Emoji",sans-serif; font: 600 10px var(--font-mono); 
+  padding: 3px 8px; border-radius: 4px; background: var(--bg-secondary); 
+  border: 1px solid var(--border-color); color: var(--text-secondary); cursor: pointer; 
+}
+
+.pc-body { 
+  display: flex; gap: 16px; padding: 10px 14px; 
+  max-height: 34vh; overflow: auto; 
+}
+.pc-left { flex: 2; min-width: 0; }
+.pc-right { flex: 1; min-width: 0; border-left: 1px solid var(--border-light); padding-left: 14px; }
+
+.pc-section { margin-bottom: 8px; }
+.pc-section h4 { 
+  font: 700 11px var(--font-sans); text-transform: uppercase; letter-spacing: .06em; 
+  color: var(--text-tertiary); margin-bottom: 4px; 
+}
+.pc-section p { font-size: 12px; line-height: 1.55; color: var(--text-secondary); }
+.pc-section code { 
+  font: 600 11px var(--font-mono); background: var(--bg-secondary); padding: 1px 5px; 
+  border-radius: 3px; color: var(--accent-indigo-text); 
+}
+.pc-section strong { color: var(--text-primary); }
+
+.concept-card { 
+  flex: 1; min-width: 140px; padding: 6px 8px; background: var(--bg-secondary); 
+  border-radius: 5px; border-left: 3px solid var(--accent-indigo); font-size: 11px; line-height: 1.5; 
+}
+.concept-card strong { 
+  display: block; color: var(--accent-indigo-text); margin-bottom: 2px; font-size: 10px; text-transform: uppercase; 
+}
+
+.complexity-row { display: flex; gap: 6px; margin-top: 4px; }
+.cx-chip { 
+  font: 600 11px var(--font-mono); padding: 3px 8px; border-radius: 99px; 
+  background: var(--accent-indigo-bg); color: var(--accent-indigo-text); border: 1px solid var(--accent-indigo); 
+}
+
+.test-chip { 
+  display: flex; flex-direction: column; gap: 3px; padding: 6px 8px; margin-bottom: 5px; 
+  background: var(--bg-secondary); border-radius: 5px; border: 1px solid var(--border-color); 
+  cursor: pointer; transition: all var(--ease); 
+}
+.test-chip:hover { border-color: var(--accent-indigo); background: var(--accent-indigo-bg); }
+.test-chip.active { border-color: var(--accent-indigo); background: var(--accent-indigo-bg); }
+
+.tc-row { display: flex; align-items: center; gap: 5px; flex-wrap: wrap; }
+.tc-vals { 
+  display: flex; align-items: center; gap: 4px; flex-wrap: wrap; margin-top: 2px; 
+}
+.tc-vals code { 
+  font: 600 10px var(--font-mono); background: var(--bg-card); color: var(--accent-indigo-text); 
+  padding: 1px 5px; border-radius: 3px; border: 1px solid var(--border-light); 
+}
+.pt-tag { 
+  font: 600 9px var(--font-mono); padding: 1px 5px; border-radius: 3px; 
+  background: var(--accent-indigo); color: #fff; text-transform: uppercase; 
+}
+.tc-exp { font: 600 10px var(--font-mono); color: var(--accent-teal-text); margin-left: auto; }
+
+.run-row { display: flex; align-items: center; gap: 8px; margin-top: 6px; }
+.btn-run { 
+  font-family: system-ui,"Segoe UI Emoji",sans-serif; font: 700 11px var(--font-sans); 
+  padding: 5px 12px; background: var(--accent-indigo); color: #fff; border: none; border-radius: 5px; cursor: pointer; 
+}
+.live-output { 
+  font: 700 12px var(--font-mono); padding: 4px 10px; background: var(--accent-green-bg); 
+  color: var(--accent-green-text); border-radius: 4px; border: 1px solid var(--accent-green); 
+}
+
+.main-row { flex: 1; display: flex; overflow: hidden; min-height: 0; position: relative; }
+.col { display: flex; flex-direction: column; overflow: hidden; min-width: 0; }
+.col-code { width: 33%; min-width: 260px; max-width: 42vw; border-right: 1px solid var(--border-color); background: var(--bg-card); }
+.col-viz { flex: 1; min-width: 0; background: var(--bg-primary); padding: 14px 18px; overflow-y: auto; }
+
+.code-panel { padding: 12px 0; overflow-y: auto; height: 100%; }
+.code-line { display: flex; font-family: var(--font-mono); font-size: 13px; line-height: var(--lh-code); padding: 1px 14px; }
+.code-line.active { background: var(--accent-indigo-bg); }
+.section-label { font:700 10px var(--font-sans); text-transform:uppercase; letter-spacing:.08em; color:var(--text-tertiary); padding:8px 12px; border-bottom:1px solid var(--border-light); background:var(--bg-card); }
+.ln { width: 32px; color: var(--text-tertiary); text-align: right; padding-right: 10px; user-select: none; flex-shrink: 0; }
+.code-content { flex: 1; white-space: pre; }
+.kw { color: var(--accent-indigo); font-weight: 600; }
+.fn { color: #185FA5; }
+.num { color: #993C1D; }
+.str { color: var(--accent-teal); }
+
+.vars-strip { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; width:100%; max-width:820px; }
+.var-chip { font-family: var(--font-mono); font-size: 12px; padding: 3px 9px; background: var(--bg-secondary); border: 1px solid var(--border-light); border-radius: 999px; }
+.var-chip.vc-active { background: var(--accent-indigo-bg); border-color: var(--accent-indigo); color: var(--accent-indigo-text); font-weight: 600; }
+
+.viz-row { display:flex; gap:12px; align-items:flex-start; flex-wrap:wrap; }
+.viz-card { background:var(--bg-card); border:1px solid var(--border-color); border-radius:var(--radius-md); padding:10px; flex:1; min-width:240px; }
+.viz-title { font-weight:700; font-size:12px; margin-bottom:6px; display:flex; align-items:center; gap:6px; color:var(--text-secondary); }
+
+/* ========== VISUALIZATION STYLES ========== */
+.viz-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  max-width: 820px;
+}
+
+.viz-sec {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 10px 12px;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+.viz-sec-head {
+  font: 700 11px var(--font-sans);
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  letter-spacing: .3px;
+}
+
+/* Queue Visualization - Much better looking */
+.queue-container {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  min-height: 232px;
+  height: 232px;
+  padding: 8px 8px 4px;
+  background: linear-gradient(to bottom, #f4f3ed 0%, #eeede6 40%, var(--bg-secondary) 100%);
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
+  overflow-x: auto;
+  position: relative;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,.035), 0 1px 0 #fff;
+  min-width: 360px;
+}
+
+/* Thin ground line for "standing in queue" feel */
+.queue-container::after {
+  content: '';
+  position: absolute;
+  left: 6px; right: 6px; bottom: 4px;
+  height: 3px;
+  background: linear-gradient(to right, transparent, rgba(0,0,0,.12), transparent);
+  border-radius: 2px;
+  z-index: 1;
+}
+
+.person {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 58px;
+  transition: transform 0.2s ease, filter 0.2s;
+  position: relative;
+  cursor: default;
+  z-index: 2;
+}
+.person-index {
+  font-size: 9px;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  color: var(--text-tertiary);
+  letter-spacing: .5px;
+  margin-bottom: 3px;
+  opacity: .85;
+}
+
+.person-bar-wrap {
+  position: relative;
+  width: 40px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  border-radius: 5px 5px 0 0;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0,0,0,.12);
+  border: 1px solid rgba(0,0,0,.1);
+  border-bottom: none;
+  background: #e8e6de;
+}
+
+.person-bar {
+  width: 100%;
+  background: var(--accent-indigo);
+  transition: height 0.28s cubic-bezier(0.23, 1, 0.32, 1), background 0.25s, box-shadow 0.2s;
+  position: relative;
+  min-height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 800;
+  font-family: var(--font-mono);
+  text-shadow: 0 1px 2px rgba(0,0,0,.35);
+  border-top: 1px solid rgba(255,255,255,.35);
+  box-sizing: border-box;
+}
+
+/* Height number lives on the bar */
+.person-bar .bar-val {
+  position: relative;
+  z-index: 2;
+  pointer-events: none;
+  font-weight: 800;
+  letter-spacing: -.2px;
+}
+
+.person.active {
+  transform: scale(1.06);
+  z-index: 5;
+}
+.person.active .person-bar-wrap {
+  box-shadow: 0 0 0 3px rgba(245,158,11,.28), 0 4px 12px rgba(180,83,9,.3);
+}
+.person.active .person-bar {
+  background: linear-gradient(180deg, #f59e0b 0%, #d97706 100%);
+  box-shadow: 0 0 0 1px #b45309 inset, 0 0 14px rgba(245,158,11,.7);
+  animation: pulse-node 1.05s infinite;
+}
+
+.person.visible .person-bar-wrap {
+  box-shadow: 0 0 0 2px rgba(21,128,61,.25), 0 2px 8px rgba(21,128,61,.15);
+}
+.person.visible .person-bar {
+  background: linear-gradient(180deg, #15803d 0%, #14532d 100%);
+  border-top-color: rgba(255,255,255,.3);
+}
+
+.person.popped .person-bar-wrap {
+  opacity: .55;
+  filter: saturate(.6);
+}
+.person.popped .person-bar {
+  background: linear-gradient(180deg, #c9b8b4 0%, #b8a39e 100%);
+  color: #5a4a46;
+  text-shadow: none;
+  border-top-color: rgba(0,0,0,.08);
+}
+
+.person.future .person-bar-wrap {
+  opacity: .45;
+  filter: grayscale(.3);
+}
+.person.future .person-bar {
+  background: #b5b0a4;
+  color: #4a463c;
+  text-shadow: none;
+}
+
+/* Small head icon sitting on top of the bar */
+.person-head {
+  position: absolute;
+  top: -1px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 16px;
+  height: 16px;
+  background: #fff;
+  border: 2.5px solid var(--text-primary);
+  border-radius: 50%;
+  z-index: 3;
+  box-shadow: 0 1px 3px rgba(0,0,0,.15);
+  font-size: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+.person.active .person-head {
+  border-color: var(--accent-amber);
+  background: #fffbeb;
+}
+.person.visible .person-head {
+  border-color: var(--accent-green);
+}
+.person.popped .person-head,
+.person.future .person-head {
+  opacity: .5;
+  border-color: #888;
+}
+
+/* Sight lines overlay - nicer */
+.sight-svg {
+  position: absolute;
+  left: 0; top: 0; width: 100%; height: 100%;
+  pointer-events: none;
+  z-index: 6;
+  overflow: visible;
+}
+.sight-line {
+  stroke: #c2410f;
+  stroke-width: 2.8;
+  stroke-dasharray: 6 3;
+  opacity: .95;
+  fill: none;
+  filter: drop-shadow(0 1px 3px rgba(194,65,15,.35));
+  animation: sight-dash 1.05s linear infinite;
+}
+.sight-line.blocker {
+  stroke: #166534;
+  stroke-width: 3.5;
+  stroke-dasharray: none;
+  opacity: 1;
+  filter: drop-shadow(0 1px 4px rgba(21,128,61,.45));
+}
+@keyframes sight-dash {
+  to { stroke-dashoffset: -18; }
+}
+
+/* Stack Visualization */
+.stack-col {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 5px;
+  min-height: 108px;
+  padding: 10px 8px;
+  background: var(--bg-secondary);
+  border-radius: 8px;
+  border: 1px solid var(--border-light);
+  box-shadow: inset 0 1px 2px rgba(0,0,0,.025);
+}
+.stack-item {
+  padding: 5px 10px;
+  background: #fff;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  font-size: 12px;
+  font-family: var(--font-mono);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 1px 2px rgba(0,0,0,.04);
+}
+.stack-item.front {
+  border-color: var(--accent-green);
+  background: var(--accent-green-bg);
+  font-weight: 800;
+  color: var(--accent-green-text);
+  box-shadow: 0 1px 3px rgba(21,128,61,.2);
+}
+
+/* Result Array - nicely aligned under the queue */
+.result-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: nowrap;
+  min-height: 30px;
+  padding: 3px 6px;
+  overflow-x: auto;
+  background: var(--bg-secondary);
+  border-radius: 8px;
+  border: 1px solid var(--border-light);
+}
+.res-chip {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 800;
+  padding: 4px 9px;
+  background: #fff;
+  color: var(--text-secondary);
+  border: 1.5px solid var(--border-color);
+  border-radius: 999px;
+  transition: all 0.2s;
+  width: 58px;
+  flex-shrink: 0;
+  text-align: center;
+  box-shadow: 0 1px 1px rgba(0,0,0,.03);
+}
+.res-chip.filled {
+  background: var(--accent-green-bg);
+  color: var(--accent-green-text);
+  border-color: var(--accent-green);
+  box-shadow: 0 1px 3px rgba(21,128,61,.18);
+  font-weight: 800;
+}
+.res-chip.zero { opacity: .55; }
+
+/* === NEW: Live res = [0] * n array visualization === */
+.live-res-row {
+  display: flex;
+  gap: 10px;
+  align-items: flex-end;
+  flex-wrap: nowrap;
+  padding: 6px 6px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  overflow-x: auto;
+  min-height: 66px;
+}
+.live-res-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 58px;
+  min-width: 58px;
+  background: #fff;
+  border: 2px solid var(--border-color);
+  border-radius: 6px;
+  padding: 4px 2px 5px;
+  font-family: var(--font-mono);
+  box-shadow: 0 1px 2px rgba(0,0,0,.04);
+  transition: all .2s ease;
+}
+.live-res-cell .res-idx {
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--text-tertiary);
+  margin-bottom: 1px;
+}
+.live-res-cell .res-val {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text-secondary);
+  line-height: 1;
+  min-height: 22px;
+  display: flex;
+  align-items: center;
+}
+.live-res-cell.initial {
+  border-color: #d1cfc3;
+  background: #faf9f5;
+}
+.live-res-cell.initial .res-val {
+  color: #8a8578;
+  font-weight: 700;
+}
+.live-res-cell.updated,
+.live-res-cell.filled {
+  border-color: var(--accent-green);
+  background: var(--accent-green-bg);
+  box-shadow: 0 1px 4px rgba(21,128,61,.2);
+}
+.live-res-cell.updated .res-val,
+.live-res-cell.filled .res-val {
+  color: var(--accent-green-text);
+  font-weight: 800;
+}
+.live-res-cell.just-written {
+  animation: res-write-pop 0.6s ease;
+  border-color: var(--accent-amber);
+  background: #fef3c7;
+}
+.live-res-cell.just-written .res-val {
+  color: #92400e;
+}
+@keyframes res-write-pop {
+  0% { transform: scale(0.7); }
+  50% { transform: scale(1.15); }
+  100% { transform: scale(1); }
+}
+
+/* Current visibility panel */
+.vis-panel {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  min-height: 34px;
+}
+.vis-chip {
+  font: 600 11px var(--font-mono);
+  background: #FEF3C7;
+  color: #78350F;
+  border: 1px solid #f59e0b;
+  padding: 3px 10px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  box-shadow: 0 1px 2px rgba(180,83,9,.1);
+}
+.vis-chip.blocker {
+  background: var(--accent-green-bg);
+  color: var(--accent-green-text);
+  border-color: var(--accent-green);
+  font-weight: 700;
+  box-shadow: 0 1px 3px rgba(21,128,61,.15);
+}
+.vis-count {
+  font: 700 12px var(--font-mono);
+  padding: 3px 10px;
+  background: var(--accent-indigo-bg);
+  color: var(--accent-indigo-text);
+  border-radius: 99px;
+  border: 1px solid var(--accent-indigo);
+  box-shadow: 0 1px 2px rgba(83,74,183,.15);
+}
+
+/* Legend */
+.viz-legend {
+  display:flex; gap:10px; flex-wrap:wrap; font-size:9px; color:var(--text-tertiary); margin-top:6px;
+}
+.viz-legend span { display:inline-flex; align-items:center; gap:3px; }
+
+/* === LOG PREVIEW === */
+.log-popup {
+  --log-scale: 1;
+  position: fixed; bottom: 52px; right: 14px;
+  width: 480px;
+  max-width: 92vw; max-height: 75vh;
+  border-radius: var(--radius-lg);
+  box-shadow: 0 10px 32px rgba(0,0,0,.14);
+  border: 1px solid var(--border-color);
+  background: var(--bg-card);
+  overflow: hidden;
+  display: flex; flex-direction: column;
+  z-index: 100;
+  transition: opacity .15s, transform .15s;
+  transform: scale(var(--log-scale));
+  transform-origin: bottom right;
+}
+.log-popup--hidden { opacity: 0; pointer-events: none; }
+.log-popup-body { flex: 1; overflow: auto; padding: 0; width: 100%; }
+.log-popup-body > .log-card { border-radius: 0; border: none; border-left: 0; }
+
+.log-card {
+  border-radius: var(--radius-md); overflow: hidden;
+  border: 1px solid var(--border-color); border-left-width: 4px;
+  font-size: var(--fs-xs); background: var(--bg-card);
+}
+.log-card-header {
+  display: flex; align-items: center; gap: 6px;
+  padding: 8px 10px 6px; background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-light);
+}
+.log-badge {
+  font-size: 10px; font-weight: 700; padding: 1px 7px; border-radius: 3px;
+  background: var(--accent-indigo-bg); color: var(--accent-indigo-text);
+}
+.log-line-ref {
+  font: 700 10px var(--font-mono); color: var(--accent-indigo);
+  background: var(--accent-indigo-bg); padding: 1px 6px; border-radius: 4px;
+  border: 1px solid var(--accent-indigo);
+}
+.log-status-pill {
+  font-family: system-ui,"Segoe UI Emoji",sans-serif;
+  font-size: 9px; font-weight: 700; padding: 2px 7px; border-radius: 99px;
+  text-transform: uppercase; margin-left: auto; border: 1px solid;
+}
+.log-status--success { background: var(--accent-green-bg); color: var(--accent-green-text); border-color: var(--accent-green); }
+.log-status--fail    { background: var(--accent-red-bg); color: var(--accent-red-text); border-color: var(--accent-red); }
+.log-status--skip    { background: var(--bg-tertiary); color: var(--text-tertiary); border-color: var(--border-color); }
+.log-status--loop    { background: rgba(56,139,253,.14); color: #185FA5; border-color: #388bfd; }
+.log-status--prune   { background: var(--accent-red-bg); color: var(--accent-red-text); border-color: var(--accent-red); }
+.log-status--info    { background: rgba(130,80,255,.14); color: #3C3489; border-color: #8250ff; }
+
+.log-section { padding: 7px 10px; border-bottom: 1px dashed var(--border-light); }
+.log-section:last-child { border-bottom: none; }
+.log-section-title {
+  font: 700 8px var(--font-mono); text-transform: uppercase; letter-spacing: .06em;
+  color: var(--text-tertiary); margin-bottom: 3px; display: flex; align-items: center; gap: 4px;
+}
+.log-section-title-icon { font-family: system-ui,"Segoe UI Emoji",sans-serif; }
+
+.log-code-snippet {
+  font: 600 11px var(--font-mono); background: #0d1117; color: #e6edf3;
+  padding: 6px 9px; border-radius: 4px; display: block; overflow-x: auto; white-space: pre;
+  border: 1px solid #30363d;
+}
+.log-code-snippet .ck { color: #ff7b72; }
+.log-code-snippet .cs { color: #a5d6ff; }
+.log-code-snippet .cn { color: #79c0ff; }
+.log-code-snippet .cf { color: #d2a8ff; }
+.log-code-snippet .cc { color: #8b949e; font-style: italic; }
+
+.log-kv-row { display: flex; flex-wrap: wrap; gap: 5px; }
+.log-kv {
+  font: 11px var(--font-mono); padding: 2px 7px; border-radius: 4px;
+  background: var(--bg-secondary); border: 1px solid var(--border-light);
+}
+.log-kv-key { color: var(--text-tertiary); font-weight: 500; }
+.log-kv-val { color: var(--text-primary); font-weight: 700; }
+.log-kv--in { background: rgba(56,139,253,.08); border-color: rgba(56,139,253,.3); }
+.log-kv--out { background: rgba(63,185,80,.08); border-color: rgba(63,185,80,.4); }
+.log-kv--out .log-kv-val { color: #15803D; }
+.log-kv--changed { background: rgba(180,83,9,.10); border-color: rgba(180,83,9,.4); }
+
+.log-verdict {
+  display: flex; align-items: center; gap: 6px;
+  font: 600 11px var(--font-mono); padding: 5px 8px; border-radius: 5px;
+  background: var(--bg-secondary); border: 1px solid var(--border-light);
+}
+.log-verdict--true { background: var(--accent-green-bg); border-color: var(--accent-green); color: var(--accent-green-text); }
+.log-verdict--false { background: var(--accent-red-bg); border-color: var(--accent-red); color: var(--accent-red-text); }
+
+.log-why { font-size: 11px; line-height: 1.55; color: var(--text-primary); padding: 4px 0; }
+.log-why strong { color: var(--accent-indigo-text); }
+.log-analogy {
+  font: italic 11px var(--font-sans); color: var(--text-secondary);
+  background: #FFF8E7; border: 1px solid #FBE8A6; border-left: 3px solid var(--accent-amber);
+  padding: 6px 9px; border-radius: 4px; line-height: 1.55;
+}
+.log-analogy strong { color: var(--accent-amber-text); font-style: normal; font-weight: 700; }
+
+.footer-bar { flex-shrink: 0; display: flex; border-top: 1px solid var(--border-color); background: white; }
+.footer-left { width: 33%; min-width: 260px; max-width: 42vw; padding: 8px 14px; display: flex; align-items: center; gap: 10px; border-right: 1px solid var(--border-light); }
+.footer-right { flex: 1; padding: 8px 18px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+
+.btn { font-size: 13px; padding: 5px 12px; border: 1px solid var(--border-color); background: white; border-radius: 6px; cursor: pointer; font-weight: 600; }
+.btn:hover { background: var(--bg-secondary); }
+.btn-primary { background: var(--accent-indigo); color: white; border-color: var(--accent-indigo); }
+.btn-primary:hover { background: var(--accent-indigo-hover, #4740A0); }
+
+.step-info { font-family: var(--font-mono); font-weight: 700; font-size: 13px; }
+.action-badge { font-size: 10px; font-weight: 700; padding: 2px 9px; border-radius: 999px; background: var(--bg-tertiary); }
+
+.log-toggle-btn { font-size: 12px; padding: 4px 10px; border-radius: 6px; cursor: pointer; }
+.log-toggle-btn--off { opacity: .6; }
+
+kbd { font-family: var(--font-mono); font-size: 11px; padding: 2px 6px; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 4px; }
+
+body.no-select { user-select: none; }
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 3px; }
+
+.resize-handle {
+  position: absolute; top: 0; bottom: 0; width: 6px; cursor: col-resize; z-index: 30;
+  background: transparent; transition: background .1s;
+  margin-left: -3px;
+}
+.resize-handle:hover, .resize-handle.active { 
+  background: var(--accent-indigo); 
+  opacity: .35; 
+  box-shadow: 0 0 0 1px var(--accent-indigo);
+}
+
+.action-badge { font-size: 10px; font-weight: 700; padding: 2px 9px; border-radius: 999px; background: var(--bg-tertiary); }
+.action-badge--func-def, .action-badge--call, .action-badge--return, .action-badge--init { background: var(--accent-indigo-bg); color: var(--accent-indigo-text); border:1px solid var(--accent-indigo); }
+.action-badge--for-check, .action-badge--if-check, .action-badge--while-check { background: rgba(56,139,253,.14); color:#185FA5; border:1px solid #388bfd; }
+.action-badge--found, .action-badge--assign, .action-badge--mark { background: var(--accent-green-bg); color: var(--accent-green-text); border:1px solid var(--accent-green); }
+.action-badge--pop { background: var(--accent-red-bg); color: var(--accent-red-text); border:1px solid var(--accent-red); }
+.action-badge--push { background: var(--accent-green-bg); color: var(--accent-green-text); border:1px solid var(--accent-green); }
+.action-badge--exit { background: var(--bg-tertiary); color: var(--text-tertiary); border:1px solid var(--border-color); }
+
+.footer-sep { width:1px; height:18px; background:var(--border-light); margin:0 4px; }
+.btn-zoom { padding:3px 7px; }
+.log-zoom-label { font-size:11px; width:38px; text-align:center; display:inline-block; vertical-align:middle; }
+
+@keyframes pulse-node {
+  0%,100% { box-shadow: 0 0 4px var(--accent-indigo); }
+  50% { box-shadow: 0 0 12px var(--accent-indigo); }
+}
+@keyframes shake {
+  0%,100% { transform: translateX(0); }
+  25% { transform: translateX(-3px); }
+  75% { transform: translateX(3px); }
+}
+@keyframes win-pulse {
+  0%,100% { box-shadow: 0 0 3px rgba(234,179,8,.5); }
+  50% { box-shadow: 0 0 8px rgba(234,179,8,.9); }
+}
+</style>
+</head>
+<body>
+<div class="app-shell">
+  <!-- PROBLEM CARD -->
+  <div class="problem-card">
+    <header class="pc-header">
+      <div class="pc-header-left">
+        <a href="../00_HomePage/gt_learn_homepage.html" class="gt-btn">GT LEARN</a>
+        <span class="lc-num">#1944</span>
+        <span class="lc-title">👥 Number of Visible People in Queue</span>
+        <span class="lc-diff lc-diff--hard">HARD</span>
+        <span class="lc-tag">Monotonic Stack</span>
+      </div>
+      <div class="pc-header-right">
+        <div class="input-wrap">
+          <label>heights =</label>
+          <input id="inputHeights" value="10,6,8,5,11,9">
+        </div>
+        <span id="expectedBadge" class="expected-badge">exp: [3,1,2,1,1,0]</span>
+        <button id="probToggleBtn" class="toggle-btn" onclick="toggleProblem()">▲ Hide</button>
+      </div>
+    </header>
+    
+    <div class="pc-body" id="probBody">
+      <div class="pc-left">
+        <div class="pc-section">
+          <h4>📝 Problem Statement</h4>
+          <p>There are <code>n</code> people standing in a queue. You are given an array <code>heights</code>. A person can see another person to their right in the queue if everybody in between is shorter than both of them. Return an array where <code>answer[i]</code> is the number of people the <code>i-th</code> person can see.</p>
+        </div>
+        
+        <div class="pc-section">
+          <h4>🧠 Solving Approach</h4>
+          <p>We traverse from <strong>right to left</strong>. We maintain a <strong>Monotonic Stack</strong> that keeps heights in decreasing order. If the current person is taller than the stack's top, those shorter people are "popped" (they are visible but blocked for anyone further left). If the stack still has someone after popping, that person is also visible (the first one who blocks the view).</p>
+        </div>
+        
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+          <div class="concept-card"><strong>Right-to-Left</strong> Process from end so we know who is ahead.</div>
+          <div class="concept-card"><strong>Pop Shorter</strong> Remove people shorter than current (they are visible but blocked).</div>
+          <div class="concept-card"><strong>Count Blocker</strong> If stack not empty after pops, add 1 (the blocker is visible).</div>
+        </div>
+        
+        <div class="complexity-row">
+          <span class="cx-chip">Time: O(N)</span>
+          <span class="cx-chip">Space: O(N)</span>
+        </div>
+      </div>
+      
+      <div class="pc-right">
+        <div class="pc-section" style="margin-bottom:4px">
+          <h4>🧪 Test Cases (click to load)</h4>
+        </div>
+        
+        <div class="test-chip" onclick="loadTest(0)">
+          <div class="tc-row">
+            <span class="pt-tag">T1</span>
+            <span>Standard</span>
+            <span class="tc-exp">exp:[3,1,2,1,1,0]</span>
+          </div>
+          <div class="tc-vals">
+            <code>[10,6,8,5,11,9]</code>
+          </div>
+        </div>
+        
+        <div class="test-chip" onclick="loadTest(1)">
+          <div class="tc-row">
+            <span class="pt-tag">T2</span>
+            <span>Increasing</span>
+            <span class="tc-exp">exp:[4,1,1,1,0]</span>
+          </div>
+          <div class="tc-vals">
+            <code>[5,1,2,3,10]</code>
+          </div>
+        </div>
+        
+        <div class="test-chip" onclick="loadTest(2)">
+          <div class="tc-row">
+            <span class="pt-tag">T3</span>
+            <span>Decreasing</span>
+            <span class="tc-exp">exp:[1,1,1,1,0]</span>
+          </div>
+          <div class="tc-vals">
+            <code>[10,9,8,7,6]</code>
+          </div>
+        </div>
+        
+        <div class="run-row">
+          <button class="btn-run" onclick="resetWithInput()">▶ Run</button>
+          <span id="liveOutput" class="live-output">—</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div class="main-row">
+    <!-- CODE PANEL -->
+    <div class="col col-code" id="col1">
+      <div class="section-label">📜 Python Code</div>
+      <div class="code-panel" id="codePanel"></div>
+    </div>
+
+    <!-- RESIZE HANDLE -->
+    <div id="resizeH1" class="resize-handle" title="Drag to resize code panel"></div>
+
+    <!-- VISUALIZATION PANEL -->
+    <div class="col col-viz">
+      <div class="section-label">📊 Visualization — Queue & Stack</div>
+      <div class="vars-strip" id="varsStrip"></div>
+      
+      <div class="viz-wrap">
+        <!-- NEW: Explicit live res = [0] * n display -->
+        <div class="viz-sec">
+          <div class="viz-sec-head">📦 res = [0] * n &nbsp;&nbsp;• Live Result Array (initialized to zeros, then filled right-to-left)</div>
+          <div id="liveResViz" class="live-res-row"></div>
+          <div style="font-size:10px; color:var(--text-tertiary); margin-top:3px;">
+            Initialized to all zeros. Each time we finish a person we do <code>res[i] = count</code> and the box updates.
+          </div>
+        </div>
+
+        <!-- 1. QUEUE VISUALIZATION (people as bars + sight lines) -->
+        <div class="viz-sec">
+          <div class="viz-sec-head">👥 Queue — People facing right (process from RIGHT → LEFT)</div>
+          <div id="queueViz" class="queue-container"></div>
+          <div class="viz-legend" style="font-size:10px;gap:8px;margin-top:4px;">
+            <span><span style="width:12px;height:12px;background:#b5b0a4;border-radius:3px;display:inline-block;vertical-align:middle"></span> Future</span>
+            <span><span style="width:12px;height:12px;background:linear-gradient(#f59e0b,#d97706);border-radius:3px;display:inline-block;vertical-align:middle"></span> Current i</span>
+            <span><span style="width:12px;height:12px;background:linear-gradient(#15803d,#14532d);border-radius:3px;display:inline-block;vertical-align:middle"></span> In stack (visible candidate)</span>
+            <span><span style="width:12px;height:12px;background:#c9b8b4;border-radius:3px;display:inline-block;vertical-align:middle"></span> Popped (blocked for others)</span>
+            <span style="color:#c2410f;margin-left:4px">→ arrows = who this person can see (dashed = popped, solid = blocker)</span>
+          </div>
+        </div>
+
+        <!-- 2. CURRENT VISIBILITY (who this person sees) -->
+        <div class="viz-sec">
+          <div class="viz-sec-head">👀 This Person Can See (live count this step)</div>
+          <div id="visPanel" class="vis-panel"></div>
+          <div style="font-size:10px;color:var(--text-tertiary);margin-top:2px">Pops = shorter people visible (but blocked for people behind). +1 if stack top remains = the first taller blocker.</div>
+        </div>
+
+        <!-- 3. MONOTONIC STACK -->
+        <div class="viz-sec">
+          <div class="viz-sec-head">📚 Monotonic Stack — top = closest remaining person on the right (candidates for future blockers)</div>
+          <div id="stackViz" class="stack-col"></div>
+          <div style="font-size:10px;color:var(--text-tertiary);margin-top:2px">Stores [height, original index]. Kept in decreasing order. Only potential visible people for left-side observers remain.</div>
+        </div>
+
+        <!-- 4. RESULT ARRAY (aligned under people for easy correlation) -->
+        <div class="viz-sec">
+          <div class="viz-sec-head">📋 res values aligned under each person (for quick reference)</div>
+          <div id="resultViz" class="result-row"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer-bar">
+    <div class="footer-left" id="footerLeft">
+      <span id="stepInfo" class="step-info">0/0</span>
+      <span id="actionBadge" class="action-badge">INIT</span>
+    </div>
+    <div class="footer-right">
+      <kbd>←</kbd><kbd>→</kbd>
+      <button class="btn" type="button" onclick="resetStep()">↺</button>
+      <button class="btn" type="button" onclick="stepBy(-1)">◀</button>
+      <button class="btn btn-primary" type="button" onclick="stepBy(1)">▶ Next</button>
+      <span class="footer-sep"></span>
+      <button id="logToggleBtn" class="log-toggle-btn" type="button" onclick="toggleLogPreview()">📋 ON</button>
+      <button class="btn-zoom" type="button" onclick="logZoom(-1)">−</button>
+      <span id="logZoomLabel" class="log-zoom-label">100%</span>
+      <button class="btn-zoom" type="button" onclick="logZoom(1)">+</button>
+      <button class="btn-zoom" type="button" onclick="logZoomReset()">↺</button>
+      <span class="footer-sep"></span>
+      <button class="btn btn-fullscreen" type="button" onclick="toggleFullscreen()">⛶</button>
+    </div>
+  </div>
+</div>
+
+<!-- LOG POPUP -->
+<div class="log-popup" id="logPopup">
+  <div class="log-popup-body" id="logPopupBody"></div>
+</div>
+
+<script>
+// ==================== DATA & STATE ====================
+const codeLines = [
+  "def canSeePersonsCount(heights):",
+  "    n = len(heights)",
+  "    res = [0] * n",
+  "    stack = []",
+  "    for i in range(n - 1, -1, -1):",
+  "        count = 0",
+  "        while stack and heights[i] > stack[-1]:",
+  "            stack.pop()",
+  "            count += 1",
+  "        if stack:",
+  "            count += 1",
+  "        res[i] = count",
+  "        stack.append(heights[i])",
+  "    return res"
+];
+
+let steps = [];
+let currentStep = 0;
+let logEnabled = true;
+let logZoomLevel = 100;
+let codeWidthUserSet = false;
+let curResult = null;
+
+// ==================== RICH LOG HELPER (v2) ====================
+const LOG_BADGE = {
+  "func-def": "📌 DEF", "init": "⚙️ INIT", "call": "📞 CALL", "return": "🏆 RETURN",
+  "for-check": "🔁 FOR", "while-check": "🔁 WHILE", "if-check": "🔎 IF", "assign": "✏️ ASSIGN",
+  "found": "🎉 FOUND", "prune": "✂️ PRUNE", "fail": "❌ FAIL", "exit": "🔚 EXIT", "skip": "⏭ SKIP", "info": "ℹ️ INFO",
+  "pop": "⬇ POP", "push": "⬆ PUSH", "mark": "✅ MARK"
+};
+
+const BADGE_LABEL = {
+  "func-def": "DEF", "init": "INIT", "call": "CALL", "return": "RETURN",
+  "for-check": "FOR", "while-check": "WHILE", "if-check": "IF", "assign": "ASSIGN",
+  "found": "FOUND", "prune": "PRUNE", "fail": "FAIL", "exit": "EXIT", "skip": "SKIP", "info": "INFO",
+  "pop": "POP", "push": "PUSH", "mark": "MARK"
+};
+
+function hlCode(raw) {
+  let h = raw;
+  h = h.replace(/("[^"]*"|'[^']*')/g, '\x01s\x02$1\x03');
+  h = h.replace(/\b(def|for|in|if|return|break|continue|and|else|elif|True|False|None|not|or|while|lambda)\b/g, '\x01k\x02$1\x03');
+  h = h.replace(/\b(len|range|int|str|list|append|pop|sorted|min|max|sum|abs|enumerate|zip|print|set|add)\b/g, '\x01f\x02$1\x03');
+  h = h.replace(/(?<![.\w"\x01\x02\x03])(-?\d+)\b/g, '\x01n\x02$1\x03');
+  h = h.replace(/(#.*$)/gm, '\x01c\x02$1\x03');
+  h = h.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  h = h.replace(/\x01([a-z])\x02/g, (_, c) => `<span class="c${c}">`).replace(/\x03/g, '</span>');
+  return h;
+}
+
+function richLog(opts) {
+  const statusMap = {
+    success: "✅ Success", fail: "❌ Failed", skip: "⏭ Skipped",
+    loop: "🔁 Loop iter", prune: "✂️ Pruned", info: "ℹ️ Info"
+  };
+  const status = opts.status || "info";
+  let html = `<div class="log-card log-card--${opts.action || 'info'}">`;
+
+  // Header
+  html += `<div class="log-card-header">`;
+  html += `<span class="log-badge log-badge--${opts.action || ''}">${LOG_BADGE[opts.action] || opts.action}</span>`;
+  html += `<span class="log-line-ref">L${opts.line + 1}</span>`;
+  html += `<span class="log-status-pill log-status--${status}">${statusMap[status]}</span>`;
+  html += `</div>`;
+
+  // Code Executing
+  if (opts.code) {
+    html += `<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">📜</span>Code Executing</div>`;
+    html += `<code class="log-code-snippet">${hlCode(opts.code)}</code></div>`;
+  }
+
+  // Input Values
+  if (opts.inputs && opts.inputs.length) {
+    html += `<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">📥</span>Input Values (line is using these)</div><div class="log-kv-row">`;
+    opts.inputs.forEach(kv => {
+      html += `<span class="log-kv log-kv--in"><span class="log-kv-key">${kv.k}</span>=<span class="log-kv-val">${kv.v}</span></span>`;
+    });
+    html += `</div></div>`;
+  }
+
+  // Output / State After Line
+  if (opts.outputs && opts.outputs.length) {
+    html += `<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">📤</span>Output / State After Line</div><div class="log-kv-row">`;
+    opts.outputs.forEach(kv => {
+      const cls = kv.changed ? 'log-kv--changed' : 'log-kv--out';
+      html += `<span class="log-kv ${cls}"><span class="log-kv-key">${kv.k}</span>=<span class="log-kv-val">${kv.v}</span></span>`;
+    });
+    html += `</div></div>`;
+  }
+
+  // Verdict / Decision
+  if (opts.verdict) {
+    const vCls = opts.verdictTrue === true ? 'log-verdict--true' : (opts.verdictTrue === false ? 'log-verdict--false' : '');
+    const vIcon = opts.verdictTrue === true ? '✓' : (opts.verdictTrue === false ? '✗' : '•');
+    html += `<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">⚖️</span>Verdict / Decision</div>`;
+    html += `<div class="log-verdict ${vCls}">${vIcon} ${opts.verdict}</div></div>`;
+  }
+
+  // Why This Happens (Hinglish)
+  if (opts.why) {
+    html += `<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">💡</span>Why This Happens</div>`;
+    html += `<div class="log-why">${opts.why}</div></div>`;
+  }
+
+  // Real-Life Analogy (Hinglish)
+  if (opts.analogy) {
+    html += `<div class="log-section"><div class="log-section-title"><span class="log-section-title-icon">🎭</span>Real-Life Analogy</div>`;
+    html += `<div class="log-analogy">${opts.analogy}</div></div>`;
+  }
+
+  html += `</div>`;
+  return html;
+}
+
+// ==================== BUILD STEPS ====================
+function buildSteps(heightsStr) {
+  const st = [];
+  const MAX_STEPS = 5000;
+  const heights = heightsStr.split(',').map(Number);
+  const n = heights.length;
+  let res = new Array(n).fill(0);
+  let stack = []; // now stores [height, originalIndex]
+  
+  function snap(extra) {
+    return Object.assign({ 
+      heights: [...heights], 
+      n: n, 
+      res: [...res], 
+      stack: stack.map(p => [...p]),   // [h, idx] pairs
+      currSeen: []
+    }, extra || {});
+  }
+  
+  function pushStep(o) {
+    if (st.length >= MAX_STEPS) return;
+    st.push(Object.assign({ line: 0, action: "info", logHTML: "" }, o, snap(o)));
+  }
+  
+  // Line 0: Def
+  pushStep({
+    line: 0, action: "func-def",
+    logHTML: richLog({
+      line: 0, action: "func-def", code: "def canSeePersonsCount(heights):",
+      status: "info",
+      inputs: [{k:"heights",v:`[${heights.join(',')}]`}],
+      why: "<strong>Function</strong> shuru ho rahi hai. Hum har person ke liye count karenge ki woh kitne logon ko dekh sakta hai. <strong>Monotonic Stack</strong> use karenge taaki <strong>O(N)</strong> time mein solution mile.",
+      analogy: "Jaise ek teacher class mein khade bachchon ko dekhti hai — kaun kisko dekh pa raha hai aur kaun peeche chhup gaya hai."
+    })
+  });
+  
+  // Line 1: n = len
+  pushStep({
+    line: 1, action: "init",
+    logHTML: richLog({
+      line: 1, action: "init", code: "n = len(heights)",
+      status: "success",
+      inputs: [{k:"heights",v:`[${heights.join(',')}]`}],
+      outputs: [{k:"n",v:n}],
+      why: "<strong>Total logon</strong> ki ginti ki. <code>n = ${n}</code> log queue mein hain.",
+      analogy: "Line mein total kitne log hain, yeh ginna zaroori hai taaki loop sahi se chale."
+    })
+  });
+  
+  // Line 2: res = [0]*n
+  pushStep({
+    line: 2, action: "init",
+    logHTML: richLog({
+      line: 2, action: "init", code: "res = [0] * n",
+      status: "success",
+      inputs: [{k:"n",v:n}],
+      outputs: [{k:"res",v:`[${res.join(',')}]`, changed:true}],
+      why: "<strong>Result array</strong> initialize kiya. Shuru mein sabka count <code>0</code> hai kyunki abhi kisi ne kisi ko nahi dekha.",
+      analogy: "Jaise exam result sheet pe sabke marks pehle '0' likhe hote hain, baad mein update honge."
+    })
+  });
+  
+  // Line 3: stack = []
+  pushStep({
+    line: 3, action: "init",
+    logHTML: richLog({
+      line: 3, action: "init", code: "stack = []",
+      status: "success",
+      outputs: [{k:"stack",v:"[]", changed:true}],
+      why: "<strong>Monotonic stack</strong> empty start hoga. Yeh humein right side ke logon ki heights track karne mein help karega (<strong>decreasing order</strong> maintain karega).",
+      analogy: "Ek special line jahan sirf 'tall' log khade hote hain. Chhote log agar aage aa jayein toh unhe nikaal diya jaata hai."
+    })
+  });
+  
+  // Main Loop (Right to Left) — using index-aware stack [h, idx]
+  for (let i = n - 1; i >= 0; i--) {
+    let localCount = 0;
+    let seenThisStep = []; // indices this person sees (for viz)
+    
+    // For check
+    pushStep({
+      line: 4, action: "for-check",
+      logHTML: richLog({
+        line: 4, action: "for-check", code: `for i in range(${n-1}, -1, -1):   # i=${i}`,
+        status: "loop",
+        inputs: [{k:"i",v:i}, {k:"heights[i]",v:heights[i]}],
+        verdict: `<code>i &gt;= 0</code> → True (continue)`,
+        verdictTrue: true,
+        why: `Loop ka iteration. Ab hum index <code>${i}</code> wale person (height <code>${heights[i]}</code>) ko process kar rahe hain. Right se left ja rahe hain taaki pata chale ki aage kaun khada hai.`,
+        analogy: `Camera ab position <code>${i}</code> pe aa gayi. Dekhte hain ki yeh banda apne aage kitnon ko dekh paata hai.`
+      }),
+      currIdx: i,
+      currSeen: [],
+      localCount: 0
+    });
+    
+    // Line 5: count = 0
+    pushStep({
+      line: 5, action: "init",
+      logHTML: richLog({
+        line: 5, action: "init", code: "count = 0",
+        status: "success",
+        outputs: [{k:"count",v:0, changed:true}],
+        why: "Is person ke liye <strong>visible count</strong> reset kiya. Abhi tak koi dikhai nahi diya.",
+        analogy: "Har naye observer ke liye counter zero se start hota hai."
+      }),
+      currIdx: i,
+      currSeen: [],
+      localCount: 0
+    });
+    
+    // Line 6-8: While loop (Pop shorter ones — they ARE visible to current)
+    while (stack.length > 0 && heights[i] > stack[stack.length - 1][0]) {
+      const [topH, topIdx] = stack[stack.length - 1];
+      
+      // While condition TRUE
+      pushStep({
+        line: 6, action: "while-check",
+        logHTML: richLog({
+          line: 6, action: "while-check", code: `while stack and heights[${i}] > stack[-1]:`,
+          status: "loop",
+          inputs: [{k:"heights[i]",v:heights[i]}, {k:"stack[-1]",v:topH}],
+          verdict: `<code>${heights[i]} &gt; ${topH}</code> → True`,
+          verdictTrue: true,
+          why: `Current person (<code>${heights[i]}</code>) stack ke top (<code>${topH}</code> at idx <code>${topIdx}</code>) se lamba hai. Matlab yeh chhota banda current ko dikhai de raha hai (isliye count++). Lekin iske peeche walon ko nahi dikhega kyunki current blocker ban gaya.`,
+          analogy: "Tum lamba ho toh tumhare aage ka chhota banda tumhe dikhta hai, par tumhare peeche wale ko uska sir nahi dikhega."
+        }),
+        currIdx: i,
+        currSeen: [...seenThisStep]
+      });
+      
+      // Line 7: pop
+      stack.pop();
+      seenThisStep.push(topIdx); // this popped person is visible to i
+      pushStep({
+        line: 7, action: "pop",
+        logHTML: richLog({
+          line: 7, action: "pop", code: "stack.pop()",
+          status: "prune",
+          inputs: [{k:"stack",v: stack.length ? `[${stack.map(p=>p[0]).join(',')}]` : '[]'}],
+          outputs: [{k:"popped",v:`h=${topH} (idx ${topIdx})`}, {k:"stack",v: stack.length ? `[${stack.map(p=>p[0]).join(',')}]` : '[]', changed:true}],
+          why: `Person idx=<code>${topIdx}</code> (h=<code>${topH}</code>) pop hua kyunki current (<code>${heights[i]}</code>) usse lamba tha. Yeh <strong>visible</strong> hai is current person ke liye (count badhega).`,
+          analogy: "Chhote bande ko hata diya — ab woh current ke liye 'dekha gaya' hai, aage ke logon ke liye blocked."
+        }),
+        currIdx: i,
+        currSeen: [...seenThisStep]
+      });
+      
+      // Line 8: count += 1
+      localCount += 1;
+      pushStep({
+        line: 8, action: "mark",
+        logHTML: richLog({
+          line: 8, action: "mark", code: "count += 1",
+          status: "success",
+          outputs: [{k:"count",v:localCount, changed:true}],
+          why: `Popped person (idx ${topIdx}) ko current ne dekh liya! <strong>count = ${localCount}</strong>. Yeh banda dikhai de raha tha lekin ab blocked ho gaya aage ke liye.`,
+          analogy: "Ek aur darshan! Ticket number badha."
+        }),
+        currIdx: i,
+        currSeen: [...seenThisStep]
+      });
+    }
+    
+    // While condition FALSE (Exit while)
+    if (stack.length > 0) {
+      const topH = stack[stack.length-1][0];
+      pushStep({
+        line: 6, action: "while-check",
+        logHTML: richLog({
+          line: 6, action: "while-check", code: `while stack and heights[${i}] > stack[-1]:`,
+          status: "skip",
+          inputs: [{k:"heights[i]",v:heights[i]}, {k:"stack[-1]",v:topH}],
+          verdict: `<code>${heights[i]} &gt; ${topH}</code> → False`,
+          verdictTrue: false,
+          why: `Ab stack ka top (h=${topH}) current se bada ya barabar hai. Isliye loop band. Yeh top banda <strong>blocker</strong> banega — current isko dekh payega lekin iske peeche wale nahi.`,
+          analogy: "Lamba blocker aa gaya — ab sirf usko hi dekh sakte ho, uske peeche sab hide."
+        }),
+        currIdx: i,
+        currSeen: [...seenThisStep]
+      });
+    } else {
+      pushStep({
+        line: 6, action: "while-check",
+        logHTML: richLog({
+          line: 6, action: "while-check", code: `while stack and heights[${i}] > stack[-1]:`,
+          status: "skip",
+          inputs: [{k:"stack",v:"[]"}],
+          verdict: `Stack empty → False`,
+          verdictTrue: false,
+          why: "<strong>Stack empty</strong> — right side mein koi bhi nahi bacha. Sirf pop kiye gaye log dikhe (jo chhote the).",
+          analogy: "Sab chhote log dekh liye, ab right side khali — deewar hai."
+        }),
+        currIdx: i,
+        currSeen: [...seenThisStep]
+      });
+    }
+    
+    // Line 9: if stack (add the blocker)
+    const stackNotEmpty = stack.length > 0;
+    pushStep({
+      line: 9, action: "if-check",
+      logHTML: richLog({
+        line: 9, action: "if-check", code: "if stack:",
+        status: stackNotEmpty ? "success" : "skip",
+        inputs: [{k:"stack",v: stack.length ? `[${stack.map(p=>p[0]).join(',')}]` : '[]'}],
+        verdict: stackNotEmpty ? "Stack not empty → True (add blocker)" : "Stack empty → False",
+        verdictTrue: stackNotEmpty,
+        why: stackNotEmpty 
+          ? `Stack mein abhi bhi log hain. Nearest (top) banda <strong>blocker</strong> hai jo current ki view rok raha hai lekin khud dikhai de raha hai — isliye count++ karenge.` 
+          : "Stack khali. Koi blocker nahi. Jo bhi pop hue the unko hi count kiya.",
+        analogy: stackNotEmpty ? "Last mein ek lamba aadmi khada hai jo sab cover kar raha hai — usko count karo." : "Koi nahi bacha, bas jo pop hue unka hisaab."
+      }),
+      currIdx: i,
+      currSeen: [...seenThisStep]
+    });
+    
+    if (stackNotEmpty) {
+      const [blockH, blockIdx] = stack[stack.length-1];
+      // Line 10: count += 1
+      localCount += 1;
+      seenThisStep.push(blockIdx);
+      pushStep({
+        line: 10, action: "mark",
+        logHTML: richLog({
+          line: 10, action: "mark", code: "count += 1",
+          status: "success",
+          outputs: [{k:"count",v:localCount, changed:true}],
+          why: `Blocker person idx=<code>${blockIdx}</code> (h=${blockH}) bhi visible! <strong>count = ${localCount}</strong>. Woh current ko rok raha hai par khud dikhai de raha hai.`,
+          analogy: "Final boss dikhai de gaya — bonus count!"
+        }),
+        currIdx: i,
+        currSeen: [...seenThisStep]
+      });
+    }
+    
+    // Line 11: res[i] = count
+    res[i] = localCount;
+    pushStep({
+      line: 11, action: "assign",
+      logHTML: richLog({
+        line: 11, action: "assign", code: `res[${i}] = count`,
+        status: "success",
+        inputs: [{k:"i",v:i}, {k:"count",v:localCount}],
+        outputs: [{k:`res[${i}]`,v:localCount, changed:true}],
+        why: `Person <code>${i}</code> (h=${heights[i]}) total <code>${localCount}</code> log right side mein dekh sakta hai. Result store kar diya.`,
+        analogy: "Report card pe final number likh diya is person ka."
+      }),
+      currIdx: i,
+      currSeen: [...seenThisStep],
+      localCount: localCount
+    });
+    
+    // Line 12: stack.append( (heights[i], i) )
+    stack.push([heights[i], i]);
+    pushStep({
+      line: 12, action: "push",
+      logHTML: richLog({
+        line: 12, action: "push", code: `stack.append(heights[${i}])`,
+        status: "success",
+        inputs: [{k:"heights[i]",v:heights[i]}],
+        outputs: [{k:"stack",v:`[${stack.map(p=>p[0]).join(',')}]`, changed:true}],
+        why: `Current (idx ${i}, h=${heights[i]}) ko stack mein push. Ab left side ke log isko dekh sakte hain (agar lamba ho toh). Stack monotonically decreasing hai (top se bottom ki taraf height ghat rahi).`,
+        analogy: "Naya tallest-so-far record book mein register ho gaya for future observers."
+      }),
+      currIdx: i,
+      currSeen: [...seenThisStep]
+    });
+  }
+  
+  // For loop EXIT
+  pushStep({
+    line: 4, action: "exit",
+    logHTML: richLog({
+      line: 4, action: "exit", 
+      code: `for loop exit`,
+      status: "info",
+      inputs: [{k:"i",v:"-1"}],
+      verdict: `Range exhausted → False`,
+      verdictTrue: false,
+      why: "Saare indices process ho gaye hain. Loop naturally exit ho gaya.",
+      analogy: "Puri class ki attendance lag gayi, ab register band karo."
+    }),
+    currIdx: -1,
+    currSeen: []
+  });
+  
+  // Line 13: return
+  pushStep({
+    line: 13, action: "return",
+    logHTML: richLog({
+      line: 13, action: "return", code: "return res",
+      status: "success",
+      inputs: [{k:"res",v:`[${res.join(',')}]`}],
+      outputs: [{k:"result",v:`[${res.join(',')}]`}],
+      why: "Final result return kar rahe hain. Har person ke liye visible logon ki count taiyaar hai.",
+      analogy: "Jaise exam ke final results board pe laga diye gaye."
+    }),
+    currIdx: null,
+    currSeen: []
+  });
+  
+  curResult = res;
+  return st;
+}
+
+// ==================== RENDER FUNCTIONS ====================
+function renderCode() {
+  const panel = document.getElementById('codePanel');
+  panel.innerHTML = codeLines.map((raw, i) => {
+    let h = raw;
+    h = h.replace(/("[^"]*"|'[^']*')/g, '\x01STR\x02$1\x03');
+    h = h.replace(/\b(def|for|in|if|return|break|continue|and|else|elif|True|False|None|not|or|while|lambda)\b/g, '\x01KW\x02$1\x03');
+    h = h.replace(/\b(len|range|int|str|list|append|pop|sorted|min|max|sum|abs|enumerate|zip|print|set|add)\b/g, '\x01FN\x02$1\x03');
+    h = h.replace(/(?<![.\w"\x01\x02\x03])(-?\d+)\b/g, '\x01NUM\x02$1\x03');
+    h = h.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    h = h.replace(/\x01([A-Z]+)\x02/g, function(_, c) { return '<span class="' + c.toLowerCase() + '">'; }).replace(/\x03/g, '</span>');
+    return `<div class="code-line" data-line="${i}"><span class="ln">${i+1}</span><span class="code-content">${h}</span></div>`;
+  }).join('');
+}
+
+function fitCodeWidth() {
+  const col = document.getElementById('col1');
+  if (!codeWidthUserSet) {
+    col.style.width = Math.min(col.offsetWidth, window.innerWidth * 0.42) + 'px';
+  }
+  syncFooterWidth();
+  positionResizeHandle();
+}
+
+function syncFooterWidth() {
+  document.getElementById('footerLeft').style.width = document.getElementById('col1').offsetWidth + 'px';
+}
+
+function positionResizeHandle() {
+  var col1 = document.getElementById('col1');
+  var h = document.getElementById('resizeH1');
+  if (col1 && h) {
+    h.style.left = (col1.offsetWidth - 3) + 'px';
+  }
+}
+
+// Resize handle
+(function() {
+  var col1 = document.getElementById('col1');
+  var h = document.getElementById('resizeH1');
+  if (!col1 || !h) return;
+  positionResizeHandle();
+  h.addEventListener('mousedown', function(e) {
+    e.preventDefault();
+    codeWidthUserSet = true;
+    var startX = e.clientX, startW = col1.offsetWidth;
+    document.body.classList.add('no-select');
+    h.classList.add('active');
+    function mv(ev) {
+      var newW = Math.max(140, Math.min(520, startW + (ev.clientX - startX)));
+      col1.style.width = newW + 'px';
+      syncFooterWidth();
+      positionResizeHandle();
+    }
+    function up() {
+      document.removeEventListener('mousemove', mv);
+      document.removeEventListener('mouseup', up);
+      document.body.classList.remove('no-select');
+      h.classList.remove('active');
+    }
+    document.addEventListener('mousemove', mv);
+    document.addEventListener('mouseup', up);
+  });
+})();
+
+function renderVarsStrip(snap) {
+  const el = document.getElementById('varsStrip');
+  const i = (snap.currIdx != null && snap.currIdx >= 0 ? snap.currIdx : (snap.currIdx === -1 ? 'done' : '-'));
+  const stDisplay = (snap.stack || []).map(p => `${p[0]}(P${p[1]})`).join(', ');
+  const showCount = (snap.localCount != null ? snap.localCount : (snap.currSeen ? snap.currSeen.length : '—'));
+  el.innerHTML = `
+    <span class="var-chip">n=<strong>${snap.n}</strong></span>
+    <span class="var-chip vc-active">i=<strong>${i}</strong></span>
+    <span class="var-chip">count=<strong>${showCount}</strong></span>
+    <span class="var-chip">stack=[${stDisplay || '—'}]</span>
+    <span class="var-chip">seen=[${(snap.currSeen||[]).join(',') || '—'}]</span>
+  `;
+}
+
+function renderLiveRes(snap) {
+  const container = document.getElementById('liveResViz');
+  if (!container) return;
+
+  container.innerHTML = '';
+  const res = snap.res || [];
+  const currI = snap.currIdx;
+  const justWritten = (snap.action === 'assign' && typeof snap.currIdx === 'number') ? snap.currIdx : null;
+
+  res.forEach((val, idx) => {
+    const cell = document.createElement('div');
+    cell.className = 'live-res-cell';
+
+    // Determine state for "res = [0] * n" display:
+    // Only mark as "processed/filled" once we have actually started the main loop
+    // and this index is to the right of the current i we are working on.
+    const loopStarted = (typeof currI === 'number' && currI >= 0);
+    const isFinal = snap.action === 'return';
+    const isProcessed = isFinal || (loopStarted && (idx > currI));
+    const isInitial = !isProcessed && val === 0;
+
+    if (isProcessed) {
+      cell.classList.add('filled', 'updated');
+    } else if (isInitial) {
+      cell.classList.add('initial');
+    }
+
+    // Highlight the exact cell that was just written on the "res[i] = count" step
+    if (justWritten === idx) {
+      cell.classList.add('just-written');
+    }
+
+    // Index label (shows "i=0", "i=1" ...)
+    const idxEl = document.createElement('div');
+    idxEl.className = 'res-idx';
+    idxEl.textContent = 'i=' + idx;
+
+    // The actual value (starts at 0, then gets overwritten)
+    const valEl = document.createElement('div');
+    valEl.className = 'res-val';
+    valEl.textContent = val;
+
+    cell.appendChild(idxEl);
+    cell.appendChild(valEl);
+    container.appendChild(cell);
+  });
+}
+
+function renderQueue(snap) {
+  const container = document.getElementById('queueViz');
+  container.innerHTML = '';
+  const heights = snap.heights || [];
+  const currI = snap.currIdx;
+  const maxH = Math.max(...heights, 1);
+  const stackPairs = snap.stack || [];
+  const inStackIdxs = new Set(stackPairs.map(p => p[1]));
+
+  // Much taller bars: give ~170px of vertical room for the colored bar itself
+  const BAR_MAX = 168;
+
+  heights.forEach((h, idx) => {
+    const div = document.createElement('div');
+    div.className = 'person';
+    div.dataset.idx = idx;
+
+    // State classes (right-to-left processing)
+    if (idx === currI) {
+      div.classList.add('active');
+    } else if (currI != null && idx > currI) {
+      if (inStackIdxs.has(idx)) {
+        div.classList.add('visible');
+      } else {
+        div.classList.add('popped');
+      }
+    } else if (currI != null && idx < currI) {
+      div.classList.add('future');
+    } else if (currI == null) {
+      if (inStackIdxs.has(idx)) div.classList.add('visible');
+      else div.classList.add('popped');
+    }
+
+    // Index (small, above everything)
+    const idxBadge = document.createElement('div');
+    idxBadge.className = 'person-index';
+    idxBadge.textContent = idx;
+
+    // The bar + wrap (the star of the show)
+    const barWrap = document.createElement('div');
+    barWrap.className = 'person-bar-wrap';
+
+    const bar = document.createElement('div');
+    bar.className = 'person-bar';
+    const barH = Math.max(24, Math.round((h / maxH) * BAR_MAX));
+    bar.style.height = barH + 'px';
+
+    // Big readable height number living on the bar
+    const barVal = document.createElement('span');
+    barVal.className = 'bar-val';
+    barVal.textContent = h;
+    bar.appendChild(barVal);
+
+    barWrap.appendChild(bar);
+
+    // Small head sitting on top of the bar (absolute)
+    const head = document.createElement('div');
+    head.className = 'person-head';
+    head.textContent = '●';
+
+    // Put head + wrap together, then index on top
+    const barGroup = document.createElement('div');
+    barGroup.style.position = 'relative';
+    barGroup.appendChild(head);
+    barGroup.appendChild(barWrap);
+
+    div.appendChild(idxBadge);
+    div.appendChild(barGroup);
+
+    // If this person is currently active and has a count, show a tiny live badge
+    if (idx === currI && snap.currSeen && snap.currSeen.length > 0) {
+      const live = document.createElement('div');
+      live.style.cssText = 'position:absolute;bottom:-2px;right:-4px;font:700 9px var(--font-mono);background:#fef3c7;color:#92400e;padding:1px 5px;border-radius:99px;border:1px solid #f59e0b;';
+      live.textContent = '+' + snap.currSeen.length;
+      barGroup.appendChild(live);
+    }
+
+    container.appendChild(div);
+  });
+
+  // Sight lines (only when curr person is seeing someone right now)
+  // We build the SVG *after* people are in the DOM so we can measure real positions.
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  svg.setAttribute('class', 'sight-svg');
+
+  const containerW = container.scrollWidth || container.clientWidth || 400;
+  const containerH = container.offsetHeight || 232;
+  svg.setAttribute('width', containerW);
+  svg.setAttribute('height', containerH);
+  svg.setAttribute('viewBox', `0 0 ${containerW} ${containerH}`);
+
+  // Arrowhead definitions for nice arrows
+  const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+  defs.innerHTML = `
+    <marker id="arrow-amber" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#d97706"/>
+    </marker>
+    <marker id="arrow-green" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#15803d"/>
+    </marker>
+  `;
+  svg.appendChild(defs);
+
+  const currEl = container.querySelector('.person.active');
+
+  if (currEl && snap.currSeen && snap.currSeen.length > 0) {
+    const contRect = container.getBoundingClientRect();
+
+    // Get reliable center X for current person
+    const cRect = currEl.getBoundingClientRect();
+    let cX = (cRect.left + cRect.width / 2) - contRect.left + container.scrollLeft;
+
+    // Prefer to measure the actual bar for better "eye" position
+    const currBarWrap = currEl.querySelector('.person-bar-wrap');
+    if (currBarWrap) {
+      const bRect = currBarWrap.getBoundingClientRect();
+      cX = (bRect.left + bRect.width / 2) - contRect.left + container.scrollLeft;
+    }
+
+    snap.currSeen.forEach((sIdx, k) => {
+      const target = container.querySelector(`.person[data-idx="${sIdx}"]`);
+      if (!target) return;
+
+      const tRect = target.getBoundingClientRect();
+      let tX = (tRect.left + tRect.width / 2) - contRect.left + container.scrollLeft;
+
+      const tgtBarWrap = target.querySelector('.person-bar-wrap');
+      if (tgtBarWrap) {
+        const tb = tgtBarWrap.getBoundingClientRect();
+        tX = (tb.left + tb.width / 2) - contRect.left + container.scrollLeft;
+      }
+
+      // Dynamic Y calculation using actual measured positions (much more reliable)
+      let cY = 58;
+      let tY = 30;
+
+      if (currBarWrap) {
+        const bRect = currBarWrap.getBoundingClientRect();
+        // Position relative to the container's content area
+        const barTopInContainer = bRect.top - contRect.top;
+        // Eye level — a little below the head circle on the current bar
+        cY = barTopInContainer + 26;
+      }
+
+      const tgtBarWrapEl = target.querySelector('.person-bar-wrap');
+      if (tgtBarWrapEl) {
+        const tbRect = tgtBarWrapEl.getBoundingClientRect();
+        const tgtBarTop = tbRect.top - contRect.top;
+        // Target near the top/head of the person being seen
+        tY = tgtBarTop + 6;
+      }
+
+      const isBlocker = (k === snap.currSeen.length - 1) &&
+                        (snap.stack || []).some(p => p[1] === sIdx);
+
+      const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+      line.setAttribute('x1', cX);
+      line.setAttribute('y1', cY);
+      line.setAttribute('x2', tX);
+      line.setAttribute('y2', tY);
+
+      const cls = 'sight-line' + (isBlocker ? ' blocker' : '');
+      line.setAttribute('class', cls);
+
+      // Attach proper arrow marker
+      if (isBlocker) {
+        line.setAttribute('marker-end', 'url(#arrow-green)');
+      } else {
+        line.setAttribute('marker-end', 'url(#arrow-amber)');
+      }
+
+      svg.appendChild(line);
+    });
+  }
+
+  container.appendChild(svg);
+}
+
+function renderStack(snap) {
+  const container = document.getElementById('stackViz');
+  container.innerHTML = '';
+  const stack = snap.stack || []; // [h, idx][]
+  
+  if (stack.length === 0) {
+    container.innerHTML = '<div style="text-align:center; color:#8a8578; font-size:11px; padding:18px 8px; font-style:italic;">Stack empty — right side is clear</div>';
+  } else {
+    // top of visual = closest (last pushed = top logically)
+    // because column-reverse, first in array appears at bottom visually, last at top.
+    stack.forEach((pair, k) => {
+      const [h, idx] = pair;
+      const item = document.createElement('div');
+      const isTop = (k === stack.length - 1);
+      item.className = 'stack-item' + (isTop ? ' front' : '');
+      item.innerHTML = `<span>P${idx} h</span><span style="font-weight:700;">${h}</span>`;
+      if (isTop) item.title = 'Top = closest blocker candidate';
+      container.appendChild(item);
+    });
+  }
+}
+
+function renderResult(snap) {
+  const container = document.getElementById('resultViz');
+  container.innerHTML = '';
+  const res = snap.res || [];
+  const currI = snap.currIdx;
+  
+  res.forEach((val, idx) => {
+    const chip = document.createElement('div');
+    const loopStarted = (typeof currI === 'number' && currI >= 0);
+    const isFinal = snap.action === 'return';
+    const isDone = isFinal || (loopStarted && (idx > currI));
+    chip.className = 'res-chip' + (isDone ? ' filled' : '');
+    if (!isDone && val === 0) chip.classList.add('zero');
+    chip.textContent = `P${idx}:${val}`;
+    container.appendChild(chip);
+  });
+}
+
+function renderVisPanel(snap) {
+  const el = document.getElementById('visPanel');
+  if (!el) return;
+  const seen = snap.currSeen || [];
+  const heights = snap.heights || [];
+  const currI = snap.currIdx;
+
+  if (!seen.length) {
+    // Clean, good-looking empty state while we are still at count=0 for this person
+    el.innerHTML = `
+      <div style="display:flex;align-items:center;gap:8px;width:100%;">
+        <span class="vis-count" style="background:#f1f0e9;color:#6b6658;border-color:#d1cfc3;">0</span>
+        <span style="font-size:12px;color:#6b6658;">No one seen yet for person <strong style="font-family:var(--font-mono);color:#3f3d38;">P${currI != null ? currI : ''}</strong> (h=${currI != null ? heights[currI] : ''})</span>
+        <span style="margin-left:auto;font-size:10px;color:#8a8578;">Waiting for first pop or blocker...</span>
+      </div>`;
+    return;
+  }
+
+  let html = `<span class="vis-count">+${seen.length}</span>`;
+  seen.forEach((sidx, k) => {
+    const isLast = (k === seen.length - 1);
+    const cls = isLast && (snap.stack||[]).some(p => p[1]===sidx) ? 'vis-chip blocker' : 'vis-chip';
+    html += `<span class="${cls}">P${sidx} <span style="opacity:.75">(h=${heights[sidx]})</span> ${isLast ? '★ blocker' : 'popped'}</span>`;
+  });
+  el.innerHTML = html;
+}
+
+function renderViz(snap) {
+  renderVarsStrip(snap);
+  renderLiveRes(snap);      // NEW: shows res = [0] * n live
+  renderQueue(snap);
+  renderVisPanel(snap);
+  renderStack(snap);
+  renderResult(snap);
+}
+
+function showLogPreview(s) {
+  if (!logEnabled) return;
+  const body = document.getElementById('logPopupBody');
+  body.innerHTML = s.logHTML || '';
+  document.getElementById('logPopup').classList.remove('log-popup--hidden');
+  updateLogZoom();
+}
+
+function hideLogPopup() {
+  document.getElementById('logPopup').classList.add('log-popup--hidden');
+}
+
+function renderStep(idx) {
+  if (!steps.length) return;
+  const s = steps[idx];
+  currentStep = idx;
+  
+  document.getElementById('stepInfo').textContent = `${idx + 1}/${steps.length}`;
+  
+  const badge = document.getElementById('actionBadge');
+  badge.textContent = BADGE_LABEL[s.action] || s.action;
+  badge.className = `action-badge action-badge--${s.action}`;
+  
+  // highlight active code line
+  document.querySelectorAll('.code-line').forEach(el => el.classList.remove('active'));
+  const activeLine = document.querySelector(`.code-line[data-line="${s.line}"]`);
+  if (activeLine) {
+    activeLine.classList.add('active');
+    activeLine.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+  }
+  
+  renderViz(s);
+  showLogPreview(s);
+}
+
+// ==================== CONTROLS ====================
+function stepBy(delta) {
+  const next = Math.max(0, Math.min(steps.length - 1, currentStep + delta));
+  renderStep(next);
+}
+
+function resetStep() {
+  renderStep(0);
+}
+
+function toggleLogPreview() {
+  logEnabled = !logEnabled;
+  const btn = document.getElementById('logToggleBtn');
+  btn.textContent = logEnabled ? '📋 ON' : '📋 OFF';
+  btn.classList.toggle('log-toggle-btn--off', !logEnabled);
+  if (!logEnabled) hideLogPopup();
+  else if (steps.length) showLogPreview(steps[currentStep]);
+}
+
+function logZoom(dir) {
+  logZoomLevel = Math.max(60, Math.min(180, logZoomLevel + dir * 20));
+  updateLogZoom();
+}
+function logZoomReset() { logZoomLevel = 100; updateLogZoom(); }
+function updateLogZoom() {
+  document.getElementById('logZoomLabel').textContent = logZoomLevel + '%';
+  document.getElementById('logPopup').style.setProperty('--log-scale', logZoomLevel / 100);
+}
+
+function toggleFullscreen() {
+  const viz = document.querySelector('.col-viz');
+  if (!document.fullscreenElement) {
+    viz.requestFullscreen().catch(() => {});
+  } else {
+    document.exitFullscreen();
+  }
+}
+
+function toggleProblem() {
+  const body = document.getElementById('probBody');
+  const btn = document.getElementById('probToggleBtn');
+  if (body.style.display === 'none') {
+    body.style.display = 'flex';
+    btn.textContent = '▲ Hide';
+  } else {
+    body.style.display = 'none';
+    btn.textContent = '▼ Show';
+  }
+}
+
+// ==================== INPUT HANDLING ====================
+function parseInputs() {
+  const heightsStr = document.getElementById('inputHeights').value.trim();
+  return { heightsStr };
+}
+
+function resetWithInput() {
+  const { heightsStr } = parseInputs();
+  if (!heightsStr) {
+    alert("Please enter heights");
+    return;
+  }
+  
+  renderCode();
+  fitCodeWidth();
+  
+  steps = buildSteps(heightsStr);
+  currentStep = 0;
+  renderStep(0);
+  
+  const out = document.getElementById('liveOutput');
+  out.textContent = (curResult && curResult.length) ? `[${curResult.join(',')}]` : '—';
+  out.style.background = 'var(--accent-green-bg)';
+}
+
+function loadTest(caseNum) {
+  const tests = [
+    { h: "10,6,8,5,11,9", exp: "[3,1,2,1,1,0]" },
+    { h: "5,1,2,3,10", exp: "[4,1,1,1,0]" },
+    { h: "10,9,8,7,6", exp: "[1,1,1,1,0]" }
+  ];
+  const t = tests[caseNum];
+  document.getElementById('inputHeights').value = t.h;
+  document.getElementById('expectedBadge').textContent = `exp: ${t.exp}`;
+  
+  setTimeout(() => {
+    resetWithInput();
+  }, 80);
+}
+
+// ==================== KEYBOARD ====================
+document.addEventListener('keydown', function(e) {
+  if (e.target.tagName === 'INPUT') return;
+  if (e.key === 'ArrowRight') { e.preventDefault(); stepBy(1); }
+  else if (e.key === 'ArrowLeft') { e.preventDefault(); stepBy(-1); }
+  else if (e.key.toLowerCase() === 'r') { e.preventDefault(); resetStep(); }
+});
+
+// ==================== INIT ====================
+function init() {
+  renderCode();
+  
+  const defaultH = "10,6,8,5,11,9";
+  document.getElementById('inputHeights').value = defaultH;
+  document.getElementById('expectedBadge').textContent = 'exp: [3,1,2,1,1,0]';
+  
+  steps = buildSteps(defaultH);
+  currentStep = 0;
+  renderStep(0);
+  
+  const out = document.getElementById('liveOutput');
+  out.textContent = (curResult && curResult.length) ? `[${curResult.join(',')}]` : '—';
+  out.style.background = 'var(--accent-green-bg)';
+  
+  fitCodeWidth();
+  syncFooterWidth();
+  positionResizeHandle();
+  
+  window.addEventListener('resize', () => {
+    if (!codeWidthUserSet) fitCodeWidth();
+    else {
+      syncFooterWidth();
+      positionResizeHandle();
+    }
+  });
+  
+  document.querySelectorAll('.test-chip').forEach((chip, idx) => {
+    chip.addEventListener('click', () => {
+      document.querySelectorAll('.test-chip').forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+    });
+  });
+}
+
+window.onload = init;
+</script>
+</body>
+</html>
